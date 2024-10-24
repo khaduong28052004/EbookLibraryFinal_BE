@@ -53,6 +53,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 // import org.springframework.web.bind.annotation.PutMapping;
 // import org.springframework.web.bind.annotation.PathVariable;
 // import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @CrossOrigin("*")
 @RestController
@@ -131,6 +133,17 @@ public class ApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(map);
         }
     }
+
+    @GetMapping("/product/delete")
+    public String getMethodName() {
+        return "oke delete product";
+    }
+    @GetMapping("/flashsale/create")
+    public String falshsale() {
+        return "oke create flashsale";
+    }
+    
+    
 
     // @Autowired
     // private OtpDTORepository dao;

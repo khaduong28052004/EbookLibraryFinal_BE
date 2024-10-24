@@ -17,7 +17,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
                 response.getWriter()
-                        .write("{\"error\":\"sAuthorzed\",\"message\":  \"" + accessDeniedException.getMessage() + "\"}")
+                        .write("{\"error\":\"sAuthorzed\",\"message\":  \"" + accessDeniedException.getMessage() + " Ban khong co quyen nay!!! "+"\"}");
     }
 
 }

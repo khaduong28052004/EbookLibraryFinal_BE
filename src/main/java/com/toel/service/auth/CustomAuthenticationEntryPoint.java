@@ -18,7 +18,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
        // TODO Auto-generated method stub
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		response.setContentType("application/json");
-		response.getWriter().write("{\"error\":\"UnAuthorzed\",\"message\":  \"" + authException.getMessage() + "\"}");
+		response.getWriter().write("{\"error\":\"UnAuthorzed\",\"message\":  \""+"ban can dang nhap !! " + authException.getMessage() + "\"}");
 		// throw new UnsupportedOperationException("Unimplemented method 'commence'");
     }
     
