@@ -60,7 +60,7 @@ public class Account {
 	@Nationalized
 	String shopName;
 
-	String numberIdImage;
+	String numberId;
 
 	String beforeIdImage;
 
