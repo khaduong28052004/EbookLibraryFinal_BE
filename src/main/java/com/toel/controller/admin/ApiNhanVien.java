@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/admin/nhanvien")
-@Validated
 public class ApiNhanVien {
     @Autowired
     Service_NhanVien service_NhanVien;

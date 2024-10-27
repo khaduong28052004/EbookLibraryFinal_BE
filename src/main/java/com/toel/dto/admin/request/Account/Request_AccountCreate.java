@@ -11,17 +11,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Request_AccountCreate {
-    @NotNull(message = "username không được để trống.")
+    @NotNull(message = "FIELD_REQUIRED")
     String username;
-    @NotNull(message = "password không được để trống.")
+    @NotNull(message = "FIELD_REQUIRED")
     String password;
-    @NotNull(message = "fullname không được để trống.")
+    @NotNull(message = "FIELD_REQUIRED")
     String fullname;
-    @NotNull(message = "giới tính không được để trống.")
+    @NotNull(message = "FIELD_REQUIRED")
     Boolean gender;
-    @NotNull(message = "email không được để trống.")
+    @NotNull(message = "FIELD_REQUIRED")
     String email;
     Date birthday;
-    @NotNull(message = "số điện thoại không được để trống.")
+    @NotNull(message = "FIELD_REQUIRED")
     String phone;
 }
