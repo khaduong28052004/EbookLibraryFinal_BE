@@ -1,5 +1,6 @@
 package com.toel.model;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -30,19 +31,17 @@ public class DiscountRate {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer id;
 
-	boolean isDelete;
+	@Column(name = "discount", columnDefinition = "integer")
+	Integer discount;
 
 	@Column(name = "dateDelete", columnDefinition = "datetime")
-	Date dateDelete;
-
-	@Column(name = "name", columnDefinition = "text")
-	String name;
+	LocalDateTime dateDelete;
 
 	@Column(name = "dateStart", columnDefinition = "datetime")
-	Date dateStart;
+	LocalDateTime dateStart;
 
 	@Column(name = "dateInsert", columnDefinition = "datetime")
-	Date dateInsert;
+	LocalDateTime dateInsert;
 
 	@OneToMany(mappedBy = "discountRate")
 	List<Bill> bills;
