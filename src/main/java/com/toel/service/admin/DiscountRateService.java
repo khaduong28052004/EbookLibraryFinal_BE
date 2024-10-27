@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.request.DiscountRate.DiscountRateCreate;
 import com.toel.dto.admin.response.Response_DiscountRate;
-import com.toel.mapper.DiscountRateMapper;
+import com.toel.mapper.admin.DiscountRateMapper;
 import com.toel.model.Account;
 import com.toel.model.DiscountRate;
 import com.toel.repository.AccountRepository;
