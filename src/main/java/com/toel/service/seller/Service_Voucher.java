@@ -1,6 +1,7 @@
 package com.toel.service.seller;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ import com.toel.repository.TypeVoucherRepository;
 import com.toel.repository.VoucherRepository;
 
 @Service
-public class VoucherService {
+public class Service_Voucher {
     @Autowired
     VoucherRepository voucherRepository;
     @Autowired
@@ -34,17 +35,16 @@ public class VoucherService {
     @Autowired
     AccountRepository accountRepository;
 
-    // public PageImpl<Response_Voucher> getAll(
-    // int page, int size, boolean sortBy, String sortColumn, Integer account_id) {
-    // Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ?
-    // Direction.DESC : Direction.ASC, sortColumn));
-    // Page<Voucher> pageVoucher = voucherRepository.findAllByIdAccount(account_id,
-    // pageable);
-    // List<Response_Voucher> list = pageVoucher.stream()
-    // .map(voucher -> voucherMapper.response_Voucher(voucher))
-    // .collect(Collectors.toList());
-    // return new PageImpl<>(list, pageable, pageVoucher.getTotalElements());
-    // }
+    public PageImpl<Response_Voucher> getAll(
+            int page, int size, boolean sortBy, String sortColumn, Integer account_id) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
+        Page<Voucher> pageVoucher = voucherRepository.findAllByIdAccount(account_id,
+                pageable);
+        List<Response_Voucher> list = pageVoucher.stream()
+                .map(voucher -> voucherMapper.response_Voucher(voucher))
+                .collect(Collectors.toList());
+        return new PageImpl<>(list, pageable, pageVoucher.getTotalElements());
+    }
 
     public Response_Voucher edit(int voucher_id) {
         return voucherMapper.response_Voucher(voucherRepository.findById(voucher_id).get());
@@ -55,5 +55,12 @@ public class VoucherService {
         voucher.setAccount(accountRepository.findById(account_id).get());
         voucher.setTypeVoucher(typeVoucherRepository.findById(1).get());
         return voucherMapper.response_Voucher(voucherRepository.saveAndFlush(voucher));
+    }
+
+    public boolean delete(Integer voucher_id) {
+        Optional<Voucher> voucher = voucherRepository.findById(voucher_id);
+        voucher.get().setDelete(!voucher.get().isDelete());
+        voucherRepository.saveAndFlush(voucher.get());
+        return voucher.get().isDelete();
     }
 }

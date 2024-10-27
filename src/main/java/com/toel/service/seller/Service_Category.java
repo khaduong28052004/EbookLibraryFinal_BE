@@ -22,7 +22,7 @@ import com.toel.repository.CategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class CategoryService {
+public class Service_Category {
     @Autowired
     CategoryMapper categoryMapper;
     @Autowired

@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.request.Request_Category;
 import com.toel.dto.seller.response.Response_Category;
-import com.toel.service.seller.CategoryService;
+import com.toel.service.seller.Service_Category;
 
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/seller/category")
 public class ApiCategory {
     @Autowired
-    CategoryService categoryService;
+    Service_Category categoryService;
 
     @GetMapping("/getAll")
     public ApiResponse<PageImpl<Response_Category>> getAll(
