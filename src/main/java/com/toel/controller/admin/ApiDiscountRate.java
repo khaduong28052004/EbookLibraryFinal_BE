@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
-import com.toel.dto.admin.request.DiscountRate.DiscountRateCreate;
+import com.toel.dto.admin.request.DiscountRate.Request_DiscountRateCreate;
 import com.toel.dto.admin.response.Response_DiscountRate;
 import com.toel.service.admin.Service_DiscountRate;
 
@@ -57,7 +57,7 @@ public class ApiDiscountRate {
     }
 
     @PostMapping
-    public ApiResponse<Response_DiscountRate> post(@RequestBody @Valid DiscountRateCreate entity) {
+    public ApiResponse<Response_DiscountRate> post(@RequestBody @Valid Request_DiscountRateCreate entity) {
         return ApiResponse.<Response_DiscountRate>build()
                 .result(discountReateService.create(entity));
     }

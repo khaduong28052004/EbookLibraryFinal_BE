@@ -13,7 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import com.toel.dto.admin.request.DiscountRate.DiscountRateCreate;
+import com.toel.dto.admin.request.DiscountRate.Request_DiscountRateCreate;
 import com.toel.dto.admin.response.Response_DiscountRate;
 import com.toel.mapper.admin.DiscountRateMapper;
 import com.toel.model.Account;
@@ -45,7 +45,7 @@ public class Service_DiscountRate {
         return new PageImpl<>(list, pageable, pageDiscount.getTotalElements());
     }
 
-    public Response_DiscountRate create(DiscountRateCreate discountRate) {
+    public Response_DiscountRate create(Request_DiscountRateCreate discountRate) {
         Account account = accountRepository.findById(discountRate.getAccount())
                 .orElseThrow(() -> new RuntimeException( "Không tìm thấy account"));
         DiscountRate entity = discountRateMapper.toDiscountRateCreate(discountRate);
