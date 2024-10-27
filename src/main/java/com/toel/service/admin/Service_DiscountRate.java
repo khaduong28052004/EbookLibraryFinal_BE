@@ -22,7 +22,7 @@ import com.toel.repository.AccountRepository;
 import com.toel.repository.DiscountRateRepository;
 
 @Service
-public class DiscountRateService {
+public class Service_DiscountRate {
     @Autowired
     DiscountRateRepository discountRateRepository;
     @Autowired
@@ -45,17 +45,17 @@ public class DiscountRateService {
         return new PageImpl<>(list, pageable, pageDiscount.getTotalElements());
     }
 
-    // public Response_DiscountRate create(DiscountRateCreate discountRate) {
-    //     Account account = accountRepository.findById(discountRate.getAccount())
-    //             .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_EXISTED, "Account"));
-    //     DiscountRate entity = discountRateMapper.toDiscountRateCreate(discountRate);
-    //     entity.setAccount(account);
-    //     entity.setDateCreate(LocalDateTime.now());
-    //     entity.setDateStart(discountRate.getDateStart());
-    //     discountRateRepository.findAllBydateDeleteIsNull().forEach(rate -> {
-    //         rate.setDateDelete(LocalDateTime.now());
-    //         discountRateRepository.save(rate);
-    //     });
-    //     return discountRateMapper.tochChietKhauResponse(discountRateRepository.save(entity));
-    // }
+    public Response_DiscountRate create(DiscountRateCreate discountRate) {
+        Account account = accountRepository.findById(discountRate.getAccount())
+                .orElseThrow(() -> new RuntimeException( "Không tìm thấy account"));
+        DiscountRate entity = discountRateMapper.toDiscountRateCreate(discountRate);
+        entity.setAccount(account);
+        entity.setDateInsert(LocalDateTime.now());
+        entity.setDateStart(discountRate.getDateStart());
+        discountRateRepository.findAllBydateDeleteIsNull().forEach(rate -> {
+            rate.setDateDelete(LocalDateTime.now());
+            discountRateRepository.save(rate);
+        });
+        return discountRateMapper.tochChietKhauResponse(discountRateRepository.save(entity));
+    }
 }

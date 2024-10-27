@@ -13,15 +13,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
+import com.toel.dto.admin.request.DiscountRate.DiscountRateCreate;
 import com.toel.dto.admin.response.Response_DiscountRate;
-import com.toel.service.admin.DiscountRateService;
+import com.toel.service.admin.Service_DiscountRate;
+
+import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/admin/chietkhau")
 public class ApiDiscountRate {
     @Autowired
-    DiscountRateService discountReateService;
+    Service_DiscountRate discountReateService;
 
     @GetMapping
     public ApiResponse<PageImpl<Response_DiscountRate>> getAll(
@@ -39,14 +45,21 @@ public class ApiDiscountRate {
 
                 LocalDate date = LocalDate.parse(search, formatter);
                 searchDateTime = date.atStartOfDay(); // Chuyển đổi LocalDate thành LocalDateTime
-                System.out.println("searchDateTime: "+searchDateTime);
+                System.out.println("searchDateTime: " + searchDateTime);
             } catch (Exception e) {
                 return ApiResponse.<PageImpl<Response_DiscountRate>>build()
-                .code(500)
-                .message("Ngày không đúng định dạng");
+                        .code(500)
+                        .message("Ngày không đúng định dạng");
             }
         }
         return ApiResponse.<PageImpl<Response_DiscountRate>>build()
-                .result(discountReateService.getAll(page, size, searchDateTime,sortBy,sortColumn));
+                .result(discountReateService.getAll(page, size, searchDateTime, sortBy, sortColumn));
     }
+
+    @PostMapping
+    public ApiResponse<Response_DiscountRate> post(@RequestBody @Valid DiscountRateCreate entity) {
+        return ApiResponse.<Response_DiscountRate>build()
+                .result(discountReateService.create(entity));
+    }
+
 }
