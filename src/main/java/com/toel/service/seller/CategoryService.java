@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.stereotype.Service;
 
 import com.toel.dto.seller.request.Request_Category;
 import com.toel.dto.seller.response.Response_Category;
@@ -20,6 +21,7 @@ import com.toel.repository.CategoryRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
+@Service
 public class CategoryService {
     @Autowired
     CategoryMapper categoryMapper;
