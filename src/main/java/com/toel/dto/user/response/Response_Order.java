@@ -2,6 +2,8 @@ package com.toel.dto.user.response;
 
 import java.util.Date;
 
+import org.mapstruct.Mapper;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +13,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Mapper(componentModel = "spring")
 public class Response_Order {
 	Integer orderID;
 	Double orderTotalPrice;
