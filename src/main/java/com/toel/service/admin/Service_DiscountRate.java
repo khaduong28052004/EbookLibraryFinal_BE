@@ -48,8 +48,6 @@ public class Service_DiscountRate {
     }
 
     public Response_DiscountRate create(Request_DiscountRateCreate discountRate) {
-        // Account account = accountRepository.findById(discountRate.getAccount())
-        //         .orElseThrow(() -> new RuntimeException( "Không tìm thấy account"));
         Account account = accountRepository.findById(discountRate.getAccount())
         .orElseThrow(()-> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
         DiscountRate entity = discountRateMapper.toDiscountRateCreate(discountRate);
