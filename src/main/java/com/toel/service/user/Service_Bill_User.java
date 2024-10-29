@@ -11,14 +11,18 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_Bill;
 import com.toel.dto.user.response.Response_Bill_Shop;
 import com.toel.dto.user.response.Response_Bill_Product;
-import com.toel.dto.user.resquest.Request_Bill;
+import com.toel.dto.user.resquest.Request_Bill_User;
+import com.toel.model.Account;
 import com.toel.model.Address;
 import com.toel.model.Bill;
+import com.toel.model.Cart;
 import com.toel.model.Evalue;
 import com.toel.model.OrderStatus;
 import com.toel.model.Product;
@@ -31,8 +35,8 @@ import com.toel.repository.EvalueRepository;
 import com.toel.repository.OrderStatusRepository;
 import com.toel.repository.ProductReportRepository;
 
-@Service
-public class Service_Bill {
+@Service("userServiceBill")
+public class Service_Bill_User {
 	@Autowired
 	BillRepository billRepository;
 	@Autowired
@@ -46,13 +50,33 @@ public class Service_Bill {
 	@Autowired
 	EvalueRepository evaluateRepository;
 	@Autowired
-	CartRepository cartDetailRepository;
+	CartRepository cartRepository;
 	@Autowired
 	AddressRepository addressRepository;
+	@Autowired
+	OrderStatusRepository oderStatusRepository;
 
-	public List<Object[]> getBillsByOrderStatus(Request_Bill BillShopRequestDTO) {
+	public Map<String, Object> getBills(Request_Bill_User requestBillDTO) {
+		Map<String, Object> response = new HashMap<String, Object>();
+		try {
+			List<Object[]> productsInBill = getBillsByOrderStatus(requestBillDTO);
+			List<Response_Bill> shopListInBill = createBillsWithProductsInBillDetail(productsInBill);
+			response.put("data", shopListInBill);
+			response.put("status", "success");
+			response.put("message", "Retrieve data successfully");
+		} catch (Exception e) {
+			response.put("status", "error");
+			response.put("message", "An error occurred while retrieving orders.");
+			response.put("error", e.getMessage());
+			return (Map<String, Object>) ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
+		return response;
+	}
+
+	public List<Object[]> getBillsByOrderStatus(Request_Bill_User BillShopRequestDTO) {
 		Integer userId = BillShopRequestDTO.getUserID();
-		String orderStatus = BillShopRequestDTO.getOrderStatusFind() == null ? "" : BillShopRequestDTO.getOrderStatusFind();
+		String orderStatus = BillShopRequestDTO.getOrderStatusFind() == null ? ""
+				: BillShopRequestDTO.getOrderStatusFind();
 
 		switch (orderStatus) {
 		case "CHUANBI":
@@ -119,6 +143,7 @@ public class Service_Bill {
 				billData.setProducts(new ArrayList<>());
 				billMap.put(billID, billData); // Thêm bill mới vào Map
 			}
+
 			Response_Bill_Product productData = new Response_Bill_Product();
 			productData.setProductId(productID);
 			productData.setProductName(productName);
@@ -127,7 +152,7 @@ public class Service_Bill {
 			productData.setProductPrice(productPrice);
 			productData.setProductDiscountPrice(productDiscountPrice);
 			productData.setProductImageURL(productImageURL);
-			
+
 			Evalue isEvalued = evaluateRepository.findByProductIdAndAccountId(userID, productID, billID);
 			productData.setIsEvaluate(isEvalued != null);
 			billData.getProducts().add(productData);
@@ -135,4 +160,123 @@ public class Service_Bill {
 		bills.addAll(billMap.values());
 		return bills;
 	}
+
+	public Map<String, Object> cancelBill(Integer billId) {
+		Map<String, Object> response = new HashMap<String, Object>();
+		Optional<Bill> billOptional = billRepository.findById(billId);
+		Optional<OrderStatus> orderStatusOptional = orderStatusRepository.findById(6);
+
+		if (orderStatusOptional.isEmpty()) {
+			response.put("message", "Trạng thái đơn hàng không tồn tại");
+			response.put("status", "fail");
+			return response;
+		}
+
+		if (billOptional.isEmpty()) {
+			response.put("message", "Đơn hàng không tồn tại");
+			response.put("status", "fail");
+		}
+
+		try {
+			Bill bill = billOptional.get();
+			bill.setUpdateAt(new Date());
+			bill.setOrderStatus(orderStatusOptional.get());
+			billRepository.saveAndFlush(bill);
+			response.put("message", "Hủy đơn thành công");
+			response.put("status", "successfully");
+		} catch (Exception e) {
+			response.put("message", "Hủy đơn thất bại");
+			response.put("status", "error");
+			response.put("server-message", e.getMessage());
+		}
+		return response;
+	}
+
+	public Map<String, Object> confirmBill(Integer billId) {
+		Map<String, Object> response = new HashMap<String, Object>();
+
+		Optional<OrderStatus> orderStatusOptional = orderStatusRepository.findById(5);
+		if (orderStatusOptional.isEmpty()) {
+			response.put("message", "Trạng thái đơn hàng không tồn tại");
+			response.put("status", "fail");
+		}
+
+		Optional<Bill> billOptional = billRepository.findById(billId);
+		if (billOptional.isEmpty()) {
+			response.put("message", "Đơn hàng không tồn tại");
+			response.put("status", "fail");
+		}
+
+		try {
+			Bill bill = billOptional.get();
+			bill.setUpdateAt(new Date());
+			bill.setOrderStatus(orderStatusOptional.get());
+			billRepository.saveAndFlush(bill);
+
+			response.put("message", "Đã xác nhận thành công");
+			response.put("status", "successfully");
+		} catch (Exception e) {
+			response.put("message", "Xác nhận thất bại");
+			response.put("status", "error");
+			response.put("server-message", e.getMessage());
+		}
+
+		return response;
+	}
+
+	public Map<String, Object> reOrder(Integer billId) {
+		Map<String, Object> response = new HashMap<String, Object>();
+		List<Cart> cart = new ArrayList<Cart>();
+
+		List<Object[]> originBills = billDetailRepository.getOriginBillsByBillId(billId);
+		if (originBills.isEmpty()) {
+			response.put("data", false);
+			response.put("message", "Không có chi tiết hóa đơn nào được tìm thấy.");
+			response.put("status", "fail");
+			return response;
+		}
+
+		try {
+			for (Object[] billDetail : originBills) {
+				Integer quantityToAdd = Integer.parseInt(billDetail[0].toString());
+				Integer accountId = Integer.parseInt(billDetail[1].toString());
+				Integer productId = Integer.parseInt(billDetail[2].toString());
+				
+				Cart existingCartDetail = cartRepository.findCartByAccountIdAndProductId(productId, accountId);
+				if (existingCartDetail != null) {
+					existingCartDetail.setQuantity(existingCartDetail.getQuantity() + quantityToAdd);
+					cartRepository.saveAndFlush(existingCartDetail);
+				} else {
+					Cart newCart = new Cart();
+					
+					Account account = new Account();
+					account.setId(accountId);
+					
+					Product product = new Product();
+					product.setId(productId);
+					
+					newCart.setAccount(account);
+					newCart.setProduct(product);
+					newCart.setQuantity(quantityToAdd);
+					cart.add(newCart);
+				}
+			}
+
+			if (!cart.isEmpty()) {
+				cartRepository.saveAll(cart);
+			}
+
+			response.put("data", true);
+			response.put("message", "Đã thêm vào giỏ hàng");
+			response.put("status", "successfully");
+		} catch (Exception e) {
+			response.put("data", false);
+			response.put("message", "Lỗi thêm vào giỏ hàng");
+			response.put("status", "error");
+			response.put("error", e.getMessage());
+		}
+
+		return response;
+	}
+
 }
