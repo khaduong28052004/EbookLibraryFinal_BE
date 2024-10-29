@@ -12,7 +12,7 @@ public class Response_DiscountRate {
     private LocalDateTime dateDelete;
     private int discount;
     private LocalDateTime dateStart;
-    private LocalDateTime dateCreate;
+    private LocalDateTime dateInsert;
     private Response_Account account;
     private List<Response_Bill> bills;
 }

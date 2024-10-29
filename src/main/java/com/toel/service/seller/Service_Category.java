@@ -22,13 +22,14 @@ import com.toel.repository.CategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class CategoryService {
+public class Service_Category {
     @Autowired
     CategoryMapper categoryMapper;
     @Autowired
     CategoryRepository categoryRepository;
 
-    public PageImpl<Response_Category> getAll(int page, int size, boolean sortBy, String sortColumn) {
+    public PageImpl<Response_Category> getAll(
+            Integer page, Integer size, boolean sortBy, String sortColumn) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
         Page<Category> pagetCategory = categoryRepository.findAll(pageable);
         List<Response_Category> list = pagetCategory.stream()

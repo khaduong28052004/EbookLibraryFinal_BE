@@ -1,7 +1,10 @@
 package com.toel.repository;
 
 import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -67,5 +70,9 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			+ "WHERE user.id = :userId \r\n"
 			+ "ORDER BY  createdDatetime DESC ", nativeQuery = true)
 	List<Object[]> getBillsByUserIdAll(@Param("userId") Integer userId);
+
+    @Query("SELECT b FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id = ?1")
+    Page<Bill> findAllByShopId(Integer shopId, Pageable pageable);
+
 
 }

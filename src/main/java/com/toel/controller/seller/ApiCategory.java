@@ -14,14 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.request.Request_Category;
 import com.toel.dto.seller.response.Response_Category;
-import com.toel.service.seller.CategoryService;
+import com.toel.service.seller.Service_Category;
+
+import jakarta.validation.Valid;
 
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/seller/category")
 public class ApiCategory {
     @Autowired
-    CategoryService categoryService;
+    Service_Category categoryService;
 
     @GetMapping("/getAll")
     public ApiResponse<PageImpl<Response_Category>> getAll(
@@ -34,7 +36,8 @@ public class ApiCategory {
     }
 
     @PostMapping("/save")
-    public ApiResponse<Response_Category> save(@RequestBody Request_Category request_Category) {
+    public ApiResponse<Response_Category> save(
+            @RequestBody @Valid Request_Category request_Category) {
         Response_Category response = categoryService.save(request_Category);
 
         return ApiResponse.<Response_Category>build()
