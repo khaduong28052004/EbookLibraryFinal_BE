@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
-import com.toel.dto.seller.request.Request_Category;
 import com.toel.dto.seller.request.Request_Voucher;
 import com.toel.dto.seller.response.Response_Voucher;
 import com.toel.service.seller.Service_Voucher;

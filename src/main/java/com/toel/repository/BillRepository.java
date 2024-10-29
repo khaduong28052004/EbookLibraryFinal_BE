@@ -9,7 +9,7 @@ import com.toel.model.Bill;
 
 public interface BillRepository extends JpaRepository<Bill, Integer> {
 
-    @Query("SELECT b FROM Bill b JOIN b.billDetails WHERE bd.product.account.id = ?1")
+    @Query("SELECT b FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id = ?1")
     Page<Bill> findAllByShopId(Integer shopId, Pageable pageable);
 
 }

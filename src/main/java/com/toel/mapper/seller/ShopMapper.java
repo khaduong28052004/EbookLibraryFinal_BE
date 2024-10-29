@@ -7,7 +7,7 @@ import com.toel.dto.seller.response.Response_Account;
 import com.toel.model.Account;
 
 @Mapper(componentModel = "spring")
-public interface AccountMapper {
+public interface ShopMapper {
     Response_Account response_Account(Account account);
 
     Account account(Request_Account request_Account);

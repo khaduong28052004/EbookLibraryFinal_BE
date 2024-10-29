@@ -14,6 +14,8 @@ import com.toel.dto.seller.request.Request_Account;
 import com.toel.dto.seller.response.Response_Account;
 import com.toel.service.seller.Service_Shop;
 
+import jakarta.validation.Valid;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/seller/shop")
@@ -30,7 +32,7 @@ public class ApiShop {
 
     @PostMapping("/save")
     public ApiResponse<Response_Account> save(
-            @RequestBody Request_Account request_Account) {
+            @RequestBody @Valid Request_Account request_Account) {
         return ApiResponse.<Response_Account>build()
                 .result(service_Shop.save(request_Account));
     }
