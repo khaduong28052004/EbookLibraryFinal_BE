@@ -17,7 +17,7 @@ import com.toel.dto.admin.request.DiscountRate.Request_DiscountRateCreate;
 import com.toel.dto.admin.response.Response_DiscountRate;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
-import com.toel.mapper.admin.DiscountRateMapper;
+import com.toel.mapper.admin.Admin_DiscountRateMapper;
 import com.toel.model.Account;
 import com.toel.model.DiscountRate;
 import com.toel.repository.AccountRepository;
@@ -28,7 +28,7 @@ public class Service_DiscountRate {
     @Autowired
     DiscountRateRepository discountRateRepository;
     @Autowired
-    DiscountRateMapper discountRateMapper;
+    Admin_DiscountRateMapper discountRateMapper;
     @Autowired
     AccountRepository accountRepository;
 
@@ -48,8 +48,6 @@ public class Service_DiscountRate {
     }
 
     public Response_DiscountRate create(Request_DiscountRateCreate discountRate) {
-        // Account account = accountRepository.findById(discountRate.getAccount())
-        //         .orElseThrow(() -> new RuntimeException( "Không tìm thấy account"));
         Account account = accountRepository.findById(discountRate.getAccount())
         .orElseThrow(()-> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
         DiscountRate entity = discountRateMapper.toDiscountRateCreate(discountRate);

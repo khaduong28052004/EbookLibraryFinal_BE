@@ -16,13 +16,13 @@ import lombok.*;
 @NoArgsConstructor
 public class Request_DiscountRateCreate {
     @NotNull(message = "FIELD_REQUIRED")
-    @Min(value = 1, message = "FIELD_MIN_VALUE")
+    @Min(value = 1, message = "FIELD_INVALID_ID")
     private Integer discount;
     @NotNull(message = "FIELD_REQUIRED")
     @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm")
     private LocalDateTime dateStart;
     @NotNull(message = "FIELD_REQUIRED")
-    @Min(value = 1, message = "FIELD_ID_NOT_VALID")
+    @Min(value = 1, message = "FIELD_INVALID_ID")
     private Integer account;
 }

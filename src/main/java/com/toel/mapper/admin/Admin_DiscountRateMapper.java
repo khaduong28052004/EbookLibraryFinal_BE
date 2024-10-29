@@ -8,7 +8,7 @@ import com.toel.dto.admin.response.Response_DiscountRate;
 import com.toel.model.DiscountRate;
 
 @Mapper(componentModel = "spring")
-public interface DiscountRateMapper {
+public interface Admin_DiscountRateMapper {
     Response_DiscountRate tochChietKhauResponse(DiscountRate discountRate);
 
     @Mapping(target = "account", ignore = true)

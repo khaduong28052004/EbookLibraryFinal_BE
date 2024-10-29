@@ -1,5 +1,6 @@
 package com.toel.model;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -32,9 +33,9 @@ public class FlashSale {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer id;
 
-	Date dateStart;
+	LocalDateTime dateStart;
 
-	Date dateEnd;
+	LocalDateTime dateEnd;
 
 	boolean isDelete;
 
