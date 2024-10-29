@@ -21,7 +21,6 @@ public class Service_Shop {
     }
 
     public Response_Account save(Request_Account request_Account) {
-        Account account = accountMapper.account(request_Account);
-        return accountMapper.response_Account(accountRepository.saveAndFlush(account));
+        return accountMapper.response_Account(accountRepository.saveAndFlush(accountMapper.account(request_Account)));
     }
 }
