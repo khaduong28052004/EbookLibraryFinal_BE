@@ -19,7 +19,7 @@ import com.toel.dto.admin.request.FlashSale.Request_FlashSaleCreate;
 import com.toel.dto.admin.response.Response_FlashSale;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
-import com.toel.mapper.admin.FlashSaleMapper;
+import com.toel.mapper.admin.Admin_FlashSaleMapper;
 import com.toel.model.FlashSale;
 import com.toel.repository.FlashSaleRepository;
 
@@ -28,7 +28,7 @@ public class Service_FlashSale {
     @Autowired
     FlashSaleRepository flashSaleRepository;
     @Autowired
-    FlashSaleMapper flashSaleMapper;
+    Admin_FlashSaleMapper flashSaleMapper;
 
     public PageImpl<Response_FlashSale> getAll(int page, int size, Boolean sortBy, String column, LocalDateTime date) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));

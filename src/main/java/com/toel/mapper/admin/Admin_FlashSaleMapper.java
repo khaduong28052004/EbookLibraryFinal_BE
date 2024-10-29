@@ -10,7 +10,7 @@ import com.toel.dto.admin.response.Response_FlashSale;
 import com.toel.model.FlashSale;
 
 @Mapper(componentModel = "spring")
-public interface FlashSaleMapper {
+public interface Admin_FlashSaleMapper {
     @Mapping(target = "account", ignore = true)
     Response_FlashSale tResponse_FlashSale(FlashSale flashSale);
 

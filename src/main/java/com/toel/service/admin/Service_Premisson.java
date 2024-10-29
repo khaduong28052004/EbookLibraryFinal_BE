@@ -19,7 +19,7 @@ import com.toel.dto.admin.response.Response_Permission;
 import com.toel.dto.admin.response.Response_Permission_Role;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
-import com.toel.mapper.admin.PermissionMapper;
+import com.toel.mapper.admin.Admin_PermissionMapper;
 import com.toel.model.Permission;
 import com.toel.model.Role;
 import com.toel.model.RolePermission;
@@ -37,7 +37,7 @@ public class Service_Premisson {
     @Autowired
     RoleRepository roleRepository;
     @Autowired
-    PermissionMapper permissionMapper;
+    Admin_PermissionMapper permissionMapper;
     @Autowired
     RolePermissionRepository rolePermissionRepository;
     @Autowired

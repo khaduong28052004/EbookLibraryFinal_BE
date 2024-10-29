@@ -9,7 +9,7 @@ import com.toel.dto.admin.response.Response_Permission;
 import com.toel.model.Permission;
 
 @Mapper(componentModel = "spring")
-public interface PermissionMapper {
+public interface Admin_PermissionMapper {
     Response_Permission toPermission(Permission permission);
 
     Permission toPermissionCreate(Request_PermissionCreate entity);

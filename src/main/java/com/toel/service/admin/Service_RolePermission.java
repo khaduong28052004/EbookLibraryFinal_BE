@@ -7,7 +7,7 @@ import com.toel.dto.admin.request.RolePermission.Request_RolePermissionCreate;
 import com.toel.dto.admin.response.Response_RolePermission;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
-import com.toel.mapper.admin.RolePermissionMapper;
+import com.toel.mapper.admin.Admin_RolePermissionMapper;
 import com.toel.model.Permission;
 import com.toel.model.Role;
 import com.toel.model.RolePermission;
@@ -24,7 +24,7 @@ public class Service_RolePermission {
     @Autowired
     RolePermissionRepository rolePermissionRepository;
     @Autowired
-    RolePermissionMapper rolePermissionMapper;
+    Admin_RolePermissionMapper rolePermissionMapper;
 
     public Response_RolePermission create(Request_RolePermissionCreate entity) {
         Permission permission = permissionRepository.findById(entity.getPermission())
