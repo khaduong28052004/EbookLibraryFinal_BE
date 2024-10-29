@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Response_Account {
+public class Response_DiscountRate {
     Integer id;
-    String avatar;
-    String background;
-    String shopName;
+    Integer discount;
 }
