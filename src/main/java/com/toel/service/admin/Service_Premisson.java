@@ -98,14 +98,14 @@ public class Service_Premisson {
         rolePermission.setPermission(permission.getId());
         rolePermission.setRole(entity.getRole());
         service_RolePermission.create(rolePermission);
-        return permissionMapper.toPermission(permission);
+        return permissionMapper.toPermission(permissionRepository.save(permission));
     }
 
     public Response_Permission update(Requset_PermissionUpdate entity) {
         Permission permission = permissionRepository.findById(entity.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Permission"));
         permissionMapper.toPermissionUpdate(permission, entity);
-        return permissionMapper.toPermission(permission);
+        return permissionMapper.toPermission(permissionRepository.save(permission));
     }
 
     public void delete(Integer id) {

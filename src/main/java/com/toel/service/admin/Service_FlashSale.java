@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.admin.request.FlashSale.Request_FlashSaleCreate;
+import com.toel.dto.admin.request.FlashSale.Request_FlashSaleUpdate;
 import com.toel.dto.admin.response.Response_FlashSale;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
@@ -50,7 +51,15 @@ public class Service_FlashSale {
         return flashSaleMapper.tResponse_FlashSale(flashSale);
     }
 
-    // public Response_FlashSale create(Request_FlashSaleCreate flashSaleCreate){
+    public Response_FlashSale create(Request_FlashSaleCreate flashSaleCreate) {
+        return flashSaleMapper
+                .tResponse_FlashSale(flashSaleRepository.save(flashSaleMapper.toFlashSaleCreate(flashSaleCreate)));
+    }
 
-    // }
+    public Response_FlashSale update(Request_FlashSaleUpdate flashSaleUpdate) {
+        FlashSale entity = flashSaleRepository.findById(flashSaleUpdate.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSale"));
+        flashSaleMapper.toFlashSaleUpdate(entity, flashSaleUpdate);
+        return flashSaleMapper.tResponse_FlashSale(flashSaleRepository.save(entity));
+    }
 }
