@@ -13,12 +13,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import com.toel.dto.seller.request.Request_Category;
 import com.toel.dto.seller.request.Request_Voucher;
-import com.toel.dto.seller.response.Response_Category;
 import com.toel.dto.seller.response.Response_Voucher;
 import com.toel.mapper.seller.VoucherMapper;
-import com.toel.model.TypeVoucher;
 import com.toel.model.Voucher;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.TypeVoucherRepository;
@@ -36,7 +33,7 @@ public class Service_Voucher {
     AccountRepository accountRepository;
 
     public PageImpl<Response_Voucher> getAll(
-            int page, int size, boolean sortBy, String sortColumn, Integer account_id) {
+            Integer page, Integer size, boolean sortBy, String sortColumn, Integer account_id) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
         Page<Voucher> pageVoucher = voucherRepository.findAllByIdAccount(account_id,
                 pageable);
@@ -46,7 +43,7 @@ public class Service_Voucher {
         return new PageImpl<>(list, pageable, pageVoucher.getTotalElements());
     }
 
-    public Response_Voucher edit(int voucher_id) {
+    public Response_Voucher edit(Integer voucher_id) {
         return voucherMapper.response_Voucher(voucherRepository.findById(voucher_id).get());
     }
 
