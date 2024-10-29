@@ -39,8 +39,8 @@ public class Service_Category {
     }
 
     public Response_Category save(Request_Category request_Category) {
-        Category entity = categoryMapper.category(request_Category);
-        return categoryMapper.response_Category(categoryRepository.saveAndFlush(entity));
+        return categoryMapper
+                .response_Category(categoryRepository.saveAndFlush(categoryMapper.category(request_Category)));
     }
 
     public void delete(Integer id_category) {
