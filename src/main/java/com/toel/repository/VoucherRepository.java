@@ -11,4 +11,5 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
 
     @Query("SELECT v FROM Voucher v WHERE v.account.id = ?1")
     Page<Voucher> findAllByIdAccount(Integer idAccount, Pageable pageable);
+
 }

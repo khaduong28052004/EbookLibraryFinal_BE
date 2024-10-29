@@ -13,8 +13,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import com.toel.dto.admin.request.DiscountRate.DiscountRateCreate;
+import com.toel.dto.admin.request.DiscountRate.Request_DiscountRateCreate;
 import com.toel.dto.admin.response.Response_DiscountRate;
+import com.toel.exception.AppException;
+import com.toel.exception.ErrorCode;
 import com.toel.mapper.admin.DiscountRateMapper;
 import com.toel.model.Account;
 import com.toel.model.DiscountRate;
@@ -22,7 +24,7 @@ import com.toel.repository.AccountRepository;
 import com.toel.repository.DiscountRateRepository;
 
 @Service
-public class DiscountRateService {
+public class Service_DiscountRate {
     @Autowired
     DiscountRateRepository discountRateRepository;
     @Autowired
@@ -45,17 +47,19 @@ public class DiscountRateService {
         return new PageImpl<>(list, pageable, pageDiscount.getTotalElements());
     }
 
-    // public Response_DiscountRate create(DiscountRateCreate discountRate) {
-    //     Account account = accountRepository.findById(discountRate.getAccount())
-    //             .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_EXISTED, "Account"));
-    //     DiscountRate entity = discountRateMapper.toDiscountRateCreate(discountRate);
-    //     entity.setAccount(account);
-    //     entity.setDateCreate(LocalDateTime.now());
-    //     entity.setDateStart(discountRate.getDateStart());
-    //     discountRateRepository.findAllBydateDeleteIsNull().forEach(rate -> {
-    //         rate.setDateDelete(LocalDateTime.now());
-    //         discountRateRepository.save(rate);
-    //     });
-    //     return discountRateMapper.tochChietKhauResponse(discountRateRepository.save(entity));
-    // }
+    public Response_DiscountRate create(Request_DiscountRateCreate discountRate) {
+        // Account account = accountRepository.findById(discountRate.getAccount())
+        //         .orElseThrow(() -> new RuntimeException( "Không tìm thấy account"));
+        Account account = accountRepository.findById(discountRate.getAccount())
+        .orElseThrow(()-> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
+        DiscountRate entity = discountRateMapper.toDiscountRateCreate(discountRate);
+        entity.setAccount(account);
+        entity.setDateInsert(LocalDateTime.now());
+        entity.setDateStart(discountRate.getDateStart());
+        discountRateRepository.findAllBydateDeleteIsNull().forEach(rate -> {
+            rate.setDateDelete(LocalDateTime.now());
+            discountRateRepository.save(rate);
+        });
+        return discountRateMapper.tochChietKhauResponse(discountRateRepository.save(entity));
+    }
 }

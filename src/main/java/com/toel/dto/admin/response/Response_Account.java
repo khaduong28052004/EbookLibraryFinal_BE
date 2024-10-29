@@ -15,7 +15,7 @@ public class Response_Account {
     String password;
     String avatar;
     String fullname;
-    boolean gender;
+    Boolean gender;
     String email;
     Date birthday;
     String phone;
