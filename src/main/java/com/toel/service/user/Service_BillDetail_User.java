@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_Bill_User;
 import com.toel.dto.user.response.Response_Bill_Shop_User;
+import com.toel.dto.user.response.Response_BillDetail_User;
 import com.toel.dto.user.response.Response_Bill_Product_User;
 import com.toel.dto.user.resquest.Request_Bill_User;
 import com.toel.model.Account;
@@ -35,8 +36,8 @@ import com.toel.repository.EvalueRepository;
 import com.toel.repository.OrderStatusRepository;
 import com.toel.repository.ProductReportRepository;
 
-@Service("userServiceBill")
-public class Service_Bill_User {
+@Service
+public class Service_BillDetail_User {
 	@Autowired
 	BillRepository billRepository;
 	@Autowired
@@ -56,11 +57,10 @@ public class Service_Bill_User {
 	@Autowired
 	OrderStatusRepository oderStatusRepository;
 
-	public Map<String, Object> getBills(Request_Bill_User requestBillDTO) {
+	public Map<String, Object> getBillDetail(Integer billId) {
 		Map<String, Object> response = new HashMap<String, Object>();
 		try {
-			List<Object[]> productsInBill = getBillsByOrderStatus(requestBillDTO);
-			List<Response_Bill_User> shopListInBill = createBillsWithProductsInBillDetail(productsInBill);
+			List<Response_BillDetail_User> shopListInBill = createBillsWithProductsInBillDetail(billId);
 			response.put("data", shopListInBill);
 			response.put("status", "success");
 			response.put("message", "Retrieve data successfully");
@@ -68,39 +68,16 @@ public class Service_Bill_User {
 			response.put("status", "error");
 			response.put("message", "An error occurred while retrieving orders.");
 			response.put("error", e.getMessage());
-			return (Map<String, Object>) ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 		return response;
 	}
 
-	public List<Object[]> getBillsByOrderStatus(Request_Bill_User BillShopRequestDTO) {
-		Integer userId = BillShopRequestDTO.getUserID();
-		String orderStatus = BillShopRequestDTO.getOrderStatusFind() == null ? ""
-				: BillShopRequestDTO.getOrderStatusFind();
+	public List<Response_BillDetail_User> createBillsWithProductsInBillDetail(Integer billId) {
+		Map<Integer, Response_BillDetail_User> billMap = new HashMap<>(); // Map để lưu các bill với key là billID
+		List<Object[]> billDetail = billDetailRepository.findBillDetailById(billId); // Danh sách để trả về cuối cùng
+		List<Response_BillDetail_User> productDetail = new ArrayList<>();
 
-		switch (orderStatus) {
-		case "CHUANBI":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByCreateAt(userId, 1);
-		case "DANGXULY":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 2);
-		case "DANGGIAO":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 3);
-		case "DAGIAO":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 4);
-		case "HOANTHANH":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 5);
-		case "DAHUY":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 6);
-		default:
-			return billRepository.getBillsByUserIdAll(userId);
-		}
-	}
-
-	public List<Response_Bill_User> createBillsWithProductsInBillDetail(List<Object[]> productsInBill) {
-		Map<Integer, Response_Bill_User> billMap = new HashMap<>(); // Map để lưu các bill với key là billID
-		List<Response_Bill_User> bills = new ArrayList<>(); // Danh sách để trả về cuối cùng
-
-		for (Object[] product : productsInBill) {
+		for (Object[] product : billDetail) {
 			Integer billID = Integer.parseInt(product[1].toString());
 			Integer userID = Integer.parseInt(product[0].toString());
 			Double billTotalPrice = Double.parseDouble(product[2].toString());
@@ -122,10 +99,12 @@ public class Service_Bill_User {
 			Integer shopId = Integer.parseInt(product[18].toString());
 			String shopName = product[19].toString();
 			String shopAvatar = product[20].toString();
+			String userFullname = product[21].toString();
+			String userPhone = product[22].toString();
 
-			Response_Bill_User billData = billMap.get(billID);
+			Response_BillDetail_User billData = billMap.get(billID);
 			if (billData == null) {
-				billData = new Response_Bill_User();
+				billData = new Response_BillDetail_User();
 				billData.setBillID(billID);
 				billData.setUserID(userID);
 				billData.setBillTotalPrice(billTotalPrice);
@@ -140,6 +119,8 @@ public class Service_Bill_User {
 				billData.setShopId(shopId);
 				billData.setShopName(shopName);
 				billData.setShopAvatar(shopAvatar);
+				billData.setUserFullname(userFullname);
+				billData.setUserPhone(userPhone);
 				billData.setProducts(new ArrayList<>());
 				billMap.put(billID, billData); // Thêm bill mới vào Map
 			}
@@ -157,8 +138,8 @@ public class Service_Bill_User {
 			productData.setIsEvaluate(isEvalued != null);
 			billData.getProducts().add(productData);
 		}
-		bills.addAll(billMap.values());
-		return bills;
+		productDetail.addAll(billMap.values());
+		return productDetail;
 	}
 
 	public Map<String, Object> cancelBill(Integer billId) {

@@ -9,5 +9,4 @@ public interface CartRepository extends JpaRepository<Cart, Integer> {
 
 	@Query(value = "SELECT c FROM carts  c WHERE c.product.id = ?1 AND c.account.id = ?2 ")
 	Cart findCartByAccountIdAndProductId(Integer productId, Integer accountId);
-
 }

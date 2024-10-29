@@ -6,16 +6,16 @@ import java.util.List;
 import org.mapstruct.Mapper;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Mapper(componentModel = "spring")
-public class Response_Bill {
+public class Response_BillDetail_User {
 	Integer userID;
 	Integer billID;
 	Double billTotalPrice;
@@ -30,6 +30,8 @@ public class Response_Bill {
 	Integer shopId;
 	String shopName;
 	String shopAvatar;
-	List<Response_Bill_Product> products; 
+	String userPhone;
+	String userFullname;
+	List<Response_Bill_Product_User> products; 
 
 }
