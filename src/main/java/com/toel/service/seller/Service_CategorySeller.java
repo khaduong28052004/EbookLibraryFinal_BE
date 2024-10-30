@@ -19,12 +19,12 @@ import com.toel.mapper.seller.Seller_CategoryMapper;
 import com.toel.model.Category;
 import com.toel.repository.CategoryRepository;
 
-import jakarta.persistence.EntityNotFoundException;
-
 @Service
 public class Service_CategorySeller {
+
     @Autowired
     Seller_CategoryMapper categoryMapper;
+
     @Autowired
     CategoryRepository categoryRepository;
 
@@ -38,17 +38,18 @@ public class Service_CategorySeller {
         return new PageImpl<>(list, pageable, pageCategory.getTotalElements());
     }
 
-    public Response_Category save(Request_Category request_Category) {
+    public Response_Category save(
+            Request_Category request_Category) {
         return categoryMapper
                 .response_Category(categoryRepository.saveAndFlush(categoryMapper.category(request_Category)));
     }
 
-    public void delete(Integer id_category) {
+    public void delete(
+            Integer id_category) {
         categoryRepository.findById(id_category)
-                .ifPresentOrElse(
-                        category -> categoryRepository.delete(category),
-                        () -> {
-                            throw new EntityNotFoundException("Category with id " + id_category + " not found.");
+                .ifPresent(
+                        category -> {
+                            categoryRepository.delete(category);
                         });
     }
 }

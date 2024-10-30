@@ -22,6 +22,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/seller/voucher")
 public class ApiVoucherSeller {
+
         @Autowired
         Service_VoucherSeller service_Voucher;
 
@@ -38,9 +39,8 @@ public class ApiVoucherSeller {
 
         @PostMapping("/save")
         public ApiResponse<Response_Voucher> save(
-                        @RequestBody @Valid Request_Voucher request_Voucher,
-                        @RequestParam("account_id") Integer account_id) {
-                Response_Voucher response_Voucher = service_Voucher.save(request_Voucher, account_id);
+                        @RequestBody @Valid Request_Voucher request_Voucher) {
+                Response_Voucher response_Voucher = service_Voucher.save(request_Voucher);
                 return ApiResponse.<Response_Voucher>build()
                                 .message(response_Voucher.getId() == null ? "Thêm voucher thành công"
                                                 : "Cập nhật voucher thành công")

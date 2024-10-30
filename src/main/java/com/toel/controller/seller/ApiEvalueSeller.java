@@ -21,6 +21,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/seller/evalue")
 public class ApiEvalueSeller {
+
     @Autowired
     Service_EvalueSeller service_Evalue;
 

@@ -47,11 +47,8 @@ public class Service_VoucherSeller {
         return voucherMapper.response_Voucher(voucherRepository.findById(voucher_id).get());
     }
 
-    public Response_Voucher save(Request_Voucher request_Voucher, Integer account_id) {
-        Voucher voucher = voucherMapper.voucher(request_Voucher);
-        voucher.setAccount(accountRepository.findById(account_id).get());
-        voucher.setTypeVoucher(typeVoucherRepository.findById(1).get());
-        return voucherMapper.response_Voucher(voucherRepository.saveAndFlush(voucher));
+    public Response_Voucher save(Request_Voucher request_Voucher) {
+        return voucherMapper.response_Voucher(voucherRepository.saveAndFlush(voucherMapper.voucher(request_Voucher)));
     }
 
     public boolean delete(Integer voucher_id) {
