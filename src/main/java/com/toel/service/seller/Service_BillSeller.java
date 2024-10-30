@@ -22,7 +22,7 @@ import com.toel.repository.BillRepository;
 import com.toel.repository.OrderStatusRepository;
 
 @Service
-public class Service_Bill {
+public class Service_BillSeller {
     @Autowired
     Seller_BillMapper billMapper;
     @Autowired
