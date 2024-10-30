@@ -15,40 +15,41 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.seller.request.Request_Category;
 import com.toel.dto.seller.response.Response_Category;
-import com.toel.mapper.seller.CategoryMapper;
+import com.toel.mapper.seller.Seller_CategoryMapper;
 import com.toel.model.Category;
 import com.toel.repository.CategoryRepository;
 
-import jakarta.persistence.EntityNotFoundException;
-
 @Service
-public class Service_Category {
+public class Service_CategorySeller {
+
     @Autowired
-    CategoryMapper categoryMapper;
+    Seller_CategoryMapper categoryMapper;
+
     @Autowired
     CategoryRepository categoryRepository;
 
     public PageImpl<Response_Category> getAll(
             Integer page, Integer size, boolean sortBy, String sortColumn) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
-        Page<Category> pagetCategory = categoryRepository.findAll(pageable);
-        List<Response_Category> list = pagetCategory.stream()
+        Page<Category> pageCategory = categoryRepository.findAll(pageable);
+        List<Response_Category> list = pageCategory.stream()
                 .map(category -> categoryMapper.response_Category(category))
                 .collect(Collectors.toList());
-        return new PageImpl<>(list, pageable, pagetCategory.getTotalElements());
+        return new PageImpl<>(list, pageable, pageCategory.getTotalElements());
     }
 
-    public Response_Category save(Request_Category request_Category) {
-        Category entity = categoryMapper.category(request_Category);
-        return categoryMapper.response_Category(categoryRepository.saveAndFlush(entity));
+    public Response_Category save(
+            Request_Category request_Category) {
+        return categoryMapper
+                .response_Category(categoryRepository.saveAndFlush(categoryMapper.category(request_Category)));
     }
 
-    public void delete(Integer id_category) {
+    public void delete(
+            Integer id_category) {
         categoryRepository.findById(id_category)
-                .ifPresentOrElse(
-                        category -> categoryRepository.delete(category),
-                        () -> {
-                            throw new EntityNotFoundException("Category with id " + id_category + " not found.");
+                .ifPresent(
+                        category -> {
+                            categoryRepository.delete(category);
                         });
     }
 }

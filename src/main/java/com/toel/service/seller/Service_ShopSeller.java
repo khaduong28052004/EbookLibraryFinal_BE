@@ -5,14 +5,14 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.seller.request.Request_Account;
 import com.toel.dto.seller.response.Response_Account;
-import com.toel.mapper.seller.ShopMapper;
+import com.toel.mapper.seller.Seller_ShopMapper;
 import com.toel.model.Account;
 import com.toel.repository.AccountRepository;
 
 @Service
-public class Service_Shop {
+public class Service_ShopSeller {
     @Autowired
-    ShopMapper accountMapper;
+    Seller_ShopMapper accountMapper;
     @Autowired
     AccountRepository accountRepository;
 
@@ -21,7 +21,6 @@ public class Service_Shop {
     }
 
     public Response_Account save(Request_Account request_Account) {
-        Account account = accountMapper.account(request_Account);
-        return accountMapper.response_Account(accountRepository.saveAndFlush(account));
+        return accountMapper.response_Account(accountRepository.saveAndFlush(accountMapper.account(request_Account)));
     }
 }

@@ -8,7 +8,7 @@ import com.toel.dto.seller.response.Response_Voucher;
 import com.toel.model.Voucher;
 
 @Mapper(componentModel = "spring")
-public interface VoucherMapper {
+public interface Seller_VoucherMapper {
 
     Response_Voucher response_Voucher(Voucher voucher);
 

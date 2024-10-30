@@ -15,16 +15,16 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.seller.request.Request_Bill;
 import com.toel.dto.seller.response.Response_Bill;
-import com.toel.mapper.seller.BillMapper;
+import com.toel.mapper.seller.Seller_BillMapper;
 import com.toel.model.Bill;
 import com.toel.model.OrderStatus;
 import com.toel.repository.BillRepository;
 import com.toel.repository.OrderStatusRepository;
 
 @Service
-public class Service_Bill {
+public class Service_BillSeller {
     @Autowired
-    BillMapper billMapper;
+    Seller_BillMapper billMapper;
     @Autowired
     BillRepository billRepository;
     @Autowired
@@ -37,7 +37,6 @@ public class Service_Bill {
         List<Response_Bill> list = pageBill.stream()
                 .map(bill -> billMapper.response_Bill(bill))
                 .collect(Collectors.toList());
-
         return new PageImpl<>(list, pageable, pageBill.getTotalElements());
     }
 

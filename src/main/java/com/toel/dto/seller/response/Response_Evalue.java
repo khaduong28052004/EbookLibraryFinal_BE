@@ -1,5 +1,15 @@
 package com.toel.dto.seller.response;
 
-public class Response_Evalue {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Response_Evalue {
+	Integer id;
+	int star;
+	String content;
+    
 }
