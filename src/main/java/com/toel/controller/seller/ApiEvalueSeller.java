@@ -13,16 +13,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.request.Request_Evalue;
 import com.toel.dto.seller.response.Response_Evalue;
-import com.toel.service.seller.Service_Evalue;
+import com.toel.service.seller.Service_EvalueSeller;
 
 import jakarta.validation.Valid;
 
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/seller/evalue")
-public class ApiEvalue {
+public class ApiEvalueSeller {
     @Autowired
-    Service_Evalue service_Evalue;
+    Service_EvalueSeller service_Evalue;
 
     @GetMapping("/getAll")
     public ApiResponse<PageImpl<Response_Evalue>> getALl(

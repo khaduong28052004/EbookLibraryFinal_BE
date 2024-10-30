@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.seller.request.Request_Bill;
 import com.toel.dto.seller.response.Response_Bill;
-import com.toel.mapper.seller.BillMapper;
+import com.toel.mapper.seller.Seller_BillMapper;
 import com.toel.model.Bill;
 import com.toel.model.OrderStatus;
 import com.toel.repository.BillRepository;
@@ -24,7 +24,7 @@ import com.toel.repository.OrderStatusRepository;
 @Service
 public class Service_Bill {
     @Autowired
-    BillMapper billMapper;
+    Seller_BillMapper billMapper;
     @Autowired
     BillRepository billRepository;
     @Autowired

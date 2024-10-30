@@ -15,16 +15,16 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.seller.request.Request_Category;
 import com.toel.dto.seller.response.Response_Category;
-import com.toel.mapper.seller.CategoryMapper;
+import com.toel.mapper.seller.Seller_CategoryMapper;
 import com.toel.model.Category;
 import com.toel.repository.CategoryRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class Service_Category {
+public class Service_CategorySeller {
     @Autowired
-    CategoryMapper categoryMapper;
+    Seller_CategoryMapper categoryMapper;
     @Autowired
     CategoryRepository categoryRepository;
 

@@ -21,7 +21,7 @@ import jakarta.validation.Valid;
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/seller/bill")
-public class ApiBill {
+public class ApiBillSeller {
         @Autowired
         Service_Bill service_Bill;
 

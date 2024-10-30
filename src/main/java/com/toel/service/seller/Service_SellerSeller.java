@@ -1,5 +1,5 @@
 package com.toel.service.seller;
 
-public class Service_Seller {
+public class Service_SellerSeller {
 
 }
