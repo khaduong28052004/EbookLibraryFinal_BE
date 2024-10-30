@@ -37,7 +37,6 @@ public class Service_Bill {
         List<Response_Bill> list = pageBill.stream()
                 .map(bill -> billMapper.response_Bill(bill))
                 .collect(Collectors.toList());
-
         return new PageImpl<>(list, pageable, pageBill.getTotalElements());
     }
 

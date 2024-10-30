@@ -39,7 +39,6 @@ public class ApiCategory {
     public ApiResponse<Response_Category> save(
             @RequestBody @Valid Request_Category request_Category) {
         Response_Category response = categoryService.save(request_Category);
-
         return ApiResponse.<Response_Category>build()
                 .message(response.getId() == null ? "Thêm thể loại thành công" : "Cập nhật thể loại thành công")
                 .result(response);

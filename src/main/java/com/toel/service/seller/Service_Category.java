@@ -31,11 +31,11 @@ public class Service_Category {
     public PageImpl<Response_Category> getAll(
             Integer page, Integer size, boolean sortBy, String sortColumn) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
-        Page<Category> pagetCategory = categoryRepository.findAll(pageable);
-        List<Response_Category> list = pagetCategory.stream()
+        Page<Category> pageCategory = categoryRepository.findAll(pageable);
+        List<Response_Category> list = pageCategory.stream()
                 .map(category -> categoryMapper.response_Category(category))
                 .collect(Collectors.toList());
-        return new PageImpl<>(list, pageable, pagetCategory.getTotalElements());
+        return new PageImpl<>(list, pageable, pageCategory.getTotalElements());
     }
 
     public Response_Category save(Request_Category request_Category) {

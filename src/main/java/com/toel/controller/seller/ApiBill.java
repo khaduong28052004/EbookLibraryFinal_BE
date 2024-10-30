@@ -22,32 +22,34 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/seller/bill")
 public class ApiBill {
-    @Autowired
-    Service_Bill service_Bill;
+        @Autowired
+        Service_Bill service_Bill;
 
-    @GetMapping("/getAll")
-    public ApiResponse<PageImpl<Response_Bill>> getAll(
-            @RequestParam("account_id") Integer account_id,
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "5") Integer size,
-            @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
-            @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
-        return ApiResponse.<PageImpl<Response_Bill>>build()
-                .result(service_Bill.getAll(page, size, sortBy, sortColumn, account_id));
-    }
+        @GetMapping("/getAll")
+        public ApiResponse<PageImpl<Response_Bill>> getAll(
+                        @RequestParam(value = "account_id", defaultValue = "0") Integer account_id,
+                        @RequestParam(value = "page", defaultValue = "0") Integer page,
+                        @RequestParam(value = "size", defaultValue = "5") Integer size,
+                        @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
+                        @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
+                return ApiResponse.<PageImpl<Response_Bill>>build()
+                                .result(service_Bill.getAll(page, size, sortBy, sortColumn, account_id));
+        }
 
-    @PostMapping("updateOrderStatus")
-    public ApiResponse<Response_Bill> updateOrderStatus(
-            @RequestBody @Valid Request_Bill request_Bill) {
-        return ApiResponse.<Response_Bill>build()
-                .result(service_Bill.updateOrderStatus(request_Bill));
-    }
+        @PostMapping("updateOrderStatus")
+        public ApiResponse<Response_Bill> updateOrderStatus(
+                        @RequestBody @Valid Request_Bill request_Bill) {
+                return ApiResponse.<Response_Bill>build()
+                                .message("Cập nhật trạng thái đơn hàng thành công")
+                                .result(service_Bill.updateOrderStatus(request_Bill));
+        }
 
-    @PostMapping("huy")
-    public ApiResponse<Response_Bill> huy(
-            @RequestBody @Valid Request_Bill request_Bill) {
-        return ApiResponse.<Response_Bill>build()
-                .result(service_Bill.huy(request_Bill));
-    }
+        @PostMapping("huy")
+        public ApiResponse<Response_Bill> huy(
+                        @RequestBody @Valid Request_Bill request_Bill) {
+                return ApiResponse.<Response_Bill>build()
+                                .message("Hủy đơn hàng thành công")
+                                .result(service_Bill.huy(request_Bill));
+        }
 
 }

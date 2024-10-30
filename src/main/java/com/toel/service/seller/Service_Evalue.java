@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.toel.dto.seller.request.Request_Evalue;
 import com.toel.dto.seller.response.Response_Evalue;
 import com.toel.mapper.seller.EvalueMapper;
 import com.toel.model.Evalue;
@@ -32,5 +33,9 @@ public class Service_Evalue {
                 .map(evlue -> evalueMapper.response_Evalue(evlue))
                 .collect(Collectors.toList());
         return new PageImpl<>(list, pageable, pageEvalue.getTotalElements());
+    }
+
+    public Response_Evalue phanHoi(Request_Evalue request_Evalue) {
+        return evalueMapper.response_Evalue(evalueRepository.saveAndFlush(evalueMapper.evalue(request_Evalue)));
     }
 }

@@ -27,7 +27,7 @@ public class ApiVoucher {
 
         @GetMapping("/getAll")
         public ApiResponse<PageImpl<Response_Voucher>> getAll(
-                        @RequestParam("account_id") Integer account_id,
+                        @RequestParam(value = "account_id", defaultValue = "0") Integer account_id,
                         @RequestParam(value = "page", defaultValue = "0") Integer page,
                         @RequestParam(value = "size", defaultValue = "5") Integer size,
                         @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,

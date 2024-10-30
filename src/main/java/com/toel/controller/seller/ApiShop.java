@@ -25,7 +25,7 @@ public class ApiShop {
 
     @GetMapping("/get")
     public ApiResponse<Response_Account> get(
-            @RequestParam("account_id") Integer account_id) {
+            @RequestParam(value = "account_id", defaultValue = "0") Integer account_id) {
         return ApiResponse.<Response_Account>build()
                 .result(service_Shop.get(account_id));
     }
@@ -34,6 +34,7 @@ public class ApiShop {
     public ApiResponse<Response_Account> save(
             @RequestBody @Valid Request_Account request_Account) {
         return ApiResponse.<Response_Account>build()
+                .message("Cập nhật thông tin Shop thành công")
                 .result(service_Shop.save(request_Account));
     }
 }
