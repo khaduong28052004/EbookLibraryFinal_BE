@@ -12,8 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.user.response.Response_Bill_User;
 import com.toel.dto.user.resquest.Request_Bill_User;
+import com.toel.dto.user.resquest.Request_Evaluate_User;
 import com.toel.model.Bill;
 import com.toel.model.Evalue;
 import com.toel.repository.AccountRepository;
@@ -35,42 +39,53 @@ import com.toel.repository.ProductReportRepository;
 import com.toel.repository.config.admin.Config_Repo_Account;
 import com.toel.repository.config.user.Config_Repo_CartDetail;
 import com.toel.service.user.Service_Bill_User;
+import com.toel.service.user.Service_Evaluate_User;
+
+import jakarta.validation.Valid;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/bill")
+@RequestMapping("/api/v1/evaluate")
 public class ApiEvaluateUser {
 
 	@Autowired
-	private Service_Bill_User billService_Bill;
+	private Service_Evaluate_User serviceEvaluate_User;
 
-	/* Lấy thông tin order */
-	@PostMapping("/read")
+	@PostMapping("/create")
 	public ResponseEntity<Map<String, Object>> getAllOrdersByOrderStatus(
-			@RequestBody Request_Bill_User requestBillDTO) {
-		Map<String, Object> response = billService_Bill.getBills(requestBillDTO);
+			@Valid @ModelAttribute Request_Evaluate_User requestEvaluateDTO, BindingResult bindingResult) {
+
+		if (bindingResult.hasErrors()) {
+			Map<String, Object> response = new HashMap<>();
+			for (FieldError error : bindingResult.getFieldErrors()) {
+				response.put(error.getField(), error.getDefaultMessage());
+				response.put("status", "fail");
+			}
+			return ResponseEntity.badRequest().body(response);
+		}
+		Map<String, Object> response = serviceEvaluate_User.saveEvaluate(requestEvaluateDTO);
 		return ResponseEntity.ok(response);
 	}
 
 	/* Hủy order */
-	@PostMapping("/update_status/cancel/{billId}")
-	public ResponseEntity<Map<String, Object>> cancelOrderByBill(@PathVariable("billId") Integer billId) {
-		Map<String, Object> response = billService_Bill.cancelBill(billId);
-		return ResponseEntity.ok(response);
-	}
+//	@PostMapping("/update_status/cancel/{billId}")
+//	public ResponseEntity<Map<String, Object>> cancelOrderByBill(@PathVariable("billId") Integer billId) {
+//		Map<String, Object> response = serEvaluate_User.saveEvaluate(billId);
+//		return ResponseEntity.ok(response);
+//	}
 
 	/* Xác nhận order đã nhận */
-	@PostMapping("/update_status/confirm/{billId}")
-	public ResponseEntity<Map<String, Object>> confirmReceivedOrder(@PathVariable("billId") Integer billId) {
-		Map<String, Object> response = billService_Bill.confirmBill(billId);
-		return ResponseEntity.ok(response);
-	}
+//	@PostMapping("/update_status/confirm/{billId}")
+//	public ResponseEntity<Map<String, Object>> confirmReceivedOrder(@PathVariable("billId") Integer billId) {
+//		Map<String, Object> response = billService_Bill.confirmBill(billId);
+//		return ResponseEntity.ok(response);
+//	}
 
 	/* Mua lại order */
-	@PostMapping("/create/reorder/{billId}")
-	public ResponseEntity<Map<String, Object>> reOrder(@PathVariable("billId") Integer billId) {
-		Map<String, Object> response = billService_Bill.reOrder(billId);
-		return ResponseEntity.ok(response);
-	}
+//	@PostMapping("/create/reorder/{billId}")
+//	public ResponseEntity<Map<String, Object>> reOrder(@PathVariable("billId") Integer billId) {
+//		Map<String, Object> response = billService_Bill.reOrder(billId);
+//		return ResponseEntity.ok(response);
+//	}
 
 }

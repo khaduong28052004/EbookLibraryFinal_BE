@@ -73,8 +73,8 @@ public class Service_BillDetail_User {
 	}
 
 	public List<Response_BillDetail_User> createBillsWithProductsInBillDetail(Integer billId) {
-		Map<Integer, Response_BillDetail_User> billMap = new HashMap<>(); // Map để lưu các bill với key là billID
-		List<Object[]> billDetail = billDetailRepository.findBillDetailById(billId); // Danh sách để trả về cuối cùng
+		Map<Integer, Response_BillDetail_User> billMap = new HashMap<>();
+		List<Object[]> billDetail = billDetailRepository.findBillDetailById(billId); 
 		List<Response_BillDetail_User> productDetail = new ArrayList<>();
 
 		for (Object[] product : billDetail) {
