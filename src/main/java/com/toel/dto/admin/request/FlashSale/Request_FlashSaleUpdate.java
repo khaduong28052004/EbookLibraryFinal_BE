@@ -13,13 +13,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Request_FlashSaleUpdate {
-  @NotBlank(message = "FIELD_REQUIRED")
-    @Min(value = 1, message = "FIELD_INVALID_ID")
-    private Integer id;
-    @NotNull(message = "FIELD_REQUIRED")
-    private LocalDateTime dateStart;
-    @NotNull(message = "FIELD_REQUIRED")
-    private LocalDateTime dateEnd;
-    @NotNull(message = "FIELD_REQUIRED")
-    private Integer account;   
+  @NotNull(message = "FIELD_REQUIRED")
+  @Min(value = 1, message = "FIELD_INVALID_ID")
+  private Integer id;
+  @NotNull(message = "FIELD_REQUIRED")
+  private LocalDateTime dateStart;
+  @NotNull(message = "FIELD_REQUIRED")
+  private LocalDateTime dateEnd;
+  @NotNull(message = "FIELD_REQUIRED")
+  private Integer account;
 }

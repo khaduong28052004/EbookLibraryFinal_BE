@@ -70,7 +70,7 @@ public class ApiPermissionAdmin {
             @RequestParam(value = "id", required = false) Integer id) {
         service_Premisson.delete(id);
         return ApiResponse.<Response_Permission>build()
-                .message("Xóa nhân viên thành công");
+                .message("Xóa permission thành công");
     }
 
 }

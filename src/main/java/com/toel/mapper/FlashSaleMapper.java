@@ -11,7 +11,6 @@ import com.toel.model.FlashSale;
 
 @Mapper(componentModel = "spring")
 public interface FlashSaleMapper {
-    @Mapping(target = "account", ignore = true)
     Response_FlashSale tResponse_FlashSale(FlashSale flashSale);
 
     @Mapping(target = "account", ignore = true)

@@ -18,5 +18,5 @@ public class Response_FlashSale {
 	Date dateStart;
 	Date dateEnd;
 	boolean isDelete;
-	Request_AccountCreate account;
+	Response_Account account;
 }

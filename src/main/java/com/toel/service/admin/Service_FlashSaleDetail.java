@@ -49,22 +49,19 @@ public class Service_FlashSaleDetail {
                     .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Flash sale"));
         }
         if (Boolean.TRUE.equals(status)) {
-            pageItems = productRepository.selectAllProductInFlashSale(idFlashSale, pageable);
+            pageItems = flashSaleDetailRepository.findAllByFlashSale(flashSale, pageable);
         } else if (Boolean.FALSE.equals(status)) {
             pageItems = productRepository.selectAllProductNotInFlashSale(idFlashSale, pageable);
         } else {
-            pageItems = (idFlashSale != null)
-                    ? flashSaleDetailRepository.findAllByFlashSale(flashSale, pageable)
-                    : flashSaleDetailRepository.findAll(pageable);
+            pageItems = flashSaleDetailRepository.findAll(pageable);
         }
         List<?> list = pageItems.stream()
-                .map(item -> {
-                    if (item instanceof FlashSaleDetail) {
+                .map(item ->{
+                    if (status == true) {
                         return flashSaleDetailsMapper.toFlashSaleDetail((FlashSaleDetail) item);
-                    } else if (item instanceof Product) {
+                    } else {
                         return productMapper.response_Product((Product) item);
                     }
-                    return null;
                 })
                 .collect(Collectors.toList());
 
