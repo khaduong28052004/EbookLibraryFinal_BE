@@ -15,18 +15,18 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.seller.request.Request_Voucher;
 import com.toel.dto.seller.response.Response_Voucher;
-import com.toel.mapper.seller.VoucherMapper;
+import com.toel.mapper.seller.Seller_VoucherMapper;
 import com.toel.model.Voucher;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.TypeVoucherRepository;
 import com.toel.repository.VoucherRepository;
 
 @Service
-public class Service_Voucher {
+public class Service_VoucherSeller {
     @Autowired
     VoucherRepository voucherRepository;
     @Autowired
-    VoucherMapper voucherMapper;
+    Seller_VoucherMapper voucherMapper;
     @Autowired
     TypeVoucherRepository typeVoucherRepository;
     @Autowired
@@ -47,11 +47,8 @@ public class Service_Voucher {
         return voucherMapper.response_Voucher(voucherRepository.findById(voucher_id).get());
     }
 
-    public Response_Voucher save(Request_Voucher request_Voucher, Integer account_id) {
-        Voucher voucher = voucherMapper.voucher(request_Voucher);
-        voucher.setAccount(accountRepository.findById(account_id).get());
-        voucher.setTypeVoucher(typeVoucherRepository.findById(1).get());
-        return voucherMapper.response_Voucher(voucherRepository.saveAndFlush(voucher));
+    public Response_Voucher save(Request_Voucher request_Voucher) {
+        return voucherMapper.response_Voucher(voucherRepository.saveAndFlush(voucherMapper.voucher(request_Voucher)));
     }
 
     public boolean delete(Integer voucher_id) {

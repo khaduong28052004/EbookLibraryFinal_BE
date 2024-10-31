@@ -37,6 +37,7 @@ public class Evalue {
 	int star;
 
 	Integer idParent;
+
 	@Nationalized
 	String content;
 

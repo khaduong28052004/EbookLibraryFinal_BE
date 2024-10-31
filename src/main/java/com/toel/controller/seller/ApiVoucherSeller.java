@@ -14,20 +14,21 @@ import org.springframework.web.bind.annotation.RestController;
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.request.Request_Voucher;
 import com.toel.dto.seller.response.Response_Voucher;
-import com.toel.service.seller.Service_Voucher;
+import com.toel.service.seller.Service_VoucherSeller;
 
 import jakarta.validation.Valid;
 
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/seller/voucher")
-public class ApiVoucher {
+public class ApiVoucherSeller {
+
         @Autowired
-        Service_Voucher service_Voucher;
+        Service_VoucherSeller service_Voucher;
 
         @GetMapping("/getAll")
         public ApiResponse<PageImpl<Response_Voucher>> getAll(
-                        @RequestParam("account_id") Integer account_id,
+                        @RequestParam(value = "account_id", defaultValue = "0") Integer account_id,
                         @RequestParam(value = "page", defaultValue = "0") Integer page,
                         @RequestParam(value = "size", defaultValue = "5") Integer size,
                         @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
@@ -38,9 +39,8 @@ public class ApiVoucher {
 
         @PostMapping("/save")
         public ApiResponse<Response_Voucher> save(
-                        @RequestBody @Valid Request_Voucher request_Voucher,
-                        @RequestParam("account_id") Integer account_id) {
-                Response_Voucher response_Voucher = service_Voucher.save(request_Voucher, account_id);
+                        @RequestBody @Valid Request_Voucher request_Voucher) {
+                Response_Voucher response_Voucher = service_Voucher.save(request_Voucher);
                 return ApiResponse.<Response_Voucher>build()
                                 .message(response_Voucher.getId() == null ? "Thêm voucher thành công"
                                                 : "Cập nhật voucher thành công")

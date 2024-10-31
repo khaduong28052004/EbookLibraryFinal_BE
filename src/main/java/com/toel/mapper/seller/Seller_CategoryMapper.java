@@ -7,7 +7,7 @@ import com.toel.dto.seller.response.Response_Category;
 import com.toel.model.Category;
 
 @Mapper(componentModel = "spring")
-public interface CategoryMapper {
+public interface Seller_CategoryMapper {
     Response_Category response_Category(Category category);
 
     Category category(Request_Category request_Category);

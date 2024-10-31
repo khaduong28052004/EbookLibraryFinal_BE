@@ -14,16 +14,17 @@ import org.springframework.web.bind.annotation.RestController;
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.request.Request_Category;
 import com.toel.dto.seller.response.Response_Category;
-import com.toel.service.seller.Service_Category;
+import com.toel.service.seller.Service_CategorySeller;
 
 import jakarta.validation.Valid;
 
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/seller/category")
-public class ApiCategory {
+public class ApiCategorySeller {
+
     @Autowired
-    Service_Category categoryService;
+    Service_CategorySeller categoryService;
 
     @GetMapping("/getAll")
     public ApiResponse<PageImpl<Response_Category>> getAll(
@@ -39,7 +40,6 @@ public class ApiCategory {
     public ApiResponse<Response_Category> save(
             @RequestBody @Valid Request_Category request_Category) {
         Response_Category response = categoryService.save(request_Category);
-
         return ApiResponse.<Response_Category>build()
                 .message(response.getId() == null ? "Thêm thể loại thành công" : "Cập nhật thể loại thành công")
                 .result(response);

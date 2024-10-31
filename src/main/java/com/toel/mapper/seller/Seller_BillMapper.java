@@ -8,7 +8,7 @@ import com.toel.dto.seller.response.Response_Bill;
 import com.toel.model.Bill;
 
 @Mapper(componentModel = "spring")
-public interface BillMapper {
+public interface Seller_BillMapper {
     Response_Bill response_Bill(Bill bill);
 
     @Mapping(target = "orderStatus", ignore = true)
