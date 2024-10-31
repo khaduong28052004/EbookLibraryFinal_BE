@@ -14,7 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.admin.request.FlashSale.Request_FlashSaleCreate;
 import com.toel.dto.admin.request.FlashSale.Request_FlashSaleUpdate;
 import com.toel.dto.admin.response.Response_FlashSale;
@@ -61,5 +60,12 @@ public class Service_FlashSale {
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSale"));
         flashSaleMapper.toFlashSaleUpdate(entity, flashSaleUpdate);
         return flashSaleMapper.tResponse_FlashSale(flashSaleRepository.save(entity));
+    }
+
+    public void delete(Integer id) {
+        FlashSale entity = flashSaleRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSale"));
+        entity.setDelete(true);
+        flashSaleRepository.save(entity);
     }
 }

@@ -12,14 +12,14 @@ import lombok.*;
 @NoArgsConstructor
 public class Request_DiscountRateUpdate {
     @NotNull(message = "FIELD_REQUIRED")
-    @Min(value = 1, message = "FIELD_INVALID_ID")
+    @Min(value = 1, message = "FIELD_MIN_VALUE")
     private Integer id;
     @NotNull(message = "FIELD_REQUIRED")
     @Min(value = 1, message = "FIELD_MIN_VALUE")
     private Integer discount;
     @NotNull(message = "FIELD_REQUIRED")
     private LocalDateTime dateStart;
-    @NotBlank(message = "FIELD_REQUIRED")
+    @NotNull(message = "FIELD_REQUIRED")
     @Min(value = 1, message = "FIELD_INVALID_ID")
     private Integer account;
 }
