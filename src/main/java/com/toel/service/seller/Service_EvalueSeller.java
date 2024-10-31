@@ -14,14 +14,14 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.seller.request.Request_Evalue;
 import com.toel.dto.seller.response.Response_Evalue;
-import com.toel.mapper.seller.Seller_EvalueMapper;
+import com.toel.mapper.EvalueMapper;
 import com.toel.model.Evalue;
 import com.toel.repository.EvalueRepository;
 
 @Service
 public class Service_EvalueSeller {
     @Autowired
-    Seller_EvalueMapper evalueMapper;
+    EvalueMapper evalueMapper;
     @Autowired
     EvalueRepository evalueRepository;
 

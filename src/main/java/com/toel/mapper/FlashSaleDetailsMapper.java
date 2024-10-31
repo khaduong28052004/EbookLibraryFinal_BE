@@ -1,4 +1,4 @@
-package com.toel.mapper.admin;
+package com.toel.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -11,7 +11,7 @@ import com.toel.dto.admin.response.Response_FlashSaleDetail;
 import com.toel.model.FlashSaleDetail;
 
 @Mapper(componentModel = "spring")
-public interface Admin_FlashSaleDetailsMapper {
+public interface FlashSaleDetailsMapper {
     Response_FlashSaleDetail toFlashSaleDetail(FlashSaleDetail flashSaleDetail);
 
     @Mapping(target = "product", ignore = true)

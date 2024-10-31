@@ -17,8 +17,8 @@ import com.toel.dto.admin.request.FlashSaleDetail.Resquest_FlashSaleDetailsUpdat
 import com.toel.dto.admin.response.Response_FlashSaleDetail;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
-import com.toel.mapper.admin.Admin_FlashSaleDetailsMapper;
-import com.toel.mapper.seller.Seller_ProductMapper;
+import com.toel.mapper.FlashSaleDetailsMapper;
+import com.toel.mapper.ProductMapper;
 import com.toel.model.FlashSale;
 import com.toel.model.FlashSaleDetail;
 import com.toel.model.Product;
@@ -29,7 +29,7 @@ import com.toel.repository.ProductRepository;
 @Service
 public class Service_FlashSaleDetail {
     @Autowired
-    Admin_FlashSaleDetailsMapper flashSaleDetailsMapper;
+    FlashSaleDetailsMapper flashSaleDetailsMapper;
     @Autowired
     FlashSaleDetailRepository flashSaleDetailRepository;
     @Autowired
@@ -37,7 +37,7 @@ public class Service_FlashSaleDetail {
     @Autowired
     ProductRepository productRepository;
     @Autowired
-    Seller_ProductMapper productMapper;
+    ProductMapper productMapper;
 
     public PageImpl<?> getAll(int page, int size, Boolean sortBy, String column, Boolean status, Integer idFlashSale) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));

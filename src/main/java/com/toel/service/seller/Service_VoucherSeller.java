@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.seller.request.Request_Voucher;
 import com.toel.dto.seller.response.Response_Voucher;
-import com.toel.mapper.seller.Seller_VoucherMapper;
+import com.toel.mapper.VoucherMapper;
 import com.toel.model.Voucher;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.TypeVoucherRepository;
@@ -26,7 +26,7 @@ public class Service_VoucherSeller {
     @Autowired
     VoucherRepository voucherRepository;
     @Autowired
-    Seller_VoucherMapper voucherMapper;
+    VoucherMapper voucherMapper;
     @Autowired
     TypeVoucherRepository typeVoucherRepository;
     @Autowired

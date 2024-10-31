@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.seller.request.Request_Category;
 import com.toel.dto.seller.response.Response_Category;
-import com.toel.mapper.seller.Seller_CategoryMapper;
+import com.toel.mapper.CategoryMapper;
 import com.toel.model.Category;
 import com.toel.repository.CategoryRepository;
 
@@ -23,7 +23,7 @@ import com.toel.repository.CategoryRepository;
 public class Service_CategorySeller {
 
     @Autowired
-    Seller_CategoryMapper categoryMapper;
+    CategoryMapper categoryMapper;
 
     @Autowired
     CategoryRepository categoryRepository;
