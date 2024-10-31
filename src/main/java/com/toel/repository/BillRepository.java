@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import com.toel.dto.seller.response.Response_DoanhSo;
 import com.toel.dto.seller.response.Response_DoanhThu;
+import com.toel.dto.seller.response.Response_Year;
 import com.toel.dto.user.response.Response_Bill;
 import com.toel.model.Bill;
 
@@ -104,4 +105,6 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	@Query("SELECT SUM(b.totalPrice * (1 - (b.discountRate.discount / 100.0))) FROM Bill b JOIN BillDetail bd WHERE YEAR(b.finishAt) = ?1 AND bd.product.account.id = ?2")
 	List<Response_DoanhThu> getListDoanhThu(Integer year, Integer account_id);
 
+	@Query("SELECT DISTINCT YEAR(b.finishAt) FROM Bill b JOIN BillDetail bd WHERE b.finishAt IS NOT NULL AND bd.product.account.id = ?1 ORDER BY YEAR(b.finishAt) DESC")
+	List<Response_Year> getDistinctYears(Integer account_id);
 }
