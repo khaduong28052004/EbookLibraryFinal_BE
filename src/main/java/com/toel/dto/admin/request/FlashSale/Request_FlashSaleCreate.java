@@ -20,6 +20,6 @@ public class Request_FlashSaleCreate {
     private LocalDateTime dateStart;
     @NotNull(message = "FIELD_REQUIRED")
     private LocalDateTime dateEnd;
-    @NotBlank(message = "FIELD_REQUIRED")
+    @NotNull(message = "FIELD_REQUIRED")
     private Integer account;
 }

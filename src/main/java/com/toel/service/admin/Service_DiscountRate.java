@@ -17,7 +17,7 @@ import com.toel.dto.admin.request.DiscountRate.Request_DiscountRateCreate;
 import com.toel.dto.admin.response.Response_DiscountRate;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
-import com.toel.mapper.admin.Admin_DiscountRateMapper;
+import com.toel.mapper.DiscountRateMapper;
 import com.toel.model.Account;
 import com.toel.model.DiscountRate;
 import com.toel.repository.AccountRepository;
@@ -28,7 +28,7 @@ public class Service_DiscountRate {
     @Autowired
     DiscountRateRepository discountRateRepository;
     @Autowired
-    Admin_DiscountRateMapper discountRateMapper;
+    DiscountRateMapper discountRateMapper;
     @Autowired
     AccountRepository accountRepository;
 

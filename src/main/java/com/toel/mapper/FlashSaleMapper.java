@@ -1,4 +1,4 @@
-package com.toel.mapper.admin;
+package com.toel.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -10,7 +10,7 @@ import com.toel.dto.admin.response.Response_FlashSale;
 import com.toel.model.FlashSale;
 
 @Mapper(componentModel = "spring")
-public interface Admin_FlashSaleMapper {
+public interface FlashSaleMapper {
     @Mapping(target = "account", ignore = true)
     Response_FlashSale tResponse_FlashSale(FlashSale flashSale);
 

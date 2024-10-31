@@ -19,7 +19,7 @@ import jakarta.validation.Valid;
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/admin/rolepermission")
-public class ApiRolePermission {
+public class ApiRolePermissionAdmin {
     @Autowired
     Service_RolePermission service_RolePermission;
 
