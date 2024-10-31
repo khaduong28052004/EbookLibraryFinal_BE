@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.hibernate.annotations.Nationalized;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
@@ -34,13 +33,10 @@ public class OrderStatus {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer id;
-	
+
 	@Nationalized
 	String name;
-	
-	@Temporal(TemporalType.DATE)
-	Date date;
-	
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "orderStatus")
 	List<Bill> bills;
