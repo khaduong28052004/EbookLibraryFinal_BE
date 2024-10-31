@@ -5,7 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.toel.repository.AccountRepository;
-import com.toel.service.EmailService;
+// import com.toel.service.EmailService;
+import com.toel.service.SendMailService;
 import com.toel.service.auth.OtpService;
 
 
@@ -36,7 +37,6 @@ public class OtpController {
 
     @PostMapping("api/v1/otp/lo")
     public String postMethodName(@RequestParam String email) {
-        //TODO: process POST request
         String o = otpService.find(email);
         
         return o;
@@ -53,12 +53,20 @@ public class OtpController {
         }
     }
 
-    @Autowired
-    private EmailService emailService;
+    // @Autowired
+    // private EmailService emailService;
 
-    @GetMapping("/api/v1/otp/send-email")
+    // @GetMapping("/api/v1/otp/send-email")
+    // public String sendEmail() {
+    //     emailService.sendSimpleEmail("kienlhpc05751@fpt.edu.vn", "Test Subject", "Test Email Body");
+    //     return "Email sent!";
+    // }
+     @Autowired
+     private SendMailService sendMailService;
+
+       @GetMapping("/api/v1/otp/send-email")
     public String sendEmail() {
-        emailService.sendSimpleEmail("kienlhpc05751@fpt.edu.vn", "Test Subject", "Test Email Body");
+        sendMailService.push("kienlhpc05751@fpt.edu.vn", "Test Subject", "Test Email Body");
         return "Email sent!";
     }
 }
