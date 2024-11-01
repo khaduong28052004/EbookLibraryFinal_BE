@@ -17,4 +17,7 @@ public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
     Evalue findByProductIdAndAccountId(@Param("accountId") Integer accountId, @Param("productId") Integer productId,
             @Param("billId") Integer billId);
 
+    @Query(value = "SELECT CASE WHEN EXISTS (SELECT 1 FROM evalues WHERE evalues.bill_id = :billDetailId) THEN 1 ELSE 0 END AS isEvaluated ", nativeQuery = true)
+	Integer isEvaluate(@Param("billDetailId") Integer isEvaluate);
+
 }
