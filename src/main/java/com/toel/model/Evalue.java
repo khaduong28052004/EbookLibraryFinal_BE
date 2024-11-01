@@ -33,9 +33,11 @@ public class Evalue {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer id;
-	
+
 	int star;
-	
+
+	Integer idParent;
+
 	@Nationalized
 	String content;
 
@@ -50,10 +52,9 @@ public class Evalue {
 	@ManyToOne
 	@JoinColumn(name = "account_id")
 	Account account;
-	
+
 	@OneToOne
 	@JoinColumn(name = "bill_id")
-	BillDetail billDetail; 
-
+	BillDetail billDetail;
 
 }
