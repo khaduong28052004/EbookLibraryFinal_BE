@@ -20,9 +20,11 @@ public class OtpController {
 
     @PostMapping("/api/v1/otp/generate")
     public ResponseEntity<String> generateOtp(@RequestParam String email) {
-        boolean isvalid = accountRepository.existsByEmail(email);
+        // boolean isvalid = accountRepository.existsByEmail(email);
+        boolean isvalid = true;
         if (isvalid) {
             String otp = otpService.generateOtp(email);
+            emailService.sendSimpleEmail("kienlhpc05751@fpt.edu.vn", "Test Subject", "Test Email Body"+otp);
             return ResponseEntity.ok("OTP generated: " + otp);
 
         } else {

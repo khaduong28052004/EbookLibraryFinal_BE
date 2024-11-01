@@ -2,6 +2,7 @@ package com.toel.controller.auth;
 
 
 import java.lang.foreign.Linker.Option;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ import com.toel.dto.JwtResponseDTO;
 import com.toel.dto.OtpDTO;
 import com.toel.dto.PermissionDTO;
 import com.toel.model.Account;
+import com.toel.model.Permission;
 import com.toel.model.Role;
 import com.toel.model.RolePermission;
 import com.toel.repository.AccountRepository;
@@ -74,7 +76,7 @@ public class ApiController {
     PermissionRepository permissionRepository;
     @Autowired
     RolePermissionRepository rolesPermissionRepository;
-
+  
     @Autowired
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -173,4 +175,58 @@ public class ApiController {
     // public String admin() {
     //     return "dao.findOtpById(id)";
     // }
+
+    @PostMapping("/user/token")
+    public ResponseEntity<?> giahan(@RequestBody JwtResponseDTO entity) {
+        String accessToken = entity.getAccessToken();
+        if (!jwtService.isTokenExpired(accessToken)) {
+            String username = jwtService.extractUsername(accessToken);
+            System.out.println(username);
+            Map<String, Object> map = new HashMap<>(); // Information to include in the new JWT
+            String newToken = jwtService.GenerateToken(username, map); // Generate a new token
+            System.out.println("Generated Token: " + newToken);
+            System.out.println("t o ke=====:" + jwtService.isTokenExpired(accessToken));
+            return ResponseEntity.ok(newToken);
+        } else {
+            return ResponseEntity.ok("lỗi");
+        }
+    }
+
+
+    @PostMapping("/user/loginGoogle")
+    public ResponseEntity<?> AuthGG(@RequestBody Account entity) {
+        String email = entity.getEmail();
+        Account account = accountRepository.findByEmail(email); // một email một tài khoản
+        if (account != null) {
+            // List<RoleDetail> listRoleDetail = roleDetailRepository.findByAccount(account.getId());
+            List<Role> roles = new ArrayList<>();
+            // for (RoleDetail roleDetail : listRoleDetail) {
+            //     roles.add(roleDetail.getRole());
+            // }
+            Map<String, Object> map = new HashMap();
+            String token = jwtService.GenerateToken(account.getUsername(), map);
+            System.out.println("Generated Token: " + token); // Debugging log
+            List<Permission> list1List =  permissionRepository.findAll();
+            List<PermissionDTO> list = new ArrayList();
+            PermissionDTO per = new PermissionDTO();
+            for (Permission iterable_element : list1List) {
+                per.setId(null);
+                per.getCotSlug();
+                per.getDescription();
+                list.add(per); 
+            }
+            return ResponseEntity.ok(JwtResponseDTO.builder().accessToken(token)
+                    .username(account.getUsername())
+                    .id_account(account.getId())
+                    .avatar(account.getAvatar())
+                    .roles("LỎ")
+                    .Permission(list)
+                    .build());
+        } else {
+            // return ResponseEntity.ok("Chưa đăng ký tài khoản!");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("tài khoản email chưa đăng ký!");
+        }
+    }
+
+    
 }
