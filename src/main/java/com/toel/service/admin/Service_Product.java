@@ -35,7 +35,7 @@ public class Service_Product {
         if (key.isBlank()) {
             pageProduct = productRepository.findAllByIsDeleteAndIsActive(false,true, pageable);
         } else {
-            pageProduct = productRepository.findAllByIsDelete(false, pageable);
+            pageProduct = productRepository.findAllByIsDeleteAndIsActive(false,true, pageable);
         }
         List<Response_Product> list = pageProduct.stream()
                 .map(Product -> productMapper.response_Product(Product))
