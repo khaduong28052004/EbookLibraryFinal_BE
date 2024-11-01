@@ -14,8 +14,8 @@ import lombok.Setter;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Mapper(componentModel = "spring")
-public class Response_Bill {
+//@Mapper(componentModel = "spring")
+public class Response_Bill_User {
 	Integer userID;
 	Integer billID;
 	Double billTotalPrice;
@@ -30,6 +30,6 @@ public class Response_Bill {
 	Integer shopId;
 	String shopName;
 	String shopAvatar;
-	List<Response_Bill_Product> products; 
+	List<Response_Bill_Product_User> products; 
 
 }
