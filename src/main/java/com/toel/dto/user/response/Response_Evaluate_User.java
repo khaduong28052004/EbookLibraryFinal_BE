@@ -14,7 +14,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-//@Mapper(componentModel = "spring")
 public class Response_Evaluate_User {
 	private Integer star;
 	private String content;
