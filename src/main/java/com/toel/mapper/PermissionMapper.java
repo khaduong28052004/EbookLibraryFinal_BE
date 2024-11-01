@@ -1,4 +1,4 @@
-package com.toel.mapper.admin;
+package com.toel.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -9,7 +9,7 @@ import com.toel.dto.admin.response.Response_Permission;
 import com.toel.model.Permission;
 
 @Mapper(componentModel = "spring")
-public interface Admin_PermissionMapper {
+public interface PermissionMapper {
     Response_Permission toPermission(Permission permission);
 
     Permission toPermissionCreate(Request_PermissionCreate entity);

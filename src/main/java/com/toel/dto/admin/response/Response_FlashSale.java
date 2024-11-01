@@ -19,5 +19,4 @@ public class Response_FlashSale {
 	Date dateEnd;
 	boolean isDelete;
 	Request_AccountCreate account;
-	List<FlashSaleDetail> flashSaleDetails;
 }

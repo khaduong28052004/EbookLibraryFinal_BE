@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/admin/chietkhau")
-public class ApiDiscountRate {
+public class ApiDiscountRateAdmin {
     @Autowired
     Service_DiscountRate discountReateService;
 

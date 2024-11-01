@@ -1,4 +1,4 @@
-package com.toel.mapper.seller;
+package com.toel.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -8,7 +8,7 @@ import com.toel.dto.seller.response.Response_Voucher;
 import com.toel.model.Voucher;
 
 @Mapper(componentModel = "spring")
-public interface Seller_VoucherMapper {
+public interface VoucherMapper {
 
     Response_Voucher response_Voucher(Voucher voucher);
 

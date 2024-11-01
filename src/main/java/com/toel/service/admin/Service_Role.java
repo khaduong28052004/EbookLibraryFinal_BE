@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import com.toel.dto.admin.response.Response_Role;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
-import com.toel.mapper.admin.Admin_RoleMapper;
+import com.toel.mapper.RoleMapper;
 import com.toel.model.Permission;
 import com.toel.model.Role;
 import com.toel.repository.PermissionRepository;
@@ -28,7 +28,7 @@ public class Service_Role {
     @Autowired
     PermissionRepository permissionRepository;
     @Autowired
-    Admin_RoleMapper roleMapper;
+    RoleMapper roleMapper;
 
     public PageImpl<Response_Role> getRoleNotPermissonRole(Integer idPermission, Integer page, Integer size, Boolean sortBy,
             String sortColumn) {
