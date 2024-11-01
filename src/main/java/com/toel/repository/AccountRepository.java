@@ -24,4 +24,7 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
                         boolean gender, boolean status, Role role, String username, String fullname, String email,
                         String phone, Pageable pageable);
 
+        Page<Account> findAllByRole(Role role, Pageable pageable);
+
+
 }

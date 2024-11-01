@@ -21,7 +21,7 @@ import com.toel.repository.AccountRepository;
 import com.toel.repository.RoleRepository;
 
 @Service
-public class Service_NhanVien {
+public class Service_Account {
         @Autowired
         AccountRepository accountRepository;
         @Autowired
@@ -29,11 +29,11 @@ public class Service_NhanVien {
         @Autowired
         RoleRepository roleRepository;
 
-        public PageImpl<Response_Account> getAll(
+        public PageImpl<Response_Account> getAll(String rolename,
                         String search, Boolean gender, Integer page, Integer size, Boolean sortBy, String sortColumn) {
                 Pageable pageable = PageRequest.of(page, size,
                                 Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
-                Role role = roleRepository.findByNameIgnoreCase("ADMINV1");
+                Role role = roleRepository.findByNameIgnoreCase(rolename);
                 Page<Account> pageAccount = null;
                 if (search == null || search.isBlank()) {
                         pageAccount = (gender == null)
@@ -57,9 +57,16 @@ public class Service_NhanVien {
                 return new PageImpl<>(list, pageable, pageAccount.getTotalElements());
         }
 
-        public Response_Account create(Request_AccountCreate entity) {
+        public Response_Account updateStatus(int id) {
+                Account entity = accountRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Không tìm thấy account"));
+                entity.setStatus(!entity.isStatus());
+                return accountMapper.toAccount(accountRepository.saveAndFlush(entity));
+        }
+
+        public Response_Account create(String rolename, Request_AccountCreate entity) {
                 Account account = accountMapper.toAccountCreate(entity);
-                account.setRole(roleRepository.findByNameIgnoreCase("ADMINV1"));
+                account.setRole(roleRepository.findByNameIgnoreCase(rolename));
                 account.setStatus(true);
                 return accountMapper.toAccount(accountRepository.saveAndFlush(account));
         }
