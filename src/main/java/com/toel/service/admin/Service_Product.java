@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.response.Response_Account;
+import com.toel.dto.admin.response.Response_ProductListFlashSale;
 import com.toel.dto.seller.response.Response_Product;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
@@ -32,7 +33,7 @@ public class Service_Product {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));
         Page<Product> pageProduct;
         if (key.isBlank()) {
-            pageProduct = productRepository.findAllByIsDelete(false, pageable);
+            pageProduct = productRepository.findAllByIsDeleteAndIsActive(false,true, pageable);
         } else {
             pageProduct = productRepository.findAllByIsDelete(false, pageable);
         }
@@ -42,10 +43,10 @@ public class Service_Product {
         return new PageImpl<>(list, pageable, pageProduct.getTotalElements());
     }
 
-    public Response_Product getId(Integer id) {
+    public Response_ProductListFlashSale getId(Integer id) {
         Product Product = productRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Product"));
-        return productMapper.response_Product(Product);
+        return productMapper.tProductListFlashSale(Product);
     }
 
     public Response_Product updateActive(int id) {

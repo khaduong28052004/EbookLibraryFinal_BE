@@ -16,7 +16,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
        @Query("SELECT p FROM Product p WHERE p.isDelete=false and p.id NOT IN (SELECT fl.product.id FROM FlashSaleDetail fl Where fl.id =?1)")
        Page<Product> selectAllProductNotInFlashSale(Integer flashSaleId, Pageable pageable);
 
-       Page<Product> findAllByIsDelete(Boolean isDelete, Pageable pageable);
+       Page<Product> findAllByIsDeleteAndIsActive(Boolean isDelete,Boolean isActive, Pageable pageable);
 
        // @Query("SELECT p FROM Product p WHERE p.isActive = true AND p.isDelete = false " +
        //               "AND (:price IS NULL OR p.price = :price) " +
