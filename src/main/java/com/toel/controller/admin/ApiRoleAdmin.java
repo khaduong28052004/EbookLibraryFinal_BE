@@ -16,7 +16,7 @@ import com.toel.service.admin.Service_Role;
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/admin/role")
-public class ApiRole {
+public class ApiRoleAdmin {
     @Autowired
     Service_Role service_Role;
 

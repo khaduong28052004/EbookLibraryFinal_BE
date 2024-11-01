@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/admin/permission")
-public class ApiPermission {
+public class ApiPermissionAdmin {
     @Autowired
     Service_Premisson service_Premisson;
 

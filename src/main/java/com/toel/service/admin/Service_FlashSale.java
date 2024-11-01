@@ -1,6 +1,4 @@
 package com.toel.service.admin;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,13 +12,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.admin.request.FlashSale.Request_FlashSaleCreate;
 import com.toel.dto.admin.request.FlashSale.Request_FlashSaleUpdate;
 import com.toel.dto.admin.response.Response_FlashSale;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
-import com.toel.mapper.admin.Admin_FlashSaleMapper;
+import com.toel.mapper.FlashSaleMapper;
 import com.toel.model.FlashSale;
 import com.toel.repository.FlashSaleRepository;
 
@@ -29,7 +26,7 @@ public class Service_FlashSale {
     @Autowired
     FlashSaleRepository flashSaleRepository;
     @Autowired
-    Admin_FlashSaleMapper flashSaleMapper;
+    FlashSaleMapper flashSaleMapper;
 
     public PageImpl<Response_FlashSale> getAll(int page, int size, Boolean sortBy, String column, LocalDateTime date) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));
@@ -61,5 +58,12 @@ public class Service_FlashSale {
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSale"));
         flashSaleMapper.toFlashSaleUpdate(entity, flashSaleUpdate);
         return flashSaleMapper.tResponse_FlashSale(flashSaleRepository.save(entity));
+    }
+
+    public void delete(Integer id) {
+        FlashSale entity = flashSaleRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSale"));
+        entity.setDelete(true);
+        flashSaleRepository.save(entity);
     }
 }

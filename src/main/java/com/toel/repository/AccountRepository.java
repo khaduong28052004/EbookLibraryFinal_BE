@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.toel.model.Account;
 import com.toel.model.Role;
-import java.util.List;
 
 public interface AccountRepository extends JpaRepository<Account, Integer> {
+
         Page<Account> findAllByRoleAndStatus(Role role, boolean status, Pageable pageable);
 
         Page<Account> findAllByRoleAndStatusAndGender(Role role, boolean status, boolean gender, Pageable pageable);
@@ -23,5 +23,9 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
         Page<Account> findAllByGenderAndStatusAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
                         boolean gender, boolean status, Role role, String username, String fullname, String email,
                         String phone, Pageable pageable);
+
+        Account findByUsername(String username);
+
+        boolean existsByEmail(String email);
 
 }

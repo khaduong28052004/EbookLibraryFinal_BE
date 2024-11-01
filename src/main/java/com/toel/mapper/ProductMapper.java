@@ -1,4 +1,4 @@
-package com.toel.mapper.seller;
+package com.toel.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -8,7 +8,7 @@ import com.toel.dto.seller.response.Response_Product;
 import com.toel.model.Product;
 
 @Mapper(componentModel = "spring")
-public interface Seller_ProductMapper {
+public interface ProductMapper {
     Response_Product response_Product(Product product);
 
     @Mapping(target = "category", ignore = true)

@@ -14,14 +14,14 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.seller.request.Request_Product;
 import com.toel.dto.seller.response.Response_Product;
-import com.toel.mapper.seller.Seller_ProductMapper;
+import com.toel.mapper.ProductMapper;
 import com.toel.model.Product;
 import com.toel.repository.ProductRepository;
 
 @Service
 public class Service_ProductSeller {
     @Autowired
-    Seller_ProductMapper productMapper;
+    ProductMapper productMapper;
     @Autowired
     ProductRepository productRepository;
 

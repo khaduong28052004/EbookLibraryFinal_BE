@@ -1,4 +1,4 @@
-package com.toel.mapper.seller;
+package com.toel.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -8,7 +8,7 @@ import com.toel.dto.seller.response.Response_Bill;
 import com.toel.model.Bill;
 
 @Mapper(componentModel = "spring")
-public interface Seller_BillMapper {
+public interface BillMapper {
     Response_Bill response_Bill(Bill bill);
 
     @Mapping(target = "orderStatus", ignore = true)
