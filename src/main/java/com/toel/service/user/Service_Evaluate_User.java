@@ -74,7 +74,6 @@ public class Service_Evaluate_User {
 
 	public Map<String, Object> saveEvaluate(Request_Evaluate_User requestEvaluateDTO) {
 		Map<String, Object> response = new HashMap<>();
-
 		try {
 			validateEntitiesExist(requestEvaluateDTO);
 			createEvaluate(requestEvaluateDTO);
@@ -156,7 +155,6 @@ public class Service_Evaluate_User {
 			evaluate.setImageEvalues(imageList);
 			evaluateRepository.saveAndFlush(evaluate);
 		}
-
 		return evaluate;
 	}
 
@@ -177,7 +175,6 @@ public class Service_Evaluate_User {
 	private void checkImageAttributes(MultipartFile image) throws IOException {
 
 		BufferedImage bufferedImage = ImageIO.read(image.getInputStream());
-
 		if (bufferedImage == null) {
 			throw new IllegalArgumentException("Không thể đọc ảnh: " + image.getOriginalFilename());
 		}

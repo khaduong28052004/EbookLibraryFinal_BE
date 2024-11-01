@@ -14,7 +14,7 @@ import lombok.Setter;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Mapper(componentModel = "spring")
+//@Mapper(componentModel = "spring")
 public class Response_Bill_User {
 	Integer userID;
 	Integer billID;

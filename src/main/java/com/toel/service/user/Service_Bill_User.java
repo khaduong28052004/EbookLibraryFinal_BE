@@ -247,7 +247,6 @@ public class Service_Bill_User {
 					existingCartDetail.setQuantity(existingCartDetail.getQuantity() + quantityToAdd);
 					cartRepository.saveAndFlush(existingCartDetail);
 				} else {
-					Cart newCart = new Cart();
 
 					Account account = new Account();
 					account.setId(accountId);
@@ -255,6 +254,7 @@ public class Service_Bill_User {
 					Product product = new Product();
 					product.setId(productId);
 
+					Cart newCart = new Cart();
 					newCart.setAccount(account);
 					newCart.setProduct(product);
 					newCart.setQuantity(quantityToAdd);

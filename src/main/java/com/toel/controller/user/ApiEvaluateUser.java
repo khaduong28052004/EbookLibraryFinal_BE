@@ -67,25 +67,4 @@ public class ApiEvaluateUser {
 		return ResponseEntity.ok(response);
 	}
 
-	/* Hủy order */
-//	@PostMapping("/update_status/cancel/{billId}")
-//	public ResponseEntity<Map<String, Object>> cancelOrderByBill(@PathVariable("billId") Integer billId) {
-//		Map<String, Object> response = serEvaluate_User.saveEvaluate(billId);
-//		return ResponseEntity.ok(response);
-//	}
-
-	/* Xác nhận order đã nhận */
-//	@PostMapping("/update_status/confirm/{billId}")
-//	public ResponseEntity<Map<String, Object>> confirmReceivedOrder(@PathVariable("billId") Integer billId) {
-//		Map<String, Object> response = billService_Bill.confirmBill(billId);
-//		return ResponseEntity.ok(response);
-//	}
-
-	/* Mua lại order */
-//	@PostMapping("/create/reorder/{billId}")
-//	public ResponseEntity<Map<String, Object>> reOrder(@PathVariable("billId") Integer billId) {
-//		Map<String, Object> response = billService_Bill.reOrder(billId);
-//		return ResponseEntity.ok(response);
-//	}
-
 }
