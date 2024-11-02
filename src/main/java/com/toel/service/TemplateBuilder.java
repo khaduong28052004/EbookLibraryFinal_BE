@@ -1,83 +1,24 @@
 package com.toel.service;
 
-import java.io.File;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import com.toel.dto.MailSenderDTO;
-import com.toel.model.BillDetail;
-
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-
-@Service
-public class EmailService {
-
-    // @Autowired
-    // JavaMailSender mailSender;
-    @Autowired
-    JavaMailSender sender;
-
-    // public void sendSimpleEmail(String toEmail, String subject, String body) {
-    // SimpleMailMessage message = new SimpleMailMessage();
-    // message.setFrom("khaduong28052004@gmail.com");
-    // message.setTo(toEmail);
-    // message.setSubject(subject);
-    // message.setText(body);
-    // mailSender.send(message);
-    // System.out.println("Email sent successfully!");
-    // }
-
-    List<MimeMessage> queue = new ArrayList<>();
-
-    public void push(String to, String subject, String content) {
-        MailSenderDTO mail = new MailSenderDTO(to, subject, from(content));
-        this.push(mail);
-    }
-    public void push(String to, String subject, EmailTemplateType templateType, String...dynamicData) {
-        String content = TemplateBuilder.buildContent(templateType, dynamicData);
-        MailSenderDTO mail = new MailSenderDTO(to, subject, content);
-        this.push(mail);
-    }
-
-    public void push(MailSenderDTO mail) {
-        MimeMessage mime = sender.createMimeMessage();
-        try {
-            MimeMessageHelper helper = new MimeMessageHelper(mime, true, "utf-8");
-            helper.setFrom(mail.getFrom());
-            helper.setTo(mail.getToEmail());
-            helper.setSubject(mail.getSubject());
-            helper.setText(mail.getContent(), true);
-            try {
-                for (String cc : mail.getCc()) {
-                    helper.addCc(cc);
-                }
-                for (String bcc : mail.getBcc()) {
-                    helper.addBcc(bcc);
-                }
-                for (File file : mail.getFiles()) {
-                    helper.addAttachment(file.getName(), file);
-                }
-            } catch (Exception e) {
-                // TODO: handle exception
-            }
-        } catch (MessagingException e) {
-            e.printStackTrace();
+public class TemplateBuilder {
+    public static String buildContent(EmailTemplateType type, String... dynamicData) {
+        switch (type) {
+            case OTP:
+                return buildOtpTemplate(dynamicData); // Pass the OTP code as dynamic data
+            case PASSWORD_RESET:
+                return buildPasswordResetTemplate(dynamicData);
+            case WELCOME:
+                return buildWelcomeTemplate(dynamicData);
+            default:
+                throw new IllegalArgumentException("Invalid template type");
         }
-        queue.add(mime);
     }
 
-    public String from(String connect) {
-
-        String lp = "<!DOCTYPE html>\r\n" +
+    private static String buildOtpTemplate(String... data) {
+        String otp = data[0];
+        String username = data.length > 1 ? data[1] : "User"; // Optional data handling
+        // HTML for OTP email template
+        return "<!DOCTYPE html>\r\n" +
                 "<html lang=\"vi\">\r\n" +
                 "<head>\r\n" +
                 " <meta charset=\"UTF-8\">\r\n" +
@@ -148,8 +89,11 @@ public class EmailService {
                 " <p>Xin chào,</p>\r\n" +
                 " <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản của mình. Dưới đây là mã OTP để xác nhận quá trình này:</p>\r\n"
                 +
-                " <div class=\"otp-box\">Mã OTP của bạn là: ["+connect+"] <a href=\"https://www.w3schools.com/\">Đổi mật khẩu ngay!</a></div>\r\n" +
+                " <div class=\"otp-box\">Mã OTP của bạn là: [" + otp
+                + "] >>><a href='https://www.w3schools.com'>Đổi mật khẩu ngay!</a></div>\r\n" +
                 " <p>Xin vui lòng nhập mã này vào trang đặt lại mật khẩu để tiếp tục quá trình đặt lại mật khẩu.</p>\r\n"
+                +
+                "<a href='https://www.w3schools.com'>Đổi mật khẩu ngay!</a>"
                 +
                 " <p>Lưu ý rằng mã OTP sẽ hết hạn sau 1 phút kể từ lúc nhận được mail.</p>\r\n" +
                 " <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>\r\n" +
@@ -164,20 +108,36 @@ public class EmailService {
                 " </div>\r\n" +
                 "</body>\r\n" +
                 "</html>";
-        return lp;
     }
 
-    @Scheduled(fixedDelay = 100)
-    public void run() {
-        int error = 0;
-        int success = 0;
-        try {
-            while (!queue.isEmpty()) {
-                MimeMessage mime = queue.remove(0);
-                sender.send(mime);
-                success++;
-            }
-        } catch (Exception e) {
-            error++;        }
+    private static String buildPasswordResetTemplate(String... data) {
+        // HTML for Password Reset template with placeholder for the reset link
+        return "<html>" +
+                "<body>" +
+                "<div style=\"max-width:600px;margin:20px auto;padding:20px;background-color:#f4f4f9;border-radius:8px;\">"
+                +
+                "<h2>Password Reset Request</h2>" +
+                "<p>To reset your password, please click the link below:</p>" +
+                "<a href=\"" + data[0] + "\" style=\"color:#007bff;text-decoration:none;\">Reset Password</a>" +
+                "<p>If you did not request a password reset, please ignore this email.</p>" +
+                "<p>Thank you,<br>Your Support Team</p>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
+    }
+
+    private static String buildWelcomeTemplate(String... data) {
+        // HTML for Welcome email template with a placeholder for a personalized message
+        return "<html>" +
+                "<body>" +
+                "<div style=\"max-width:600px;margin:20px auto;padding:20px;background-color:#f4f4f9;border-radius:8px;\">"
+                +
+                "<h2>Welcome!</h2>" +
+                "<p>" + data[0] + "</p>" +
+                "<p>Thank you for joining us! We’re excited to have you on board.</p>" +
+                "<p>Best Regards,<br>Your Support Team</p>" +
+                "</div>" +
+                "</body>" +
+                "</html>";
     }
 }

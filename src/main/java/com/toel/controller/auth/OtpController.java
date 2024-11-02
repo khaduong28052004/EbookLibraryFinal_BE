@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.toel.repository.AccountRepository;
 import com.toel.service.EmailService;
+import com.toel.service.EmailTemplateType;
 import com.toel.service.auth.OtpService;
-
 
 @CrossOrigin("*")
 @RestController
@@ -18,13 +18,16 @@ public class OtpController {
     @Autowired
     private OtpService otpService;
 
+
     @PostMapping("/api/v1/otp/generate")
     public ResponseEntity<String> generateOtp(@RequestParam String email) {
         // boolean isvalid = accountRepository.existsByEmail(email);
         boolean isvalid = true;
         if (isvalid) {
             String otp = otpService.generateOtp(email);
-            emailService.sendSimpleEmail("kienlhpc05751@fpt.edu.vn", "Test Subject", "Test Email Body"+otp);
+            // emailService.sendSimpleEmail("kienlhpc05751@fpt.edu.vn", "Test Subject", "Test Email Body"+otp);
+            //emailService.push("kienlhpc05751@fpt.edu.vn", "Mã otp của bạn", otp);
+            emailService.push("kienlhpc05751@fpt.edu.vn", "Mã otp của bạn", EmailTemplateType.OTP, otp,"lỏ");
             return ResponseEntity.ok("OTP generated: " + otp);
 
         } else {
@@ -38,12 +41,11 @@ public class OtpController {
 
     @PostMapping("api/v1/otp/lo")
     public String postMethodName(@RequestParam String email) {
-        //TODO: process POST request
+        // TODO: process POST request
         String o = otpService.find(email);
-        
+
         return o;
     }
-    
 
     @PostMapping("/api/v1/otp/verify")
     public ResponseEntity<String> verifyOtp(@RequestParam String email, @RequestParam String otp) {
@@ -60,7 +62,9 @@ public class OtpController {
 
     @GetMapping("/api/v1/otp/send-email")
     public String sendEmail() {
-        emailService.sendSimpleEmail("kienlhpc05751@fpt.edu.vn", "Test Subject", "Test Email Body");
+        // emailService.sendSimpleEmail("kienlhpc05751@fpt.edu.vn", "Test Subject",
+        // "Test Email Body");
+        emailService.push("kienlhpc05751@fpt.edu.vn", "Test Subject", "Test Email Body");
         return "Email sent!";
     }
 }

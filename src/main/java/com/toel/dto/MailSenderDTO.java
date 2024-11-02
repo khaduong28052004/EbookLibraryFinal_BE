@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MailSender {
+public class MailSenderDTO {
 	private String from = "khaduong28052004@gmail.com";
 	private String toEmail;
 	private String subject;
@@ -23,7 +23,7 @@ public class MailSender {
 	private List<String> bcc;
 	private List<File> files;
 
-	public MailSender(String toEmail, String subject, String content) {
+	public MailSenderDTO(String toEmail, String subject, String content) {
 		this.toEmail = toEmail;
 		this.subject = subject;
 		this.content = content;
