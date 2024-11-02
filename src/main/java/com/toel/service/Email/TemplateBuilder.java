@@ -1,4 +1,4 @@
-package com.toel.service;
+package com.toel.service.Email;
 
 public class TemplateBuilder {
     public static String buildContent(EmailTemplateType type, String... dynamicData) {

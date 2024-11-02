@@ -1,4 +1,4 @@
-package com.toel.service;
+package com.toel.service.Email;
 
 import java.io.File;
 import java.time.LocalDateTime;

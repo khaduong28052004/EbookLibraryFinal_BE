@@ -5,8 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.toel.repository.AccountRepository;
-import com.toel.service.EmailService;
-import com.toel.service.EmailTemplateType;
+import com.toel.service.Email.EmailService;
+import com.toel.service.Email.EmailTemplateType;
 import com.toel.service.auth.OtpService;
 
 @CrossOrigin("*")
