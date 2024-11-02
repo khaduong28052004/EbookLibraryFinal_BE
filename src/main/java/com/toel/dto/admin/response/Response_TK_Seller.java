@@ -1,7 +1,6 @@
 package com.toel.dto.admin.response;
 
 import java.util.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Response_Account {
+public class Response_TK_Seller {
     Integer id;
     String username;
     String password;
@@ -27,5 +26,5 @@ public class Response_Account {
     String afterCitizenIdentification;
     Integer sumFollow;
     Integer sumProduct;
-    Integer agvEvalue;
+    Double agvEvalue;
 }

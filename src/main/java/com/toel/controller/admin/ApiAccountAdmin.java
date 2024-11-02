@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.admin.request.Account.Request_AccountCreate;
-import com.toel.dto.admin.request.FlashSale.Request_FlashSaleUpdate;
 import com.toel.dto.admin.response.Response_Account;
-import com.toel.dto.admin.response.Response_FlashSale;
 import com.toel.service.admin.Service_Account;
 
 import jakarta.validation.Valid;
@@ -30,24 +28,38 @@ public class ApiAccountAdmin {
     Service_Account service_Account;
 
     @GetMapping
-    public ApiResponse<PageImpl<Response_Account>> getAllNhanVApiResponse(
-            @RequestParam(value = "role", required = false) Boolean role,
+    public ApiResponse<PageImpl<?>> getAll(
+            @RequestParam(value = "role", required = false) String role,
             @RequestParam(value = "search", required = false) String search,
             @RequestParam(value = "gender", required = false) Boolean gender,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "5") Integer size,
             @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
             @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
-        PageImpl<Response_Account> pageImpl;
-        if (Boolean.TRUE) {
+        PageImpl<?> pageImpl;
+        if (role.equalsIgnoreCase("adminv1")) {
             pageImpl = service_Account.getAll("ADMINV1", search, gender, page, size, sortBy, sortColumn);
-        } else if (Boolean.FALSE) {
+        } else if (role.equalsIgnoreCase("user")) {
             pageImpl = service_Account.getAll("USER", search, gender, page, size, sortBy, sortColumn);
+        } else if (role.equalsIgnoreCase("seller")) {
+            pageImpl = service_Account.getAll("SELLER", search, gender, page, size, sortBy, sortColumn);
         } else {
             pageImpl = null;
         }
-        return ApiResponse.<PageImpl<Response_Account>>build()
+        return ApiResponse.<PageImpl<?>>build()
                 .result(pageImpl);
+    }
+
+    @GetMapping("seller/browse")
+    public ApiResponse<PageImpl<Response_Account>> getAllSellerBrowse(
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "gender", required = false) Boolean gender,
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "5") Integer size,
+            @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
+            @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
+        return ApiResponse.<PageImpl<Response_Account>>build()
+                .result(service_Account.getAllSellerNotBorwse(search, gender, page, size, sortBy, sortColumn));
     }
 
     @PostMapping("nhanvien")
@@ -57,9 +69,15 @@ public class ApiAccountAdmin {
     }
 
     @PutMapping
-    public ApiResponse<Response_Account> put(@RequestParam(value = "id", required = false) Integer id) {
+    public ApiResponse<Response_Account> putStatus(@RequestParam(value = "id", required = false) Integer id) {
         return ApiResponse.<Response_Account>build()
                 .result(service_Account.updateStatus(id));
+    }
+
+    @PutMapping("seller/browse")
+    public ApiResponse<Response_Account> putActive(@RequestParam(value = "id", required = false) Integer id) {
+        return ApiResponse.<Response_Account>build()
+                .result(service_Account.updateActive(id));
     }
 
     @DeleteMapping

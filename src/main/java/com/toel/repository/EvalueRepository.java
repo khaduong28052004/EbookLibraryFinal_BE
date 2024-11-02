@@ -17,4 +17,7 @@ public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
     Evalue findByProductIdAndAccountId(@Param("accountId") Integer accountId, @Param("productId") Integer productId,
             @Param("billId") Integer billId);
 
+    @Query("SELECT AVG(e.star) FROM Evalue e WHERE e.account.id = :accountId")
+    Double calculateAverageStarByAccountId(@Param("accountId") Integer accountId);
+
 }

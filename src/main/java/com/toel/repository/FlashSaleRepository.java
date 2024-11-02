@@ -8,8 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import com.toel.model.FlashSale;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.time.LocalDateTime;
 
 public interface FlashSaleRepository extends JpaRepository<FlashSale, Integer> {
     @Query("SELECT f FROM FlashSale f WHERE (CAST(f.dateStart AS date) BETWEEN :dateStart AND :dateEnd OR CAST(f.dateEnd AS date) BETWEEN :dateStart AND :dateEnd) AND f.isDelete = :delete")

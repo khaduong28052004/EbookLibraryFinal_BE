@@ -26,5 +26,21 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
         Page<Account> findAllByRole(Role role, Pageable pageable);
 
+        List<Account> findAllByRole(Role role);
 
+        Page<Account> findAllByRoleAndStatusAndNumberIdIsNotNull(Role role, boolean status, Pageable pageable);
+
+        Page<Account> findAllByRoleAndStatusAndGenderAndNumberIdIsNotNull(Role role, boolean status, boolean gender,
+                        Pageable pageable);
+
+        Page<Account> findAllByUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContainingAndStatusAndRoleAndNumberIdIsNotNull(
+                        String username, String fullname, String email, String phone, boolean status, Role role,
+                        Pageable pageable);
+
+        @Query("SELECT a FROM Account a WHERE a.gender = ?1 AND a.status = ?2 AND a.role = ?3 AND a.numberId IS NOT NULL "
+                        +
+                        "AND (a.username LIKE %?4% OR a.fullname LIKE %?5% OR a.email LIKE %?6% OR a.phone LIKE %?7%)")
+        Page<Account> findAllByGenderAndStatusAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContainingAndNumberIdIsNotNull(
+                        boolean gender, boolean status, Role role, String username, String fullname, String email,
+                        String phone, Pageable pageable);
 }
