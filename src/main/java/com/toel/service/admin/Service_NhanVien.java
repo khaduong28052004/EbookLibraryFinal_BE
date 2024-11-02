@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.request.Account.Request_AccountCreate;
 import com.toel.dto.admin.response.Response_Account;
-import com.toel.mapper.admin.Admin_AccountMapper;
+import com.toel.mapper.AccountMapper;
 import com.toel.model.Account;
 import com.toel.model.Role;
 import com.toel.repository.AccountRepository;
@@ -25,7 +25,7 @@ public class Service_NhanVien {
         @Autowired
         AccountRepository accountRepository;
         @Autowired
-        Admin_AccountMapper accountMapper;
+        AccountMapper accountMapper;
         @Autowired
         RoleRepository roleRepository;
 

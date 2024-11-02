@@ -23,9 +23,7 @@ public enum ErrorCode {
     FIELD_INVALID_ID(3005, "Id {key} không hợp lệ!", HttpStatus.BAD_REQUEST),
 
     TIME_RANGE_ERROR(4001, "Thời gian bắt đầu phải trước thời gian kết thúc", HttpStatus.BAD_REQUEST),
-    EMAIL_FORMAT_ERROR(4002, "Email không hợp lệ!", HttpStatus.BAD_REQUEST),
-
-    FIELD_INVALID_ID2(3005, "giá phải nhỏ hơn điều kiện", HttpStatus.BAD_REQUEST);
+    EMAIL_FORMAT_ERROR(4002, "Email không hợp lệ!", HttpStatus.BAD_REQUEST);
 
     private final int code;
     private final String message;
