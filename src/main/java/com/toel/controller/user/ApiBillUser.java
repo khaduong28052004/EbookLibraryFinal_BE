@@ -38,7 +38,7 @@ import com.toel.service.user.Service_Bill_User;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/bill")
+@RequestMapping("/api/v1/user/bill")
 public class ApiBillUser {
 
 	@Autowired
