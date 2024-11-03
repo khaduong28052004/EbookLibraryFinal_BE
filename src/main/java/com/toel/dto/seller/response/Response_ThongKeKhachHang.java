@@ -7,7 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Response_DoanhSo {
-    double value;
-    Integer month;
+public class Response_ThongKeKhachHang {
+    String name;
+    Integer soSanPham;
+    Integer luotMua;
+    Integer luotDanhGia;
+    double soTien;
 }

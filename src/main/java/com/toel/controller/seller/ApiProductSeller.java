@@ -30,7 +30,7 @@ public class ApiProductSeller {
 
     @GetMapping("/getAll")
     public ApiResponse<PageImpl<Response_Product>> getAll(
-            @RequestParam(value = "account_id", defaultValue = "0") Integer account_id,
+            @RequestParam(value = "account_id", defaultValue = "1") Integer account_id,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "5") Integer size,
             @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,

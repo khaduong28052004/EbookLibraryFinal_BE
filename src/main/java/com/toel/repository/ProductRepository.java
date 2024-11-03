@@ -9,13 +9,13 @@ import com.toel.model.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Integer> {
 
-    @Query("SELECT p FROM Product p where p.account.id = ?1")
+    @Query("SELECT p FROM Product p WHERE p.account.id = ?1")
     Page<Product> findByAccountId(Integer account_id, Pageable pageable);
 
     @Query("SELECT p FROM Product p WHERE p.id NOT IN (SELECT fl.product.id FROM FlashSaleDetail fl Where fl.id =?1)")
-    Page<Product> selectAllProductNotInFlashSale(Integer flashSaleId,Pageable pageable);
+    Page<Product> selectAllProductNotInFlashSale(Integer flashSaleId, Pageable pageable);
 
     @Query("SELECT p FROM Product p WHERE p.id IN (SELECT fl.product.id FROM FlashSaleDetail fl Where fl.id =?1)")
-    Page<Product> selectAllProductInFlashSale(Integer flashSaleId,Pageable pageable);
+    Page<Product> selectAllProductInFlashSale(Integer flashSaleId, Pageable pageable);
 
 }

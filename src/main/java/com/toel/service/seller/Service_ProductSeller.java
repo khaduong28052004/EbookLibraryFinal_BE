@@ -1,5 +1,6 @@
 package com.toel.service.seller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,11 +28,13 @@ public class Service_ProductSeller {
 
     public PageImpl<Response_Product> getAll(
             Integer page, Integer size, boolean sortBy, String sortColum, Integer account_id) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColum));
         Page<Product> pageProduct = productRepository.findByAccountId(account_id, pageable);
-        List<Response_Product> list = pageProduct.stream()
-                .map(product -> productMapper.response_Product(product))
-                .collect(Collectors.toList());
+        List<Response_Product> list = pageProduct.hasContent()
+                ? pageProduct.stream()
+                        .map(product -> productMapper.response_Product(product))
+                        .collect(Collectors.toList())
+                : new ArrayList<>();
         return new PageImpl<>(list, pageable, pageProduct.getTotalElements());
     }
 

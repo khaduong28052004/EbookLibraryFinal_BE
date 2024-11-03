@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Response_DoanhSo {
-    double value;
-    Integer month;
+public class Response_VoucherDetail {
+    Integer id;
+    Response_Account account;
+    Response_Voucher voucher;
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.request.Request_Voucher;
 import com.toel.dto.seller.response.Response_Voucher;
+import com.toel.dto.seller.response.Response_VoucherDetail;
 import com.toel.service.seller.Service_VoucherSeller;
 
 import jakarta.validation.Valid;
@@ -60,5 +61,16 @@ public class ApiVoucherSeller {
                 boolean status = service_Voucher.delete(voucher_id);
                 return ApiResponse.build()
                                 .message(status ? "Khôi phục hoạt động thành công" : "Ngừng hoạt động thành công");
+        }
+
+        @GetMapping("/getDetail")
+        public ApiResponse<PageImpl<Response_VoucherDetail>> getDetail(
+                        @RequestParam(value = "page", defaultValue = "0") Integer page,
+                        @RequestParam(value = "size", defaultValue = "5") Integer size,
+                        @RequestParam(value = "sortBy", defaultValue = "true") boolean sortBy,
+                        @RequestParam(value = "sortColum", defaultValue = "id") String sortColum,
+                        @RequestParam(value = "voucher_id", defaultValue = "0") Integer voucher_id) {
+                return ApiResponse.<PageImpl<Response_VoucherDetail>>build()
+                                .result(service_Voucher.getAllDetail(page, size, sortBy, sortColum, voucher_id));
         }
 }
