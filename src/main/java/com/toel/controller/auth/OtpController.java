@@ -1,9 +1,13 @@
 package com.toel.controller.auth;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import com.toel.model.Account;
 import com.toel.repository.AccountRepository;
 import com.toel.service.Email.EmailService;
 import com.toel.service.Email.EmailTemplateType;
@@ -17,7 +21,8 @@ public class OtpController {
     private AccountRepository accountRepository;
     @Autowired
     private OtpService otpService;
-
+    @Autowired
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();// Create BCryptPasswordEncoder instance
 
     @PostMapping("/api/v1/otp/generate")
     public ResponseEntity<String> generateOtp(@RequestParam String email) {
@@ -25,9 +30,10 @@ public class OtpController {
         boolean isvalid = true;
         if (isvalid) {
             String otp = otpService.generateOtp(email);
-            // emailService.sendSimpleEmail("kienlhpc05751@fpt.edu.vn", "Test Subject", "Test Email Body"+otp);
-            //emailService.push("kienlhpc05751@fpt.edu.vn", "Mã otp của bạn", otp);
-            emailService.push("kienlhpc05751@fpt.edu.vn", "Mã otp của bạn", EmailTemplateType.OTP, otp,"lỏ");
+            // emailService.sendSimpleEmail("kienlhpc05751@fpt.edu.vn", "Test Subject",
+            // "Test Email Body"+otp);
+            // emailService.push("kienlhpc05751@fpt.edu.vn", "Mã otp của bạn", otp);
+            emailService.push("kienlhpc05751@fpt.edu.vn", "Mã otp của bạn", EmailTemplateType.OTP, otp, "lỏ");
             return ResponseEntity.ok("OTP generated: " + otp);
 
         } else {
@@ -66,5 +72,41 @@ public class OtpController {
         // "Test Email Body");
         emailService.push("kienlhpc05751@fpt.edu.vn", "Test Subject", "Test Email Body");
         return "Email sent!";
+    }
+
+    @PostMapping("/user/updatePass") // updatePass
+    public ResponseEntity<?> putMethodName(@RequestParam Integer id, @RequestParam String repass,
+            @RequestParam String oldpass) {
+        Optional<Account> account = accountRepository.findById(id);
+        Account accountRe = account.get();
+        String hashPass = passwordEncoder.encode(repass);
+        accountRe.setPassword(hashPass);
+        try {
+            accountRepository.save(accountRe);
+        } catch (Exception e) {
+            // TODO: handle exceptiot
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("lỗi");
+        }
+        return ResponseEntity.ok("oke");
+    }
+   
+    @PostMapping("/user/changePassword") // email trung se sai
+    public ResponseEntity<?> changePassword(
+            @RequestParam String pass,
+            @RequestParam String rpass,
+            @RequestParam String email) {
+        if (!pass.equals(rpass)) {
+            return ResponseEntity.badRequest().body("Passwords do not match.");
+        }
+        Account accountOpt = accountRepository.findByEmail(email);
+        if (accountOpt == null) {
+            return ResponseEntity.badRequest().body("User not found.");
+        }
+        // Account account = accountOpt.get();
+        // Set the new password (You should hash the password before saving)
+        accountOpt.setPassword(passwordEncoder.encode(pass));
+        accountRepository.save(accountOpt);
+        return ResponseEntity.ok("Password changed successfully.");
     }
 }
