@@ -1,5 +1,7 @@
 package com.toel.repository;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -101,4 +103,9 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	@Query("SELECT SUM(b.totalPrice * (1 - (b.discountRate.discount / 100.0))) FROM Bill b JOIN BillDetail bd WHERE YEAR(b.finishAt) = ?1 AND bd.product.account.id = ?2")
 	List<Response_DoanhThu> getListDoanhThu(Integer year, Integer account_id);
 
+	@Query("SELECT AVG(b.discountPrice) FROM Bill b WHERE b.account.id =?1 AND ( ?2 IS NULL OR b.finishAt >= ?2) AND ( ?3 IS NULL OR b.finishAt <= ?3 )")
+	Double calculateVoucherByShop_San(Integer account, LocalDate dateStart, LocalDate dateEnd);
+
+	// @Query("SELECT b FROM Bill b WHERE b.account.id =?1 AND ( ?2 IS NULL OR b.finishAt >= ?2) AND ( ?3 IS NULL OR b.finishAt <= ?3 )")
+	// Page<Bill> selectBill(Integer account, LocalDate dateStart, LocalDate dateEnd);
 }

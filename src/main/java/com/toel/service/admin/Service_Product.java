@@ -26,18 +26,18 @@ public class Service_Product {
     @Autowired
     ProductMapper productMapper;
 
-    public PageImpl<Response_ProductListFlashSale> getAll(int page, int size, Boolean sortBy, String column, String key) {
+    public PageImpl<Response_ProductListFlashSale> getAll(int page, int size, Boolean sortBy, String column,
+            String key) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));
         Page<Product> pageProduct;
         Double priceOrSale = parseStringToDouble(key);
 
-        if (key.isBlank()) {
-            pageProduct = productRepository.findByActive(true, pageable);
+        if (key.isBlank() || key == null) {
+            pageProduct = productRepository.findByIsActive(true, pageable);
         } else if (priceOrSale != null) {
-            pageProduct = productRepository.selectAllByActiveAndMatchingAttributes(priceOrSale, priceOrSale, null, null,
-                    null, null, pageable);
+            pageProduct = productRepository.selectAllByActiveAndMatchingKey(null, priceOrSale, pageable);
         } else {
-            pageProduct = productRepository.selectAllByActiveAndMatchingAttributes(null, null, key, key, column, key,
+            pageProduct = productRepository.selectAllByActiveAndMatchingKey(key, null,
                     pageable);
         }
         List<Response_ProductListFlashSale> list = pageProduct.stream()
@@ -46,7 +46,8 @@ public class Service_Product {
         return new PageImpl<>(list, pageable, pageProduct.getTotalElements());
     }
 
-    public PageImpl<Response_ProductListFlashSale> getAllBrowse(int page, int size, Boolean sortBy, String column, String key) {
+    public PageImpl<Response_ProductListFlashSale> getAllBrowse(int page, int size, Boolean sortBy, String column,
+            String key) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));
         Page<Product> pageProduct;
         Double priceOrSale = parseStringToDouble(key);
@@ -54,12 +55,10 @@ public class Service_Product {
         if (key.isBlank()) {
             pageProduct = productRepository.findAllByIsDeleteAndIsActive(false, false, pageable);
         } else if (priceOrSale != null) {
-            pageProduct = productRepository.selectAllByActiveAndDeleteAndMatchingAttributes(priceOrSale, priceOrSale,
-                    null, null,
-                    null, null, pageable);
+            pageProduct = productRepository.selectAllByActiveAndDeleteAndMatchingAttributes(null, priceOrSale,
+                    pageable);
         } else {
-            pageProduct = productRepository.selectAllByActiveAndDeleteAndMatchingAttributes(null, null, key, key,
-                    column, key,
+            pageProduct = productRepository.selectAllByActiveAndDeleteAndMatchingAttributes(key, null,
                     pageable);
         }
         List<Response_ProductListFlashSale> list = pageProduct.stream()
@@ -69,9 +68,9 @@ public class Service_Product {
     }
 
     // public Response_ProductListFlashSale getId(Integer id) {
-    //     Product Product = productRepository.findById(id)
-    //             .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Product"));
-    //     return productMapper.tProductListFlashSale(Product);
+    // Product Product = productRepository.findById(id)
+    // .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Product"));
+    // return productMapper.tProductListFlashSale(Product);
     // }
 
     public Response_ProductListFlashSale updateStatus(int id) {
@@ -80,6 +79,7 @@ public class Service_Product {
         entity.setDelete(!entity.isDelete());
         return productMapper.tProductListFlashSale(productRepository.save(entity));
     }
+
     public Response_ProductListFlashSale updateActive(int id) {
         Product entity = productRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Product"));

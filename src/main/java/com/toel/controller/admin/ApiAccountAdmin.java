@@ -71,7 +71,7 @@ public class ApiAccountAdmin {
     @PutMapping
     public ApiResponse<Response_Account> putStatus(@RequestParam(value = "id", required = false) Integer id) {
         return ApiResponse.<Response_Account>build()
-                .result(service_Account.updateStatus(id));
+                .result(service_Account.updateStatus(id, null));
     }
 
     @PutMapping("seller/browse")
@@ -83,7 +83,7 @@ public class ApiAccountAdmin {
     @DeleteMapping
     public ApiResponse<Response_Account> delete(
             @RequestParam(value = "id", required = false) Integer id) {
-        service_Account.delete(id);
+        service_Account.updateStatus(id, false);
         return ApiResponse.<Response_Account>build()
                 .message("Xóa nhân viên thành công");
     }

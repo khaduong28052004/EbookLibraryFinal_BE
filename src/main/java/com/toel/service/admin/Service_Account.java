@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import com.toel.dto.admin.request.Account.Request_AccountCreate;
 import com.toel.dto.admin.response.Response_Account;
 import com.toel.dto.admin.response.Response_TK_Seller;
+import com.toel.exception.AppException;
+import com.toel.exception.ErrorCode;
 import com.toel.mapper.AccountMapper;
 import com.toel.model.Account;
 import com.toel.model.Role;
@@ -116,16 +118,20 @@ public class Service_Account {
                 return new PageImpl<>(list, pageable, pageAccount.getTotalElements());
         }
 
-        public Response_Account updateStatus(int id) {
+        public Response_Account updateStatus(int id, Boolean status) {
                 Account entity = accountRepository.findById(id)
-                                .orElseThrow(() -> new RuntimeException("Không tìm thấy account"));
-                entity.setStatus(!entity.isStatus());
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
+                if (Boolean.FALSE) {
+                        entity.setStatus(false);
+                } else {
+                        entity.setStatus(!entity.isStatus());
+                }
                 return accountMapper.toAccount(accountRepository.saveAndFlush(entity));
         }
 
         public Response_Account updateActive(int id) {
                 Account entity = accountRepository.findById(id)
-                                .orElseThrow(() -> new RuntimeException("Không tìm thấy account"));
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
                 Role role = roleRepository.findByNameIgnoreCase("Seller");
                 entity.setRole(role);
                 return accountMapper.toAccount(accountRepository.saveAndFlush(entity));
@@ -138,10 +144,4 @@ public class Service_Account {
                 return accountMapper.toAccount(accountRepository.saveAndFlush(account));
         }
 
-        public void delete(Integer id) {
-                Account entity = accountRepository.findById(id)
-                                .orElseThrow(() -> new RuntimeException("Không tìm thấy account"));
-                entity.setStatus(false);
-                accountRepository.save(entity);
-        }
 }
