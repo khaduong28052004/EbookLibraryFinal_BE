@@ -94,17 +94,21 @@ public class Service_Thongke {
                                         accountnew.setDTshop(
                                                         billDetailRepository.calculateAverageBillByShop(account.getId(),
                                                                         dateStart, dateEnd));
+                                        System.out.println("Doanh thu shop: " + accountnew.getDTshop());
                                         accountnew.setDTSan(
                                                         billDetailRepository.calculateChietKhauByShop_San(
                                                                         account.getId(), dateStart, dateEnd));
+                                        System.out.println("Doanh thu sàn: " + accountnew.getDTSan());
                                         accountnew.setPhi(billRepository.calculateVoucherByShop_San(account.getId(),
                                                         dateStart, dateEnd));
+                                        System.out.println("Phí: " + accountnew.getPhi());
                                         accountnew.setLoiNhuan(
                                                         billDetailRepository.calculateChietKhauByShop_San(
                                                                         account.getId(), dateStart, dateEnd)
                                                                         - billRepository.calculateVoucherByShop_San(
                                                                                         account.getId(), dateStart,
                                                                                         dateEnd));
+                                        System.out.println("Lợi nhuận: " + accountnew.getLoiNhuan());
                                         return accountnew;
                                 })
                                 .collect(Collectors.toList());
@@ -112,12 +116,13 @@ public class Service_Thongke {
                 return new PageImpl<>(list, pageable, pageAccount.getTotalElements());
         }
 
-        // public PageImpl<Response_TK_Bill> getAll_TK_DonHang(LocalDate dateStart, LocalDate dateEnd, Integer page,
-        //                 Integer size, Boolean sortBy, String sortColumn) {
-        //         Pageable pageable = PageRequest.of(page, size,
-        //                         Sort.by(sortBy ? Sort.Direction.DESC : Sort.Direction.ASC, sortColumn));
-        //         Page<Bill> pageBill;
-                
+        // public PageImpl<Response_TK_Bill> getAll_TK_DonHang(LocalDate dateStart,
+        // LocalDate dateEnd, Integer page,
+        // Integer size, Boolean sortBy, String sortColumn) {
+        // Pageable pageable = PageRequest.of(page, size,
+        // Sort.by(sortBy ? Sort.Direction.DESC : Sort.Direction.ASC, sortColumn));
+        // Page<Bill> pageBill;
+
         // }
 
 }

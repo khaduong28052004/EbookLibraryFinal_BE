@@ -1,5 +1,6 @@
 package com.toel.model;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -42,11 +43,11 @@ public class Bill {
 
 	double priceShipping;
 
-	Date finishAt;
+	LocalDate finishAt;
 
-	Date createAt;
+	LocalDate createAt;
 
-	Date updateAt;
+	LocalDate updateAt;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "bill")
