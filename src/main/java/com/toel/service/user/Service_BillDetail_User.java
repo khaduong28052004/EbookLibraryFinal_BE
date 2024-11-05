@@ -1,9 +1,6 @@
 package com.toel.service.user;
 
-import java.security.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -11,17 +8,11 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.toel.dto.user.response.Response_Bill_User;
-import com.toel.dto.user.response.Response_Bill_Shop_User;
 import com.toel.dto.user.response.Response_BillDetail_User;
 import com.toel.dto.user.response.Response_Bill_Product_User;
-import com.toel.dto.user.resquest.Request_Bill_User;
 import com.toel.model.Account;
-import com.toel.model.Address;
 import com.toel.model.Bill;
 import com.toel.model.Cart;
 import com.toel.model.Evalue;
@@ -34,7 +25,6 @@ import com.toel.repository.BillRepository;
 import com.toel.repository.CartRepository;
 import com.toel.repository.EvalueRepository;
 import com.toel.repository.OrderStatusRepository;
-import com.toel.repository.ProductReportRepository;
 
 @Service
 public class Service_BillDetail_User {
@@ -46,8 +36,6 @@ public class Service_BillDetail_User {
 	OrderStatusRepository orderStatusRepository;
 	@Autowired
 	AccountRepository accountRepository;
-	@Autowired
-	ProductReportRepository productRepository;
 	@Autowired
 	EvalueRepository evaluateRepository;
 	@Autowired

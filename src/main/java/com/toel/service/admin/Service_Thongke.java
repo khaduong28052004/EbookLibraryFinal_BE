@@ -22,7 +22,6 @@ import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
 import com.toel.repository.EvalueRepository;
 import com.toel.repository.LikeRepository;
-import com.toel.repository.ProductReportRepository;
 import com.toel.repository.ProductRepository;
 import com.toel.repository.RoleRepository;
 
@@ -34,8 +33,6 @@ public class Service_Thongke {
         RoleRepository roleRepository;
         @Autowired
         ProductRepository productRepository;
-        @Autowired
-        ProductReportRepository productReportRepository;
         @Autowired
         BillDetailRepository billDetailRepository;
         @Autowired
