@@ -1,6 +1,8 @@
 
 package com.toel.service.user;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,6 +23,7 @@ import com.toel.model.Evalue;
 import com.toel.model.OrderStatus;
 import com.toel.model.Product;
 import com.toel.repository.AccountRepository;
+import com.toel.repository.AddressRepository;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
 import com.toel.repository.CartRepository;
@@ -41,7 +44,9 @@ public class Service_BillDetail_User {
 	private EvalueRepository evaluateRepository;
 	@Autowired
 	private CartRepository cartRepository;
-
+	@Autowired
+	private AddressRepository addressRepository;
+	
 	public Map<String, Object> getBillDetail(Integer billId) {
 		Map<String, Object> response = new HashMap<String, Object>();
 		try {
@@ -79,16 +84,19 @@ public class Service_BillDetail_User {
 		Double billDiscountPrice = Double.parseDouble(product[3].toString());
 		Double billTotalShippingPrice = Double.parseDouble(product[4].toString());
 		Integer billTotalQuantity = Integer.parseInt(product[5].toString());
-		String billAddress = product[6].toString();
+		Integer billAddressId =Integer.parseInt( product[6].toString());
 		Integer orderStatusID = Integer.parseInt(product[7].toString());
-		Date createdDatetime = (Date) product[8];
-		Date updatedDatetime = (Date) product[9];
+		String createdDatetime = product[8].toString();
+		String updatedDatetime =  product[9].toString();
 		Double billDiscountRate = Double.parseDouble(product[10].toString());
 		Integer shopId = Integer.parseInt(product[18].toString());
 		String shopName = product[19].toString();
 		String shopAvatar = product[20].toString();
 		String userFullname = product[21].toString();
 		String userPhone = product[22].toString();
+		String orderStatus = orderStatusRepository.findById(orderStatusID).get().getName();
+		String address = addressRepository.findById(billAddressId).get().getFullNameAddress();
+
 		Response_BillDetail_User billData = new Response_BillDetail_User();
 		billData.setBillID(billID);
 		billData.setUserID(userID);
@@ -96,10 +104,11 @@ public class Service_BillDetail_User {
 		billData.setBillDiscountPrice(billDiscountPrice);
 		billData.setBillTotalShippingPrice(billTotalShippingPrice);
 		billData.setBillTotalQuantity(billTotalQuantity);
-		billData.setBillAddress(billAddress);
+		billData.setBillAddress(address);
 		billData.setBillOrderStatusId(orderStatusID);
-		billData.setCreatedDatetime(createdDatetime);
-		billData.setUpdatedDatetime(updatedDatetime);
+		billData.setBillOrderStatus(orderStatus);
+		billData.setCreatedDatetime(formatDate(createdDatetime));
+		billData.setUpdatedDatetime(formatDate(updatedDatetime));
 		billData.setBillDiscountRate(billDiscountRate);
 		billData.setShopId(shopId);
 		billData.setShopName(shopName);
@@ -197,4 +206,21 @@ public class Service_BillDetail_User {
 		}
 	}
 
+
+	public static String formatDate(String inputDate) {
+        // Định dạng đầu vào
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+        // Định dạng đầu ra
+        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy/MM/dd");
+        
+        try {
+            // Phân tích chuỗi đầu vào thành đối tượng Date
+            Date date = inputFormat.parse(inputDate);
+            // Định dạng lại đối tượng Date thành chuỗi đầu ra
+            return outputFormat.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null; // Hoặc xử lý lỗi theo cách khác
+        }
+    }
 }

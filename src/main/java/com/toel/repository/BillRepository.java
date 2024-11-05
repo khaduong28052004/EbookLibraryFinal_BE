@@ -138,4 +138,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			"GROUP BY bd.product.name, bd.product.category.name")
 	List<Object[]> getListThongKeSanPham(Integer account_id);
 
+	@Query(value="SELECT * FROM Bills WHERE orderstatus_id = :orderstatusID", nativeQuery = true)
+	List<Bill> findByOrderStatusId(@Param("orderstatusID") Integer orderstatusId);
+
 }

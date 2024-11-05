@@ -1,5 +1,8 @@
 package com.toel.controller.user;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,9 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.user.response.Response_BillDetail_User;
@@ -31,15 +36,15 @@ import com.toel.service.user.Service_BillDetail_User;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/user/billdetail")
+@RequestMapping("/api/v1/billdetail")
 public class ApiBillDetailUser {
 
 	@Autowired
 	private Service_BillDetail_User service_BillDetail_User;
 
 	/* Lấy thông tin order */
-	@PostMapping("/read/{billId}")
-	public ResponseEntity<Map<String, Object>> getAllOrdersByOrderStatus(@PathVariable("billId") Integer billId) {
+	@GetMapping("/read")
+	public ResponseEntity<Map<String, Object>> getAllOrdersByOrderStatus(@RequestParam("billId") Integer billId) {
 		Map<String, Object> response = new HashMap<String, Object>();
 		try {
 			List<Response_BillDetail_User> shopListInBill = service_BillDetail_User
@@ -114,5 +119,6 @@ public class ApiBillDetailUser {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
+	
 
 }
