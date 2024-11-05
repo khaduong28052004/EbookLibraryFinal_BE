@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_BillDetail_User;
 import com.toel.dto.user.response.Response_Bill_Product_User;
-<<<<<<< HEAD
 import com.toel.exception.CustomException;
-=======
->>>>>>> 788c4537e106dc0ff31503362a830df441dba806
 import com.toel.model.Account;
 import com.toel.model.Bill;
 import com.toel.model.Cart;
@@ -41,18 +38,9 @@ public class Service_BillDetail_User {
 	@Autowired
 	private AccountRepository accountRepository;
 	@Autowired
-<<<<<<< HEAD
 	private EvalueRepository evaluateRepository;
 	@Autowired
 	private CartRepository cartRepository;
-=======
-	EvalueRepository evaluateRepository;
-	@Autowired
-	CartRepository cartRepository;
-	@Autowired
-	AddressRepository addressRepository;
-	@Autowired
-	OrderStatusRepository oderStatusRepository;
 
 	public Map<String, Object> getBillDetail(Integer billId) {
 		Map<String, Object> response = new HashMap<String, Object>();
@@ -68,7 +56,6 @@ public class Service_BillDetail_User {
 		}
 		return response;
 	}
->>>>>>> 788c4537e106dc0ff31503362a830df441dba806
 
 	public List<Response_BillDetail_User> createBillsWithProductsInBillDetail(Integer billId) {
 		Map<Integer, Response_BillDetail_User> billMap = new HashMap<>();

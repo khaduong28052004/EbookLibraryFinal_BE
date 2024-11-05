@@ -33,7 +33,7 @@ import com.toel.service.user.Service_Bill_User;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/user/bill")
+@RequestMapping("/api/v1/bill")
 public class ApiBillUser {
 
 	@Autowired
@@ -43,6 +43,7 @@ public class ApiBillUser {
 	@PostMapping("/read")
 	public ResponseEntity<Map<String, Object>> getAllOrdersByOrderStatus(
 			@RequestBody Request_Bill_User requestBillDTO) {
+		System.out.println("TEST 12333");
 		Map<String, Object> response = service_Bill_User.getBills(requestBillDTO);
 		return ResponseEntity.ok(response);
 	}
