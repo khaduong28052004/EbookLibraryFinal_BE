@@ -1,10 +1,7 @@
 package com.toel.model;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
-
-import org.hibernate.annotations.Nationalized;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -15,7 +12,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,11 +39,11 @@ public class Bill {
 
 	double priceShipping;
 
-	LocalDate finishAt;
+	Date finishAt;
 
-	LocalDate createAt;
+	Date createAt;
 
-	LocalDate updateAt;
+	Date updateAt;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "bill")

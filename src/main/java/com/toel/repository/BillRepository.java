@@ -102,7 +102,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	List<Response_DoanhThu> getListDoanhThu(Integer year, Integer account_id);
 
 	@Query("SELECT COALESCE(AVG(b.discountPrice),0) FROM Bill b WHERE b.account.id =?1 AND ( ?2 IS NULL OR b.finishAt >= ?2) AND ( ?3 IS NULL OR b.finishAt <= ?3 )")
-	Double calculateVoucherByShop_San(Integer account, LocalDate dateStart, LocalDate dateEnd);
+	Double calculateVoucherByShop_San(Integer account, Date dateStart, Date dateEnd);
 
 	// @Query("SELECT b FROM Bill b WHERE b.account.id =?1 AND ( ?2 IS NULL OR
 	// b.finishAt >= ?2) AND ( ?3 IS NULL OR b.finishAt <= ?3 )")

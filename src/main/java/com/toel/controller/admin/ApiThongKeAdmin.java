@@ -1,6 +1,6 @@
 package com.toel.controller.admin;
 
-import java.time.LocalDate;
+import java.sql.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
-import com.toel.dto.admin.response.Response_Account;
 import com.toel.dto.admin.response.ThongKe.Response_TKDT_Seller;
 import com.toel.service.admin.Service_Thongke;
 
@@ -24,8 +23,8 @@ public class ApiThongKeAdmin {
 
     @GetMapping
     public ApiResponse<PageImpl<Response_TKDT_Seller>> getAllTKDT_Seller(
-            @RequestParam(value = "dateStart", required = false) LocalDate dateStart,
-            @RequestParam(value = "dateEnd", required = false) LocalDate dateEnd,
+            @RequestParam(value = "dateStart", required = false) Date dateStart,
+            @RequestParam(value = "dateEnd", required = false) Date dateEnd,
             @RequestParam(value = "search", required = false) String search,
             @RequestParam(value = "gender", required = false) Boolean gender,
             @RequestParam(value = "page", defaultValue = "0") Integer page,

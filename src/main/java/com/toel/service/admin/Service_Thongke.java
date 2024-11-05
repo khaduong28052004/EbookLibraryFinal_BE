@@ -1,6 +1,5 @@
 package com.toel.service.admin;
 
-import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -15,10 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.response.ThongKe.Response_TKDT_Seller;
-import com.toel.dto.admin.response.ThongKe.Response_TK_Bill;
 import com.toel.mapper.AccountMapper;
 import com.toel.model.Account;
-import com.toel.model.Bill;
 import com.toel.model.Role;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.BillDetailRepository;
@@ -50,7 +47,7 @@ public class Service_Thongke {
         @Autowired
         AccountMapper accountMapper;
 
-        public PageImpl<Response_TKDT_Seller> get_TKDT_Seller(LocalDate dateStart, LocalDate dateEnd,
+        public PageImpl<Response_TKDT_Seller> get_TKDT_Seller(Date dateStart, Date dateEnd,
                         String search, Boolean gender, Integer page, Integer size, Boolean sortBy, String sortColumn) {
 
                 Role role = roleRepository.findByNameIgnoreCase("Seller");
@@ -73,16 +70,16 @@ public class Service_Thongke {
                                                                         pageable);
                 }
 
-                // Set dateStart and dateEnd to the current month if both are null
+                // // Set dateStart and dateEnd to the current month if both are null
                 // if (dateStart == null && dateEnd == null) {
                 // Calendar calendarStart = Calendar.getInstance();
                 // Calendar calendarEnd = Calendar.getInstance();
 
-                // // Thiết lập dateStart là ngày đầu tiên của tháng hiện tại
+                // // // Thiết lập dateStart là ngày đầu tiên của tháng hiện tại
                 // calendarStart.set(Calendar.DAY_OF_MONTH, 1);
                 // // dateStart = calendarStart.getTime();
 
-                // // Thiết lập dateEnd là ngày cuối cùng của tháng hiện tại
+                // // // Thiết lập dateEnd là ngày cuối cùng của tháng hiện tại
                 // calendarEnd.set(Calendar.DAY_OF_MONTH,
                 // calendarEnd.getActualMaximum(Calendar.DAY_OF_MONTH));
                 // dateEnd = calendarEnd.getTime();
