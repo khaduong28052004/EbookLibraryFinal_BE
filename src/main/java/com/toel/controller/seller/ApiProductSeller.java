@@ -14,8 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
-import com.toel.dto.seller.request.Request_Product;
-import com.toel.dto.seller.request.Request_Voucher;
+import com.toel.dto.seller.request.Product.Request_ProductCreate;
+import com.toel.dto.seller.request.Product.Request_ProductUpdate;
+import com.toel.dto.seller.request.Voucher.Request_VoucherCreate;
 import com.toel.dto.seller.response.Response_Product;
 import com.toel.dto.seller.response.Response_Voucher;
 import com.toel.service.seller.Service_ProductSeller;
@@ -43,11 +44,18 @@ public class ApiProductSeller {
 
         @PostMapping("/create")
         public ApiResponse<Response_Product> create(
-                        @RequestBody @Valid Request_Product request_Product) throws IOException {
+                        @RequestBody @Valid Request_ProductCreate request_Product) throws IOException {
                 return ApiResponse.<Response_Product>build()
-                                .message(request_Product.getId() == null ? "Thêm sản phẩm thành công"
-                                                : "Cập nhật sản phẩm thành công")
+                                .message("Thêm sản phẩm thành công")
                                 .result(service_ProductSeller.create(request_Product));
+        }
+
+        @PostMapping("/update")
+        public ApiResponse<Response_Product> update(
+                        @RequestBody @Valid Request_ProductUpdate request_Product) throws IOException {
+                return ApiResponse.<Response_Product>build()
+                                .message("Cập nhật sản phẩm thành công")
+                                .result(service_ProductSeller.update(request_Product));
         }
 
         @DeleteMapping("/delete")

@@ -1,4 +1,4 @@
-package com.toel.dto.seller.request;
+package com.toel.dto.seller.request.Voucher;
 
 import java.util.Date;
 
@@ -15,8 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Request_Voucher {
-    Integer id;
+public class Request_VoucherCreate {
     @NotBlank(message = "FIELD_REQUIRED")
     String name;
     @NotBlank(message = "FIELD_REQUIRED")

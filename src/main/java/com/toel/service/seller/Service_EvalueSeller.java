@@ -16,7 +16,9 @@ import com.toel.dto.seller.request.Request_Evalue;
 import com.toel.dto.seller.response.Response_Evalue;
 import com.toel.mapper.EvalueMapper;
 import com.toel.model.Evalue;
+import com.toel.repository.AccountRepository;
 import com.toel.repository.EvalueRepository;
+import com.toel.repository.ProductRepository;
 
 @Service
 public class Service_EvalueSeller {
@@ -24,6 +26,10 @@ public class Service_EvalueSeller {
     EvalueMapper evalueMapper;
     @Autowired
     EvalueRepository evalueRepository;
+    @Autowired
+    AccountRepository accountRepository;
+    @Autowired
+    ProductRepository productRepository;
 
     public PageImpl<Response_Evalue> getAll(
             Integer page, Integer size, boolean sortBy, String sortColum, Integer account_id) {
@@ -36,6 +42,9 @@ public class Service_EvalueSeller {
     }
 
     public Response_Evalue phanHoi(Request_Evalue request_Evalue) {
-        return evalueMapper.response_Evalue(evalueRepository.saveAndFlush(evalueMapper.evalue(request_Evalue)));
+        Evalue evalue = evalueMapper.evalue(request_Evalue);
+        evalue.setAccount(accountRepository.findById(request_Evalue.getAccount()).get());
+        evalue.setProduct(productRepository.findById(request_Evalue.getProduct()).get());
+        return evalueMapper.response_Evalue(evalueRepository.saveAndFlush(evalue));
     }
 }

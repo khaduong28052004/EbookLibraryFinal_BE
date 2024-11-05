@@ -13,7 +13,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import com.toel.dto.seller.request.Request_Category;
+import com.toel.dto.seller.request.Category.Request_CategoryCreate;
+import com.toel.dto.seller.request.Category.Request_CategoryUpdate;
 import com.toel.dto.seller.response.Response_Category;
 import com.toel.mapper.CategoryMapper;
 import com.toel.model.Category;
@@ -38,10 +39,16 @@ public class Service_CategorySeller {
         return new PageImpl<>(list, pageable, pageCategory.getTotalElements());
     }
 
-    public Response_Category save(
-            Request_Category request_Category) {
+    public Response_Category create(
+            Request_CategoryCreate request_Category) {
         return categoryMapper
-                .response_Category(categoryRepository.saveAndFlush(categoryMapper.category(request_Category)));
+                .response_Category(categoryRepository.saveAndFlush(categoryMapper.categoryCreate(request_Category)));
+    }
+
+    public Response_Category update(
+            Request_CategoryUpdate request_Category) {
+        return categoryMapper
+                .response_Category(categoryRepository.saveAndFlush(categoryMapper.categoryUpdate(request_Category)));
     }
 
     public void delete(

@@ -14,10 +14,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import com.toel.dto.seller.request.Request_Product;
+import com.toel.dto.seller.request.Product.Request_ProductCreate;
+import com.toel.dto.seller.request.Product.Request_ProductUpdate;
 import com.toel.dto.seller.response.Response_Product;
 import com.toel.mapper.ProductMapper;
 import com.toel.model.Product;
+import com.toel.repository.AccountRepository;
+import com.toel.repository.CategoryRepository;
 import com.toel.repository.ProductRepository;
 
 @Service
@@ -28,6 +31,10 @@ public class Service_ProductSeller {
     ProductRepository productRepository;
     @Autowired
     Service_ImageProductSeller service_ImageProductSeller;
+    @Autowired
+    AccountRepository accountRepository;
+    @Autowired
+    CategoryRepository categoryRepository;
 
     public PageImpl<Response_Product> getAll(
             Integer page, Integer size, boolean sortBy, String sortColum, Integer account_id) {
@@ -42,9 +49,20 @@ public class Service_ProductSeller {
     }
 
     public Response_Product create(
-            Request_Product request_Product) throws IOException {
-        Product product = productMapper.product(request_Product);
-        service_ImageProductSeller.saveProductImages(product, request_Product.getImages());
+            Request_ProductCreate request_Product) throws IOException {
+        Product product = productMapper.productCreate(request_Product);
+        product.setAccount(accountRepository.findById(request_Product.getAccount()).get());
+        product.setCategory(categoryRepository.findById(request_Product.getCategory()).get());
+        service_ImageProductSeller.createProductImages(product, request_Product.getImageProducts());
+        return productMapper.response_Product(productRepository.saveAndFlush(product));
+    }
+
+    public Response_Product update(
+            Request_ProductUpdate request_Product) throws IOException {
+        Product product = productMapper.productUpdate(request_Product);
+        product.setAccount(accountRepository.findById(request_Product.getAccount()).get());
+        product.setCategory(categoryRepository.findById(request_Product.getCategory()).get());
+        service_ImageProductSeller.updateProductImages(product, request_Product.getImageProducts());
         return productMapper.response_Product(productRepository.saveAndFlush(product));
     }
 

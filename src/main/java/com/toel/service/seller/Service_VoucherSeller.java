@@ -14,7 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import com.toel.dto.seller.request.Request_Voucher;
+import com.toel.dto.seller.request.Voucher.Request_VoucherCreate;
+import com.toel.dto.seller.request.Voucher.Request_VoucherUpdate;
 import com.toel.dto.seller.response.Response_Voucher;
 import com.toel.dto.seller.response.Response_VoucherDetail;
 import com.toel.mapper.VoucherDetailMapper;
@@ -56,8 +57,20 @@ public class Service_VoucherSeller {
         return voucherMapper.response_Voucher(voucherRepository.findById(voucher_id).get());
     }
 
-    public Response_Voucher save(Request_Voucher request_Voucher) {
-        return voucherMapper.response_Voucher(voucherRepository.saveAndFlush(voucherMapper.voucher(request_Voucher)));
+    public Response_Voucher create(Request_VoucherCreate request_Voucher) {
+        Voucher voucher = voucherMapper.voucherCreate(request_Voucher);
+        voucher.setAccount(accountRepository.findById(request_Voucher.getAccount()).get());
+        voucher.setTypeVoucher(typeVoucherRepository.findById(request_Voucher.getTypeVoucher()).get());
+        return voucherMapper
+                .response_Voucher(voucherRepository.saveAndFlush(voucher));
+    }
+
+    public Response_Voucher update(Request_VoucherUpdate request_Voucher) {
+        Voucher voucher = voucherMapper.voucherUpdate(request_Voucher);
+        voucher.setAccount(accountRepository.findById(request_Voucher.getAccount()).get());
+        voucher.setTypeVoucher(typeVoucherRepository.findById(request_Voucher.getTypeVoucher()).get());
+        return voucherMapper
+                .response_Voucher(voucherRepository.saveAndFlush(voucher));
     }
 
     public boolean delete(Integer voucher_id) {
