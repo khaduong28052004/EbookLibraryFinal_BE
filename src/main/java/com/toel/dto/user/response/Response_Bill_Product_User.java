@@ -16,8 +16,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Mapper(componentModel = "spring")
-public class Response_Bill_Product {
+public class Response_Bill_Product_User {
 	Integer productId;
 	String productName;
 	String productIntroduce;

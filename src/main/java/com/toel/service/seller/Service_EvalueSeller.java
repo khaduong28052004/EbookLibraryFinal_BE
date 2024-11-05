@@ -27,7 +27,7 @@ public class Service_EvalueSeller {
 
     public PageImpl<Response_Evalue> getAll(
             Integer page, Integer size, boolean sortBy, String sortColum, Integer account_id) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColum));
         Page<Evalue> pageEvalue = evalueRepository.findByAccountId(account_id, pageable);
         List<Response_Evalue> list = pageEvalue.stream()
                 .map(evlue -> evalueMapper.response_Evalue(evlue))

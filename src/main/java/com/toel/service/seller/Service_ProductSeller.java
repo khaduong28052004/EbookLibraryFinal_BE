@@ -1,5 +1,7 @@
 package com.toel.service.seller;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,20 +26,26 @@ public class Service_ProductSeller {
     ProductMapper productMapper;
     @Autowired
     ProductRepository productRepository;
+    @Autowired
+    Service_ImageProductSeller service_ImageProductSeller;
 
     public PageImpl<Response_Product> getAll(
             Integer page, Integer size, boolean sortBy, String sortColum, Integer account_id) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColum));
         Page<Product> pageProduct = productRepository.findByAccountId(account_id, pageable);
-        List<Response_Product> list = pageProduct.stream()
-                .map(product -> productMapper.response_Product(product))
-                .collect(Collectors.toList());
+        List<Response_Product> list = pageProduct.hasContent()
+                ? pageProduct.stream()
+                        .map(product -> productMapper.response_Product(product))
+                        .collect(Collectors.toList())
+                : new ArrayList<>();
         return new PageImpl<>(list, pageable, pageProduct.getTotalElements());
     }
 
-    public Response_Product save(
-            Request_Product request_Product) {
-        return productMapper.response_Product(productRepository.saveAndFlush(productMapper.product(request_Product)));
+    public Response_Product create(
+            Request_Product request_Product) throws IOException {
+        Product product = productMapper.product(request_Product);
+        service_ImageProductSeller.saveProductImages(product, request_Product.getImages());
+        return productMapper.response_Product(productRepository.saveAndFlush(product));
     }
 
     public void delete(

@@ -32,7 +32,7 @@ public class Service_BillSeller {
 
     public PageImpl<Response_Bill> getAll(Integer page, Integer size, boolean sortBy, String sortColumn,
             Integer account_id) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
         Page<Bill> pageBill = billRepository.findAllByShopId(account_id, pageable);
         List<Response_Bill> list = pageBill.stream()
                 .map(bill -> billMapper.response_Bill(bill))

@@ -1,5 +1,7 @@
 package com.toel.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,9 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.toel.model.Account;
 import com.toel.model.Role;
-import java.util.List;
 
 public interface AccountRepository extends JpaRepository<Account, Integer> {
+
         Page<Account> findAllByRoleAndStatus(Role role, boolean status, Pageable pageable);
 
         Page<Account> findAllByRoleAndStatusAndGender(Role role, boolean status, boolean gender, Pageable pageable);
@@ -48,10 +50,17 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
         Page<Account> findAllByUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContainingAndRole(
                         String username, String fullname, String email, String phone, Role role, Pageable pageable);
-                        @Query("SELECT a FROM Account a WHERE a.gender = ?1 AND a.role = ?2 " +
+
+        @Query("SELECT a FROM Account a WHERE a.gender = ?1 AND a.role = ?2 " +
                         "AND (a.username LIKE %?3% OR a.fullname LIKE %?4% OR a.email LIKE %?5% OR a.phone LIKE %?6%)")
         Page<Account> findAllByGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
                         boolean gender, Role role, String username, String fullname, String email,
                         String phone, Pageable pageable);
+
+        Account findByUsername(String username);
+
+        boolean existsByEmail(String email);
+
+        Account findByEmail(String email);
 
 }

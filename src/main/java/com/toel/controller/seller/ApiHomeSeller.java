@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.response.Response_Home;
+import com.toel.dto.seller.response.Response_Year;
 import com.toel.service.seller.Service_HomeSeller;
 
 @CrossOrigin("*")
@@ -19,7 +20,7 @@ public class ApiHomeSeller {
     @Autowired
     Service_HomeSeller service_HomeSeller;
 
-    @GetMapping("/")
+    @GetMapping("/getData")
     public ApiResponse<Response_Home> getHome(
             @RequestParam(value = "account_id", defaultValue = "0") Integer account_id,
             @RequestParam(value = "year", defaultValue = "0") Integer year) {
@@ -32,5 +33,12 @@ public class ApiHomeSeller {
                         .listDoanhSo(service_HomeSeller.getListDoanhSo(year, account_id))
                         .listDoanhThu(service_HomeSeller.getListDoanhThu(year, account_id))
                         .build());
+    }
+
+    @GetMapping("/getYears")
+    public ApiResponse getYears(
+            @RequestParam(value = "account_id", defaultValue = "0") Integer account_id) {
+        return ApiResponse.build()
+                .result(service_HomeSeller.getYears(account_id));
     }
 }

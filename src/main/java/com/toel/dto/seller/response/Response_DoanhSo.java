@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Response_DoanhSo {
     double value;
+    Integer month;
 }

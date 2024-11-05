@@ -11,13 +11,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Mapper(componentModel = "spring")
-public class Response_Bill_Shop {
-	 Integer shopId; 
-	 String shopName; 
-	 String shopAvatar;
-	 List<Response_Bill> bills;
+public class Response_Bill_Shop_User {
+	Integer shopId;
+	String shopName;
+	String shopAvatar;
+	List<Response_Bill_User> bills;
 }

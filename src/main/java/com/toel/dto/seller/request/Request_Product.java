@@ -1,6 +1,9 @@
 package com.toel.dto.seller.request;
 
 import java.util.Date;
+import java.util.List;
+
+import com.toel.dto.seller.request.ImageProduct.Request_ImageProduct;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -38,4 +41,6 @@ public class Request_Product {
     Integer account;
     @NotNull(message = "FIELD_REQUIRED")
     Integer category;
+    @NotNull(message = "FIELD_REQUIRED")
+    List<Request_ImageProduct> images;
 }
