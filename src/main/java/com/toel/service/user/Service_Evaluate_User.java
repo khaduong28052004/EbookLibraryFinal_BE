@@ -1,55 +1,33 @@
 package com.toel.service.user;
 
-import java.security.Timestamp;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import javax.imageio.stream.ImageInputStreamImpl;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Iterator;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.toel.dto.user.response.Response_Bill_Shop_User;
-import com.toel.dto.user.response.Response_Bill_Product_User;
-import com.toel.dto.user.resquest.Request_Bill_User;
 import com.toel.dto.user.resquest.Request_Evaluate_User;
 import com.toel.model.Account;
-import com.toel.model.Address;
-import com.toel.model.Bill;
 import com.toel.model.BillDetail;
-import com.toel.model.Cart;
 import com.toel.model.Evalue;
 import com.toel.model.ImageEvalue;
-import com.toel.model.OrderStatus;
 import com.toel.model.Product;
 import com.toel.repository.AccountRepository;
-import com.toel.repository.AddressRepository;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
-import com.toel.repository.CartRepository;
 import com.toel.repository.EvalueRepository;
 import com.toel.repository.ImageEvalueRepository;
-import com.toel.repository.OrderStatusRepository;
-import com.toel.repository.ProductReportRepository;
 import com.toel.repository.ProductRepository;
 
 import jakarta.persistence.EntityNotFoundException;

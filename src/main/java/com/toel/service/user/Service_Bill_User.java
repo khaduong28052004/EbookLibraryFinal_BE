@@ -41,7 +41,6 @@ import com.toel.repository.CartRepository;
 import com.toel.repository.EvalueRepository;
 import com.toel.repository.OrderStatusRepository;
 import com.toel.repository.PaymentMethodRepository;
-import com.toel.repository.ProductReportRepository;
 import com.toel.service.Email.EmailService;
 
 @Service("userServiceBill")
@@ -57,8 +56,6 @@ public class Service_Bill_User {
 	@Autowired
 	AccountRepository accountRepository;
 	@Autowired
-	ProductReportRepository productRepository;
-	@Autowired
 	EvalueRepository evaluateRepository;
 	@Autowired
 	CartRepository cartRepository;
@@ -68,6 +65,7 @@ public class Service_Bill_User {
 	OrderStatusRepository oderStatusRepository;
 	@Autowired
 	EmailService emailService;
+
 
 	public Map<String, Object> getBills(Request_Bill_User requestBillDTO) {
 		Map<String, Object> response = new HashMap<String, Object>();
@@ -109,6 +107,7 @@ public class Service_Bill_User {
 			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 6);
 		default:
 			return billRepository.getBillsByUserIdAll(userId);
+
 		}
 	}
 

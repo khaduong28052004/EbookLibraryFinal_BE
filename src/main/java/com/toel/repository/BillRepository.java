@@ -25,7 +25,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			+ "COALESCE(bills.discountrate_id, 0) as billDiscountRate, "
 			+ "products.id as productId, products.name as productName, products.introduce as productIntroduce, "
 			+ "billdetails.quantity as productQuantity, billdetails.price as productPrice, billdetails.discountPrice as productDiscountPrice, imageproducts.name as productImageURL, "
-			+ "shop.id as shopId, shop.shopName, shop.avatar as shopAvatar, bills.paymentmethod_id \r\n"
+			+ "shop.id as shopId, shop.shopName, shop.avatar as shopAvatar, bills.paymentmethod_id \\r\\n "
 			+ "FROM bills "
 			+ "JOIN accounts user ON bills.account_id = user.id "
 			+ "JOIN billdetails ON billdetails.bill_id = bills.id "
@@ -44,7 +44,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			+ "COALESCE(bills.discountrate_id, 0) as billDiscountRate, "
 			+ "products.id as productId, products.name as productName, products.introduce as productIntroduce, "
 			+ "billdetails.quantity as productQuantity, billdetails.price as productPrice, billdetails.discountPrice as productDiscountPrice, imageproducts.name as productImageURL, "
-			+ "shop.id as shopId, shop.shopName, shop.avatar as shopAvatar, bills.paymentmethod_id \r\n"
+			+ "shop.id as shopId, shop.shopName, shop.avatar as shopAvatar, bills.paymentmethod_id \r\n "
 			+ "FROM bills "
 			+ "JOIN accounts user ON bills.account_id = user.id "
 			+ "JOIN billdetails ON billdetails.bill_id = bills.id "
@@ -64,8 +64,8 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			+ "products.id as productId, products.name as productName,products.introduce as productIntroduce, \r\n"
 			+ "billdetails.quantity as productQuantity , billdetails.price as productPrice, "
 			+ "billdetails.discountPrice as productDiscountPrice, imageproducts.name as productImageURL,\r\n"
-			+ "shop.id as shopId,  shop.shopName, shop.avatar as  shopAvatar,\r\n"
 			+ "bills.paymentmethod_id \r\n"
+			+ "shop.id as shopId,  shop.shopName, shop.avatar as  shopAvatar\r\n"
 			+ "FROM\r\n"
 			+ "bills JOIN accounts user ON bills.account_id = user.id \r\n"
 			+ "JOIN billdetails ON billdetails.bill_id = bills.id\r\n"
@@ -111,5 +111,6 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	@Query("SELECT DISTINCT YEAR(b.finishAt) FROM Bill b JOIN BillDetail bd WHERE b.finishAt IS NOT NULL AND bd.product.account.id = ?1 ORDER BY YEAR(b.finishAt) DESC")
 	List<Response_Year> getDistinctYears(Integer account_id);
 
-	List<Bill> findByOrderStatusId(int i);
+	@Query(value ="SELECT * FROM Bills WHERE orderstatus_id = :orderstatusID",nativeQuery = true)
+	List<Bill> findByOrderStatusId(@Param("orderstatusID") Integer orderstatusID);
 }

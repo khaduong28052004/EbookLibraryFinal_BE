@@ -20,7 +20,7 @@ public class ApiHomeSeller {
     @Autowired
     Service_HomeSeller service_HomeSeller;
 
-    @GetMapping("/")
+    @GetMapping("/getData")
     public ApiResponse<Response_Home> getHome(
             @RequestParam(value = "account_id", defaultValue = "0") Integer account_id,
             @RequestParam(value = "year", defaultValue = "0") Integer year) {

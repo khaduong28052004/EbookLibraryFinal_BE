@@ -1,7 +1,5 @@
 package com.toel.dto.admin.response;
 
-import java.util.List;
-
 import lombok.*;
 
 @Data
