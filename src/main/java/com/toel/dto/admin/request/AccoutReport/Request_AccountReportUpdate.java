@@ -1,4 +1,4 @@
-package com.toel.dto.admin.request.ProductReport;
+package com.toel.dto.admin.request.AccoutReport;
 
 import java.util.Date;
 
@@ -12,7 +12,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Request_ProductReportCreate {
+public class Request_AccountReportUpdate {
+    @NotNull(message = "FIELD_REQUIRED")
+    @Min(value = 1, message = "FIELD_INVALID_ID")
+    Integer id;
     @NotBlank(message = "FIELD_REQUIRED")
     String title;
     @NotBlank(message = "FIELD_REQUIRED")
@@ -22,6 +25,9 @@ public class Request_ProductReportCreate {
     @NotNull(message = "FIELD_REQUIRED")
     @Min(value = 1, message = "FIELD_INVALID_ID")
     Integer product;
+    @NotNull(message = "FIELD_REQUIRED")
+    @Min(value = 1, message = "FIELD_INVALID_ID")
+    Integer parent_id;
     @NotNull(message = "FIELD_REQUIRED")
     @Min(value = 1, message = "FIELD_INVALID_ID")
     Integer account;

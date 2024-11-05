@@ -34,7 +34,6 @@ import com.toel.repository.BillRepository;
 import com.toel.repository.CartRepository;
 import com.toel.repository.EvalueRepository;
 import com.toel.repository.OrderStatusRepository;
-import com.toel.repository.ProductReportRepository;
 
 @Service("userServiceBill")
 public class Service_Bill_User {
@@ -46,8 +45,6 @@ public class Service_Bill_User {
 	OrderStatusRepository orderStatusRepository;
 	@Autowired
 	AccountRepository accountRepository;
-	@Autowired
-	ProductReportRepository productRepository;
 	@Autowired
 	EvalueRepository evaluateRepository;
 	@Autowired

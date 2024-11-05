@@ -1,9 +1,6 @@
-package com.toel.dto.admin.request.ProductReport;
+package com.toel.dto.admin.request.AccoutReport;
 
 import java.util.Date;
-
-import com.toel.model.Account;
-import com.toel.model.Product;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -15,10 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Request_ProductReportUpdate {
-    @NotNull(message = "FIELD_REQUIRED")
-    @Min(value = 1, message = "FIELD_INVALID_ID")
-    Integer id;
+public class Request_AccountReportCreate {
     @NotBlank(message = "FIELD_REQUIRED")
     String title;
     @NotBlank(message = "FIELD_REQUIRED")
@@ -29,6 +23,8 @@ public class Request_ProductReportUpdate {
     @Min(value = 1, message = "FIELD_INVALID_ID")
     Integer product;
     @NotNull(message = "FIELD_REQUIRED")
+    @Min(value = 1, message = "FIELD_INVALID_ID")
+    Integer parent_id;
     @Min(value = 1, message = "FIELD_INVALID_ID")
     Integer account;
 }

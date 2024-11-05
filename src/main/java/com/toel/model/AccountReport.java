@@ -24,7 +24,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "ProductReports")
-public class ProductReport {
+public class AccountReport {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,9 +41,10 @@ public class ProductReport {
 
 	String content;
 
-	@ManyToOne
-	@JoinColumn(name = "product_id")
-	Product product;
+	int parent_id;
+	// @ManyToOne
+	// @JoinColumn(name = "product_id")
+	// Product product;
 
 	@ManyToOne
 	@JoinColumn(name = "account_id")

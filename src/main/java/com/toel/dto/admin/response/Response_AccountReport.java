@@ -3,7 +3,6 @@ package com.toel.dto.admin.response;
 import java.util.Date;
 
 import com.toel.model.Account;
-import com.toel.model.Product;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,13 +10,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Response_ProductReport {
+public class Response_AccountReport {
     Integer id;
     String title;
     boolean status;
     Date createAt;
     Date resolve_at;
     String content;
-    Product product;
+    int parent_id;
     Account account;
 }

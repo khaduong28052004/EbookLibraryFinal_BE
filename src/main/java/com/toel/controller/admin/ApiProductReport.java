@@ -9,32 +9,30 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
-import com.toel.dto.admin.response.Response_Permission;
-import com.toel.dto.admin.response.Response_Permission_Role;
-import com.toel.dto.admin.response.Response_ProductReport;
-import com.toel.service.admin.Service_ProductReport;
+import com.toel.dto.admin.response.Response_AccountReport;
+import com.toel.service.admin.Service_AccountReport;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/admin/productreport")
+@RequestMapping("/api/v1/admin/accountreport")
 public class ApiProductReport {
     @Autowired
-    Service_ProductReport service_ProductReport;
+    Service_AccountReport service_AccountReport;
 
     @GetMapping
-    public ApiResponse<PageImpl<Response_ProductReport>> getAllNhanVApiResponse(
+    public ApiResponse<PageImpl<Response_AccountReport>> getAllNhanVApiResponse(
             @RequestParam(value = "search", required = false) String search,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "5") Integer size,
             @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
             @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
-        return ApiResponse.<PageImpl<Response_ProductReport>>build()
-                .result(service_ProductReport.getAll(page, size, sortBy, sortColumn, search));
+        return ApiResponse.<PageImpl<Response_AccountReport>>build()
+                .result(service_AccountReport.getAll(page, size, sortBy, sortColumn, search));
     }
 
     @GetMapping("id")
-    public ApiResponse<Response_ProductReport> getById(@RequestParam(value = "id", required = false) Integer id) {
-        return ApiResponse.<Response_ProductReport>build()
-                .result(service_ProductReport.getId(id));
+    public ApiResponse<Response_AccountReport> getById(@RequestParam(value = "id", required = false) Integer id) {
+        return ApiResponse.<Response_AccountReport>build()
+                .result(service_AccountReport.getId(id));
     }
 }
