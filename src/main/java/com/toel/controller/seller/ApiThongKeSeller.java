@@ -14,14 +14,14 @@ import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.response.Response_ThongKeBill;
 import com.toel.dto.seller.response.Response_ThongKeKhachHang;
 import com.toel.dto.seller.response.Response_ThongKeSanPham;
-import com.toel.service.seller.Service_ThongKe;
+import com.toel.service.seller.Service_ThongKeSeller;
 
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/seller/thongKe")
 public class ApiThongKeSeller {
         @Autowired
-        Service_ThongKe service_ThongKe;
+        Service_ThongKeSeller service_ThongKe;
 
         @GetMapping("/bill")
         public ApiResponse<Response_ThongKeBill> getThongKeBill(
