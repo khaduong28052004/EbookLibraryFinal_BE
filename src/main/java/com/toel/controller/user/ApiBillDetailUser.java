@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.toel.dto.user.response.Response_BillDetail_User;
 import com.toel.dto.user.response.Response_Bill_User;
 import com.toel.dto.user.resquest.Request_Bill_User;
+import com.toel.exception.CustomException;
 import com.toel.model.Bill;
 import com.toel.model.Evalue;
 import com.toel.repository.AccountRepository;
@@ -48,29 +49,79 @@ public class ApiBillDetailUser {
 	/* Lấy thông tin order */
 	@PostMapping("/read/{billId}")
 	public ResponseEntity<Map<String, Object>> getAllOrdersByOrderStatus(@PathVariable("billId") Integer billId) {
-		Map<String, Object> response = service_BillDetail_User.getBillDetail(billId);
+		Map<String, Object> response = new HashMap<String, Object>();
+		try {
+			List<Response_BillDetail_User> shopListInBill = service_BillDetail_User
+					.createBillsWithProductsInBillDetail(billId);
+			response.put("data", shopListInBill);
+			response.put("status", "success");
+			response.put("message", "Retrieve data successfully");
+		} catch (Exception e) {
+			response.put("status", "error");
+			response.put("message", "An error occurred while retrieving orders.");
+			response.put("error", e.getMessage());
+		}
 		return ResponseEntity.ok(response);
 	}
 
 	/* Hủy order */
 	@PostMapping("/update_status/cancel/{billId}")
 	public ResponseEntity<Map<String, Object>> cancelOrderByBill(@PathVariable("billId") Integer billId) {
-		Map<String, Object> response = service_BillDetail_User.cancelBill(billId);
-		return ResponseEntity.ok(response);
+		Map<String, Object> response = new HashMap<>();
+		try {
+			service_BillDetail_User.cancelBill(billId);
+			response.put("message", "Hủy đơn thành công");
+			response.put("status", "successfully");
+			return ResponseEntity.ok(response);
+		} catch (CustomException e) {
+			response.put("message", e.getMessage());
+			response.put("status", e.getStatus());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		} catch (Exception e) {
+			response.put("message", e.getMessage());
+			response.put("status", "error");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
 	}
 
 	/* Xác nhận order đã nhận */
 	@PostMapping("/update_status/confirm/{billId}")
 	public ResponseEntity<Map<String, Object>> confirmReceivedOrder(@PathVariable("billId") Integer billId) {
-		Map<String, Object> response = service_BillDetail_User.confirmBill(billId);
-		return ResponseEntity.ok(response);
+		Map<String, Object> response = new HashMap<>();
+		try {
+			service_BillDetail_User.confirmBill(billId);
+			response.put("message", "Xác nhận đơn hàng thành công");
+			response.put("status", "successfully");
+			return ResponseEntity.ok(response);
+		} catch (CustomException e) {
+			response.put("message", e.getMessage());
+			response.put("status", e.getStatus());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		} catch (Exception e) {
+			response.put("message", e.getMessage());
+			response.put("status", "error");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
 	}
 
 	/* Mua lại order */
 	@PostMapping("/create/reorder/{billId}")
 	public ResponseEntity<Map<String, Object>> reOrder(@PathVariable("billId") Integer billId) {
-		Map<String, Object> response = service_BillDetail_User.reOrder(billId);
-		return ResponseEntity.ok(response);
+		Map<String, Object> response = new HashMap<>();
+		try {
+			service_BillDetail_User.confirmBill(billId);
+			response.put("message", "Đã thêm vào giỏ hàng");
+			response.put("status", "successfully");
+			return ResponseEntity.ok(response);
+		} catch (CustomException e) {
+			response.put("message", e.getMessage());
+			response.put("status", e.getStatus());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		} catch (Exception e) {
+			response.put("message", e.getMessage());
+			response.put("status", "error");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
 	}
 
 }
