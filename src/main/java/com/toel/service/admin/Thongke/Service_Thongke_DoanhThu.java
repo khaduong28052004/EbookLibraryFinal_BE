@@ -1,6 +1,5 @@
-package com.toel.service.admin;
+package com.toel.service.admin.Thongke;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +25,7 @@ import com.toel.repository.ProductRepository;
 import com.toel.repository.RoleRepository;
 
 @Service
-public class Service_Thongke {
+public class Service_Thongke_DoanhThu {
         @Autowired
         AccountRepository accountRepository;
         @Autowired
@@ -74,12 +73,12 @@ public class Service_Thongke {
 
                 // // // Thiết lập dateStart là ngày đầu tiên của tháng hiện tại
                 // calendarStart.set(Calendar.DAY_OF_MONTH, 1);
-                // // dateStart = calendarStart.getTime();
+                // dateStart = new Date();
 
                 // // // Thiết lập dateEnd là ngày cuối cùng của tháng hiện tại
                 // calendarEnd.set(Calendar.DAY_OF_MONTH,
                 // calendarEnd.getActualMaximum(Calendar.DAY_OF_MONTH));
-                // dateEnd = calendarEnd.getTime();
+                // dateEnd = new Date();;
                 // }
 
                 List<Response_TKDT_Seller> list = pageAccount.stream()
@@ -87,21 +86,30 @@ public class Service_Thongke {
                                         Response_TKDT_Seller accountnew = accountMapper.tResponse_TKDT_Seller(account);
                                         accountnew.setDTshop(
                                                         billDetailRepository.calculateAverageBillByShop(account.getId(),
-                                                                        dateStart, dateEnd));
+                                                                        dateStart == null ? new Date() : dateStart,
+                                                                        dateEnd == null ? new Date() : dateEnd));
                                         System.out.println("Doanh thu shop: " + accountnew.getDTshop());
                                         accountnew.setDTSan(
                                                         billDetailRepository.calculateChietKhauByShop_San(
-                                                                        account.getId(), dateStart, dateEnd));
+                                                                        account.getId(),
+                                                                        dateStart == null ? new Date() : dateStart,
+                                                                        dateEnd == null ? new Date() : dateEnd));
                                         System.out.println("Doanh thu sàn: " + accountnew.getDTSan());
                                         accountnew.setPhi(billRepository.calculateVoucherByShop_San(account.getId(),
-                                                        dateStart, dateEnd));
+                                                        dateStart == null ? new Date() : dateStart,
+                                                        dateEnd == null ? new Date() : dateEnd));
                                         System.out.println("Phí: " + accountnew.getPhi());
                                         accountnew.setLoiNhuan(
                                                         billDetailRepository.calculateChietKhauByShop_San(
-                                                                        account.getId(), dateStart, dateEnd)
+                                                                        account.getId(),
+                                                                        dateStart == null ? new Date() : dateStart,
+                                                                        dateEnd == null ? new Date() : dateEnd)
                                                                         - billRepository.calculateVoucherByShop_San(
-                                                                                        account.getId(), dateStart,
-                                                                                        dateEnd));
+                                                                                        account.getId(),
+                                                                                        dateStart == null ? new Date()
+                                                                                                        : dateStart,
+                                                                                        dateEnd == null ? new Date()
+                                                                                                        : dateEnd));
                                         System.out.println("Lợi nhuận: " + accountnew.getLoiNhuan());
                                         return accountnew;
                                 })

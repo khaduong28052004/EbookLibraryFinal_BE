@@ -1,6 +1,8 @@
 package com.toel.model;
 
 
+import java.util.Date;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,6 +30,8 @@ public class Like {
 	Integer id;
 	
 	boolean status;
+	
+	Date createAt;
 	
 	@ManyToOne
 	@JoinColumn(name = "product_id")

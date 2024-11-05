@@ -15,8 +15,8 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 	@Query("SELECT COALESCE(AVG((bd.price - bd.discountPrice) * bd.quantity), 0) " +
 			"FROM BillDetail bd " +
 			"WHERE bd.product.account.id = :accountId " +
-			"AND (:dateStart IS NULL OR bd.bill.finishAt >= :dateStart) " +
-			"AND (:dateEnd IS NULL OR bd.bill.finishAt <= :dateEnd)")
+			"AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd) ")
+			// "AND (:dateEnd IS NULL OR bd.bill.finishAt <= :dateEnd)")
 	Double calculateAverageBillByShop(@Param("accountId") Integer accountId,
 			@Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd);
@@ -24,8 +24,9 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 	@Query("SELECT COALESCE(AVG((bd.price * bd.quantity) * (bd.bill.discountRate.discount / 100)),0) " +
 			"FROM BillDetail bd " +
 			"WHERE bd.product.account.id = :accountId " +
-			"AND (:dateStart IS NULL OR bd.bill.finishAt >= :dateStart) " +
-			"AND (:dateEnd IS NULL OR bd.bill.finishAt <= :dateEnd)")
+			"AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd) ")
+			// "AND (:dateStart IS NULL OR bd.bill.finishAt >= :dateStart) " +
+			// "AND (:dateEnd IS NULL OR bd.bill.finishAt <= :dateEnd)")
 	Double calculateChietKhauByShop_San(@Param("accountId") Integer accountId,
 			@Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd);
