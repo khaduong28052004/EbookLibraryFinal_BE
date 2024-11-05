@@ -8,13 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
-import com.toel.dto.admin.request.Account.Request_AccountCreate;
 import com.toel.dto.admin.request.Permission.Request_PermissionCreate;
-import com.toel.dto.admin.response.Response_Account;
 import com.toel.dto.admin.response.Response_Permission;
 import com.toel.dto.admin.response.Response_Permission_Role;
 import com.toel.service.admin.Service_Premisson;
-import com.toel.service.admin.Service_RolePermission;
 
 import jakarta.validation.Valid;
 
@@ -70,7 +67,7 @@ public class ApiPermissionAdmin {
             @RequestParam(value = "id", required = false) Integer id) {
         service_Premisson.delete(id);
         return ApiResponse.<Response_Permission>build()
-                .message("Xóa nhân viên thành công");
+                .message("Xóa permission thành công");
     }
 
 }

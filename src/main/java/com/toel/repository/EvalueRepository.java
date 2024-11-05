@@ -7,6 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.toel.model.Evalue;
+import java.util.List;
+import com.toel.model.Product;
+import com.toel.model.Account;
+
+
 
 public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
 
@@ -19,5 +24,13 @@ public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
 
 	@Query(value = "SELECT CASE WHEN EXISTS (SELECT 1 FROM evalues WHERE evalues.bill_id = :billDetailId) THEN 1 ELSE 0 END AS isEvaluated ", nativeQuery = true)
 	Integer isEvaluate(@Param("billDetailId") Integer isEvaluate);
+
+    @Query("SELECT AVG(e.star) FROM Evalue e WHERE e.product.account.id = :accountId")
+    Double calculateAverageStarByAccountId(@Param("accountId") Integer accountId);
+
+    @Query("SELECT AVG(e.star) FROM Evalue e WHERE e.product.id = :productId")
+    Double calculateAverageStarByProduct(@Param("productId") Integer productId);
+
+    List<Evalue> findAllByProduct(Product product);
 
 }

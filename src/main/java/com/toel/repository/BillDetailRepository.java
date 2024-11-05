@@ -1,5 +1,7 @@
 package com.toel.repository;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +12,23 @@ import com.toel.dto.user.response.Response_BillDetail_User;
 import com.toel.model.BillDetail;
 
 public interface BillDetailRepository extends JpaRepository<BillDetail, Integer> {
+	@Query("SELECT COALESCE(AVG((bd.price - bd.discountPrice) * bd.quantity), 0) " +
+			"FROM BillDetail bd " +
+			"WHERE bd.product.account.id = :accountId " +
+			"AND (:dateStart IS NULL OR bd.bill.finishAt >= :dateStart) " +
+			"AND (:dateEnd IS NULL OR bd.bill.finishAt <= :dateEnd)")
+	Double calculateAverageBillByShop(@Param("accountId") Integer accountId,
+			@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd);
+
+	@Query("SELECT COALESCE(AVG((bd.price * bd.quantity) * (bd.bill.discountRate.discount / 100)),0) " +
+			"FROM BillDetail bd " +
+			"WHERE bd.product.account.id = :accountId " +
+			"AND (:dateStart IS NULL OR bd.bill.finishAt >= :dateStart) " +
+			"AND (:dateEnd IS NULL OR bd.bill.finishAt <= :dateEnd)")
+	Double calculateChietKhauByShop_San(@Param("accountId") Integer accountId,
+			@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd);
 
 	@Query("SELECT  bd.quantity,  bd.bill.account.id, bd.product.id  FROM BillDetail bd  WHERE bd.bill.id = ?1")
 	List<Object[]> getOriginBillsByBillId(Integer billId);
@@ -25,7 +44,7 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 			+ "    billdetails.quantity as productQuantity,    billdetails.price as productPrice,\r\n"
 			+ "    billdetails.discountPrice as productDiscountPrice,\r\n"
 			+ "    imageproducts.name as productImageURL, shop.id as shopId,shop.shopName,\r\n"
-			+ "    shop.avatar as shopAvatar, user.fullname, user.phone\r\n" 
+			+ "    shop.avatar as shopAvatar, user.fullname, user.phone\r\n"
 			+ "	   FROM billdetails \r\n"
 			+ "	   JOIN bills ON billdetails.bill_id = bills.id \r\n"
 			+ "	   JOIN accounts user ON bills.account_id = user.id \r\n"

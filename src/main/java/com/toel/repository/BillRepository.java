@@ -1,11 +1,10 @@
 package com.toel.repository;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,6 +14,7 @@ import com.toel.dto.user.response.Response_Bill_User;
 import com.toel.dto.seller.response.Response_Bill;
 import com.toel.dto.seller.response.Response_DoanhSo;
 import com.toel.dto.seller.response.Response_DoanhThu;
+
 import com.toel.dto.seller.response.Response_ThongKeBill;
 import com.toel.dto.seller.response.Response_ThongKeKhachHang;
 import com.toel.dto.seller.response.Response_Year;
@@ -101,6 +101,13 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	@Query("SELECT b.totalPrice * (1 - (b.discountRate.discount / 100.0)) FROM Bill b JOIN b.billDetails bd WHERE YEAR(b.finishAt) = ?1 AND bd.product.account.id = ?2")
 	List<Response_DoanhThu> getListDoanhThu(Integer year, Integer account_id);
 
+	@Query("SELECT COALESCE(AVG(b.discountPrice),0) FROM Bill b WHERE b.account.id =?1 AND ( ?2 IS NULL OR b.finishAt >= ?2) AND ( ?3 IS NULL OR b.finishAt <= ?3 )")
+	Double calculateVoucherByShop_San(Integer account, Date dateStart, Date dateEnd);
+
+	// @Query("SELECT b FROM Bill b WHERE b.account.id =?1 AND ( ?2 IS NULL OR
+	// b.finishAt >= ?2) AND ( ?3 IS NULL OR b.finishAt <= ?3 )")
+	// Page<Bill> selectBill(Integer account, LocalDate dateStart, LocalDate
+	// dateEnd);
 	@Query("SELECT DISTINCT YEAR(b.finishAt) FROM Bill b JOIN b.billDetails bd WHERE b.finishAt IS NOT NULL AND bd.product.account.id = ?1 ORDER BY YEAR(b.finishAt) DESC")
 	List<Response_Year> getDistinctYears(Integer account_id);
 
