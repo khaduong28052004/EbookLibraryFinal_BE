@@ -34,9 +34,10 @@ public class ApiVoucherSeller {
                         @RequestParam(value = "page", defaultValue = "0") Integer page,
                         @RequestParam(value = "size", defaultValue = "5") Integer size,
                         @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
-                        @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
+                        @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn,
+                        @RequestParam(value = "search", required = false) String search) {
                 return ApiResponse.<PageImpl<Response_Voucher>>build()
-                                .result(service_Voucher.getAll(page, size, sortBy, sortColumn, account_id));
+                                .result(service_Voucher.getAll(page, size, sortBy, sortColumn, account_id, search));
         }
 
         @PostMapping("/create")

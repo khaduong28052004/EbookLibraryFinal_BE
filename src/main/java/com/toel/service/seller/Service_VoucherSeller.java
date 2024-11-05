@@ -43,9 +43,9 @@ public class Service_VoucherSeller {
     VoucherDetailMapper voucherDetailMapper;
 
     public PageImpl<Response_Voucher> getAll(
-            Integer page, Integer size, boolean sortBy, String sortColumn, Integer account_id) {
+            Integer page, Integer size, boolean sortBy, String sortColumn, Integer account_id, String search) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
-        Page<Voucher> pageVoucher = voucherRepository.findAllByIdAccount(account_id,
+        Page<Voucher> pageVoucher = voucherRepository.findAllByIdAccountSearch(account_id, search,
                 pageable);
         List<Response_Voucher> list = pageVoucher.stream()
                 .map(voucher -> voucherMapper.response_Voucher(voucher))

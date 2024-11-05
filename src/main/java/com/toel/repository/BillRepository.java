@@ -1,6 +1,5 @@
 package com.toel.repository;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -10,15 +9,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.toel.dto.user.response.Response_Bill_User;
-import com.toel.dto.seller.response.Response_Bill;
 import com.toel.dto.seller.response.Response_DoanhSo;
 import com.toel.dto.seller.response.Response_DoanhThu;
 
-import com.toel.dto.seller.response.Response_ThongKeBill;
-import com.toel.dto.seller.response.Response_ThongKeKhachHang;
 import com.toel.dto.seller.response.Response_Year;
-// import com.toel.dto.user.response.Response_Bill;
 import com.toel.model.Bill;
 
 @Repository
@@ -79,10 +73,10 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			+ "ORDER BY  createdDatetime DESC ", nativeQuery = true)
 	List<Object[]> getBillsByUserIdAll(@Param("userId") Integer userId);
 
-	// Seller (Update Shop)
+	// Seller (Bill)
 
-	@Query("SELECT b FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id = ?1")
-	Page<Bill> findAllByShopId(Integer shopId, Pageable pageable);
+	@Query("SELECT b FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id = ?1 AND (?2 IS NULL OR b.account.fullname LIKE CONCAT('%', ?2, '%'))")
+	Page<Bill> findAllByShopId(Integer shopId, String search, Pageable pageable);
 
 	// Home Seller
 

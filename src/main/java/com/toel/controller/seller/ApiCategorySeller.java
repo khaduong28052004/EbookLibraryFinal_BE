@@ -1,5 +1,7 @@
 package com.toel.controller.seller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -23,40 +25,53 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/category")
 public class ApiCategorySeller {
+        @Autowired
+        Service_CategorySeller categoryService;
 
-    @Autowired
-    Service_CategorySeller categoryService;
+        @GetMapping("/getAll")
+        public ApiResponse<PageImpl<Response_Category>> getAll(
+                        @RequestParam(value = "page", defaultValue = "0") Integer page,
+                        @RequestParam(value = "size", defaultValue = "5") Integer size,
+                        @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
+                        @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn,
+                        @RequestParam(value = "search", required = false) String search) {
+                return ApiResponse.<PageImpl<Response_Category>>build()
+                                .result(categoryService.getAll(page, size, sortBy, sortColumn, search));
+        }
 
-    @GetMapping("/getAll")
-    public ApiResponse<PageImpl<Response_Category>> getAll(
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "5") Integer size,
-            @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
-            @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
-        return ApiResponse.<PageImpl<Response_Category>>build()
-                .result(categoryService.getAll(page, size, sortBy, sortColumn));
-    }
+        @GetMapping("/getAllList")
+        public ApiResponse<List<Response_Category>> getAllList() {
+                return ApiResponse.<List<Response_Category>>build()
+                                .result(categoryService.getAllList());
+        }
 
-    @PostMapping("/create")
-    public ApiResponse<Response_Category> create(
-            @RequestBody @Valid Request_CategoryCreate request_Category) {
-        return ApiResponse.<Response_Category>build()
-                .message("Thêm thể loại thành công")
-                .result(categoryService.create(request_Category));
-    }
+        @GetMapping("/getListByIdParent")
+        public ApiResponse<List<Response_Category>> getListByIdParent(
+                        @RequestParam(value = "idParent", defaultValue = "0") Integer idParent) {
+                return ApiResponse.<List<Response_Category>>build()
+                                .result(categoryService.getIdParent(idParent));
+        }
 
-    @PostMapping("/update")
-    public ApiResponse<Response_Category> update(
-            @RequestBody @Valid Request_CategoryUpdate request_Category) {
-        return ApiResponse.<Response_Category>build()
-                .message("Cập nhật thể loại sản phẩm thành công")
-                .result(categoryService.update(request_Category));
-    }
+        @PostMapping("/create")
+        public ApiResponse<Response_Category> create(
+                        @RequestBody @Valid Request_CategoryCreate request_Category) {
+                return ApiResponse.<Response_Category>build()
+                                .message("Thêm thể loại thành công")
+                                .result(categoryService.create(request_Category));
+        }
 
-    @DeleteMapping("/delete")
-    public ApiResponse delete(@RequestParam("id") Integer id_category) {
-        categoryService.delete(id_category);
-        return ApiResponse.build()
-                .message("Xóa thành công thể loại");
-    }
+        @PostMapping("/update")
+        public ApiResponse<Response_Category> update(
+                        @RequestBody @Valid Request_CategoryUpdate request_Category) {
+                return ApiResponse.<Response_Category>build()
+                                .message("Cập nhật thể loại sản phẩm thành công")
+                                .result(categoryService.update(request_Category));
+        }
+
+        @DeleteMapping("/delete")
+        public ApiResponse delete(@RequestParam("id") Integer id_category) {
+                categoryService.delete(id_category);
+                return ApiResponse.build()
+                                .message("Xóa thành công thể loại");
+        }
 }

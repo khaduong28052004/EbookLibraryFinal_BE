@@ -6,8 +6,6 @@ import org.mapstruct.MappingTarget;
 
 import com.toel.dto.seller.request.Voucher.Request_VoucherCreate;
 import com.toel.dto.seller.request.Voucher.Request_VoucherUpdate;
-// import com.toel.dto.admin.request.voucher.Request_VoucherCreate;
-// import com.toel.dto.admin.request.voucher.Request_VoucherUpdate;
 
 import com.toel.dto.seller.response.Response_Voucher;
 import com.toel.model.Voucher;

@@ -37,9 +37,9 @@ public class Service_ProductSeller {
     CategoryRepository categoryRepository;
 
     public PageImpl<Response_Product> getAll(
-            Integer page, Integer size, boolean sortBy, String sortColum, Integer account_id) {
+            Integer page, Integer size, boolean sortBy, String sortColum, Integer account_id, String search) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColum));
-        Page<Product> pageProduct = productRepository.findByAccountId(account_id, pageable);
+        Page<Product> pageProduct = productRepository.findByAccountId(account_id, search, pageable);
         List<Response_Product> list = pageProduct.hasContent()
                 ? pageProduct.stream()
                         .map(product -> productMapper.response_Product(product))
