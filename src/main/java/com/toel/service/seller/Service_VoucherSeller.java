@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import com.toel.dto.seller.request.Request_Voucher;
 import com.toel.dto.seller.response.Response_Voucher;
 import com.toel.dto.seller.response.Response_VoucherDetail;
+import com.toel.exception.AppException;
+import com.toel.exception.ErrorCode;
 import com.toel.mapper.VoucherDetailMapper;
 import com.toel.mapper.VoucherMapper;
 import com.toel.model.Voucher;
@@ -56,8 +58,26 @@ public class Service_VoucherSeller {
         return voucherMapper.response_Voucher(voucherRepository.findById(voucher_id).get());
     }
 
-    public Response_Voucher save(Request_Voucher request_Voucher) {
-        return voucherMapper.response_Voucher(voucherRepository.saveAndFlush(voucherMapper.voucher(request_Voucher)));
+    public Response_Voucher create(Request_VoucherCreate request_Voucher) {
+        Voucher voucher = voucherMapper.voucherCreate(request_Voucher);
+        checkVoucher(voucher);
+        voucher.setAccount(accountRepository.findById(request_Voucher.getAccount())
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
+        voucher.setTypeVoucher(typeVoucherRepository.findById(request_Voucher.getTypeVoucher())
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "TypeVoucher")));
+        return voucherMapper
+                .response_Voucher(voucherRepository.saveAndFlush(voucher));
+    }
+
+    public Response_Voucher update(Request_VoucherUpdate request_Voucher) {
+        Voucher voucher = voucherMapper.voucherUpdate(request_Voucher);
+        checkVoucher(voucher);
+        voucher.setAccount(accountRepository.findById(request_Voucher.getAccount())
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
+        voucher.setTypeVoucher(typeVoucherRepository.findById(request_Voucher.getTypeVoucher())
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "TypeVoucher")));
+        return voucherMapper
+                .response_Voucher(voucherRepository.saveAndFlush(voucher));
     }
 
     public boolean delete(Integer voucher_id) {
@@ -76,4 +96,18 @@ public class Service_VoucherSeller {
                 .collect(Collectors.toList());
         return new PageImpl<>(list, pageable, pageVoucherDetail.getTotalElements());
     }
+
+    public void checkVoucher(Voucher voucher) {
+        boolean nameExists = voucherRepository.findAllListByIdAccount(voucher.getAccount().getId()).stream()
+                .anyMatch(voucherCheck -> voucher.getName().equalsIgnoreCase(voucherCheck.getName()) &&
+                        (voucher.getId() == null || !voucher.getId().equals(voucherCheck.getId())));
+        if (nameExists) {
+            throw new AppException(ErrorCode.OBJECT_SETUP, "Tên voucher đã tồn tại");
+        }
+
+        if (voucher.getDateStart().after(voucher.getDateEnd())) {
+            throw new AppException(ErrorCode.OBJECT_SETUP, "Ngày bắt đầu không thể lớn hơn ngày kết thúc");
+        }
+    }
+
 }

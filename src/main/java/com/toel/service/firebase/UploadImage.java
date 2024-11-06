@@ -6,6 +6,9 @@ import java.util.UUID;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.firebase.cloud.StorageClient;
+import com.toel.exception.AppException;
+import com.toel.exception.ErrorCode;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class UploadImage {
     public String uploadFile(String status, MultipartFile file) throws IOException {
         if (file.isEmpty()) {
-            throw new IOException("File is empty");
+            throw new AppException(ErrorCode.OBJECT_NOT_FOUND, "Ảnh ");
         }
         String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
         Bucket bucket = StorageClient.getInstance().bucket();
