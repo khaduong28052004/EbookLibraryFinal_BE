@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import com.toel.dto.seller.request.Category.Request_CategoryCreate;
 import com.toel.dto.seller.request.Category.Request_CategoryUpdate;
 import com.toel.dto.seller.response.Response_Category;
+import com.toel.exception.AppException;
+import com.toel.exception.ErrorCode;
 import com.toel.mapper.CategoryMapper;
 import com.toel.model.Category;
 import com.toel.repository.CategoryRepository;
@@ -56,16 +58,22 @@ public class Service_CategorySeller {
 
         public Response_Category create(
                         Request_CategoryCreate request_Category) {
-                return categoryMapper
-                                .response_Category(categoryRepository
-                                                .saveAndFlush(categoryMapper.categoryCreate(request_Category)));
+                return Optional.of(request_Category)
+                                .map(categoryMapper::categoryCreate)
+                                .filter(this::checkCategory)
+                                .map(categoryRepository::saveAndFlush)
+                                .map(categoryMapper::response_Category)
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Tên sản phẩm đã tồn tại"));
         }
 
         public Response_Category update(
                         Request_CategoryUpdate request_Category) {
-                return categoryMapper
-                                .response_Category(categoryRepository
-                                                .saveAndFlush(categoryMapper.categoryUpdate(request_Category)));
+                return Optional.of(request_Category)
+                                .map(categoryMapper::categoryUpdate)
+                                .filter(this::checkCategory)
+                                .map(categoryRepository::saveAndFlush)
+                                .map(categoryMapper::response_Category)
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Tên sản phẩm đã tồn tại"));
         }
 
         public void delete(
@@ -75,5 +83,11 @@ public class Service_CategorySeller {
                                                 category -> {
                                                         categoryRepository.delete(category);
                                                 });
+        }
+
+        public boolean checkCategory(Category category) {
+                return categoryRepository.findAll().stream().noneMatch(categoryCheck -> category.getName()
+                                .equals(categoryCheck.getName())
+                                && (category.getId() == null || !category.getId().equals(categoryCheck.getId())));
         }
 }
