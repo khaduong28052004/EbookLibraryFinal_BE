@@ -20,7 +20,7 @@ import jakarta.validation.Valid;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/evaluate")
+@RequestMapping("/api/v1/user/evaluate")
 public class ApiEvaluateUser {
 
 	@Autowired

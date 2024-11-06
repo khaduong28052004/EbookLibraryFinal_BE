@@ -23,10 +23,8 @@ public class Response_Bill_User {
 	Integer billTotalQuantity;
 	String billAddress;
 	Integer billOrderStatusId;
-	String billOrderStatus;
-	String billPaymentMethod;
-	String createdDatetime;
-	String updatedDatetime;
+	Date createdDatetime;
+	Date updatedDatetime;
 	Double billDiscountRate;
 	Integer shopId;
 	String shopName;
