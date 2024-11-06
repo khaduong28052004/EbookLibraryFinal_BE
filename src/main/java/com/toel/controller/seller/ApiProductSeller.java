@@ -36,18 +36,27 @@ public class ApiProductSeller {
                         @RequestParam(value = "page", defaultValue = "0") Integer page,
                         @RequestParam(value = "size", defaultValue = "5") Integer size,
                         @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
-                        @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
+                        @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn,
+                        @RequestParam(value = "search", required = false) String search) {
                 return ApiResponse.<PageImpl<Response_Product>>build()
-                                .result(service_ProductSeller.getAll(page, size, sortBy, sortColumn, account_id));
+                                .result(service_ProductSeller.getAll(page, size, sortBy, sortColumn, account_id,
+                                                search));
         }
 
         @PostMapping("/create")
         public ApiResponse<Response_Product> create(
-                        @RequestBody @Valid Request_Product request_Product) throws IOException {
+                        @RequestBody @Valid Request_ProductCreate request_Product) throws IOException {
                 return ApiResponse.<Response_Product>build()
-                                .message(request_Product.getId() == null ? "Thêm sản phẩm thành công"
-                                                : "Cập nhật sản phẩm thành công")
+                                .message("Thêm sản phẩm thành công")
                                 .result(service_ProductSeller.create(request_Product));
+        }
+
+        @PostMapping("/update")
+        public ApiResponse<Response_Product> update(
+                        @RequestBody @Valid Request_ProductUpdate request_Product) throws IOException {
+                return ApiResponse.<Response_Product>build()
+                                .message("Cập nhật sản phẩm thành công")
+                                .result(service_ProductSeller.update(request_Product));
         }
 
         @DeleteMapping("/delete")

@@ -77,8 +77,8 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	// Seller (Update Shop)
 
-	@Query("SELECT b FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id = ?1")
-	Page<Bill> findAllByShopId(Integer shopId, Pageable pageable);
+	@Query("SELECT b FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id = ?1 AND (?2 IS NULL OR b.account.fullname LIKE CONCAT('%', ?2, '%'))")
+	Page<Bill> findAllByShopId(Integer shopId, String search, Pageable pageable);
 
 	// Home Seller
 

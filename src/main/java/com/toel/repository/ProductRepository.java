@@ -28,8 +28,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
         Page<Product> selectAllByActiveAndMatchingKey(@Param("key") String key, @Param("price") Double price,
                         Pageable pageable);
 
-        @Query("SELECT p FROM Product p where p.account.id = ?1")
-        Page<Product> findByAccountId(Integer account_id, Pageable pageable);
+                        @Query("SELECT p FROM Product p where p.account.id = ?1 AND p.isDelete = false " +
+                        "AND (?2 IS NULL OR p.name LIKE CONCAT('%', ?2, '%'))")
+        Page<Product> findByAccountId(Integer account_id, String search, Pageable pageable);
 
         @Query("SELECT p FROM Product p WHERE p.isDelete=false and p.id NOT IN (SELECT fl.product.id FROM FlashSaleDetail fl Where fl.id =?1)")
         Page<Product> selectAllProductNotInFlashSale(Integer flashSaleId, Pageable pageable);

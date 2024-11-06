@@ -1,4 +1,4 @@
-package com.toel.dto.seller.request;
+package com.toel.dto.seller.request.Category;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Request_Category {
+public class Request_CategoryUpdate {
+    @NotNull(message = "FIELD_REQUIRED")
     Integer id;
     @NotBlank(message = "FIELD_REQUIRED")
     String name;

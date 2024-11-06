@@ -1,4 +1,4 @@
-package com.toel.dto.seller.request;
+package com.toel.dto.seller.request.Product;
 
 import java.util.Date;
 import java.util.List;
@@ -14,9 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Request_Product {
-
-    Integer id;
+public class Request_ProductCreate {
     @NotNull(message = "FIELD_REQUIRED")
     double price;
     @NotNull(message = "FIELD_REQUIRED")
@@ -42,5 +40,5 @@ public class Request_Product {
     @NotNull(message = "FIELD_REQUIRED")
     Integer category;
     @NotNull(message = "FIELD_REQUIRED")
-    List<Request_ImageProduct> images;
+    List<Request_ImageProduct> imageProducts;
 }

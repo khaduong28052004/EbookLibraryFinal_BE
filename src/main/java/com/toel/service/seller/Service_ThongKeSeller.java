@@ -23,7 +23,7 @@ import com.toel.repository.BillRepository;
 import com.toel.repository.DiscountRateRepository;
 
 @Service
-public class Service_ThongKe {
+public class Service_ThongKeSeller {
     @Autowired
     BillRepository billRepository;
     @Autowired
@@ -95,7 +95,7 @@ public class Service_ThongKe {
             double trungBinhDanhGia = ((Number) result[4]).doubleValue();
             Integer luotYeuThich = ((Number) result[5]).intValue();
             pageSanPham.add(
-                    new Response_ThongKeSanPham(name, theLoai, luotBan, luotDanhGia, trungBinhDanhGia, 0));
+                    new Response_ThongKeSanPham(name, theLoai, luotBan, luotDanhGia, trungBinhDanhGia, luotYeuThich));
         }
         return new PageImpl<>(pageSanPham, pageable, results.size());
     }

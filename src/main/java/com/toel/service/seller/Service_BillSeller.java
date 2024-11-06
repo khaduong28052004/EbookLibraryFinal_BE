@@ -31,9 +31,9 @@ public class Service_BillSeller {
     OrderStatusRepository orderStatusRepository;
 
     public PageImpl<Response_Bill> getAll(Integer page, Integer size, boolean sortBy, String sortColumn,
-            Integer account_id) {
+            Integer account_id, String search) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
-        Page<Bill> pageBill = billRepository.findAllByShopId(account_id, pageable);
+        Page<Bill> pageBill = billRepository.findAllByShopId(account_id, search, pageable);
         List<Response_Bill> list = pageBill.stream()
                 .map(bill -> billMapper.response_Bill(bill))
                 .collect(Collectors.toList());

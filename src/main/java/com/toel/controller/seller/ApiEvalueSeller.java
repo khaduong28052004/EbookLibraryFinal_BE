@@ -19,7 +19,7 @@ import jakarta.validation.Valid;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/seller/evalue")
+@RequestMapping("/api/v1/evalue")
 public class ApiEvalueSeller {
 
     @Autowired

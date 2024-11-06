@@ -11,13 +11,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.toel.dto.seller.request.Request_Product;
 import com.toel.dto.seller.request.ImageProduct.Request_ImageProduct;
 import com.toel.dto.seller.response.Response_ImageProduct;
 import com.toel.mapper.ProductMapper;
 import com.toel.model.ImageProduct;
 import com.toel.model.Product;
 import com.toel.repository.ImageProductRepository;
+import com.toel.service.firebase.DeleteImage;
 import com.toel.service.firebase.UploadImage;
 
 @Service
@@ -28,8 +28,10 @@ public class Service_ImageProductSeller {
     ProductMapper productMapper;
     @Autowired
     UploadImage uploadImage;
+    @Autowired
+    DeleteImage deleteImage;
 
-    public void saveProductImages(Product product, List<Request_ImageProduct> images) throws IOException {
+    public void createProductImages(Product product, List<Request_ImageProduct> images) throws IOException {
         List<ImageProduct> imageProducts = images.stream()
                 .map(requestImage -> {
                     try {
@@ -49,6 +51,33 @@ public class Service_ImageProductSeller {
                 .collect(Collectors.toList());
 
         // Lưu tất cả ImageProduct vào cơ sở dữ liệu trong một lần
+        imageProductRepository.saveAll(imageProducts);
+    }
+
+    public void updateProductImages(Product product, List<Request_ImageProduct> images) {
+
+        product.getImageProducts().forEach(image -> {
+            deleteImage.deleteFileByUrl(image.getName());
+            imageProductRepository.delete(image);
+        });
+        List<ImageProduct> imageProducts = images.stream()
+                .map(requestImage -> {
+                    try {
+                        MultipartFile imageFile = requestImage.getImageFile();
+                        String name = uploadImage.uploadFile("product", imageFile);
+
+                        ImageProduct imageProduct = new ImageProduct();
+                        imageProduct.setName(name);
+                        imageProduct.setProduct(product);
+                        return imageProduct;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull) 
+                .collect(Collectors.toList());
+
         imageProductRepository.saveAll(imageProducts);
     }
 }
