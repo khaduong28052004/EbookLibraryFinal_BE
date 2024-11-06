@@ -46,7 +46,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         // Public access for login, home, and some user routes
-                        .requestMatchers("/api/v1/login", "/api/home/**", "/api/v1/otp/**").permitAll() 
+                        .requestMatchers("/api/v1/login", "/api/v1/**", "/api/v1/otp/**").permitAll() 
                         
               
                         // Product permissions
