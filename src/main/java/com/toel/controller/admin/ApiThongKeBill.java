@@ -12,28 +12,27 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
-import com.toel.dto.admin.response.ThongKe.Response_TK_Product;
-import com.toel.service.admin.Thongke.Service_ThongKe_Product;
+import com.toel.dto.admin.response.ThongKe.Response_TK_Bill;
+import com.toel.service.admin.Thongke.Service_ThongKe_DonHang;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/admin/orderstatistacal/product")
-public class ApiThongKeProduct {
+@RequestMapping("/api/v1/admin/orderstatistacal/bill")
+public class ApiThongKeBill {
     @Autowired
-    Service_ThongKe_Product service_ThongKe_Product;
+    Service_ThongKe_DonHang service_Thongke;
 
     @GetMapping
-    public ApiResponse<PageImpl<Response_TK_Product>> getAllTKDT_Seller(
+    public ApiResponse<PageImpl<Response_TK_Bill>> getAllTKDT_Seller(
             @RequestParam(value = "dateStart", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date dateStart,
             @RequestParam(value = "dateEnd", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date dateEnd,
-            @RequestParam(value = "option", defaultValue = "sanpham") String option,
-            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "orderStatusId", defaultValue = "1") Integer orderStatusId,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "5") Integer size,
             @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
             @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
-        return ApiResponse.<PageImpl<Response_TK_Product>>build()
-                .result(service_ThongKe_Product.get_TKDT_Product(dateStart, dateEnd, option, search, page, size, sortBy,
+        return ApiResponse.<PageImpl<Response_TK_Bill>>build()
+                .result(service_Thongke.get_TKDT_DonHang(dateStart, dateEnd, orderStatusId, page, size, sortBy,
                         sortColumn));
     }
 }

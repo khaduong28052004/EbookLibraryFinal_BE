@@ -15,6 +15,7 @@ import com.toel.dto.seller.response.Response_DoanhThu;
 import com.toel.dto.seller.response.Response_Year;
 // import com.toel.dto.user.response.Response_Bill;
 import com.toel.model.Bill;
+import com.toel.model.OrderStatus;
 
 @Repository
 public interface BillRepository extends JpaRepository<Bill, Integer> {
@@ -138,5 +139,15 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			"WHERE bd.product.account.id = ?1 " +
 			"GROUP BY bd.product.name, bd.product.category.name")
 	List<Object[]> getListThongKeSanPham(Integer account_id);
+
+	@Query("Select b From Bill b Where b.orderStatus.id = :idOrderStatus AND (b.finishAt BETWEEN  :dateStart AND :dateEnd OR b.createAt BETWEEN  :dateStart AND :dateEnd)")
+	Page<Bill> selectAllByCreateAtBetweenOrFinishAtBetweenAndOrderStatus(@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd,
+			@Param("idOrderStatus") Integer idOrderStatus, Pageable pageable);
+
+	@Query("Select b From Bill b Where b.orderStatus.id = :idOrderStatus AND b.createAt BETWEEN  :dateStart AND :dateEnd")
+	Page<Bill> selectAllByCreateAtBetweenAndOrderStatus(@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd,
+			@Param("idOrderStatus") Integer idOrderStatus, Pageable pageable);
 
 }
