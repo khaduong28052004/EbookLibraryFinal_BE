@@ -19,6 +19,7 @@ import com.toel.dto.user.response.Response_Bill_User;
 import com.toel.dto.user.response.Response_Bill_Shop_User;
 import com.toel.dto.user.response.Response_Bill_Product_User;
 import com.toel.dto.user.resquest.Request_Bill_User;
+// import com.toel.mapper.BillMapperUser;
 import com.toel.model.Account;
 import com.toel.model.Address;
 import com.toel.model.Bill;
@@ -33,7 +34,6 @@ import com.toel.repository.BillRepository;
 import com.toel.repository.CartRepository;
 import com.toel.repository.EvalueRepository;
 import com.toel.repository.OrderStatusRepository;
-import com.toel.repository.ProductReportRepository;
 
 @Service("userServiceBill")
 public class Service_Bill_User {
@@ -46,8 +46,6 @@ public class Service_Bill_User {
 	@Autowired
 	AccountRepository accountRepository;
 	@Autowired
-	ProductReportRepository productRepository;
-	@Autowired
 	EvalueRepository evaluateRepository;
 	@Autowired
 	CartRepository cartRepository;
@@ -55,12 +53,16 @@ public class Service_Bill_User {
 	AddressRepository addressRepository;
 	@Autowired
 	OrderStatusRepository oderStatusRepository;
+	// @Autowired
+	// private BillMapperUser billMapperUser;
 
 	public Map<String, Object> getBills(Request_Bill_User requestBillDTO) {
 		Map<String, Object> response = new HashMap<String, Object>();
 		try {
 			List<Object[]> productsInBill = getBillsByOrderStatus(requestBillDTO);
 			List<Response_Bill_User> shopListInBill = createBillsWithProductsInBillDetail(productsInBill);
+			// List<Response_Bill_User> responseBills =
+			// billMapperUser.toResponseBillUserList(shopListInBill);
 			response.put("data", shopListInBill);
 			response.put("status", "success");
 			response.put("message", "Retrieve data successfully");
@@ -79,20 +81,20 @@ public class Service_Bill_User {
 				: BillShopRequestDTO.getOrderStatusFind();
 
 		switch (orderStatus) {
-		case "CHUANBI":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByCreateAt(userId, 1);
-		case "DANGXULY":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 2);
-		case "DANGGIAO":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 3);
-		case "DAGIAO":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 4);
-		case "HOANTHANH":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 5);
-		case "DAHUY":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 6);
-		default:
-			return billRepository.getBillsByUserIdAll(userId);
+			case "CHUANBI":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByCreateAt(userId, 1);
+			case "DANGXULY":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 2);
+			case "DANGGIAO":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 3);
+			case "DAGIAO":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 4);
+			case "HOANTHANH":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 5);
+			case "DAHUY":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 6);
+			default:
+				return billRepository.getBillsByUserIdAll(userId);
 		}
 	}
 

@@ -15,6 +15,8 @@ public enum ErrorCode {
     OBJECT_NOT_FOUND(2001, "%s không tồn tại", HttpStatus.NOT_FOUND),
     OBJECT_ALREADY_EXISTS(2002, "%s đã tồn tại", HttpStatus.CONFLICT),
     OBJECT_ACTIVE(2003, "%s đang hoạt động", HttpStatus.BAD_REQUEST),
+    OBJECT_SETUP(2004, "%s", HttpStatus.BAD_REQUEST),
+
 
     FIELD_REQUIRED(3001, "{key} không được bỏ trống!", HttpStatus.BAD_REQUEST),
     FIELD_INVALID_FUTURE_DATE(3002, "{key} phải là thời gian trong tương lai!", HttpStatus.BAD_REQUEST),

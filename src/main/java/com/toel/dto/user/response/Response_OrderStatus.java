@@ -13,7 +13,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-//@Mapper(componentModel = "spring")
 public class Response_OrderStatus {
 	Integer orderID;
 	Double orderTotalPrice;

@@ -25,4 +25,7 @@ public class Response_Account {
     String numberCitizenIdentification;
     String beforeCitizenIdentification;
     String afterCitizenIdentification;
+    Integer sumFollow;
+    Integer sumProduct;
+    Integer agvEvalue;
 }

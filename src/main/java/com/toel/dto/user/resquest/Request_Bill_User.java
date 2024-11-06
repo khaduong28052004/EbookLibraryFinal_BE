@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Mapper(componentModel = "spring")
 public class Request_Bill_User {
 	@NotNull(message = "User ID cannot be null")
 	Integer userID;

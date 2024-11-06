@@ -119,7 +119,7 @@ public class Account {
 //    13 report
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
-	List<ProductReport> productReports;
+	List<AccountReport> accountReports;
 //    14 Log
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
