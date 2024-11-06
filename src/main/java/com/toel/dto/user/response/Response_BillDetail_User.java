@@ -20,17 +20,19 @@ public class Response_BillDetail_User {
 	Double billTotalPrice;
 	Double billDiscountPrice;
 	Double billTotalShippingPrice;
+	Double billTempPrice;
 	Integer billTotalQuantity;
 	String billAddress;
 	Integer billOrderStatusId;
-	Date createdDatetime;
-	Date updatedDatetime;
+	String billOrderStatus;
+	String createdDatetime;
+	String updatedDatetime;
 	Double billDiscountRate;
 	Integer shopId;
 	String shopName;
 	String shopAvatar;
 	String userPhone;
 	String userFullname;
-	List<Response_Bill_Product_User> products; 
+	List<Response_Bill_Product_User> products;
 
 }
