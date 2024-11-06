@@ -20,5 +20,4 @@ public interface ProductMapper {
     Response_ProductListFlashSale tProductListFlashSale(Product product);
 
     Response_TK_Product toResponse_TK_Product(Product product);
-
 }

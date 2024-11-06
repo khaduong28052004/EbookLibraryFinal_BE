@@ -1,5 +1,6 @@
 package com.toel.service.admin.Thongke;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,7 +51,12 @@ public class Service_Thongke_DoanhThu {
                 Pageable pageable = PageRequest.of(page, size,
                                 Sort.by(sortBy ? Sort.Direction.DESC : Sort.Direction.ASC, sortColumn));
                 Page<Account> pageAccount = null;
-
+                Calendar calStart = Calendar.getInstance();
+                calStart.set(Calendar.DAY_OF_MONTH, 1);
+                Date finalDateStart = (dateStart == null) ? calStart.getTime() : dateStart;
+                Calendar calEnd = Calendar.getInstance();
+                calEnd.set(Calendar.DAY_OF_MONTH, calEnd.getActualMaximum(Calendar.DAY_OF_MONTH));
+                Date finalDateEnd = (dateEnd == null) ? calEnd.getTime() : dateEnd;
                 if (search == null || search.isBlank()) {
                         pageAccount = (gender == null)
                                         ? accountRepository.findAllByRole(role, pageable)
@@ -66,50 +72,27 @@ public class Service_Thongke_DoanhThu {
                                                                         pageable);
                 }
 
-                // // Set dateStart and dateEnd to the current month if both are null
-                // if (dateStart == null && dateEnd == null) {
-                // Calendar calendarStart = Calendar.getInstance();
-                // Calendar calendarEnd = Calendar.getInstance();
-
-                // // // Thiết lập dateStart là ngày đầu tiên của tháng hiện tại
-                // calendarStart.set(Calendar.DAY_OF_MONTH, 1);
-                // dateStart = new Date();
-
-                // // // Thiết lập dateEnd là ngày cuối cùng của tháng hiện tại
-                // calendarEnd.set(Calendar.DAY_OF_MONTH,
-                // calendarEnd.getActualMaximum(Calendar.DAY_OF_MONTH));
-                // dateEnd = new Date();;
-                // }
-
                 List<Response_TKDT_Seller> list = pageAccount.stream()
                                 .map(account -> {
                                         Response_TKDT_Seller accountnew = accountMapper.tResponse_TKDT_Seller(account);
                                         accountnew.setDTshop(
                                                         billDetailRepository.calculateAverageBillByShop(account.getId(),
-                                                                        dateStart == null ? new Date() : dateStart,
-                                                                        dateEnd == null ? new Date() : dateEnd));
+                                                                        finalDateStart, finalDateEnd));
                                         System.out.println("Doanh thu shop: " + accountnew.getDTshop());
                                         accountnew.setDTSan(
                                                         billDetailRepository.calculateChietKhauByShop_San(
                                                                         account.getId(),
-                                                                        dateStart == null ? new Date() : dateStart,
-                                                                        dateEnd == null ? new Date() : dateEnd));
+                                                                        finalDateStart, finalDateEnd));
                                         System.out.println("Doanh thu sàn: " + accountnew.getDTSan());
                                         accountnew.setPhi(billRepository.calculateVoucherByShop_San(account.getId(),
-                                                        dateStart == null ? new Date() : dateStart,
-                                                        dateEnd == null ? new Date() : dateEnd));
+                                                        finalDateStart, finalDateEnd));
                                         System.out.println("Phí: " + accountnew.getPhi());
                                         accountnew.setLoiNhuan(
                                                         billDetailRepository.calculateChietKhauByShop_San(
-                                                                        account.getId(),
-                                                                        dateStart == null ? new Date() : dateStart,
-                                                                        dateEnd == null ? new Date() : dateEnd)
+                                                                        account.getId(), finalDateStart, finalDateEnd)
                                                                         - billRepository.calculateVoucherByShop_San(
-                                                                                        account.getId(),
-                                                                                        dateStart == null ? new Date()
-                                                                                                        : dateStart,
-                                                                                        dateEnd == null ? new Date()
-                                                                                                        : dateEnd));
+                                                                                        account.getId(), finalDateStart,
+                                                                                        finalDateEnd));
                                         System.out.println("Lợi nhuận: " + accountnew.getLoiNhuan());
                                         return accountnew;
                                 })

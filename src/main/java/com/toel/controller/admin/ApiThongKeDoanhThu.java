@@ -17,8 +17,8 @@ import com.toel.service.admin.Thongke.Service_Thongke_DoanhThu;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/admin/orderstatistacal")
-public class ApiThongKeAdmin {
+@RequestMapping("/api/v1/admin/orderstatistacal/revenue")
+public class ApiThongKeDoanhThu {
     @Autowired
     Service_Thongke_DoanhThu service_Thongke;
 
@@ -37,5 +37,4 @@ public class ApiThongKeAdmin {
                         sortColumn));
     }
 
-    
 }
