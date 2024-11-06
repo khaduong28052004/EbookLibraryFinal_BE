@@ -46,7 +46,7 @@ public class Service_BillDetail_User {
 	private CartRepository cartRepository;
 	@Autowired
 	private AddressRepository addressRepository;
-	
+
 	public Map<String, Object> getBillDetail(Integer billId) {
 		Map<String, Object> response = new HashMap<String, Object>();
 		try {
@@ -83,11 +83,12 @@ public class Service_BillDetail_User {
 		Double billTotalPrice = Double.parseDouble(product[2].toString());
 		Double billDiscountPrice = Double.parseDouble(product[3].toString());
 		Double billTotalShippingPrice = Double.parseDouble(product[4].toString());
+		Double billTempPrice = billTotalPrice + billTotalShippingPrice - billDiscountPrice;
 		Integer billTotalQuantity = Integer.parseInt(product[5].toString());
-		Integer billAddressId =Integer.parseInt( product[6].toString());
+		Integer billAddressId = Integer.parseInt(product[6].toString());
 		Integer orderStatusID = Integer.parseInt(product[7].toString());
 		String createdDatetime = product[8].toString();
-		String updatedDatetime =  product[9].toString();
+		String updatedDatetime = product[9].toString();
 		Double billDiscountRate = Double.parseDouble(product[10].toString());
 		Integer shopId = Integer.parseInt(product[18].toString());
 		String shopName = product[19].toString();
@@ -102,6 +103,7 @@ public class Service_BillDetail_User {
 		billData.setUserID(userID);
 		billData.setBillTotalPrice(billTotalPrice);
 		billData.setBillDiscountPrice(billDiscountPrice);
+		billData.setBillTempPrice(billTempPrice);
 		billData.setBillTotalShippingPrice(billTotalShippingPrice);
 		billData.setBillTotalQuantity(billTotalQuantity);
 		billData.setBillAddress(address);
@@ -198,7 +200,7 @@ public class Service_BillDetail_User {
 	}
 
 	private void checkBillDetailStatus(Integer billId, Integer orderStatusId) {
-		if (billRepository.findById(billId).isEmpty() || billId == null ) {
+		if (billRepository.findById(billId).isEmpty() || billId == null) {
 			throw new CustomException("Đơn hàng không tồn tại", "error");
 		}
 		if (orderStatusRepository.findById(orderStatusId).isEmpty()) {
@@ -206,21 +208,20 @@ public class Service_BillDetail_User {
 		}
 	}
 
-
 	public static String formatDate(String inputDate) {
-        // Định dạng đầu vào
-        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
-        // Định dạng đầu ra
-        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy/MM/dd");
-        
-        try {
-            // Phân tích chuỗi đầu vào thành đối tượng Date
-            Date date = inputFormat.parse(inputDate);
-            // Định dạng lại đối tượng Date thành chuỗi đầu ra
-            return outputFormat.format(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null; // Hoặc xử lý lỗi theo cách khác
-        }
-    }
+		// Định dạng đầu vào
+		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+		// Định dạng đầu ra
+		SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy/MM/dd");
+
+		try {
+			// Phân tích chuỗi đầu vào thành đối tượng Date
+			Date date = inputFormat.parse(inputDate);
+			// Định dạng lại đối tượng Date thành chuỗi đầu ra
+			return outputFormat.format(date);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return null; // Hoặc xử lý lỗi theo cách khác
+		}
+	}
 }
