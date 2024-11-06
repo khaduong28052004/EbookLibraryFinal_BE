@@ -55,7 +55,6 @@ public class ApiBillUser {
 		bill.setUserID(userId);
 		
 		Map<String, Object> response = service_Bill_User.getBills(bill);
-
 		return ResponseEntity.ok(response);
 	}
 
