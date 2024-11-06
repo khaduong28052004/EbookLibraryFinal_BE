@@ -184,7 +184,7 @@ public class Service_Bill_User {
 	}
 
 	public void cancelBill(Integer billId) {
-		checkBillStatus(billId, 6);
+		checkBillStatus(billId, 1);
 
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
@@ -193,18 +193,19 @@ public class Service_Bill_User {
 	}
 
 	public void confirmBill(Integer billId) {
-		checkBillStatus(billId, 5);
+		checkBillStatus(billId, 4);
 
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
 		bill.setOrderStatus(orderStatusRepository.findById(5).get());
+		
 		billRepository.saveAndFlush(bill);
-
 	}
 
 	public void reOrder(Integer billId) {
 		checkBillStatus(billId, 6);
 		checkBillStatus(billId, 5);
+		
 		List<Cart> cart = new ArrayList<Cart>();
 		List<Object[]> originBills = billDetailRepository.getOriginBillsByBillId(billId);
 
@@ -213,6 +214,10 @@ public class Service_Bill_User {
 			Integer accountId = Integer.parseInt(billDetail[1].toString());
 			Integer productId = Integer.parseInt(billDetail[2].toString());
 
+			System.out.println("productId"+productId);
+			System.out.println("accountId"+accountId);
+
+			
 			Cart existingCartDetail = cartRepository.findCartByAccountIdAndProductId(productId, accountId);
 			if (existingCartDetail != null) {
 				existingCartDetail.setQuantity(existingCartDetail.getQuantity() + quantityToAdd);

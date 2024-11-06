@@ -105,7 +105,7 @@ public class ApiBillDetailUser {
 	public ResponseEntity<Map<String, Object>> reOrder(@PathVariable("billId") Integer billId) {
 		Map<String, Object> response = new HashMap<>();
 		try {
-			service_BillDetail_User.confirmBill(billId);
+			service_BillDetail_User.reOrder(billId);
 			response.put("message", "Đã thêm vào giỏ hàng");
 			response.put("status", "successfully");
 			return ResponseEntity.ok(response);

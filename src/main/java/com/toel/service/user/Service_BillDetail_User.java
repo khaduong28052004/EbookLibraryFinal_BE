@@ -145,7 +145,7 @@ public class Service_BillDetail_User {
 	}
 
 	public void cancelBill(Integer billId) {
-		checkBillDetailStatus(billId, 6);
+		checkBillDetailStatus(billId, 1);
 
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
@@ -154,7 +154,7 @@ public class Service_BillDetail_User {
 	}
 
 	public void confirmBill(Integer billId) {
-		checkBillDetailStatus(billId, 5);
+		checkBillDetailStatus(billId, 4);
 
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());

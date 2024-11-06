@@ -140,5 +140,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	@Query(value="SELECT * FROM Bills WHERE orderstatus_id = :orderstatusID", nativeQuery = true)
 	List<Bill> findByOrderStatusId(@Param("orderstatusID") Integer orderstatusId);
+	
+	
 
 }

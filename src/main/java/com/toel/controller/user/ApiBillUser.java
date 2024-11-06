@@ -43,15 +43,13 @@ public class ApiBillUser {
 
 	/* Lấy thông tin order */
 	@GetMapping("/read")
-	public ResponseEntity<Map<String, Object>> getAllOrdersByOrderStatus(
-			@RequestParam String orderStatusFind, 
-	        @RequestParam int userId) {
-		
-		System.out.println("TEST 12333");
-		   Request_Bill_User requestBillDTO = new Request_Bill_User();
-		    requestBillDTO.setOrderStatusFind(orderStatusFind);
-		    requestBillDTO.setUserID(userId);
-		    
+	public ResponseEntity<Map<String, Object>> getAllOrdersByOrderStatus(@RequestParam String orderStatusFind,
+			@RequestParam int userId) {
+
+		Request_Bill_User requestBillDTO = new Request_Bill_User();
+		requestBillDTO.setOrderStatusFind(orderStatusFind);
+		requestBillDTO.setUserID(userId);
+
 		Map<String, Object> response = service_Bill_User.getBills(requestBillDTO);
 		return ResponseEntity.ok(response);
 	}
@@ -81,6 +79,7 @@ public class ApiBillUser {
 	public ResponseEntity<Map<String, Object>> confirmReceivedOrder(@PathVariable("billId") Integer billId) {
 		Map<String, Object> response = new HashMap<>();
 		try {
+			System.out.println("confirm" + billId);
 			service_Bill_User.confirmBill(billId);
 			response.put("message", "Xác nhận đơn hàng thành công");
 			response.put("status", "successfully");
@@ -101,7 +100,7 @@ public class ApiBillUser {
 	public ResponseEntity<Map<String, Object>> reOrder(@PathVariable("billId") Integer billId) {
 		Map<String, Object> response = new HashMap<>();
 		try {
-			service_Bill_User.confirmBill(billId);
+			service_Bill_User.reOrder(billId);
 			response.put("message", "Đã thêm vào giỏ hàng");
 			response.put("status", "successfully");
 			return ResponseEntity.ok(response);
@@ -115,10 +114,10 @@ public class ApiBillUser {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
-	
+
 	@PostMapping("/testUpdateStatus")
-    public ResponseEntity<String> testUpdateStatus() {
-        service_Bill_User.updateOrdersAutomatically();
+	public ResponseEntity<String> testUpdateStatus() {
+		service_Bill_User.updateOrdersAutomatically();
 		return ResponseEntity.ok("Update Status executed successfully");
 	}
 
