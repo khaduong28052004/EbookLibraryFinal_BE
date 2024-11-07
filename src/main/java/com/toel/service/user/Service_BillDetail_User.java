@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_BillDetail_User;
 import com.toel.dto.user.response.Response_Bill_Product_User;
-import com.toel.exception.CustomException;
+//import com.toel.exception.CustomException;
 import com.toel.model.Account;
 import com.toel.model.Bill;
 import com.toel.model.Cart;
@@ -145,12 +145,8 @@ public class Service_BillDetail_User {
 	}
 
 	public void cancelBill(Integer billId) {
-<<<<<<< HEAD
-		checkBillDetailStatus(billId, 1);
-=======
-		checkBillDetailStatus(billId, 6);
->>>>>>> parent of c371119 (Revert "Merge pull request #11 from khaduong28052004/Thu01")
 
+		checkBillDetailStatus(billId, 1);
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
 		bill.setOrderStatus(orderStatusRepository.findById(6).get());
@@ -158,11 +154,7 @@ public class Service_BillDetail_User {
 	}
 
 	public void confirmBill(Integer billId) {
-<<<<<<< HEAD
 		checkBillDetailStatus(billId, 4);
-=======
-		checkBillDetailStatus(billId, 5);
->>>>>>> parent of c371119 (Revert "Merge pull request #11 from khaduong28052004/Thu01")
 
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
@@ -209,10 +201,10 @@ public class Service_BillDetail_User {
 
 	private void checkBillDetailStatus(Integer billId, Integer orderStatusId) {
 		if (billRepository.findById(billId).isEmpty() || billId == null) {
-			throw new CustomException("Đơn hàng không tồn tại", "error");
+//			throw new CustomException("Đơn hàng không tồn tại", "error");
 		}
 		if (orderStatusRepository.findById(orderStatusId).isEmpty()) {
-			throw new CustomException("Trạng thái đơn hàng không tồn tại", "error");
+//			throw new CustomException("Trạng thái đơn hàng không tồn tại", "error");
 		}
 	}
 
