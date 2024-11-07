@@ -184,7 +184,11 @@ public class Service_Bill_User {
 	}
 
 	public void cancelBill(Integer billId) {
+<<<<<<< HEAD
 		checkBillStatus(billId, 1);
+=======
+		checkBillStatus(billId, 6);
+>>>>>>> parent of c371119 (Revert "Merge pull request #11 from khaduong28052004/Thu01")
 
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
@@ -193,19 +197,31 @@ public class Service_Bill_User {
 	}
 
 	public void confirmBill(Integer billId) {
+<<<<<<< HEAD
 		checkBillStatus(billId, 4);
+=======
+		checkBillStatus(billId, 5);
+>>>>>>> parent of c371119 (Revert "Merge pull request #11 from khaduong28052004/Thu01")
 
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
 		bill.setOrderStatus(orderStatusRepository.findById(5).get());
+<<<<<<< HEAD
 		
 		billRepository.saveAndFlush(bill);
+=======
+		billRepository.saveAndFlush(bill);
+
+>>>>>>> parent of c371119 (Revert "Merge pull request #11 from khaduong28052004/Thu01")
 	}
 
 	public void reOrder(Integer billId) {
 		checkBillStatus(billId, 6);
 		checkBillStatus(billId, 5);
+<<<<<<< HEAD
 		
+=======
+>>>>>>> parent of c371119 (Revert "Merge pull request #11 from khaduong28052004/Thu01")
 		List<Cart> cart = new ArrayList<Cart>();
 		List<Object[]> originBills = billDetailRepository.getOriginBillsByBillId(billId);
 
@@ -214,10 +230,13 @@ public class Service_Bill_User {
 			Integer accountId = Integer.parseInt(billDetail[1].toString());
 			Integer productId = Integer.parseInt(billDetail[2].toString());
 
+<<<<<<< HEAD
 			System.out.println("productId"+productId);
 			System.out.println("accountId"+accountId);
 
 			
+=======
+>>>>>>> parent of c371119 (Revert "Merge pull request #11 from khaduong28052004/Thu01")
 			Cart existingCartDetail = cartRepository.findCartByAccountIdAndProductId(productId, accountId);
 			if (existingCartDetail != null) {
 				existingCartDetail.setQuantity(existingCartDetail.getQuantity() + quantityToAdd);

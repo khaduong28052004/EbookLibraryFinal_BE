@@ -145,7 +145,11 @@ public class Service_BillDetail_User {
 	}
 
 	public void cancelBill(Integer billId) {
+<<<<<<< HEAD
 		checkBillDetailStatus(billId, 1);
+=======
+		checkBillDetailStatus(billId, 6);
+>>>>>>> parent of c371119 (Revert "Merge pull request #11 from khaduong28052004/Thu01")
 
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
@@ -154,7 +158,11 @@ public class Service_BillDetail_User {
 	}
 
 	public void confirmBill(Integer billId) {
+<<<<<<< HEAD
 		checkBillDetailStatus(billId, 4);
+=======
+		checkBillDetailStatus(billId, 5);
+>>>>>>> parent of c371119 (Revert "Merge pull request #11 from khaduong28052004/Thu01")
 
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());

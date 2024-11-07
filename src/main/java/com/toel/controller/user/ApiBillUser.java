@@ -18,20 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.toel.dto.user.response.Response_BillDetail_User;
-import com.toel.dto.user.response.Response_Bill_User;
 import com.toel.dto.user.resquest.Request_Bill_User;
-import com.toel.exception.CustomException;
-import com.toel.model.Bill;
-import com.toel.model.Evalue;
-import com.toel.repository.AccountRepository;
-import com.toel.repository.BillDetailRepository;
-import com.toel.repository.BillRepository;
-import com.toel.repository.CartRepository;
-import com.toel.repository.EvalueRepository;
-import com.toel.repository.OrderStatusRepository;
-import com.toel.repository.config.admin.Config_Repo_Account;
-import com.toel.repository.config.user.Config_Repo_CartDetail;
+
+
+
 import com.toel.service.user.Service_Bill_User;
 
 @CrossOrigin("*")
@@ -44,17 +34,17 @@ public class ApiBillUser {
 
 	/* Lấy thông tin order */
 	@GetMapping("/read")
-	public ResponseEntity<Map<String, Object>> getAllOrdersByOrderStatus(@RequestParam("userId") Integer userId,
-			@RequestParam("orderStatusFind") String orderStatusFind) {
 
-		System.out.println(userId);
-		System.out.println(orderStatusFind);
+	public ResponseEntity<Map<String, Object>> getAllOrdersByOrderStatus(
+			@RequestParam String orderStatusFind, 
+	        @RequestParam int userId) {
 		
-		Request_Bill_User bill = new Request_Bill_User();
-		bill.setOrderStatusFind(orderStatusFind);
-		bill.setUserID(userId);
-		
-		Map<String, Object> response = service_Bill_User.getBills(bill);
+		System.out.println("TEST 12333");
+		   Request_Bill_User requestBillDTO = new Request_Bill_User();
+		    requestBillDTO.setOrderStatusFind(orderStatusFind);
+		    requestBillDTO.setUserID(userId);
+		    
+		Map<String, Object> response = service_Bill_User.getBills(requestBillDTO);
 
 		return ResponseEntity.ok(response);
 	}
@@ -68,10 +58,6 @@ public class ApiBillUser {
 			response.put("message", "Hủy đơn thành công");
 			response.put("status", "successfully");
 			return ResponseEntity.ok(response);
-		} catch (CustomException e) {
-			response.put("message", e.getMessage());
-			response.put("status", e.getStatus());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		} catch (Exception e) {
 			response.put("message", e.getMessage());
 			response.put("status", "error");
@@ -88,10 +74,6 @@ public class ApiBillUser {
 			response.put("message", "Xác nhận đơn hàng thành công");
 			response.put("status", "successfully");
 			return ResponseEntity.ok(response);
-		} catch (CustomException e) {
-			response.put("message", e.getMessage());
-			response.put("status", e.getStatus());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		} catch (Exception e) {
 			response.put("message", e.getMessage());
 			response.put("status", "error");
@@ -104,19 +86,22 @@ public class ApiBillUser {
 	public ResponseEntity<Map<String, Object>> reOrder(@PathVariable("billId") Integer billId) {
 		Map<String, Object> response = new HashMap<>();
 		try {
-			service_Bill_User.reOrder(billId);
+
+			service_Bill_User.confirmBill(billId);
+
 			response.put("message", "Đã thêm vào giỏ hàng");
 			response.put("status", "successfully");
 			return ResponseEntity.ok(response);
-		} catch (CustomException e) {
-			response.put("message", e.getMessage());
-			response.put("status", e.getStatus());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
 		} catch (Exception e) {
 			response.put("message", e.getMessage());
 			response.put("status", "error");
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
+
+
 	}
+	
+
 
 }

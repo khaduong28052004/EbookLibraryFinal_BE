@@ -21,12 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.toel.dto.user.response.Response_BillDetail_User;
 import com.toel.dto.user.response.Response_Bill_User;
 import com.toel.dto.user.resquest.Request_Bill_User;
-import com.toel.exception.CustomException;
 import com.toel.model.Bill;
 import com.toel.model.Evalue;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.BillDetailRepository;
-import com.toel.repository.BillRepository;
 import com.toel.repository.CartRepository;
 import com.toel.repository.EvalueRepository;
 import com.toel.repository.OrderStatusRepository;
@@ -69,10 +67,7 @@ public class ApiBillDetailUser {
 			response.put("message", "Hủy đơn thành công");
 			response.put("status", "successfully");
 			return ResponseEntity.ok(response);
-		} catch (CustomException e) {
-			response.put("message", e.getMessage());
-			response.put("status", e.getStatus());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
 		} catch (Exception e) {
 			response.put("message", e.getMessage());
 			response.put("status", "error");
@@ -89,10 +84,7 @@ public class ApiBillDetailUser {
 			response.put("message", "Xác nhận đơn hàng thành công");
 			response.put("status", "successfully");
 			return ResponseEntity.ok(response);
-		} catch (CustomException e) {
-			response.put("message", e.getMessage());
-			response.put("status", e.getStatus());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
 		} catch (Exception e) {
 			response.put("message", e.getMessage());
 			response.put("status", "error");
@@ -105,14 +97,11 @@ public class ApiBillDetailUser {
 	public ResponseEntity<Map<String, Object>> reOrder(@PathVariable("billId") Integer billId) {
 		Map<String, Object> response = new HashMap<>();
 		try {
-			service_BillDetail_User.reOrder(billId);
+
+			service_BillDetail_User.confirmBill(billId);
 			response.put("message", "Đã thêm vào giỏ hàng");
 			response.put("status", "successfully");
 			return ResponseEntity.ok(response);
-		} catch (CustomException e) {
-			response.put("message", e.getMessage());
-			response.put("status", e.getStatus());
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		} catch (Exception e) {
 			response.put("message", e.getMessage());
 			response.put("status", "error");

@@ -25,7 +25,9 @@ public class Response_BillDetail_User {
 	String billAddress;
 	Integer billOrderStatusId;
 	String billOrderStatus;
+
 	String billPaymentMethod;
+
 	String createdDatetime;
 	String updatedDatetime;
 	Double billDiscountRate;
@@ -34,6 +36,7 @@ public class Response_BillDetail_User {
 	String shopAvatar;
 	String userPhone;
 	String userFullname;
+
 	
 	List<Response_Bill_Product_User> products; 
 
