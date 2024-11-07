@@ -1,15 +1,16 @@
 package com.toel.repository;
 
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.toel.model.Product;
 import com.toel.model.Account;
-import java.util.List;
-import java.util.Date;
+import com.toel.model.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Integer> {
 
@@ -68,5 +69,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
         // FlashSaleDetail fl Where fl.id =?1)")
         // Page<Product> selectAllProductInFlashSale(Integer flashSaleId, Pageable
         // pageable);
+        
+    	@Query("SELECT p FROM Product p WHERE p.id NOT IN :idProducts")
+    	Page<Product> findAllIdNotIn(@Param("idProducts") List<Integer> idProducts, Pageable pageable);
 
 }
