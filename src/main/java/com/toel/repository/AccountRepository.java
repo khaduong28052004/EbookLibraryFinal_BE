@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.toel.model.Account;
 import com.toel.model.Role;
+import java.util.Date;
 
 public interface AccountRepository extends JpaRepository<Account, Integer> {
 
@@ -62,5 +63,21 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
         boolean existsByEmail(String email);
 
         Account findByEmail(String email);
+
+        Page<Account> findAllByCreateAtBetweenAndRole(Date dateStart, Date dateEnd, Role role, Pageable pageable);
+
+        Page<Account> findAllByCreateAtBetweenAndRoleAndGender(Date dateStart, Date dateEnd, Role role, boolean gender,
+                        Pageable pageable);
+
+        Page<Account> findAllByCreateAtBetweenAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContainingAndRole(
+                        Date dateStart, Date dateEnd, String username, String fullname, String email, String phone,
+                        Role role, Pageable pageable);
+
+        @Query("SELECT a FROM Account a WHERE a.gender = ?1 AND a.role = ?2 " +
+                        "AND (a.username LIKE %?3% OR a.fullname LIKE %?4% OR a.email LIKE %?5% OR a.phone LIKE %?6%) "+
+                        "AND a.createAt Between ?7 and ?8")
+        Page<Account> findAllByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+                        boolean gender, Role role, String username, String fullname, String email,
+                        String phone, Date dateStart, Date dateEnd, Pageable pageablle);
 
 }

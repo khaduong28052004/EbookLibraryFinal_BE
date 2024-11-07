@@ -1,4 +1,4 @@
-package com.toel.dto.admin.response;
+package com.toel.dto.admin.response.ThongKe;
 
 import java.util.Date;
 
@@ -9,18 +9,16 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Response_Account {
+public class Response_TK_Account {
     Integer id;
     String username;
     String fullname;
     Boolean gender;
     String email;
     Date birthday;
+    Date createAt;
     String phone;
-    String background;
-    String shopName;
     boolean status;
-    Integer sumFollow;
-    Integer sumProduct;
-    Integer agvEvalue;
+    Double avgdonhang;
+    Double avgStar;
 }

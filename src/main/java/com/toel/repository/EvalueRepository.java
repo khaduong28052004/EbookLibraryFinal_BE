@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.toel.model.Account;
 import com.toel.model.Evalue;
 
 import java.util.Date;
@@ -41,4 +42,7 @@ public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
 	@Query("SELECT p FROM Product p WHERE p.id IN (SELECT DISTINCT e.product.id FROM Evalue e WHERE e.createAt BETWEEN :dateStart AND :dateEnd AND (:key iS NULL OR e.product.name LIKE %:key% OR e.product.introduce LIKE %:key% OR e.product.writerName LIKE %:key% OR e.product.publishingCompany LIKE %:key%))")
 	Page<Product> sellectAllByCreateAt(@Param("key") String key, @Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd, Pageable pageable);
+
+	@Query("SELECT COALESCE(AVG(e.star),0) FROM Evalue e WHERE e.account = :account")
+	Double calculateAverageStarByKhachHang(@Param("account") Account account);
 }

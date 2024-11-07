@@ -13,9 +13,9 @@ import com.toel.dto.seller.response.Response_DoanhSo;
 import com.toel.dto.seller.response.Response_DoanhThu;
 
 import com.toel.dto.seller.response.Response_Year;
+import com.toel.model.Account;
 // import com.toel.dto.user.response.Response_Bill;
 import com.toel.model.Bill;
-import com.toel.model.OrderStatus;
 
 @Repository
 public interface BillRepository extends JpaRepository<Bill, Integer> {
@@ -155,5 +155,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	@Query(value="SELECT * FROM Bills WHERE orderstatus_id = :orderstatusID", nativeQuery = true)
 	List<Bill> findByOrderStatusId(@Param("orderstatusID") Integer orderstatusId);
 
+	@Query("SELECT COALESCE(SUM(b.totalPrice),0) FROM Bill b WHERE b.account =?1")
+	double calculateAGVTotalPriceByAccount(Account account);
 
 }
