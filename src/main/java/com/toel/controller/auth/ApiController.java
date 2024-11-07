@@ -316,4 +316,29 @@ public class ApiController {
     // .build();
     // // return ;
     // }
+
+    @PostMapping("/user/register")
+    public ResponseEntity<?> RegisterAcoount(@RequestBody Account entity) {
+        if(accountRepository.existsByUsername(entity.getUsername())){
+            return ResponseEntity.badRequest().body("Tên đăng nhập đã tồn tại!");
+        }
+        if(accountRepository.existsByEmail(entity.getEmail())){
+            return ResponseEntity.badRequest().body("Email đã tồn tại!");
+        }
+        Account account = new Account();
+        Role role = roleRepository.findById(3).orElseThrow(() -> new RuntimeException("Role not found"));
+        // RoleDetail roleDetail = new RoleDetail();
+        account.setUsername(entity.getUsername());
+        account.setEmail(entity.getEmail());
+        account.setFullname(entity.getFullname());
+        account.setPhone(entity.getPhone());
+
+        String encryptedPassword = passwordEncoder.encode(entity.getPassword());
+        account.setPassword(encryptedPassword);
+        account.setAvatar("noimg.png");
+        account.setRole(role);
+        accountRepository.save(account);
+        return ResponseEntity.ok().body("Đăng ký thành công!");
+    }
+
 }

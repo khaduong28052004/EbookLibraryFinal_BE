@@ -3,12 +3,14 @@ package com.toel.controller.auth;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.toel.model.Account;
 import com.toel.repository.AccountRepository;
+import com.toel.service.ServiceToel;
 import com.toel.service.Email.EmailService;
 import com.toel.service.Email.EmailTemplateType;
 import com.toel.service.auth.OtpService;
@@ -22,6 +24,8 @@ public class OtpController {
     @Autowired
     private OtpService otpService;
     @Autowired
+    ServiceToel serviceToel;
+    @Autowired
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();// Create BCryptPasswordEncoder instance
 
     @PostMapping("/api/v1/otp/generate")
@@ -30,10 +34,9 @@ public class OtpController {
         boolean isvalid = true;
         if (isvalid) {
             String otp = otpService.generateOtp(email);
-            // emailService.sendSimpleEmail("kienlhpc05751@fpt.edu.vn", "Test Subject",
-            // "Test Email Body"+otp);
-            // emailService.push("kienlhpc05751@fpt.edu.vn", "Mã otp của bạn", otp);
-            emailService.push("kienlhpc05751@fpt.edu.vn", "Mã otp của bạn", EmailTemplateType.OTP, otp, "lỏ");
+            String hashOTP = serviceToel.hashPassword(otp);
+            emailService.push("kienlhpc05751@fpt.edu.vn", "Mã otp của bạn", EmailTemplateType.OTP, otp,
+                    "http://localhost:5173/change-password?otp=" + hashOTP);
             return ResponseEntity.ok("OTP generated: " + otp);
 
         } else {
@@ -63,6 +66,17 @@ public class OtpController {
         }
     }
 
+    @PostMapping("/api/v1/otp/verify/{otp}")
+    public ResponseEntity<String> verifyOtp1(@PathVariable String Otp, @RequestParam String email,
+            @RequestParam String otp) {
+        boolean isValid = otpService.verifyOtp(email, otp);
+        if (isValid) {
+            return ResponseEntity.ok("OTP verified successfully");
+        } else {
+            return ResponseEntity.badRequest().body("Invalid OTP");
+        }
+    }
+
     @Autowired
     private EmailService emailService;
 
@@ -74,23 +88,31 @@ public class OtpController {
         return "Email sent!";
     }
 
-    @PostMapping("/user/updatePass") // updatePass
+    @PostMapping("/api/v1/user/updatePass") // updatePass
     public ResponseEntity<?> putMethodName(@RequestParam Integer id, @RequestParam String repass,
             @RequestParam String oldpass) {
-        Optional<Account> account = accountRepository.findById(id);
-        Account accountRe = account.get();
-        String hashPass = passwordEncoder.encode(repass);
-        accountRe.setPassword(hashPass);
         try {
+            Optional<Account> account = accountRepository.findById(id);
+            if (account.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("lỗi 400!");
+            }
+            Account accountRe = account.get();
+            // So sánh mật khẩu cũ nhập vào với mật khẩu đã mã hóa trong cơ sở dữ liệu
+            if (!passwordEncoder.matches(oldpass, accountRe.getPassword())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("sai mật khẩu!");
+            }
+            // Mã hóa mật khẩu mới
+            String hashPass = passwordEncoder.encode(repass);
+            accountRe.setPassword(hashPass);
             accountRepository.save(accountRe);
+            return ResponseEntity.ok("Cập nhật mật khẩu thành công!");
         } catch (Exception e) {
-            // TODO: handle exceptiot
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("lỗi");
+            // TODO: handle exception
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cập nhật mật khẩu không thành công!");
         }
-        return ResponseEntity.ok("oke");
+
     }
-   
+
     @PostMapping("/user/changePassword") // email trung se sai
     public ResponseEntity<?> changePassword(
             @RequestParam String pass,
