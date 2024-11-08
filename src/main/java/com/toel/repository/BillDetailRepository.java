@@ -75,4 +75,12 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 			@Param("dateEnd") Date dateEnd,
 			@Param("product") Product product);
 
+	@Query(value = "SELECT CASE WHEN EXISTS " +
+			"(SELECT billdetails.* FROM billdetails JOIN bills ON bills.id = billdetails.bill_id\r\n" +
+			"WHERE billdetails.id = :billId\r\n" +
+			"AND billdetails.product_id = :productId\r\n" +
+			"AND bills.account_id = :accountId) \r\n " +
+			"THEN 1 ELSE 0 END AS billDetailIsExisted ", nativeQuery = true)
+	Integer billDetailIsExisted(@Param("billId") Integer bill_id, @Param("productId") Integer product_id,
+			@Param("accountId") Integer account_id);
 }

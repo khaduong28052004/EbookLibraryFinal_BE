@@ -1,5 +1,8 @@
 package com.toel.repository;
 
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,9 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.toel.model.Evalue;
-
-import java.util.Date;
-import java.util.List;
 import com.toel.model.Product;
 
 public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
@@ -21,8 +21,9 @@ public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
 	Evalue findByProductIdAndAccountId(@Param("accountId") Integer accountId, @Param("productId") Integer productId,
 			@Param("billId") Integer billId);
 
-	@Query(value = "SELECT CASE WHEN EXISTS (SELECT 1 FROM evalues WHERE evalues.bill_id = :billDetailId) THEN 1 ELSE 0 END AS isEvaluated ", nativeQuery = true)
-	Integer isEvaluate(@Param("billDetailId") Integer isEvaluate);
+	@Query(value = "SELECT CASE WHEN EXISTS (SELECT 1 FROM evalues WHERE evalues.bill_id = :billId AND evalues.product_id = :productId AND evalues.account_id = :accountId) THEN 1 ELSE 0 END AS isEvaluated ", nativeQuery = true)
+	Integer isEvaluate(@Param("billId") Integer bill_id, @Param("productId") Integer product_id,
+			@Param("accountId") Integer account_id);
 
 	@Query("SELECT COALESCE(AVG(e.star),0) FROM Evalue e WHERE e.product.account.id = :accountId")
 	Double calculateAverageStarByAccountId(@Param("accountId") Integer accountId);
