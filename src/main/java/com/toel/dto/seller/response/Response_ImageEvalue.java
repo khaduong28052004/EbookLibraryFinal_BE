@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Response_Account {
+public class Response_ImageEvalue {
     Integer id;
-    String avatar;
-    String background;
-    String shopName;
-    String fullname;
+    String name;
 }

@@ -54,7 +54,7 @@ public class Evalue {
 	Account account;
 
 	@OneToOne
-	@JoinColumn(name = "bill_id")
+	@JoinColumn(name = "billDetail_id")
 	BillDetail billDetail;
 
 }
