@@ -97,25 +97,5 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
                         @Param("dateEnd") Date dateEnd,
                         Pageable pageable);
 
-        // Page<Account> findAllByCreateAtSellerBetweenAndRole(Date dateStart, Date dateEnd, Role role, Pageable pageable);
-
-        // Page<Account> findAllByCreateAtSellerBetweenAndRoleAndGender(Date dateStart, Date dateEnd, Role role,
-        //                 boolean gender,
-        //                 Pageable pageable);
-
-        // @Query("SELECT a FROM Account a WHERE a.status=true and (:gender IS NULL OR a.gender = :gender) " +
-        //                 "AND a.role = :role " +
-        //                 "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
-        //                 "OR a.email LIKE %:email% OR a.phone LIKE %:phone%) " +
-        //                 "AND a.createAtSeller BETWEEN :dateStart AND :dateEnd")
-        // Page<Account> findAllByCreateAtSellerBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-        //                 @Param("gender") Boolean gender,
-        //                 @Param("role") Role role,
-        //                 @Param("username") String username,
-        //                 @Param("fullname") String fullname,
-        //                 @Param("email") String email,
-        //                 @Param("phone") String phone,
-        //                 @Param("dateStart") Date dateStart,
-        //                 @Param("dateEnd") Date dateEnd,
-        //                 Pageable pageable);
+        boolean existsByNumberId(String cccdNumber);
 }

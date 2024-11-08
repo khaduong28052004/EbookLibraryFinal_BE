@@ -73,4 +73,7 @@ public class Product {
 	@OneToMany(mappedBy = "product")
 	List<ImageProduct> imageProducts;
 
+	@OneToMany(mappedBy = "product")
+	List<Evalue> evalues;
+
 }
