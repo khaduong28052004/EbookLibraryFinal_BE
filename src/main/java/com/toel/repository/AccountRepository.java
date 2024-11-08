@@ -63,5 +63,10 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
         Account findByEmail(String email);
 
+        boolean existsByUsername(String username);
+
+        Account findByIdAndPassword(Integer id,String Password);      
+
         boolean existsByNumberId(String cccdNumber);
+
 }
