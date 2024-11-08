@@ -12,20 +12,13 @@ import lombok.NoArgsConstructor;
 public class Response_Account {
     Integer id;
     String username;
-    String password;
-    String avatar;
     String fullname;
     Boolean gender;
     String email;
     Date birthday;
     String phone;
+    String avatar;
     String background;
     String shopName;
     boolean status;
-    String numberCitizenIdentification;
-    String beforeCitizenIdentification;
-    String afterCitizenIdentification;
-    Integer sumFollow;
-    Integer sumProduct;
-    Integer agvEvalue;
 }

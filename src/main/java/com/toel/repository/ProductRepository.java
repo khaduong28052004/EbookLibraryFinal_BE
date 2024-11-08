@@ -1,14 +1,16 @@
 package com.toel.repository;
 
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.toel.model.Product;
 import com.toel.model.Account;
-import java.util.List;
+import com.toel.model.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Integer> {
 
@@ -40,9 +42,48 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
         Page<Product> findByIsActive(boolean isActive, Pageable pageable);
 
+        Page<Product> findAllByIsDeleteAndIsActiveAndCreateAtBetween(
+                        Boolean isDelete,
+                        Boolean isActive,
+                        Date dateStart,
+                        Date dateEnd,
+                        Pageable pageable);
+
+        @Query("SELECT p FROM Product p WHERE p.isActive = true and p.isDelete=false " +
+                        "AND (p.createAt BETWEEN :dateStart AND :dateEnd) " +
+                        "AND (:key iS NULL OR p.name LIKE %:key% OR p.introduce LIKE %:key% " +
+                        "OR p.writerName LIKE %:key% OR p.publishingCompany LIKE %:key%)")
+        Page<Product> selectAllMatchingAttributesByDateStartAndDateEnd(@Param("key") String key,
+                        @Param("dateStart") Date dateStart,
+                        @Param("dateEnd") Date dateEnd,
+                        Pageable pageable);
+
+        @Query("SELECT b.account FROM Product b WHERE b.createAt BETWEEN ?1 AND ?2")
+        Page<Account> selectAllByProductAndCreateAt(Date dateStart, Date dateEnd, Pageable pageable);
+
+        @Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN ?1 AND ?2 And b.account.gender = ?3")
+        Page<Account> selectAllByProductAndGenderFinishAt(Date dateStart, Date dateEnd, Boolean gender,
+                        Pageable pageable);
+
+        @Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN :finishDateStart AND :finishDateEnd " +
+                        "AND (:gender IS NULL OR b.account.gender = :gender)" +
+                        "AND (b.account.username LIKE %:username% OR b.account.fullname LIKE %:fullname% " +
+                        "OR b.account.email LIKE %:email% OR b.account.phone LIKE %:phone%) ")
+        Page<Account> findAllByProductCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+                        @Param("finishDateStart") Date finishDateStart,
+                        @Param("finishDateEnd") Date finishDateEnd,
+                        @Param("gender") Boolean gender,
+                        @Param("username") String username,
+                        @Param("fullname") String fullname,
+                        @Param("email") String email,
+                        @Param("phone") String phone,
+                        Pageable pageable);
         // @Query("SELECT p FROM Product p WHERE p.id IN (SELECT fl.product.id FROM
         // FlashSaleDetail fl Where fl.id =?1)")
         // Page<Product> selectAllProductInFlashSale(Integer flashSaleId, Pageable
         // pageable);
+
+        @Query("SELECT p FROM Product p WHERE p.id NOT IN :idProducts")
+        Page<Product> findAllIdNotIn(@Param("idProducts") List<Integer> idProducts, Pageable pageable);
 
 }
