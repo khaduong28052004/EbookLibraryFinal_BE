@@ -65,4 +65,15 @@ public class Product {
 	@OneToMany(mappedBy = "product")
 	List<FlashSaleDetail> flashSaleDetails;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "product")
+	List<Like> likes;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "product")
+	List<ImageProduct> imageProducts;
+
+	@OneToMany(mappedBy = "product")
+	List<Evalue> evalues;
+
 }

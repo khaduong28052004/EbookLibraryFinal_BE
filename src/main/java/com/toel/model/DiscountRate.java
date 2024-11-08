@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -43,6 +45,7 @@ public class DiscountRate {
 	@Column(name = "dateInsert", columnDefinition = "datetime")
 	LocalDateTime dateInsert;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "discountRate")
 	List<Bill> bills;
 

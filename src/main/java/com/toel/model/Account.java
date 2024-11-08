@@ -50,7 +50,7 @@ public class Account {
 	String email;
 
 	@Temporal(TemporalType.DATE)
-	@JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+	// @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
 	Date birthday;
 
 	String phone;
@@ -67,6 +67,8 @@ public class Account {
 	String afterIdImage;
 
 	boolean status;
+
+	Date createAt;
 
 	// 1
 	@JsonIgnore
@@ -119,7 +121,7 @@ public class Account {
 //    13 report
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
-	List<ProductReport> productReports;
+	List<AccountReport> accountReports;
 //    14 Log
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")

@@ -22,4 +22,7 @@ public interface DiscountRateRepository extends JpaRepository<DiscountRate, Inte
       Pageable pageable);
 
   List<DiscountRate> findAllBydateDeleteIsNull();
+  
+  @Query("SELECT dr.discount FROM DiscountRate dr ORDER BY dr.id DESC")
+  Integer getChietKhau();
 }

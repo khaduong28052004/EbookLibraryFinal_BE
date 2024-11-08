@@ -1,15 +1,36 @@
 package com.toel.repository;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.toel.dto.user.response.Response_BillDetail_User;
+import com.toel.model.Bill;
 import com.toel.model.BillDetail;
+import com.toel.model.Product;
 
 public interface BillDetailRepository extends JpaRepository<BillDetail, Integer> {
+	@Query("SELECT COALESCE(AVG((bd.price - bd.discountPrice) * bd.quantity), 0) " +
+			"FROM BillDetail bd " +
+			"WHERE bd.product.account.id = :accountId " +
+			"AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd) ")
+	Double calculateAverageBillByShop(@Param("accountId") Integer accountId,
+			@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd);
+
+	@Query("SELECT COALESCE(AVG((bd.price * bd.quantity) * (bd.bill.discountRate.discount / 100)),0) " +
+			"FROM BillDetail bd " +
+			"WHERE bd.product.account.id = :accountId " +
+			"AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd) ")
+	Double calculateChietKhauByShop_San(@Param("accountId") Integer accountId,
+			@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd);
 
 	@Query("SELECT  bd.quantity,  bd.bill.account.id, bd.product.id  FROM BillDetail bd  WHERE bd.bill.id = ?1")
 	List<Object[]> getOriginBillsByBillId(Integer billId);
@@ -25,7 +46,7 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 			+ "    billdetails.quantity as productQuantity,    billdetails.price as productPrice,\r\n"
 			+ "    billdetails.discountPrice as productDiscountPrice,\r\n"
 			+ "    imageproducts.name as productImageURL, shop.id as shopId,shop.shopName,\r\n"
-			+ "    shop.avatar as shopAvatar, user.fullname, user.phone\r\n" 
+			+ "    shop.avatar as shopAvatar, user.fullname, user.phone\r\n"
 			+ "	   FROM billdetails \r\n"
 			+ "	   JOIN bills ON billdetails.bill_id = bills.id \r\n"
 			+ "	   JOIN accounts user ON bills.account_id = user.id \r\n"
@@ -39,5 +60,19 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 	@Query(value = "SELECT * FROM billdetails JOIN bills WHERE billdetails.id = :billDetailID AND billdetails.product_id = :product_id AND bills.account_id = :account_id ", nativeQuery = true)
 	Object[] hasExistOrder(@Param("billDetailID") Integer billDetailID, @Param("product_id") Integer productId,
 			@Param("account_id") Integer accountId);
+
+	@Query("SELECT p FROM Product p WHERE p.id IN (SELECT DISTINCT bd.product.id FROM BillDetail bd WHERE bd.bill.finishAt BETWEEN :dateStart AND :dateEnd)")
+	Page<Product> selectAll(@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd, Pageable pageable);
+
+	@Query("SELECT p FROM Product p WHERE p.id IN (Select DISTINCT bd.product.id FROM BillDetail bd WHERE bd.bill.finishAt BETWEEN :dateStart AND :dateEnd AND (:key iS NULL OR bd.product.name LIKE %:key% OR bd.product.introduce LIKE %:key% OR bd.product.writerName LIKE %:key% OR bd.product.publishingCompany LIKE %:key%)) ")
+	Page<Product> selectAllByFinishAt(@Param("key") String key, @Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd,
+			Pageable pageable);
+
+	@Query("Select COUNT(bd) FROM BillDetail bd WHERE bd.product = :product AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd)")
+	Integer calculateByFinishAtAndProduct(@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd,
+			@Param("product") Product product);
 
 }

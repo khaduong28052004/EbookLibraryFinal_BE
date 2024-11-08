@@ -1,5 +1,6 @@
 package com.toel.service.admin;
-import java.time.LocalDateTime;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,7 +19,9 @@ import com.toel.dto.admin.response.Response_FlashSale;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.FlashSaleMapper;
+import com.toel.model.Account;
 import com.toel.model.FlashSale;
+import com.toel.repository.AccountRepository;
 import com.toel.repository.FlashSaleRepository;
 
 @Service
@@ -27,14 +30,18 @@ public class Service_FlashSale {
     FlashSaleRepository flashSaleRepository;
     @Autowired
     FlashSaleMapper flashSaleMapper;
+    @Autowired
+    AccountRepository accountRepository;
 
-    public PageImpl<Response_FlashSale> getAll(int page, int size, Boolean sortBy, String column, LocalDateTime date) {
+    public PageImpl<Response_FlashSale> getAll(int page, int size, Boolean sortBy, String column,
+            LocalDate dateStart, LocalDate dateEnd) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));
         Page<FlashSale> pageFlashSale;
-        if (date == null) {
-            pageFlashSale = flashSaleRepository.findAll(pageable);
+        if (dateStart == null || dateEnd == null) {
+            pageFlashSale = flashSaleRepository.findAllByIsDelete(false, pageable);
         } else {
-            pageFlashSale = flashSaleRepository.findAllByDateStartOrDateEnd(date, date, pageable);
+            pageFlashSale = flashSaleRepository.findAllByDateStartOrDateEndAndIsDelete(dateStart, dateEnd, false,
+                    pageable);
         }
         List<Response_FlashSale> list = pageFlashSale.stream()
                 .map(flashsale -> flashSaleMapper.tResponse_FlashSale(flashsale))
@@ -49,14 +56,21 @@ public class Service_FlashSale {
     }
 
     public Response_FlashSale create(Request_FlashSaleCreate flashSaleCreate) {
+        Account account = accountRepository.findById(flashSaleCreate.getAccount())
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
+        FlashSale entity = flashSaleMapper.toFlashSaleCreate(flashSaleCreate);
+        entity.setAccount(account);
         return flashSaleMapper
-                .tResponse_FlashSale(flashSaleRepository.save(flashSaleMapper.toFlashSaleCreate(flashSaleCreate)));
+                .tResponse_FlashSale(flashSaleRepository.save(entity));
     }
 
     public Response_FlashSale update(Request_FlashSaleUpdate flashSaleUpdate) {
         FlashSale entity = flashSaleRepository.findById(flashSaleUpdate.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSale"));
+        Account account = accountRepository.findById(flashSaleUpdate.getAccount())
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
         flashSaleMapper.toFlashSaleUpdate(entity, flashSaleUpdate);
+        entity.setAccount(account);
         return flashSaleMapper.tResponse_FlashSale(flashSaleRepository.save(entity));
     }
 
