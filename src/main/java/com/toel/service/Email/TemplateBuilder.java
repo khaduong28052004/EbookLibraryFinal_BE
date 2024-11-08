@@ -16,6 +16,7 @@ public class TemplateBuilder {
 
     private static String buildOtpTemplate(String... data) {
         String otp = data[0];
+        String link = data[1];
         String username = data.length > 1 ? data[1] : "User"; // Optional data handling
         // HTML for OTP email template
         return "<!DOCTYPE html>\r\n" +
@@ -94,6 +95,9 @@ public class TemplateBuilder {
                 " <p>Xin vui lòng nhập mã này vào trang đặt lại mật khẩu để tiếp tục quá trình đặt lại mật khẩu.</p>\r\n"
                 +
                 "<a href='https://www.w3schools.com'>Đổi mật khẩu ngay!</a>"
+                +
+                "<a href='"+link+"'>Đổi mật khẩu ngay!</a>"
+                +" lỏ nè" +link
                 +
                 " <p>Lưu ý rằng mã OTP sẽ hết hạn sau 1 phút kể từ lúc nhận được mail.</p>\r\n" +
                 " <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>\r\n" +

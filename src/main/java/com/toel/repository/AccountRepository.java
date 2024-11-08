@@ -97,5 +97,10 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
                         @Param("dateEnd") Date dateEnd,
                         Pageable pageable);
 
+        boolean existsByUsername(String username);
+
+        Account findByIdAndPassword(Integer id, String Password);
+
         boolean existsByNumberId(String cccdNumber);
+
 }
