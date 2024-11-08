@@ -34,3 +34,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+###
+# Ignore sensitive configuration files
+# application.properties
+# .env

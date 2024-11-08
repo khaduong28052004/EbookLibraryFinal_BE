@@ -1,5 +1,6 @@
 package com.toel.config.auth;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
@@ -8,14 +9,22 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 @Configuration
 public class RedisConfig {
+    @Value("${REDIS_HOST}")
+    private String redisHost;
+    @Value("${REDIS_PORT}")
+    private Integer redisPost;
+    @Value("${REDIS_USERNAME}")
+    private String redisUsername;
+    @Value("${REDIS_PASSWORD}")
+    private String redisPassword;
 
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
-        config.setHostName("redis-17827.c56.east-us.azure.redns.redis-cloud.com");
-        config.setPort(17827);
-        config.setUsername("default");
-        config.setPassword("dNaF1Jnq9z9XLK4Y8EApk3xUHrffPTOV");
+        config.setHostName(redisHost);
+        config.setPort(redisPost);
+        config.setUsername(redisUsername);
+        config.setPassword(redisPassword);
         return new JedisConnectionFactory(config);
     }
 
