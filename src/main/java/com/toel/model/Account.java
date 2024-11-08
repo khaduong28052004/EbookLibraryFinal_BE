@@ -50,7 +50,7 @@ public class Account {
 	String email;
 
 	@Temporal(TemporalType.DATE)
-	@JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+	// @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
 	Date birthday;
 
 	String phone;
