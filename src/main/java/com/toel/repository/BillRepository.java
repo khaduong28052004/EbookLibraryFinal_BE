@@ -13,7 +13,9 @@ import com.toel.dto.seller.response.Response_DoanhSo;
 import com.toel.dto.seller.response.Response_DoanhThu;
 
 import com.toel.dto.seller.response.Response_Year;
+// import com.toel.dto.user.response.Response_Bill;
 import com.toel.model.Bill;
+import com.toel.model.OrderStatus;
 
 @Repository
 public interface BillRepository extends JpaRepository<Bill, Integer> {
@@ -23,7 +25,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			+ "COALESCE(bills.discountrate_id, 0) as billDiscountRate, "
 			+ "products.id as productId, products.name as productName, products.introduce as productIntroduce, "
 			+ "billdetails.quantity as productQuantity, billdetails.price as productPrice, billdetails.discountPrice as productDiscountPrice, imageproducts.name as productImageURL, "
-			+ "shop.id as shopId, shop.shopName, shop.avatar as shopAvatar "
+			+ "shop.id as shopId, shop.shopName, shop.avatar as shopAvatar, bills.paymentmethod_id\r\n "
 			+ "FROM bills "
 			+ "JOIN accounts user ON bills.account_id = user.id "
 			+ "JOIN billdetails ON billdetails.bill_id = bills.id "
@@ -42,7 +44,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			+ "COALESCE(bills.discountrate_id, 0) as billDiscountRate, "
 			+ "products.id as productId, products.name as productName, products.introduce as productIntroduce, "
 			+ "billdetails.quantity as productQuantity, billdetails.price as productPrice, billdetails.discountPrice as productDiscountPrice, imageproducts.name as productImageURL, "
-			+ "shop.id as shopId, shop.shopName, shop.avatar as shopAvatar "
+			+ "shop.id as shopId, shop.shopName, shop.avatar as shopAvatar,  bills.paymentmethod_id \r\n "
 			+ "FROM bills "
 			+ "JOIN accounts user ON bills.account_id = user.id "
 			+ "JOIN billdetails ON billdetails.bill_id = bills.id "
@@ -61,7 +63,9 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			+ "COALESCE(bills.discountrate_id, 0) as billDiscountRate,\r\n"
 			+ "products.id as productId, products.name as productName,products.introduce as productIntroduce, \r\n"
 			+ "billdetails.quantity as productQuantity , billdetails.price as productPrice, billdetails.discountPrice as productDiscountPrice, imageproducts.name as productImageURL,\r\n"
-			+ "shop.id as shopId,  shop.shopName, shop.avatar as  shopAvatar\r\n"
+
+			+ "shop.id as shopId,  shop.shopName, shop.avatar as  shopAvatar,  bills.paymentmethod_id\r\n"
+
 			+ "FROM\r\n"
 			+ "bills JOIN accounts user ON bills.account_id = user.id \r\n"
 			+ "JOIN billdetails ON billdetails.bill_id = bills.id\r\n"
@@ -73,7 +77,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			+ "ORDER BY  createdDatetime DESC ", nativeQuery = true)
 	List<Object[]> getBillsByUserIdAll(@Param("userId") Integer userId);
 
-	// Seller (Bill)
+	// Seller (Update Shop)
 
 	@Query("SELECT b FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id = ?1 AND (?2 IS NULL OR b.account.fullname LIKE CONCAT('%', ?2, '%'))")
 	Page<Bill> findAllByShopId(Integer shopId, String search, Pageable pageable);
@@ -137,5 +141,19 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			"WHERE bd.product.account.id = ?1 " +
 			"GROUP BY bd.product.name, bd.product.category.name")
 	List<Object[]> getListThongKeSanPham(Integer account_id);
+
+	@Query("Select b From Bill b Where b.orderStatus.id = :idOrderStatus AND (b.finishAt BETWEEN  :dateStart AND :dateEnd OR b.createAt BETWEEN  :dateStart AND :dateEnd)")
+	Page<Bill> selectAllByCreateAtBetweenOrFinishAtBetweenAndOrderStatus(@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd,
+			@Param("idOrderStatus") Integer idOrderStatus, Pageable pageable);
+
+	@Query("Select b From Bill b Where b.orderStatus.id = :idOrderStatus AND b.createAt BETWEEN  :dateStart AND :dateEnd")
+	Page<Bill> selectAllByCreateAtBetweenAndOrderStatus(@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd,
+			@Param("idOrderStatus") Integer idOrderStatus, Pageable pageable);
+
+	@Query(value="SELECT * FROM Bills WHERE orderstatus_id = :orderstatusID", nativeQuery = true)
+	List<Bill> findByOrderStatusId(@Param("orderstatusID") Integer orderstatusId);
+
 
 }

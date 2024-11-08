@@ -68,6 +68,8 @@ public class Account {
 
 	boolean status;
 
+	Date createAt;
+
 	// 1
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")

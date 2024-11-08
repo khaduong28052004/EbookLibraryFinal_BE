@@ -1,5 +1,6 @@
 package com.toel.model;
 
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.annotations.Nationalized;
@@ -38,6 +39,8 @@ public class Evalue {
 
 	Integer idParent;
 
+	Date createAt;
+	
 	@Nationalized
 	String content;
 

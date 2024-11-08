@@ -51,16 +51,16 @@ public class Product {
 	Integer quantity;
 
 	boolean isActive;
-	// account
+// account
 	@ManyToOne
 	@JoinColumn(name = "account_id")
 	Account account;
 
-	// category
+//	category
 	@ManyToOne
 	@JoinColumn(name = "category_id")
 	Category category;
-	// flashsale
+//	flashsale 
 	@JsonIgnore
 	@OneToMany(mappedBy = "product")
 	List<FlashSaleDetail> flashSaleDetails;
@@ -72,5 +72,8 @@ public class Product {
 	@JsonIgnore
 	@OneToMany(mappedBy = "product")
 	List<ImageProduct> imageProducts;
+
+	@OneToMany(mappedBy = "product")
+	List<Evalue> evalues;
 
 }
