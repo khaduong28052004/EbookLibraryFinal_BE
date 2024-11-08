@@ -16,6 +16,7 @@ public class Response_TK_Account {
     Boolean gender;
     String email;
     Date birthday;
+    String avatar;
     Date createAt;
     String phone;
     boolean status;

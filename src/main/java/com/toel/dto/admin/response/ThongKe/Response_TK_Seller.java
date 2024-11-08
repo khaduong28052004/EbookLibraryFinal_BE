@@ -14,6 +14,7 @@ public class Response_TK_Seller {
     String email;
     String phone;
     String shopName;
+    String avatar;
     boolean status;
     Integer sumProduct;
     Integer sumFollower;

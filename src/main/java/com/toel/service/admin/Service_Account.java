@@ -143,7 +143,7 @@ public class Service_Account {
         public Response_Account updateStatus(int id, Boolean status) {
                 Account entity = accountRepository.findById(id)
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
-                if (Boolean.FALSE) {
+                if (status != null && !status) {
                         entity.setStatus(false);
                 } else {
                         entity.setStatus(!entity.isStatus());

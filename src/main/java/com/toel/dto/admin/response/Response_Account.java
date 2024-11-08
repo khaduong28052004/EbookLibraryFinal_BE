@@ -17,6 +17,7 @@ public class Response_Account {
     String email;
     Date birthday;
     String phone;
+    String avatar;
     String background;
     String shopName;
     boolean status;
