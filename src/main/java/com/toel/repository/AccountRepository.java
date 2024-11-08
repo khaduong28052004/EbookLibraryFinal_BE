@@ -9,6 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.toel.model.Account;
 import com.toel.model.Role;
+
+import io.lettuce.core.dynamic.annotation.Param;
+
 import java.util.Date;
 
 public interface AccountRepository extends JpaRepository<Account, Integer> {
@@ -17,15 +20,20 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
         Page<Account> findAllByRoleAndStatusAndGender(Role role, boolean status, boolean gender, Pageable pageable);
 
-        Page<Account> findAllByUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContainingAndStatusAndRole(
-                        String username, String fullname, String email, String phone, boolean status, Role role,
-                        Pageable pageable);
-
-        @Query("SELECT a FROM Account a WHERE a.gender = ?1 AND a.status = ?2 AND a.role = ?3 " +
-                        "AND (a.username LIKE %?4% OR a.fullname LIKE %?5% OR a.email LIKE %?6% OR a.phone LIKE %?7%)")
+        @Query("SELECT a FROM Account a WHERE (:gender IS NULL OR a.gender = :gender) " +
+                        "AND a.status = :status " +
+                        "AND a.role = :role " +
+                        "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
+                        "OR a.email LIKE %:email% OR a.phone LIKE %:phone%)")
         Page<Account> findAllByGenderAndStatusAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                        boolean gender, boolean status, Role role, String username, String fullname, String email,
-                        String phone, Pageable pageable);
+                        @Param("gender") Boolean gender,
+                        @Param("status") boolean status,
+                        @Param("role") Role role,
+                        @Param("username") String username,
+                        @Param("fullname") String fullname,
+                        @Param("email") String email,
+                        @Param("phone") String phone,
+                        Pageable pageable);
 
         Page<Account> findAllByRole(Role role, Pageable pageable);
 
@@ -49,14 +57,18 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
         Page<Account> findAllByRoleAndGender(Role role, boolean gender, Pageable pageable);
 
-        Page<Account> findAllByUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContainingAndRole(
-                        String username, String fullname, String email, String phone, Role role, Pageable pageable);
-
-        @Query("SELECT a FROM Account a WHERE a.gender = ?1 AND a.role = ?2 " +
-                        "AND (a.username LIKE %?3% OR a.fullname LIKE %?4% OR a.email LIKE %?5% OR a.phone LIKE %?6%)")
+        @Query("SELECT a FROM Account a WHERE a.status=true and (:gender IS NULL OR a.gender = :gender) " +
+                        "AND a.role = :role " +
+                        "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
+                        "OR a.email LIKE %:email% OR a.phone LIKE %:phone%)")
         Page<Account> findAllByGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                        boolean gender, Role role, String username, String fullname, String email,
-                        String phone, Pageable pageable);
+                        @Param("gender") Boolean gender,
+                        @Param("role") Role role,
+                        @Param("username") String username,
+                        @Param("fullname") String fullname,
+                        @Param("email") String email,
+                        @Param("phone") String phone,
+                        Pageable pageable);
 
         Account findByUsername(String username);
 
@@ -69,15 +81,41 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
         Page<Account> findAllByCreateAtBetweenAndRoleAndGender(Date dateStart, Date dateEnd, Role role, boolean gender,
                         Pageable pageable);
 
-        Page<Account> findAllByCreateAtBetweenAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContainingAndRole(
-                        Date dateStart, Date dateEnd, String username, String fullname, String email, String phone,
-                        Role role, Pageable pageable);
-
-        @Query("SELECT a FROM Account a WHERE a.gender = ?1 AND a.role = ?2 " +
-                        "AND (a.username LIKE %?3% OR a.fullname LIKE %?4% OR a.email LIKE %?5% OR a.phone LIKE %?6%) "+
-                        "AND a.createAt Between ?7 and ?8")
+        @Query("SELECT a FROM Account a WHERE a.status=true and (:gender IS NULL OR a.gender = :gender) " +
+                        "AND a.role = :role " +
+                        "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
+                        "OR a.email LIKE %:email% OR a.phone LIKE %:phone%) " +
+                        "AND a.createAt BETWEEN :dateStart AND :dateEnd")
         Page<Account> findAllByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                        boolean gender, Role role, String username, String fullname, String email,
-                        String phone, Date dateStart, Date dateEnd, Pageable pageablle);
+                        @Param("gender") Boolean gender,
+                        @Param("role") Role role,
+                        @Param("username") String username,
+                        @Param("fullname") String fullname,
+                        @Param("email") String email,
+                        @Param("phone") String phone,
+                        @Param("dateStart") Date dateStart,
+                        @Param("dateEnd") Date dateEnd,
+                        Pageable pageable);
 
+        // Page<Account> findAllByCreateAtSellerBetweenAndRole(Date dateStart, Date dateEnd, Role role, Pageable pageable);
+
+        // Page<Account> findAllByCreateAtSellerBetweenAndRoleAndGender(Date dateStart, Date dateEnd, Role role,
+        //                 boolean gender,
+        //                 Pageable pageable);
+
+        // @Query("SELECT a FROM Account a WHERE a.status=true and (:gender IS NULL OR a.gender = :gender) " +
+        //                 "AND a.role = :role " +
+        //                 "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
+        //                 "OR a.email LIKE %:email% OR a.phone LIKE %:phone%) " +
+        //                 "AND a.createAtSeller BETWEEN :dateStart AND :dateEnd")
+        // Page<Account> findAllByCreateAtSellerBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+        //                 @Param("gender") Boolean gender,
+        //                 @Param("role") Role role,
+        //                 @Param("username") String username,
+        //                 @Param("fullname") String fullname,
+        //                 @Param("email") String email,
+        //                 @Param("phone") String phone,
+        //                 @Param("dateStart") Date dateStart,
+        //                 @Param("dateEnd") Date dateEnd,
+        //                 Pageable pageable);
 }

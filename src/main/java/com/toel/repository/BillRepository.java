@@ -16,6 +16,7 @@ import com.toel.dto.seller.response.Response_Year;
 import com.toel.model.Account;
 // import com.toel.dto.user.response.Response_Bill;
 import com.toel.model.Bill;
+import com.toel.model.Role;
 
 @Repository
 public interface BillRepository extends JpaRepository<Bill, Integer> {
@@ -152,10 +153,52 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			@Param("dateEnd") Date dateEnd,
 			@Param("idOrderStatus") Integer idOrderStatus, Pageable pageable);
 
-	@Query(value="SELECT * FROM Bills WHERE orderstatus_id = :orderstatusID", nativeQuery = true)
+	@Query(value = "SELECT * FROM Bills WHERE orderstatus_id = :orderstatusID", nativeQuery = true)
 	List<Bill> findByOrderStatusId(@Param("orderstatusID") Integer orderstatusId);
 
 	@Query("SELECT COALESCE(SUM(b.totalPrice),0) FROM Bill b WHERE b.account =?1")
 	double calculateAGVTotalPriceByAccount(Account account);
+
+	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN ?1 AND ?2")
+	Page<Account> selectAllByAccountAndFinishAt(Date dateStart, Date dateEnd, Pageable pageable);
+
+	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN ?1 AND ?2 And b.account.gender = ?3")
+	Page<Account> selectAllByAccountAndGenderFinishAt(Date dateStart, Date dateEnd, Boolean gender, Pageable pageable);
+
+	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN :finishDateStart AND :finishDateEnd " +
+			"AND (:gender IS NULL OR b.account.gender = :gender)" +
+			"AND (b.account.username LIKE %:username% OR b.account.fullname LIKE %:fullname% " +
+			"OR b.account.email LIKE %:email% OR b.account.phone LIKE %:phone%) ")
+	Page<Account> findAllByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+			@Param("finishDateStart") Date finishDateStart,
+			@Param("finishDateEnd") Date finishDateEnd,
+			@Param("gender") Boolean gender,
+			@Param("username") String username,
+			@Param("fullname") String fullname,
+			@Param("email") String email,
+			@Param("phone") String phone,
+			Pageable pageable);
+
+	Integer countByAccount(Account account);
+
+	@Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE b.finishAt BETWEEN ?1 AND ?2")
+	Page<Account> selectAllByShopAndFinishAt(Date dateStart, Date dateEnd, Pageable pageable);
+
+	@Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE b.finishAt BETWEEN ?1 AND ?2 And b.account.gender = ?3 ")
+	Page<Account> selectAllByShopAndGenderFinishAt(Date dateStart, Date dateEnd, Boolean gender, Pageable pageable);
+
+	@Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE b.finishAt BETWEEN :finishDateStart AND :finishDateEnd " +
+			"AND (:gender IS NULL OR b.account.gender = :gender)" +
+			"AND (b.account.username LIKE %:username% OR b.account.fullname LIKE %:fullname% " +
+			"OR b.account.email LIKE %:email% OR b.account.phone LIKE %:phone%) ")
+	Page<Account> findAllShopByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+			@Param("finishDateStart") Date finishDateStart,
+			@Param("finishDateEnd") Date finishDateEnd,
+			@Param("gender") Boolean gender,
+			@Param("username") String username,
+			@Param("fullname") String fullname,
+			@Param("email") String email,
+			@Param("phone") String phone,
+			Pageable pageable);
 
 }

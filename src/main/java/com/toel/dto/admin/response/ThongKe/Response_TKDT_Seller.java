@@ -12,6 +12,7 @@ public class Response_TKDT_Seller {
     String fullname;
     String email;
     String phone;
+    Boolean gender;
     String shopName;
     boolean status;
     Double DTshop;

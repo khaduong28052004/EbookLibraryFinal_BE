@@ -20,7 +20,4 @@ public class Response_Account {
     String background;
     String shopName;
     boolean status;
-    Integer sumFollow;
-    Integer sumProduct;
-    Integer agvEvalue;
 }

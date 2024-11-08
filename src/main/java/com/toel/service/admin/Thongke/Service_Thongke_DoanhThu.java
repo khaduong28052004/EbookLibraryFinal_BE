@@ -45,33 +45,16 @@ public class Service_Thongke_DoanhThu {
         AccountMapper accountMapper;
 
         public PageImpl<Response_TKDT_Seller> get_TKDT_Seller(Date dateStart, Date dateEnd,
-                        String search, Boolean gender, Integer page, Integer size, Boolean sortBy, String sortColumn) {
-
-                Role role = roleRepository.findByNameIgnoreCase("Seller");
+                        String search, Boolean gender, int page, int size,
+                        Boolean sortBy, String sortColumn) {
                 Pageable pageable = PageRequest.of(page, size,
                                 Sort.by(sortBy ? Sort.Direction.DESC : Sort.Direction.ASC, sortColumn));
-                Page<Account> pageAccount = null;
-                Calendar calStart = Calendar.getInstance();
-                calStart.set(Calendar.DAY_OF_MONTH, 1);
-                Date finalDateStart = (dateStart == null) ? calStart.getTime() : dateStart;
-                Calendar calEnd = Calendar.getInstance();
-                calEnd.set(Calendar.DAY_OF_MONTH, calEnd.getActualMaximum(Calendar.DAY_OF_MONTH));
-                Date finalDateEnd = (dateEnd == null) ? calEnd.getTime() : dateEnd;
-                if (search == null || search.isBlank()) {
-                        pageAccount = (gender == null)
-                                        ? accountRepository.findAllByRole(role, pageable)
-                                        : accountRepository.findAllByRoleAndGender(role, gender, pageable);
-                } else {
-                        pageAccount = (gender == null)
-                                        ? accountRepository
-                                                        .findAllByUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContainingAndRole(
-                                                                        search, search, search, search, role, pageable)
-                                        : accountRepository
-                                                        .findAllByGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                                                                        gender, role, search, search, search, search,
-                                                                        pageable);
-                }
+                Role role = roleRepository.findByNameIgnoreCase("seller");
 
+                Date finalDateStart = getDateStart(dateStart);
+                Date finalDateEnd = getDateEnd(dateEnd);
+
+                Page<Account> pageAccount = getPage(role, search, gender, pageable);
                 List<Response_TKDT_Seller> list = pageAccount.stream()
                                 .map(account -> {
                                         Response_TKDT_Seller accountnew = accountMapper.tResponse_TKDT_Seller(account);
@@ -101,13 +84,32 @@ public class Service_Thongke_DoanhThu {
                 return new PageImpl<>(list, pageable, pageAccount.getTotalElements());
         }
 
-        // public PageImpl<Response_TK_Bill> getAll_TK_DonHang(LocalDate dateStart,
-        // LocalDate dateEnd, Integer page,
-        // Integer size, Boolean sortBy, String sortColumn) {
-        // Pageable pageable = PageRequest.of(page, size,
-        // Sort.by(sortBy ? Sort.Direction.DESC : Sort.Direction.ASC, sortColumn));
-        // Page<Bill> pageBill;
+        public Page<Account> getPage(Role role, String search, Boolean gender, Pageable pageable) {
+                Page<Account> pageAccount = null;
+                if (search == null || search.isBlank()) {
+                        pageAccount = (gender == null)
+                                        ? accountRepository.findAllByRoleAndStatus(role, true, pageable)
+                                        : accountRepository.findAllByRoleAndStatusAndGender(role, true, gender,
+                                                        pageable);
+                } else {
+                        pageAccount = accountRepository
+                                        .findAllByGenderAndStatusAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+                                                        gender, true, role, search, search, search, search, pageable);
+                }
+                return pageAccount;
+        }
 
-        // }
+        public Date getDateStart(Date dateStart) {
+                Calendar calStart = Calendar.getInstance();
+                calStart.set(Calendar.DAY_OF_MONTH, 1);
+                Date finalDateStart = (dateStart == null) ? calStart.getTime() : dateStart;
+                return finalDateStart;
+        }
 
+        public Date getDateEnd(Date dateEnd) {
+                Calendar calEnd = Calendar.getInstance();
+                calEnd.set(Calendar.DAY_OF_MONTH, calEnd.getActualMaximum(Calendar.DAY_OF_MONTH));
+                Date finalDateEnd = (dateEnd == null) ? calEnd.getTime() : dateEnd;
+                return finalDateEnd;
+        }
 }

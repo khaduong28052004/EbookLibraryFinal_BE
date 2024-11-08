@@ -20,5 +20,6 @@ public class Response_TK_Account {
     String phone;
     boolean status;
     Double avgdonhang;
+    Integer sumDonHang;
     Double avgStar;
 }
