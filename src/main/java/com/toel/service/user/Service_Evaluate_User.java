@@ -109,7 +109,8 @@ public class Service_Evaluate_User {
 	private Evalue createEvaluate(Request_Evaluate_User requestEvaluateDTO) {
 		Evalue evaluate = new Evalue();
 		evaluate.setCreateAt(new Date());
-
+		evaluate.setIdParent(0);
+		
 		Integer star = requestEvaluateDTO.getStar();
 		String content = requestEvaluateDTO.getContent();
 		evaluate.setStar(star);

@@ -25,5 +25,6 @@ public class Response_Bill_Product_User {
 	Double productDiscountPrice;
 	String productImageURL;
 	Boolean isEvaluate;
+	Integer billDetailId;
 
 }
