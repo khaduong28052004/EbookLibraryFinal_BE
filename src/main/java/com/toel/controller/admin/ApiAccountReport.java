@@ -14,13 +14,13 @@ import com.toel.service.admin.Service_AccountReport;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/admin/accountreport")
-public class ApiProductReport {
+@RequestMapping("/api/v1/admin/report/account")
+public class ApiAccountReport {
     @Autowired
     Service_AccountReport service_AccountReport;
 
     @GetMapping
-    public ApiResponse<PageImpl<Response_AccountReport>> getAllNhanVApiResponse(
+    public ApiResponse<PageImpl<Response_AccountReport>> getAll(
             @RequestParam(value = "search", required = false) String search,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "5") Integer size,
