@@ -24,6 +24,7 @@ public class JwtResponseDTO {
     private Integer id_account;
     private String username;
     private String avatar;
+    private String fullname;
     private String roles;
     private List<PermissionDTO> Permission;
 

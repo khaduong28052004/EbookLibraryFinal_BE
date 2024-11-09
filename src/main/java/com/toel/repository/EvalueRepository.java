@@ -12,11 +12,13 @@ import com.toel.model.Evalue;
 import java.util.Date;
 import java.util.List;
 import com.toel.model.Product;
+import com.toel.model.Account;
+
 
 public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
 
-	@Query("SELECT e FROM Evalue e WHERE e.product.account.id = ?1 AND e.idParent = 0 AND e.id NOT IN (SELECT e2.idParent FROM Evalue e2 WHERE e2.idParent IS NOT NULL)")
-	Page<Evalue> findByAccountId(Integer account_id, Pageable pageable);
+	@Query("SELECT e FROM Evalue e WHERE e.product.account.id = ?1 AND e.idParent = 0 AND (?2 IS NULL OR e.product.name LIKE CONCAT('%', ?2, '%')) AND e.id NOT IN (SELECT e2.idParent FROM Evalue e2 WHERE e2.idParent IS NOT NULL)")
+	Page<Evalue> findByAccountId(Integer account_id, String search, Pageable pageable);
 
 	@Query(value = "SELECT * FROM evalues e WHERE product_id = :productId AND account_id = :accountId  AND bill_id = :billId LIMIT 1", nativeQuery = true)
 	Evalue findByProductIdAndAccountId(@Param("accountId") Integer accountId, @Param("productId") Integer productId,

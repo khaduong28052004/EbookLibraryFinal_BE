@@ -108,7 +108,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	// Page<Bill> selectBill(Integer account, LocalDate dateStart, LocalDate
 	// dateEnd);
 	@Query("SELECT DISTINCT YEAR(b.finishAt) FROM Bill b JOIN b.billDetails bd WHERE b.finishAt IS NOT NULL AND bd.product.account.id = ?1 ORDER BY YEAR(b.finishAt) DESC")
-	List<Response_Year> getDistinctYears(Integer account_id);
+	List<Integer> getDistinctYears(Integer account_id);
 
 	// Thong Ke Seller
 
@@ -187,7 +187,8 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	@Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE b.finishAt BETWEEN ?1 AND ?2 And b.account.gender = ?3 ")
 	Page<Account> selectAllByShopAndGenderFinishAt(Date dateStart, Date dateEnd, Boolean gender, Pageable pageable);
 
-	@Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE b.finishAt BETWEEN :finishDateStart AND :finishDateEnd " +
+	@Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE b.finishAt BETWEEN :finishDateStart AND :finishDateEnd "
+			+
 			"AND (:gender IS NULL OR b.account.gender = :gender)" +
 			"AND (b.account.username LIKE %:username% OR b.account.fullname LIKE %:fullname% " +
 			"OR b.account.email LIKE %:email% OR b.account.phone LIKE %:phone%) ")

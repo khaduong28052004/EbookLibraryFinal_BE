@@ -16,7 +16,7 @@ public class OtpService {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
-    private static final long OTP_EXPIRATION_MINUTES = 1; 
+    private static final long OTP_EXPIRATION_MINUTES = 5; 
 
     public String generateOtp(String email) {
         String otp = String.format("%06d", new Random().nextInt(999999));

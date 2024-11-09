@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import com.toel.dto.ChangePassOtp;
 import com.toel.model.Account;
 import com.toel.repository.AccountRepository;
 import com.toel.service.ServiceToel;
@@ -26,16 +27,17 @@ public class OtpController {
     @Autowired
     ServiceToel serviceToel;
     @Autowired
-    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();// Create BCryptPasswordEncoder instance
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @PostMapping("/api/v1/otp/generate")
-    public ResponseEntity<String> generateOtp(@RequestParam String email) {
-        // boolean isvalid = accountRepository.existsByEmail(email);
-        boolean isvalid = true;
+    public ResponseEntity<String> generateOtp(@RequestBody Account entity) {
+        System.out.println("email"+entity.getEmail());
+        boolean isvalid = accountRepository.existsByEmail(entity.getEmail());
+        // boolean isvalid = true;
         if (isvalid) {
-            String otp = otpService.generateOtp(email);
+            String otp = otpService.generateOtp(entity.getEmail());
             String hashOTP = serviceToel.hashPassword(otp);
-            emailService.push("kienlhpc05751@fpt.edu.vn", "Mã otp của bạn", EmailTemplateType.OTP, otp,
+            emailService.push(entity.getEmail(), "Mã otp của bạn", EmailTemplateType.OTP, otp,
                     "http://localhost:5173/change-password?otp=" + hashOTP);
             return ResponseEntity.ok("OTP generated: " + otp);
 
@@ -52,30 +54,63 @@ public class OtpController {
     public String postMethodName(@RequestParam String email) {
         // TODO: process POST request
         String o = otpService.find(email);
-
         return o;
     }
 
     @PostMapping("/api/v1/otp/verify")
-    public ResponseEntity<String> verifyOtp(@RequestParam String email, @RequestParam String otp) {
-        boolean isValid = otpService.verifyOtp(email, otp);
-        if (isValid) {
-            return ResponseEntity.ok("OTP verified successfully");
-        } else {
-            return ResponseEntity.badRequest().body("Invalid OTP");
+    public ResponseEntity<String> verifyOtp(@RequestBody ChangePassOtp entity) {
+        try {
+            boolean isValid = otpService.verifyOtp(entity.getEmail(), entity.getOtp());
+            boolean accountCheck = accountRepository.existsByEmail(entity.getEmail());
+            Account account = accountRepository.findByEmail(entity.getEmail());
+            String encryptedPassword = passwordEncoder.encode(entity.getNewpass());
+            if (!accountCheck) {
+                return ResponseEntity.badRequest().body("email không tồn tại!");
+            }
+            if (isValid) {
+                account.setPassword(encryptedPassword);
+                accountRepository.save(account);
+                emailService.push(account.getEmail(), "ĐỔI MẬT KHẨU THÀNH CÔNG !", EmailTemplateType.PASSWORD_SUSSECC,account.getFullname());
+                return ResponseEntity.ok("OTP verified successfully");
+            } else {
+                return ResponseEntity.badRequest().body("Invalid OTP !");
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+            System.out.println(e);
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("error");
         }
+
     }
 
-    @PostMapping("/api/v1/otp/verify/{otp}")
-    public ResponseEntity<String> verifyOtp1(@PathVariable String Otp, @RequestParam String email,
-            @RequestParam String otp) {
-        boolean isValid = otpService.verifyOtp(email, otp);
-        if (isValid) {
-            return ResponseEntity.ok("OTP verified successfully");
-        } else {
-            return ResponseEntity.badRequest().body("Invalid OTP");
-        }
-    }
+    // @PostMapping("/api/v1/otp/verify")
+    // public ResponseEntity<String> verifyOtp(@RequestParam String email,
+    // @RequestParam String otp,@RequestParam String pass) {
+    // boolean isValid = otpService.verifyOtp(email, otp);
+    // boolean accountCheck = accountRepository.existsByEmail(email);
+    // Account account = accountRepository.findByEmail(email);
+    // String encryptedPassword = passwordEncoder.encode(pass);
+    // if (isValid) {
+    // account.setPassword(encryptedPassword);
+    // accountRepository.save(account);
+    // return ResponseEntity.ok("OTP verified successfully");
+    // } else {
+    // return ResponseEntity.badRequest().body("Invalid OTP");
+    // }
+    // }
+
+    // @PostMapping("/api/v1/user/verify/{otp}")
+    // public ResponseEntity<String> verifyOtp1(@PathVariable String Otp,
+    // @RequestParam String email,
+    // @RequestParam String otp) {
+    // boolean isValid = otpService.verifyOtp(email, otp);
+    // if (isValid) {
+    // return ResponseEntity.ok("OTP verified successfully");
+    // } else {
+    // return ResponseEntity.badRequest().body("Invalid OTP");
+    // }
+    // }
 
     @Autowired
     private EmailService emailService;
