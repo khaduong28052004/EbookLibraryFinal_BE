@@ -31,6 +31,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.toel.service.Email.EmailService;
+import com.toel.service.Email.EmailTemplateType;
 import com.toel.service.auth.JwtService;
 import com.toel.dto.AuthRequestDTO;
 import com.toel.dto.JwtResponseDTO;
@@ -72,6 +75,8 @@ public class ApiController {
     PermissionRepository permissionRepository;
     @Autowired
     RolePermissionRepository rolesPermissionRepository;
+    @Autowired
+    EmailService emailService;
 
     @Autowired
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -340,6 +345,7 @@ public class ApiController {
         account.setAvatar("noimg.png");
         account.setRole(role);
         accountRepository.save(account);
+        emailService.push(account.getEmail(), "Wellcom Toel Shop!", EmailTemplateType.WELCOME,account.getFullname());
         return ResponseEntity.ok().body("Đăng ký thành công!");
     }
 
