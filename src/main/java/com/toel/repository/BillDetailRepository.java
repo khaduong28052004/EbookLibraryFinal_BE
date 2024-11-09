@@ -2,7 +2,9 @@ package com.toel.repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
+import org.antlr.v4.runtime.atn.SemanticContext.AND;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.toel.model.BillDetail;
+import com.toel.model.Evalue;
 import com.toel.model.Product;
 
 public interface BillDetailRepository extends JpaRepository<BillDetail, Integer> {
@@ -72,4 +75,19 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 			@Param("dateEnd") Date dateEnd,
 			@Param("product") Product product);
 
+	@Query(value = "SELECT CASE WHEN EXISTS " +
+			"(SELECT billdetails.* FROM billdetails JOIN bills ON bills.id = billdetails.bill_id\r\n" +
+			"WHERE billdetails.id = :billId\r\n" +
+			"AND billdetails.product_id = :productId\r\n" +
+			"AND bills.account_id = :accountId) \r\n " +
+			"THEN 1 ELSE 0 END AS billDetailIsExisted ", nativeQuery = true)
+	Integer billDetailIsExisted(@Param("billId") Integer bill_id, @Param("productId") Integer product_id,
+			@Param("accountId") Integer account_id);
+
+	@Query(value = "SELECT billdetails.id  \r\n" +
+			"FROM  billdetails JOIN bills ON bills.id= billdetails.bill_id WHERE bills.account_id=:accountId \r\n" +
+			"AND billdetails.product_id=:productId AND billdetails.bill_id=:billId", nativeQuery = true)
+	Integer findBillDetailByProductIdAndAccountId(@Param("accountId") Integer accountId,
+			@Param("productId") Integer productId,
+			@Param("billId") Integer billId);
 }
