@@ -172,15 +172,18 @@ public class Service_Bill_User {
 			productData.setProductDiscountPrice(productDiscountPrice);
 			productData.setProductImageURL(productImageURL);
 
-			Integer billDetailId = billDetailRepository.findBillDetailByProductIdAndAccountId(userID, productID,	billID);
+			Integer billDetailId = billDetailRepository.findBillDetailByProductIdAndAccountId(userID, productID,
+					billID);
 			productData.setBillDetailId(billDetailId);
-			
-			System.out.println("billDetailId "+billDetailId);
+
+			System.out.println("billDetailId " + billDetailId);
 			Integer isEvalued = evaluateRepository.isEvaluate(billDetailId, productID, userID);
 			productData.setIsEvaluate(isEvalued == 1);
 			billData.getProducts().add(productData);
 		}
 		bills.addAll(billMap.values());
+		bills.sort((bill1, bill2) -> bill2.getCreatedDatetime().compareTo(bill1.getCreatedDatetime())); // Sắp xếp giảm
+																										// dần
 		return bills;
 	}
 

@@ -53,15 +53,24 @@ public class Service_Evaluate_User {
 
 	public Map<String, Object> saveEvaluate(Request_Evaluate_User requestEvaluateDTO) {
 		Map<String, Object> response = new HashMap<>();
+	    Map<String, String> errors = new HashMap<>();
+
 		try {
 			validateEntitiesExist(requestEvaluateDTO);
-			Evalue evaluate = createEvaluate(requestEvaluateDTO);
-			response.put("message", "Gửi đánh giá thành công");
-			response.put("status", "success");
-		} catch (EntityNotFoundException | IllegalArgumentException e) {
-			response.put("message", e.getMessage());
-			response.put("status", "fail");
-		}
+			
+		      if (!errors.isEmpty()) {
+		            // Nếu có lỗi, trả về thông báo lỗi
+		            response.put("status", "fail");
+		            response.put("errors", errors);
+		        } else {
+		            Evalue evaluate = createEvaluate(requestEvaluateDTO);
+		            response.put("message", "Gửi đánh giá thành công");
+		            response.put("status", "success");
+		        }
+		    } catch (IllegalArgumentException e) {
+		        response.put("message", e.getMessage());
+		        response.put("status", "fail");
+		    }
 
 		return response;
 	}
