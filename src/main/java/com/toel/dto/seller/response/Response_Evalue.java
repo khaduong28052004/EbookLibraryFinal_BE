@@ -10,10 +10,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Response_Evalue {
+	private Integer id;
 	private Integer star;
 	private String content;
 	private Integer idParent;
 	private Response_Account account;
+	private Response_Product product;
 	private Response_BillDetail billDetail;
 	private List<Response_ImageEvalue> imageEvalues;
 }

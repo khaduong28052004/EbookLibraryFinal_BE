@@ -91,9 +91,13 @@ public class Service_HomeSeller {
         return defaultList; // Trả về danh sách đã được cập nhật
     }
 
-    public List<Response_Year> getYears(
-            Integer account_id) {
-        List<Response_Year> years = billRepository.getDistinctYears(account_id);
-        return years.isEmpty() ? Collections.singletonList(new Response_Year(Year.now().getValue())) : years;
+    public List<Response_Year> getYears(Integer account_id) {
+        // Lấy danh sách các năm khác nhau từ repository
+        List<Integer> years = billRepository.getDistinctYears(account_id);
+
+        // Nếu danh sách trống, trả về năm hiện tại, ngược lại trả về danh sách các năm
+        return years.isEmpty()
+                ? Collections.singletonList(new Response_Year(Year.now().getValue()))
+                : years.stream().map(Response_Year::new).collect(Collectors.toList());
     }
 }
