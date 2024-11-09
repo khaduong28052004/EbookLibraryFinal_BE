@@ -23,25 +23,21 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "ProductReports")
+@Table(name = "AccountReports")
 public class AccountReport {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer id;
-
 	@Nationalized
 	String title;
-
-	boolean status;
-
 	Date createAt;
-
-	Date resolve_at;
-
+	boolean status;
 	String content;
-
-	int parent_id;
+	@ManyToOne
+	@JoinColumn(name = "shop_id")
+	Account shop_id;
+	// Integer parent_id;
 	// @ManyToOne
 	// @JoinColumn(name = "product_id")
 	// Product product;

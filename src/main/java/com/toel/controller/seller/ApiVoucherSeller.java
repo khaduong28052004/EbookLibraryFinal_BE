@@ -22,7 +22,7 @@ import jakarta.validation.Valid;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/voucher")
+@RequestMapping("/api/v1/seller/voucher")
 public class ApiVoucherSeller {
 
         @Autowired

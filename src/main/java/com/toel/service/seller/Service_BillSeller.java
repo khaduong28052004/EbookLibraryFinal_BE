@@ -1,5 +1,6 @@
 package com.toel.service.seller;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Optional;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.seller.request.Request_Bill;
 import com.toel.dto.seller.response.Response_Bill;
+import com.toel.exception.AppException;
+import com.toel.exception.ErrorCode;
 import com.toel.mapper.BillMapper;
 import com.toel.model.Bill;
 import com.toel.model.OrderStatus;
@@ -42,15 +45,17 @@ public class Service_BillSeller {
 
     public Response_Bill updateOrderStatus(Request_Bill request_Bill) {
         Bill bill = billMapper.bill(request_Bill);
-        Optional<OrderStatus> orderStatus = orderStatusRepository.findById(bill.getOrderStatus().getId() + 1);
-        bill.setOrderStatus(orderStatus.get());
+        bill.setOrderStatus(orderStatusRepository.findById(bill.getOrderStatus().getId() + 1)
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "OrderStatus")));
+        bill.setUpdateAt(new Date());
         return billMapper.response_Bill(billRepository.saveAndFlush(bill));
     }
 
     public Response_Bill huy(Request_Bill request_Bill) {
         Bill bill = billMapper.bill(request_Bill);
-        Optional<OrderStatus> orderStatus = orderStatusRepository.findById(7);
-        bill.setOrderStatus(orderStatus.get());
+        bill.setOrderStatus(orderStatusRepository.findById(6)
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "OrderStatus")));
+        bill.setUpdateAt(new Date());
         return billMapper.response_Bill(billRepository.saveAndFlush(bill));
     }
 }

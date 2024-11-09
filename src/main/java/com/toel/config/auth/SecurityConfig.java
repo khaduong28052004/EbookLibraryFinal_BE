@@ -17,6 +17,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import com.toel.service.auth.CustomAccessDeniedHandler;
+import com.toel.service.auth.CustomAuthenticationEntryPoint;
 import com.toel.service.auth.UserService;
 
 // import com.kot.auth.service.userService;
@@ -104,10 +107,10 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form.loginPage("http://localhost:3000/login").permitAll())
                 .logout(logout -> logout.logoutSuccessUrl("http://localhost:3000").deleteCookies("JSESSIONID").permitAll())
-                // .exceptionHandling(exceptions -> exceptions
-                // .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                // .accessDeniedHandler(new CustomAccessDeniedHandler())
-                // )
+                .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                .accessDeniedHandler(new CustomAccessDeniedHandler())
+                )
                 .httpBasic(Customizer.withDefaults())
                 .build();
     }

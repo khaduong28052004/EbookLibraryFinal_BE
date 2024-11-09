@@ -70,6 +70,8 @@ public class Account {
 
 	Date createAt;
 
+	Date createAtSeller;
+
 	// 1
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
@@ -122,6 +124,11 @@ public class Account {
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<AccountReport> accountReports;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "shop_id")
+	List<AccountReport> ShopReports;
+
 //    14 Log
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")

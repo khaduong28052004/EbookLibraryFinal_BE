@@ -12,4 +12,5 @@ public class Response_Account {
     String avatar;
     String background;
     String shopName;
+    String fullname;
 }
