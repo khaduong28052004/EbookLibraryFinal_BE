@@ -57,8 +57,8 @@ public class Service_Account {
                 Page<Account> pageAccount = null;
                 if (search == null || search.isBlank()) {
                         pageAccount = (gender == null)
-                                        ? accountRepository.findAllByRoleAndStatus(role, true, pageable)
-                                        : accountRepository.findAllByRoleAndStatusAndGender(role, true, gender,
+                                        ? accountRepository.findAllByRole(role, pageable)
+                                        : accountRepository.findAllByRoleAndGender(role, gender,
                                                         pageable);
                 } else {
                         pageAccount = accountRepository
@@ -164,6 +164,7 @@ public class Service_Account {
                 Account account = accountMapper.toAccountCreate(entity);
                 account.setRole(roleRepository.findByNameIgnoreCase(rolename));
                 account.setStatus(true);
+                account.setCreateAt(new Date());
                 return accountMapper.toAccount(accountRepository.saveAndFlush(account));
         }
 
