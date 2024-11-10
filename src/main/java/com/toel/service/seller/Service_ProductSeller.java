@@ -28,90 +28,93 @@ import com.toel.repository.ProductRepository;
 
 @Service
 public class Service_ProductSeller {
-    @Autowired
-    ProductMapper productMapper;
-    @Autowired
-    ProductRepository productRepository;
-    @Autowired
-    Service_ImageProductSeller service_ImageProductSeller;
-    @Autowired
-    AccountRepository accountRepository;
-    @Autowired
-    CategoryRepository categoryRepository;
+        @Autowired
+        ProductMapper productMapper;
+        @Autowired
+        ProductRepository productRepository;
+        @Autowired
+        Service_ImageProductSeller service_ImageProductSeller;
+        @Autowired
+        AccountRepository accountRepository;
+        @Autowired
+        CategoryRepository categoryRepository;
 
-    public PageImpl<Response_Product> getAll(
-            Integer page, Integer size, boolean sortBy, String sortColum, Integer account_id, String search) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColum));
-        Page<Product> pageProduct = productRepository.findByAccountId(account_id, search, pageable);
-        List<Response_Product> list = pageProduct.hasContent()
-                ? pageProduct.stream()
-                        .map(product -> productMapper.response_Product(product))
-                        .collect(Collectors.toList())
-                : new ArrayList<>();
-        return new PageImpl<>(list, pageable, pageProduct.getTotalElements());
-    }
-
-    public Response_Product create(
-            Request_ProductCreate request_Product) throws IOException {
-        Product product = productMapper.productCreate(request_Product);
-        checkCreate(product);
-        product.setAccount(accountRepository.findById(request_Product.getAccount())
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
-        product.setCategory(
-                categoryRepository.findById(request_Product.getCategory())
-                        .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Category")));
-        product.setCreateAt(new Date());
-        service_ImageProductSeller.createProductImages(product, request_Product.getImageProducts());
-        return productMapper.response_Product(productRepository.saveAndFlush(product));
-    }
-
-    public Response_Product update(
-            Request_ProductUpdate request_Product) throws IOException {
-        Product product = productMapper.productUpdate(request_Product);
-        checkUpdate(product);
-        product.setAccount(accountRepository.findById(request_Product.getAccount())
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
-        product.setCategory(categoryRepository.findById(request_Product.getCategory())
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Category")));
-        service_ImageProductSeller.updateProductImages(product, request_Product.getImageProducts());
-        return productMapper.response_Product(productRepository.saveAndFlush(product));
-    }
-
-    public void delete(
-            Integer product_id) {
-        productRepository.findById(product_id).ifPresent(
-                product -> {
-                    product.setDelete(false);
-                    productRepository.saveAndFlush(product);
-                });
-    }
-
-    public void checkCreate(Product product) {
-
-        if (productRepository.findAll().stream()
-                .anyMatch(productCheck -> product.getName().equalsIgnoreCase(productCheck.getName()))) {
-            throw new AppException(ErrorCode.OBJECT_SETUP, "Tên sản phẩm đã tồn tại.");
+        public PageImpl<Response_Product> getAll(
+                        Integer page, Integer size, boolean sortBy, String sortColum, Integer account_id,
+                        String search) {
+                Pageable pageable = PageRequest.of(page, size,
+                                Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColum));
+                Page<Product> pageProduct = productRepository.findByAccountId(account_id, search, pageable);
+                List<Response_Product> list = pageProduct.hasContent()
+                                ? pageProduct.stream()
+                                                .map(product -> productMapper.response_Product(product))
+                                                .collect(Collectors.toList())
+                                : new ArrayList<>();
+                return new PageImpl<>(list, pageable, pageProduct.getTotalElements());
         }
 
-        if (product.getPrice() < 1000 || product.getPrice() < product.getSale()) {
-            String message = (product.getPrice() < 1000) ? "Giá sản phẩm phải lớn hơn 1000đ."
-                    : "Giá sản phẩm phải lớn hơn giá giảm.";
-            throw new AppException(ErrorCode.OBJECT_SETUP, message);
+        public Response_Product create(
+                        Request_ProductCreate request_Product) throws IOException {
+                Product product = productMapper.productCreate(request_Product);
+                checkCreate(product);
+                product.setAccount(accountRepository.findById(request_Product.getAccount())
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
+                product.setCategory(
+                                categoryRepository.findById(request_Product.getCategory())
+                                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
+                                                                "Category")));
+                product.setCreateAt(new Date());
+                service_ImageProductSeller.createProductImages(product, request_Product.getImageProducts());
+                return productMapper.response_Product(productRepository.saveAndFlush(product));
         }
-    }
 
-    public void checkUpdate(Product product) {
-
-        if (productRepository.findAll().stream()
-                .anyMatch(productCheck -> !product.getId().equals(productCheck.getId())
-                        && product.getName().equalsIgnoreCase(productCheck.getName()))) {
-            throw new AppException(ErrorCode.OBJECT_SETUP, "Tên sản phẩm đã tồn tại.");
+        public Response_Product update(
+                        Request_ProductUpdate request_Product) throws IOException {
+                Product product = productMapper.productUpdate(request_Product);
+                checkUpdate(product);
+                product.setAccount(accountRepository.findById(request_Product.getAccount())
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
+                product.setCategory(categoryRepository.findById(request_Product.getCategory())
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Category")));
+                service_ImageProductSeller.updateProductImages(product, request_Product.getImageProducts());
+                return productMapper.response_Product(productRepository.saveAndFlush(product));
         }
 
-        if (product.getPrice() < 1000 || product.getPrice() < product.getSale()) {
-            String message = (product.getPrice() < 1000) ? "Giá sản phẩm phải lớn hơn 1000đ."
-                    : "Giá sản phẩm phải lớn hơn giá giảm.";
-            throw new AppException(ErrorCode.OBJECT_SETUP, message);
+        public void delete(
+                        Integer product_id) {
+                productRepository.findById(product_id).ifPresent(
+                                product -> {
+                                        product.setDelete(true);
+                                        productRepository.saveAndFlush(product);
+                                });
         }
-    }
+
+        public void checkCreate(Product product) {
+
+                if (productRepository.findAll().stream()
+                                .anyMatch(productCheck -> product.getName().equalsIgnoreCase(productCheck.getName()))) {
+                        throw new AppException(ErrorCode.OBJECT_SETUP, "Tên sản phẩm đã tồn tại.");
+                }
+
+                if (product.getPrice() < 1000 || product.getPrice() < product.getSale()) {
+                        String message = (product.getPrice() < 1000) ? "Giá sản phẩm phải lớn hơn 1000đ."
+                                        : "Giá sản phẩm phải lớn hơn giá giảm.";
+                        throw new AppException(ErrorCode.OBJECT_SETUP, message);
+                }
+        }
+
+        public void checkUpdate(Product product) {
+
+                if (productRepository.findAll().stream()
+                                .anyMatch(productCheck -> !product.getId().equals(productCheck.getId())
+                                                && product.getName().equalsIgnoreCase(productCheck.getName()))) {
+                        throw new AppException(ErrorCode.OBJECT_SETUP, "Tên sản phẩm đã tồn tại.");
+                }
+
+                if (product.getPrice() < 1000 || product.getPrice() < product.getSale()) {
+                        String message = (product.getPrice() < 1000) ? "Giá sản phẩm phải lớn hơn 1000đ."
+                                        : "Giá sản phẩm phải lớn hơn giá giảm.";
+                        throw new AppException(ErrorCode.OBJECT_SETUP, message);
+                }
+        }
 }

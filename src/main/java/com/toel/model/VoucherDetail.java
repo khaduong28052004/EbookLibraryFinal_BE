@@ -26,8 +26,8 @@ public class VoucherDetail {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer id;
+
 	@ManyToOne
-	
 	@JoinColumn(name = "account_id")
 	Account account;
 	

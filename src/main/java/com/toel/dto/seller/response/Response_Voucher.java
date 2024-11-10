@@ -18,4 +18,6 @@ public class Response_Voucher {
     boolean isDelete;
     Date dateStart;
     Date dateEnd;
+    Response_Account account;
+    Response_TypeVoucher typeVoucher;
 }

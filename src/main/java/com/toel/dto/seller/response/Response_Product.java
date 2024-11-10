@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class Response_Product {
     Integer id;
     String name;
+    String writerName;
     double price;
     double sale;
     Integer quantity;
