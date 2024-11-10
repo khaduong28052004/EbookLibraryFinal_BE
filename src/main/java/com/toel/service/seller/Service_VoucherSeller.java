@@ -61,7 +61,7 @@ public class Service_VoucherSeller {
 
     public Response_Voucher create(Request_VoucherCreate request_Voucher) {
         Voucher voucher = voucherMapper.voucherCreate(request_Voucher);
-        checkVoucher(voucher);
+        // checkVoucher(voucher);
         voucher.setAccount(accountRepository.findById(request_Voucher.getAccount())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
         voucher.setTypeVoucher(typeVoucherRepository.findById(request_Voucher.getTypeVoucher())
@@ -72,7 +72,7 @@ public class Service_VoucherSeller {
 
     public Response_Voucher update(Request_VoucherUpdate request_Voucher) {
         Voucher voucher = voucherMapper.voucherUpdate(request_Voucher);
-        checkVoucher(voucher);
+        // checkVoucher(voucher);
         voucher.setAccount(accountRepository.findById(request_Voucher.getAccount())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
         voucher.setTypeVoucher(typeVoucherRepository.findById(request_Voucher.getTypeVoucher())

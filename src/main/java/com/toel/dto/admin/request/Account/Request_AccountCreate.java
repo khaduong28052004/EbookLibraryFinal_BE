@@ -21,7 +21,7 @@ public class Request_AccountCreate {
     Boolean gender;
     @NotNull(message = "FIELD_REQUIRED")
     String email;
-    @NotNull(message = "FIELD_REQUIRED")
+    // @NotNull(message = "FIELD_REQUIRED")
     Date birthday;
     @NotNull(message = "FIELD_REQUIRED")
     String phone;

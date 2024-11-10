@@ -32,9 +32,9 @@ public class Service_EvalueSeller {
     ProductRepository productRepository;
 
     public PageImpl<Response_Evalue> getAll(
-            Integer page, Integer size, boolean sortBy, String sortColum, Integer account_id) {
+            Integer page, Integer size, boolean sortBy, String sortColum, Integer account_id, String search) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColum));
-        Page<Evalue> pageEvalue = evalueRepository.findByAccountId(account_id, pageable);
+        Page<Evalue> pageEvalue = evalueRepository.findByAccountId(account_id, search, pageable);
         List<Response_Evalue> list = pageEvalue.stream()
                 .map(evlue -> evalueMapper.response_Evalue(evlue))
                 .collect(Collectors.toList());

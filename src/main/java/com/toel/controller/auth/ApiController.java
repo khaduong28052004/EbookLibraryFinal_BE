@@ -120,6 +120,8 @@ public class ApiController {
                         .avatar(null)
                         .roles(role.getName())
                         .Permission(dtos)
+                        .fullname(account.getFullname())
+                        .avatar(account.getAvatar())
                         .build());
             } else {
                 throw new UsernameNotFoundException("Invalid user request..!!");
