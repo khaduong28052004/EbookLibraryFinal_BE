@@ -15,6 +15,9 @@ import com.toel.model.Account;
 // import com.toel.dto.user.response.Response_Bill;
 import com.toel.model.Bill;
 
+import com.toel.model.OrderStatus;
+import com.toel.model.Role;
+
 @Repository
 public interface BillRepository extends JpaRepository<Bill, Integer> {
 	@Query(value = "SELECT user.id as userID, bills.id as billID, "
@@ -221,4 +224,8 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	@Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE b.finishAt BETWEEN ?1 AND ?2")
 	List<Account> selectAllByShopAndFinishAt(Date dateStart, Date dateEnd);
+
+    List<Bill> findByOrderStatus(OrderStatus orderStatus);
+	List<Bill> findByOrderStatusAndAccount(OrderStatus orderStatus,Account account);
+
 }
