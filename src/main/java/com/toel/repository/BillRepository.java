@@ -143,13 +143,17 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			"GROUP BY bd.product.name, bd.product.category.name")
 	List<Object[]> getListThongKeSanPham(Integer account_id);
 
-	@Query("Select b From Bill b Where b.orderStatus.id = :idOrderStatus AND (b.finishAt BETWEEN  :dateStart AND :dateEnd OR b.createAt BETWEEN  :dateStart AND :dateEnd)")
-	Page<Bill> selectAllByCreateAtBetweenOrFinishAtBetweenAndOrderStatus(@Param("dateStart") Date dateStart,
+	@Query("Select b From Bill b Where b.orderStatus.id = :idOrderStatus AND b.finishAt BETWEEN  :dateStart AND :dateEnd ")
+	Page<Bill> selectAllByFinishAtBetweenAndOrderStatus(@Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd,
 			@Param("idOrderStatus") Integer idOrderStatus, Pageable pageable);
 
-	@Query("Select b From Bill b Where b.orderStatus.id = :idOrderStatus AND b.createAt BETWEEN  :dateStart AND :dateEnd")
+	@Query("Select b From Bill b Where b.createAt BETWEEN  :dateStart AND :dateEnd")
 	Page<Bill> selectAllByCreateAtBetweenAndOrderStatus(@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd, Pageable pageable);
+
+	@Query("Select b From Bill b Where b.orderStatus.id = :idOrderStatus AND b.updateAt BETWEEN  :dateStart AND :dateEnd")
+	Page<Bill> selectAllByUpdateAtBetweenAndOrderStatus(@Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd,
 			@Param("idOrderStatus") Integer idOrderStatus, Pageable pageable);
 
@@ -251,5 +255,9 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	List<Bill> findByOrderStatus(OrderStatus orderStatus);
 
 	List<Bill> findByOrderStatusAndAccount(OrderStatus orderStatus, Account account);
+
+	List<Bill> findAllByCreateAtBetweenAndOrderStatus(Date dateStart, Date dateEnd, OrderStatus orderStatus);
+
+	List<Bill> findAllByFinishAtBetweenAndOrderStatus(Date dateStart, Date dateEnd, OrderStatus orderStatus);
 
 }

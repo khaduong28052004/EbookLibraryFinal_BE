@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.toel.dto.admin.response.ThongKe.Page_TK_Bill;
 import com.toel.dto.admin.response.ThongKe.Response_TK_Bill;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
@@ -34,33 +35,63 @@ public class Service_ThongKe_DonHang {
         @Autowired
         OrderStatusRepository orderStatusRepository;
 
-        public PageImpl<Response_TK_Bill> get_TKDT_DonHang(Date dateStart, Date dateEnd, Integer orderStatusId,
+        public Page_TK_Bill get_TKDT_DonHang(Date dateStart, Date dateEnd, Integer orderStatusId,
                         Integer page, Integer size, Boolean sortBy, String sortColumn) {
                 Pageable pageable = PageRequest.of(page, size,
                                 Sort.by(sortBy ? Sort.Direction.DESC : Sort.Direction.ASC, sortColumn));
-                Calendar calStart = Calendar.getInstance();
-                calStart.set(Calendar.DAY_OF_MONTH, 1);
-                Date finalDateStart = (dateStart == null) ? calStart.getTime() : dateStart;
-                Calendar calEnd = Calendar.getInstance();
-                calEnd.set(Calendar.DAY_OF_MONTH, calEnd.getActualMaximum(Calendar.DAY_OF_MONTH));
-                Date finalDateEnd = (dateEnd == null) ? calEnd.getTime() : dateEnd;
+                Date finalDateStart = getDateStart(dateStart);
+                Date finalDateEnd = getDateEnd(dateEnd);
                 // System.out.println("Ngày bắt đầu: " + finalDateStart);
                 // System.out.println("Ngày Kết thúc: " + finalDateEnd);
                 Page<Bill> pageBill;
-                OrderStatus orderStatus = orderStatusRepository.findById(orderStatusId)
-                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Trạng thái"));
-                if (orderStatus.getName().equalsIgnoreCase("Hoàn thành")) {
-                        pageBill = billRepository.selectAllByCreateAtBetweenOrFinishAtBetweenAndOrderStatus(
+                OrderStatus orderStatus = (orderStatusId != null) ? orderStatusRepository.findById(orderStatusId)
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Trạng thái")) : null;
+                if (orderStatus == null) {
+                        pageBill = billRepository.selectAllByCreateAtBetweenAndOrderStatus(finalDateStart, finalDateEnd,
+                                        pageable);
+                } else if (orderStatus.getName().equalsIgnoreCase("Hoàn thành")) {
+                        pageBill = billRepository.selectAllByFinishAtBetweenAndOrderStatus(
                                         finalDateStart, finalDateEnd, orderStatus.getId(), pageable);
                         System.out.println("hoàn thành");
                 } else {
-                        pageBill = billRepository.selectAllByCreateAtBetweenAndOrderStatus(finalDateStart, finalDateEnd,
-                                        orderStatus.getId(), pageable);
-                        System.out.println("Trạng thái: "+orderStatus.getName());
+                        pageBill = billRepository.selectAllByUpdateAtBetweenAndOrderStatus(
+                                        finalDateStart, finalDateEnd, orderStatus.getId(), pageable);
+                        System.out.println("Trạng thái: " + orderStatus.getName());
                 }
                 List<Response_TK_Bill> list = pageBill.stream()
                                 .map(billMapper::toResponse_TK_Bill)
                                 .collect(Collectors.toList());
-                return new PageImpl<>(list, pageable, pageBill.getTotalElements());
+
+                Integer tongDangChoXuLy = billRepository.findAllByCreateAtBetweenAndOrderStatus(finalDateStart,
+                                finalDateEnd, orderStatusRepository.findById(2).get()).size();
+                Integer tongDangGiao = billRepository.findAllByCreateAtBetweenAndOrderStatus(finalDateStart,
+                                finalDateEnd, orderStatusRepository.findById(3).get()).size();
+                Integer tongHoanThanh = billRepository.findAllByFinishAtBetweenAndOrderStatus(finalDateStart,
+                                finalDateEnd, orderStatusRepository.findById(5).get()).size();
+                Integer tongHuy = billRepository.findAllByCreateAtBetweenAndOrderStatus(finalDateStart,
+                                finalDateEnd, orderStatusRepository.findById(6).get()).size();
+
+                Page_TK_Bill page_TK_Bill = Page_TK_Bill.builder()
+                                .thongke(new PageImpl<>(list, pageable, pageBill.getTotalElements()))
+                                .tongDangChoXuLy(tongDangChoXuLy)
+                                .tongDangGiao(tongDangGiao)
+                                .tongHoanThanh(tongHoanThanh)
+                                .tongHuy(tongHuy)
+                                .build();
+                return page_TK_Bill;
+        }
+
+        public Date getDateStart(Date dateStart) {
+                Calendar calStart = Calendar.getInstance();
+                calStart.set(Calendar.DAY_OF_MONTH, 1);
+                Date finalDateStart = (dateStart == null) ? calStart.getTime() : dateStart;
+                return finalDateStart;
+        }
+
+        public Date getDateEnd(Date dateEnd) {
+                Calendar calEnd = Calendar.getInstance();
+                calEnd.set(Calendar.DAY_OF_MONTH, calEnd.getActualMaximum(Calendar.DAY_OF_MONTH));
+                Date finalDateEnd = (dateEnd == null) ? calEnd.getTime() : dateEnd;
+                return finalDateEnd;
         }
 }
