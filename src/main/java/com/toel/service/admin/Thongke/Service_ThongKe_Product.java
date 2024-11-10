@@ -39,12 +39,50 @@ public class Service_ThongKe_Product {
 
         public Page_TK_Product get_TKDT_Product(Date dateStart, Date dateEnd, String option,
                         String search, Integer page, Integer size, Boolean sortBy, String sortColumn) {
+
                 Pageable pageable = PageRequest.of(page, size,
                                 Sort.by(sortBy ? Sort.Direction.DESC : Sort.Direction.ASC, sortColumn));
                 Date finalDateStart = getDateStart(dateStart);
                 Date finalDateEnd = getDateEnd(dateEnd);
 
+                List<Product> allProducts;
                 Page<Product> pageProduct;
+
+                if (option.equalsIgnoreCase("bill")) {
+                        allProducts = (search == null || search.isBlank())
+                                        ? billDetailRepository.selectAll(finalDateStart, finalDateEnd)
+                                        : billDetailRepository.selectAllByFinishAt(search, finalDateStart,
+                                                        finalDateEnd);
+                } else if (option.equalsIgnoreCase("danhgia")) {
+                        allProducts = (search == null || search.isBlank())
+                                        ? evalueRepository.sellectAll(finalDateStart, finalDateEnd)
+                                        : evalueRepository.sellectAllByCreateAt(search, finalDateStart, finalDateEnd);
+                } else if (option.equalsIgnoreCase("yeuthich")) {
+                        allProducts = (search == null || search.isBlank())
+                                        ? likeRepository.selectAllProduct(finalDateStart, finalDateEnd)
+                                        : likeRepository.selectAllProductByDateStartDateEnd(search, finalDateStart,
+                                                        finalDateEnd);
+                } else {
+                        allProducts = (search == null || search.isBlank())
+                                        ? productRepository.findAllByIsDeleteAndIsActiveAndCreateAtBetween(false, true,
+                                                        finalDateStart, finalDateEnd)
+                                        : productRepository.selectAllMatchingAttributesByDateStartAndDateEnd(search,
+                                                        finalDateStart, finalDateEnd);
+                }
+
+                Integer totalBills = allProducts.stream()
+                                .mapToInt(product -> calculateProductRevenue(product, finalDateStart, finalDateEnd)
+                                                .getSumBill())
+                                .sum();
+                Integer totalLikes = allProducts.stream()
+                                .mapToInt(product -> calculateProductRevenue(product, finalDateStart, finalDateEnd)
+                                                .getSumLike())
+                                .sum();
+                Integer totalEvalues = allProducts.stream()
+                                .mapToInt(product -> calculateProductRevenue(product, finalDateStart, finalDateEnd)
+                                                .getSumEvalue())
+                                .sum();
+
                 if (option.equalsIgnoreCase("bill")) {
                         pageProduct = (search == null || search.isBlank())
                                         ? billDetailRepository.selectAll(finalDateStart, finalDateEnd, pageable)
@@ -57,8 +95,9 @@ public class Service_ThongKe_Product {
                                                         pageable);
                 } else if (option.equalsIgnoreCase("yeuthich")) {
                         pageProduct = (search == null || search.isBlank())
-                                        ? evalueRepository.sellectAll(finalDateStart, finalDateEnd, pageable)
-                                        : evalueRepository.sellectAllByCreateAt(search, finalDateStart, finalDateEnd,
+                                        ? likeRepository.selectAllProduct(finalDateStart, finalDateEnd, pageable)
+                                        : likeRepository.selectAllProductByDateStartDateEnd(search, finalDateStart,
+                                                        finalDateEnd,
                                                         pageable);
                 } else {
                         pageProduct = (search == null || search.isBlank())
@@ -72,10 +111,7 @@ public class Service_ThongKe_Product {
                                 .map(product -> calculateProductRevenue(product, finalDateStart, finalDateEnd))
                                 .collect(Collectors.toList());
 
-                Integer totalProducts = list.size();
-                Integer totalLikes = list.stream().mapToInt(Response_TK_Product::getSumLike).sum();
-                Integer totalBills = list.stream().mapToInt(Response_TK_Product::getSumBill).sum();
-                Integer totalEvalues = list.stream().mapToInt(Response_TK_Product::getSumEvalue).sum();
+                Integer totalProducts = allProducts.size();
 
                 Page_TK_Product pageTKProduct = Page_TK_Product.builder()
                                 .tongSP(totalProducts)

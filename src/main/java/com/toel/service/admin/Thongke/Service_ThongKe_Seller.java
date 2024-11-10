@@ -114,8 +114,8 @@ public class Service_ThongKe_Seller {
                 Page<Account> pageAccount = null;
                 if (search == null || search.isBlank()) {
                         pageAccount = (gender == null)
-                                        ? accountRepository.findAllByRoleAndStatus(role, true, pageable)
-                                        : accountRepository.findAllByRoleAndStatusAndGender(role, true, gender,
+                                        ? accountRepository.findAllByRole(role, pageable)
+                                        : accountRepository.findAllByRoleAndGender(role, gender,
                                                         pageable);
                 } else {
                         pageAccount = accountRepository

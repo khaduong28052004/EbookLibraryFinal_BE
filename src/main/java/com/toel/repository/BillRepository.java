@@ -260,4 +260,22 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	List<Bill> findAllByFinishAtBetweenAndOrderStatus(Date dateStart, Date dateEnd, OrderStatus orderStatus);
 
+	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN ?1 AND ?2")
+	List<Account> selectAllByAccountAndFinishAt(Date dateStart, Date dateEnd);
+
+	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN ?1 AND ?2 And b.account.gender = ?3")
+	List<Account> selectAllByAccountAndGenderFinishAt(Date dateStart, Date dateEnd, Boolean gender);
+
+	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN :finishDateStart AND :finishDateEnd " +
+			"AND (:gender IS NULL OR b.account.gender = :gender)" +
+			"AND (b.account.username LIKE %:username% OR b.account.fullname LIKE %:fullname% " +
+			"OR b.account.email LIKE %:email% OR b.account.phone LIKE %:phone%) ")
+	List<Account> findAllByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+			@Param("finishDateStart") Date finishDateStart,
+			@Param("finishDateEnd") Date finishDateEnd,
+			@Param("gender") Boolean gender,
+			@Param("username") String username,
+			@Param("fullname") String fullname,
+			@Param("email") String email,
+			@Param("phone") String phone);
 }
