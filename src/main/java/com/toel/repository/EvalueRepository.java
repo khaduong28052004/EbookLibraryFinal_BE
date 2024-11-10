@@ -20,7 +20,7 @@ public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
 	@Query("SELECT e FROM Evalue e WHERE e.product.account.id = ?1 AND e.idParent = 0 AND (?2 IS NULL OR e.product.name LIKE CONCAT('%', ?2, '%')) AND e.id NOT IN (SELECT e2.idParent FROM Evalue e2 WHERE e2.idParent IS NOT NULL)")
 	Page<Evalue> findByAccountId(Integer account_id, String search, Pageable pageable);
 
-	@Query(value = "SELECT CASE WHEN EXISTS (SELECT 1 FROM evalues WHERE evalues.bill_id = :billDetailId AND evalues.product_id = :productId AND evalues.account_id = :accountId) THEN 1 ELSE 0 END AS isEvaluated ", nativeQuery = true)
+	@Query(value = "SELECT CASE WHEN EXISTS (SELECT 1 FROM evalues WHERE evalues.billDetail_id = :billDetailId AND evalues.product_id = :productId AND evalues.account_id = :accountId) THEN 1 ELSE 0 END AS isEvaluated ", nativeQuery = true)
 	Integer isEvaluate(@Param("billDetailId") Integer billDetailId, @Param("productId") Integer product_id,
 			@Param("accountId") Integer account_id);
 

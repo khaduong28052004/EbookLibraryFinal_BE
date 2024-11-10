@@ -26,7 +26,7 @@ import com.toel.service.user.Service_Bill_User;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/bill")
+@RequestMapping("/api/v1/user/bill")
 public class ApiBillUser {
 
 	@Autowired
@@ -39,7 +39,6 @@ public class ApiBillUser {
 			@RequestParam String orderStatusFind, 
 	        @RequestParam int userId) {
 		
-		System.out.println("TEST 12333");
 		   Request_Bill_User requestBillDTO = new Request_Bill_User();
 		    requestBillDTO.setOrderStatusFind(orderStatusFind);
 		    requestBillDTO.setUserID(userId);
@@ -87,7 +86,7 @@ public class ApiBillUser {
 		Map<String, Object> response = new HashMap<>();
 		try {
 
-			service_Bill_User.confirmBill(billId);
+			service_Bill_User.reOrder(billId);
 
 			response.put("message", "Đã thêm vào giỏ hàng");
 			response.put("status", "successfully");

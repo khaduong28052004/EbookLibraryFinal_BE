@@ -34,7 +34,7 @@ import com.toel.service.user.Service_BillDetail_User;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/billdetail")
+@RequestMapping("/api/v1/user/billdetail")
 public class ApiBillDetailUser {
 
 	@Autowired
@@ -98,7 +98,7 @@ public class ApiBillDetailUser {
 		Map<String, Object> response = new HashMap<>();
 		try {
 
-			service_BillDetail_User.confirmBill(billId);
+			service_BillDetail_User.reOrder(billId);
 			response.put("message", "Đã thêm vào giỏ hàng");
 			response.put("status", "successfully");
 			return ResponseEntity.ok(response);
