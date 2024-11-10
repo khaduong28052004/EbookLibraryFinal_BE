@@ -72,7 +72,7 @@ public class Service_Bill_User {
 			List<Object[]> productsInBill = getBillsByOrderStatus(requestBillDTO);
 			List<Response_Bill_User> shopListInBill = createBillsWithProductsInBillDetail(productsInBill);
 			response.put("data", shopListInBill);
-			response.put("status", "success");
+			response.put("status", "successfully");
 			response.put("message", "Retrieve data successfully");
 		} catch (Exception e) {
 			response.put("status", "error");

@@ -53,24 +53,22 @@ public class Service_Evaluate_User {
 
 	public Map<String, Object> saveEvaluate(Request_Evaluate_User requestEvaluateDTO) {
 		Map<String, Object> response = new HashMap<>();
-	    Map<String, String> errors = new HashMap<>();
 
 		try {
 			validateEntitiesExist(requestEvaluateDTO);
-			
-		      if (!errors.isEmpty()) {
-		            // Nếu có lỗi, trả về thông báo lỗi
-		            response.put("status", "fail");
-		            response.put("errors", errors);
-		        } else {
-		            Evalue evaluate = createEvaluate(requestEvaluateDTO);
-		            response.put("message", "Gửi đánh giá thành công");
-		            response.put("status", "success");
-		        }
-		    } catch (IllegalArgumentException e) {
-		        response.put("message", e.getMessage());
-		        response.put("status", "fail");
-		    }
+
+			Evalue evaluate = createEvaluate(requestEvaluateDTO);
+
+			response.put("message", "Gửi đánh giá thành công");
+			response.put("status", "successfully");
+		} catch (IllegalArgumentException | EntityNotFoundException e) {
+			response.put("message", e.getMessage());
+			response.put("status", "fail");
+		} catch (Exception e) {
+			response.put("message", "An unexpected error occurred while saving the evaluation.");
+			response.put("status", "error");
+			e.printStackTrace();
+		}
 
 		return response;
 	}
@@ -119,32 +117,26 @@ public class Service_Evaluate_User {
 		Evalue evaluate = new Evalue();
 		evaluate.setCreateAt(new Date());
 		evaluate.setIdParent(0);
-		
-		Integer star = requestEvaluateDTO.getStar();
-		String content = requestEvaluateDTO.getContent();
-		evaluate.setStar(star);
-		evaluate.setContent(content);
 
-		Integer accountId = requestEvaluateDTO.getAccountId();
-		Account account = new Account();
-		account.setId(accountId);
+		evaluate.setStar(requestEvaluateDTO.getStar());
+		evaluate.setContent(requestEvaluateDTO.getContent());
+
+		Account account = accountRepository.findById(requestEvaluateDTO.getAccountId())
+				.orElseThrow(() -> new EntityNotFoundException("Tài khoản không tồn tại"));
 		evaluate.setAccount(account);
 
-		Integer productId = requestEvaluateDTO.getProductId();
-		Product product = new Product();
-		product.setId(productId);
+		Product product = productRepository.findById(requestEvaluateDTO.getProductId())
+				.orElseThrow(() -> new EntityNotFoundException("Sản phẩm không tồn tại"));
 		evaluate.setProduct(product);
 
-		Integer billDetailId = requestEvaluateDTO.getBillDetailId();
-		BillDetail billDetail = new BillDetail();
-		billDetail.setId(billDetailId);
+		BillDetail billDetail = billDetailRepository.findById(requestEvaluateDTO.getBillDetailId())
+				.orElseThrow(() -> new EntityNotFoundException("Đơn hàng không tồn tại"));
 		evaluate.setBillDetail(billDetail);
 
 		evaluateRepository.save(evaluate);
 
-		MultipartFile[] images = requestEvaluateDTO.getImages();
-		if (images != null && images.length > 0) {
-			List<ImageEvalue> imageEvalues = saveImages(images, evaluate);
+		if (requestEvaluateDTO.getImages() != null && requestEvaluateDTO.getImages().length > 0) {
+			List<ImageEvalue> imageEvalues = saveImages(requestEvaluateDTO.getImages(), evaluate);
 			evaluate.setImageEvalues(imageEvalues);
 			evaluateRepository.save(evaluate);
 		}
@@ -180,37 +172,36 @@ public class Service_Evaluate_User {
 		if (width > 1920 || height > 1080) {
 			throw new IllegalArgumentException("Độ phân giải ảnh không vượt quá 1920 x 1080");
 		}
-		if (size > 5 * 1024 * 1024) {
-			throw new IllegalArgumentException("Kích thước ảnh không vượt quá 5MB");
-		}
+//		if (size > 5 * 1024 * 1024) {
+//			throw new IllegalArgumentException("Kích thước ảnh không vượt quá 5MB");
+//		}
 
 	}
 
 	private List<ImageEvalue> saveImages(MultipartFile[] imageFiles, Evalue evaluate) {
-		List<ImageEvalue> imageEvaluate = new ArrayList<>();
+		List<ImageEvalue> imageEvalueList = new ArrayList<>();
 
 		for (MultipartFile imageFile : imageFiles) {
 			if (!imageFile.isEmpty()) {
 				try {
-					ImageEvalue image = new ImageEvalue();
-
-					String imageFirsebaseURL = firebaseUploadImages.uploadFile("evalue", imageFile);
-					if (imageFirsebaseURL == null || imageFirsebaseURL.isEmpty()) {
-						throw new RuntimeException("Failed to upload image to Firebase.");
+					String imageFirebaseURL = firebaseUploadImages.uploadFile("evalue", imageFile);
+					if (imageFirebaseURL == null || imageFirebaseURL.isEmpty()) {
+						throw new IOException("Failed to upload image to Firebase: " + imageFile.getOriginalFilename());
 					}
 
-					image.setName(imageFirsebaseURL);
-					image.setEvalue(evaluate);
-					imageEvaluateRepository.saveAndFlush(image);
+					ImageEvalue imageEvalue = new ImageEvalue();
+					imageEvalue.setName(imageFirebaseURL);
+					imageEvalue.setEvalue(evaluate);
+					imageEvaluateRepository.saveAndFlush(imageEvalue);
 
-					imageEvaluate.add(image);
+					imageEvalueList.add(imageEvalue);
 				} catch (Exception e) {
 					e.printStackTrace();
-					throw new EntityNotFoundException("");
+					throw new RuntimeException("Error processing image: " + imageFile.getOriginalFilename(), e);
 				}
 			}
 		}
 
-		return imageEvaluate;
+		return imageEvalueList;
 	}
 }
