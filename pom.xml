@@ -8,7 +8,6 @@
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.3.4</version>
 		<relativePath />
-		<!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.toel</groupId>
 	<artifactId>com.toel</artifactId>
@@ -130,11 +129,19 @@
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/io.github.cdimascio/dotenv-java -->
+
+		<!-- <dependency>
+			<groupId>io.github.cdimascio</groupId>
+			<artifactId>java-dotenv</artifactId>
+			<version>5.0.0</version>
+		</dependency> -->
+		<!-- https://mvnrepository.com/artifact/io.github.cdimascio/java-dotenv -->
 		<dependency>
 			<groupId>io.github.cdimascio</groupId>
-			<artifactId>dotenv-java</artifactId>
-			<version>3.0.2</version>
+			<artifactId>java-dotenv</artifactId>
+			<version>5.2.2</version>
 		</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>
