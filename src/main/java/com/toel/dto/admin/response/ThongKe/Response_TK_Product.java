@@ -6,6 +6,7 @@ import java.util.List;
 import com.toel.dto.admin.response.Response_Account;
 import com.toel.model.Category;
 import com.toel.model.FlashSaleDetail;
+import com.toel.model.ImageProduct;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,4 +34,5 @@ public class Response_TK_Product {
     Integer sumLike;
     Double avgStar;
     List<FlashSaleDetail> flashSaleDetails;
+    List<ImageProduct> imageProducts;
 }
