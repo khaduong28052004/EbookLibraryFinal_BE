@@ -11,11 +11,11 @@ import org.springframework.stereotype.Repository;
 
 import com.toel.dto.seller.response.Response_DoanhSo;
 import com.toel.dto.seller.response.Response_DoanhThu;
-
-import com.toel.dto.seller.response.Response_Year;
 import com.toel.model.Account;
 // import com.toel.dto.user.response.Response_Bill;
 import com.toel.model.Bill;
+
+import com.toel.model.OrderStatus;
 import com.toel.model.Role;
 
 @Repository
@@ -143,13 +143,17 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			"GROUP BY bd.product.name, bd.product.category.name")
 	List<Object[]> getListThongKeSanPham(Integer account_id);
 
-	@Query("Select b From Bill b Where b.orderStatus.id = :idOrderStatus AND (b.finishAt BETWEEN  :dateStart AND :dateEnd OR b.createAt BETWEEN  :dateStart AND :dateEnd)")
-	Page<Bill> selectAllByCreateAtBetweenOrFinishAtBetweenAndOrderStatus(@Param("dateStart") Date dateStart,
+	@Query("Select b From Bill b Where b.orderStatus.id = :idOrderStatus AND b.finishAt BETWEEN  :dateStart AND :dateEnd ")
+	Page<Bill> selectAllByFinishAtBetweenAndOrderStatus(@Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd,
 			@Param("idOrderStatus") Integer idOrderStatus, Pageable pageable);
 
-	@Query("Select b From Bill b Where b.orderStatus.id = :idOrderStatus AND b.createAt BETWEEN  :dateStart AND :dateEnd")
+	@Query("Select b From Bill b Where b.createAt BETWEEN  :dateStart AND :dateEnd")
 	Page<Bill> selectAllByCreateAtBetweenAndOrderStatus(@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd, Pageable pageable);
+
+	@Query("Select b From Bill b Where b.orderStatus.id = :idOrderStatus AND b.updateAt BETWEEN  :dateStart AND :dateEnd")
+	Page<Bill> selectAllByUpdateAtBetweenAndOrderStatus(@Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd,
 			@Param("idOrderStatus") Integer idOrderStatus, Pageable pageable);
 
@@ -181,25 +185,97 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	Integer countByAccount(Account account);
 
-	@Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE b.finishAt BETWEEN ?1 AND ?2")
-	Page<Account> selectAllByShopAndFinishAt(Date dateStart, Date dateEnd, Pageable pageable);
+	// @Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE
+	// b.finishAt BETWEEN ?1 AND ?2")
+	// Page<Account> selectAllByShopAndFinishAt(Date dateStart, Date dateEnd,
+	// Pageable pageable);
 
-	@Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE b.finishAt BETWEEN ?1 AND ?2 And b.account.gender = ?3 ")
-	Page<Account> selectAllByShopAndGenderFinishAt(Date dateStart, Date dateEnd, Boolean gender, Pageable pageable);
+	// @Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE
+	// b.finishAt BETWEEN ?1 AND ?2 And b.account.gender = ?3 ")
+	// Page<Account> selectAllByShopAndGenderFinishAt(Date dateStart, Date dateEnd,
+	// Boolean gender, Pageable pageable);
 
-	@Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE b.finishAt BETWEEN :finishDateStart AND :finishDateEnd "
-			+
+	// @Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE
+	// b.finishAt BETWEEN :finishDateStart AND :finishDateEnd "
+	// +
+	// "AND (:gender IS NULL OR b.account.gender = :gender)" +
+	// "AND (b.account.username LIKE %:username% OR b.account.fullname LIKE
+	// %:fullname% " +
+	// "OR b.account.email LIKE %:email% OR b.account.phone LIKE %:phone%) ")
+	// Page<Account>
+	// findAllShopByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+	// @Param("finishDateStart") Date finishDateStart,
+	// @Param("finishDateEnd") Date finishDateEnd,
+	// @Param("gender") Boolean gender,
+	// @Param("username") String username,
+	// @Param("fullname") String fullname,
+	// @Param("email") String email,
+	// @Param("phone") String phone,
+	// Pageable pageable);
+
+	@Query("SELECT a FROM Account a " +
+			"WHERE a.id IN ( " +
+			"    SELECT DISTINCT p.account.id " +
+			"    FROM Product p " +
+			"    JOIN p.billDetails bd " +
+			"    JOIN bd.bill b " +
+			"    WHERE b.finishAt BETWEEN :dateStart AND :dateEnd " +
+			") " +
+			"AND (:gender IS NULL OR a.gender = :gender) " +
+			"AND (LOWER(a.username) LIKE LOWER(CONCAT('%', :search, '%')) " +
+			"OR LOWER(a.fullname) LIKE LOWER(CONCAT('%', :search, '%')) " +
+			"OR LOWER(a.email) LIKE LOWER(CONCAT('%', :search, '%')) " +
+			"OR LOWER(a.phone) LIKE LOWER(CONCAT('%', :search, '%')))")
+	Page<Account> findByFinishAtBetweenAndGenderAndSearch(
+			@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd,
+			@Param("gender") Boolean gender,
+			@Param("search") String search,
+			Pageable pageable);
+
+	@Query("SELECT a FROM Account a " +
+			"WHERE a.id IN ( " +
+			"    SELECT DISTINCT p.account.id " +
+			"    FROM Product p " +
+			"    JOIN p.billDetails bd " +
+			"    JOIN bd.bill b " +
+			"    WHERE b.finishAt BETWEEN :dateStart AND :dateEnd " +
+			") " +
+			"AND (:gender IS NULL OR a.gender = :gender) " +
+			"AND (LOWER(a.username) LIKE LOWER(CONCAT('%', :search, '%')) " +
+			"OR LOWER(a.fullname) LIKE LOWER(CONCAT('%', :search, '%')) " +
+			"OR LOWER(a.email) LIKE LOWER(CONCAT('%', :search, '%')) " +
+			"OR LOWER(a.phone) LIKE LOWER(CONCAT('%', :search, '%')))")
+	List<Account> findByFinishAtBetweenAndGenderAndSearch(
+			@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd,
+			@Param("gender") Boolean gender,
+			@Param("search") String search);
+
+	List<Bill> findByOrderStatus(OrderStatus orderStatus);
+
+	List<Bill> findByOrderStatusAndAccount(OrderStatus orderStatus, Account account);
+
+	List<Bill> findAllByCreateAtBetweenAndOrderStatus(Date dateStart, Date dateEnd, OrderStatus orderStatus);
+
+	List<Bill> findAllByFinishAtBetweenAndOrderStatus(Date dateStart, Date dateEnd, OrderStatus orderStatus);
+
+	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN ?1 AND ?2")
+	List<Account> selectAllByAccountAndFinishAt(Date dateStart, Date dateEnd);
+
+	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN ?1 AND ?2 And b.account.gender = ?3")
+	List<Account> selectAllByAccountAndGenderFinishAt(Date dateStart, Date dateEnd, Boolean gender);
+
+	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN :finishDateStart AND :finishDateEnd " +
 			"AND (:gender IS NULL OR b.account.gender = :gender)" +
 			"AND (b.account.username LIKE %:username% OR b.account.fullname LIKE %:fullname% " +
 			"OR b.account.email LIKE %:email% OR b.account.phone LIKE %:phone%) ")
-	Page<Account> findAllShopByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+	List<Account> findAllByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
 			@Param("finishDateStart") Date finishDateStart,
 			@Param("finishDateEnd") Date finishDateEnd,
 			@Param("gender") Boolean gender,
 			@Param("username") String username,
 			@Param("fullname") String fullname,
 			@Param("email") String email,
-			@Param("phone") String phone,
-			Pageable pageable);
-
+			@Param("phone") String phone);
 }

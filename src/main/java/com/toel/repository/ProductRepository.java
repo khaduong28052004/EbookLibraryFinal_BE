@@ -58,6 +58,20 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
                         @Param("dateEnd") Date dateEnd,
                         Pageable pageable);
 
+        List<Product> findAllByIsDeleteAndIsActiveAndCreateAtBetween(
+                        Boolean isDelete,
+                        Boolean isActive,
+                        Date dateStart,
+                        Date dateEnd);
+
+        @Query("SELECT p FROM Product p WHERE p.isActive = true and p.isDelete=false " +
+                        "AND (p.createAt BETWEEN :dateStart AND :dateEnd) " +
+                        "AND (:key iS NULL OR p.name LIKE %:key% OR p.introduce LIKE %:key% " +
+                        "OR p.writerName LIKE %:key% OR p.publishingCompany LIKE %:key%)")
+        List<Product> selectAllMatchingAttributesByDateStartAndDateEnd(@Param("key") String key,
+                        @Param("dateStart") Date dateStart,
+                        @Param("dateEnd") Date dateEnd);
+
         @Query("SELECT b.account FROM Product b WHERE b.createAt BETWEEN ?1 AND ?2")
         Page<Account> selectAllByProductAndCreateAt(Date dateStart, Date dateEnd, Pageable pageable);
 

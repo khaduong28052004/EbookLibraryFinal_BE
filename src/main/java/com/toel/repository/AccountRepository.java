@@ -103,4 +103,37 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
         boolean existsByNumberId(String cccdNumber);
 
+        List<Account> findAllByRoleAndGender(Role role, boolean gender);
+
+        @Query("SELECT a FROM Account a WHERE a.status=true and (:gender IS NULL OR a.gender = :gender) " +
+                        "AND a.role = :role " +
+                        "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
+                        "OR a.email LIKE %:email% OR a.phone LIKE %:phone%)")
+        List<Account> findAllByGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+                        @Param("gender") Boolean gender,
+                        @Param("role") Role role,
+                        @Param("username") String username,
+                        @Param("fullname") String fullname,
+                        @Param("email") String email,
+                        @Param("phone") String phone);
+
+        List<Account> findAllByCreateAtBetweenAndRole(Date dateStart, Date dateEnd, Role role);
+
+        List<Account> findAllByCreateAtBetweenAndRoleAndGender(Date dateStart, Date dateEnd, Role role, boolean gender);
+
+        @Query("SELECT a FROM Account a WHERE a.status=true and (:gender IS NULL OR a.gender = :gender) " +
+                        "AND a.role = :role " +
+                        "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
+                        "OR a.email LIKE %:email% OR a.phone LIKE %:phone%) " +
+                        "AND a.createAt BETWEEN :dateStart AND :dateEnd")
+        List<Account> findAllByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+                        @Param("gender") Boolean gender,
+                        @Param("role") Role role,
+                        @Param("username") String username,
+                        @Param("fullname") String fullname,
+                        @Param("email") String email,
+                        @Param("phone") String phone,
+                        @Param("dateStart") Date dateStart,
+                        @Param("dateEnd") Date dateEnd);
+
 }

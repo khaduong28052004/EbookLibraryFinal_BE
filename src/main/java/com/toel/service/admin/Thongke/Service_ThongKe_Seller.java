@@ -66,7 +66,9 @@ public class Service_ThongKe_Seller {
                         pageAccount = getPageByCreateAtSeller(role, dateStart, dateEnd, search, gender,
                                         pageable);
                 } else if (option.equalsIgnoreCase("doanhso")) {
-                        pageAccount = getPageShopByBillFinalAt(finalDateStart, finalDateEnd, search, gender, pageable);
+                        pageAccount = billRepository.findByFinishAtBetweenAndGenderAndSearch(
+                                        finalDateStart,
+                                        finalDateEnd, gender, search, pageable);
                 } else if (option.equalsIgnoreCase("sanpham")) {
                         pageAccount = getPageShopByProductCreateAt(finalDateStart, finalDateEnd, search, gender,
                                         pageable);
@@ -112,8 +114,8 @@ public class Service_ThongKe_Seller {
                 Page<Account> pageAccount = null;
                 if (search == null || search.isBlank()) {
                         pageAccount = (gender == null)
-                                        ? accountRepository.findAllByRoleAndStatus(role, true, pageable)
-                                        : accountRepository.findAllByRoleAndStatusAndGender(role, true, gender,
+                                        ? accountRepository.findAllByRole(role, pageable)
+                                        : accountRepository.findAllByRoleAndGender(role, gender,
                                                         pageable);
                 } else {
                         pageAccount = accountRepository
@@ -147,27 +149,27 @@ public class Service_ThongKe_Seller {
                 return pageAccount;
         }
 
-        public Page<Account> getPageShopByBillFinalAt(Date dateStart, Date dateEnd,
-                        String search, Boolean gender, Pageable pageable) {
-                Page<Account> pageAccount;
+        // public Page<Account> getPageShopByBillFinalAt(Date dateStart, Date dateEnd,
+        // String search, Boolean gender, Pageable pageable) {
+        // Page<Account> pageAccount;
 
-                Date finalDateStart = getDateStart(dateStart);
-                Date finalDateEnd = getDateEnd(dateEnd);
+        // Date finalDateStart = getDateStart(dateStart);
+        // Date finalDateEnd = getDateEnd(dateEnd);
 
-                if (search == null || search.isBlank()) {
-                        pageAccount = (gender == null)
-                                        ? billRepository.selectAllByShopAndFinishAt(finalDateStart, finalDateEnd,
-                                                        pageable)
-                                        : billRepository.selectAllByShopAndGenderFinishAt(finalDateStart,
-                                                        finalDateEnd, gender, pageable);
-                } else {
-                        pageAccount = billRepository
-                                        .findAllShopByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                                                        finalDateStart, finalDateEnd, gender, search, search, search,
-                                                        search, pageable);
-                }
-                return pageAccount;
-        }
+        // if (search == null || search.isBlank()) {
+        // pageAccount = (gender == null)
+        // ? billRepository.selectAllByShopAndFinishAt(finalDateStart, finalDateEnd,
+        // pageable)
+        // : billRepository.selectAllByShopAndGenderFinishAt(finalDateStart,
+        // finalDateEnd, gender, pageable);
+        // } else {
+        // pageAccount = billRepository
+        // .findAllShopByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+        // finalDateStart, finalDateEnd, gender, search, search, search,
+        // search, pageable);
+        // }
+        // return pageAccount;
+        // }
 
         public Page<Account> getPageShopByProductCreateAt(Date dateStart, Date dateEnd,
                         String search, Boolean gender, Pageable pageable) {

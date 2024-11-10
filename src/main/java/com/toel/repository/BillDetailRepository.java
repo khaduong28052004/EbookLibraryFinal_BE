@@ -70,6 +70,14 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 			@Param("dateEnd") Date dateEnd,
 			Pageable pageable);
 
+	@Query("SELECT p FROM Product p WHERE p.id IN (SELECT DISTINCT bd.product.id FROM BillDetail bd WHERE bd.bill.finishAt BETWEEN :dateStart AND :dateEnd)")
+	List<Product> selectAll(@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd);
+
+	@Query("SELECT p FROM Product p WHERE p.id IN (Select DISTINCT bd.product.id FROM BillDetail bd WHERE bd.bill.finishAt BETWEEN :dateStart AND :dateEnd AND (:key iS NULL OR bd.product.name LIKE %:key% OR bd.product.introduce LIKE %:key% OR bd.product.writerName LIKE %:key% OR bd.product.publishingCompany LIKE %:key%)) ")
+	List<Product> selectAllByFinishAt(@Param("key") String key, @Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd);
+
 	@Query("Select COUNT(bd) FROM BillDetail bd WHERE bd.product = :product AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd)")
 	Integer calculateByFinishAtAndProduct(@Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd,
