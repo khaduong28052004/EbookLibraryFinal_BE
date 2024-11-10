@@ -16,6 +16,7 @@ import com.toel.dto.seller.response.Response_Year;
 import com.toel.model.Account;
 // import com.toel.dto.user.response.Response_Bill;
 import com.toel.model.Bill;
+import com.toel.model.OrderStatus;
 import com.toel.model.Role;
 
 @Repository
@@ -201,5 +202,9 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			@Param("email") String email,
 			@Param("phone") String phone,
 			Pageable pageable);
+
+
+    List<Bill> findByOrderStatus(OrderStatus orderStatus);
+	List<Bill> findByOrderStatusAndAccount(OrderStatus orderStatus,Account account);
 
 }
