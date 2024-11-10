@@ -82,13 +82,15 @@ public class Service_Thongke_DoanhThu {
                 return response;
         }
 
-        public double[] calculateMonthlyRevenue(Date dateStart, Date dateEnd) {
+        public double[] calculateMonthlyRevenue(Date dateStart, Date dateEnd, String search, Boolean gender) {
                 Date finalDateStart = getDateStart(dateStart);
                 Date finalDateEnd = getDateEnd(dateEnd);
                 double tongShop = 0, doanhThuSan = 0, phi = 0, loiNhuan = 0;
-                tongShop = billRepository.selectAllByShopAndFinishAt(finalDateStart, finalDateEnd)
+                tongShop = billRepository
+                                .findByFinishAtBetweenAndGenderAndSearch(finalDateStart, finalDateEnd, gender, search)
                                 .size();
-                for (Account account : billRepository.selectAllByShopAndFinishAt(finalDateStart, finalDateEnd)) {
+                for (Account account : billRepository.findByFinishAtBetweenAndGenderAndSearch(finalDateStart,
+                                finalDateEnd, gender, search)) {
                         doanhThuSan += billDetailRepository.calculateChietKhauByShop_San(account.getId(),
                                         finalDateStart,
                                         finalDateEnd);

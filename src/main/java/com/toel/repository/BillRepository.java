@@ -181,26 +181,33 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	Integer countByAccount(Account account);
 
-	// @Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE b.finishAt BETWEEN ?1 AND ?2")
-	// Page<Account> selectAllByShopAndFinishAt(Date dateStart, Date dateEnd, Pageable pageable);
+	// @Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE
+	// b.finishAt BETWEEN ?1 AND ?2")
+	// Page<Account> selectAllByShopAndFinishAt(Date dateStart, Date dateEnd,
+	// Pageable pageable);
 
-	// @Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE b.finishAt BETWEEN ?1 AND ?2 And b.account.gender = ?3 ")
-	// Page<Account> selectAllByShopAndGenderFinishAt(Date dateStart, Date dateEnd, Boolean gender, Pageable pageable);
+	// @Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE
+	// b.finishAt BETWEEN ?1 AND ?2 And b.account.gender = ?3 ")
+	// Page<Account> selectAllByShopAndGenderFinishAt(Date dateStart, Date dateEnd,
+	// Boolean gender, Pageable pageable);
 
-	// @Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE b.finishAt BETWEEN :finishDateStart AND :finishDateEnd "
-	// 		+
-	// 		"AND (:gender IS NULL OR b.account.gender = :gender)" +
-	// 		"AND (b.account.username LIKE %:username% OR b.account.fullname LIKE %:fullname% " +
-	// 		"OR b.account.email LIKE %:email% OR b.account.phone LIKE %:phone%) ")
-	// Page<Account> findAllShopByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-	// 		@Param("finishDateStart") Date finishDateStart,
-	// 		@Param("finishDateEnd") Date finishDateEnd,
-	// 		@Param("gender") Boolean gender,
-	// 		@Param("username") String username,
-	// 		@Param("fullname") String fullname,
-	// 		@Param("email") String email,
-	// 		@Param("phone") String phone,
-	// 		Pageable pageable);
+	// @Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE
+	// b.finishAt BETWEEN :finishDateStart AND :finishDateEnd "
+	// +
+	// "AND (:gender IS NULL OR b.account.gender = :gender)" +
+	// "AND (b.account.username LIKE %:username% OR b.account.fullname LIKE
+	// %:fullname% " +
+	// "OR b.account.email LIKE %:email% OR b.account.phone LIKE %:phone%) ")
+	// Page<Account>
+	// findAllShopByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+	// @Param("finishDateStart") Date finishDateStart,
+	// @Param("finishDateEnd") Date finishDateEnd,
+	// @Param("gender") Boolean gender,
+	// @Param("username") String username,
+	// @Param("fullname") String fullname,
+	// @Param("email") String email,
+	// @Param("phone") String phone,
+	// Pageable pageable);
 
 	@Query("SELECT a FROM Account a " +
 			"WHERE a.id IN ( " +
@@ -222,10 +229,27 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			@Param("search") String search,
 			Pageable pageable);
 
-	@Query("SELECT bd.product.account FROM Bill b JOIN b.billDetails bd WHERE b.finishAt BETWEEN ?1 AND ?2")
-	List<Account> selectAllByShopAndFinishAt(Date dateStart, Date dateEnd);
+	@Query("SELECT a FROM Account a " +
+			"WHERE a.id IN ( " +
+			"    SELECT DISTINCT p.account.id " +
+			"    FROM Product p " +
+			"    JOIN p.billDetails bd " +
+			"    JOIN bd.bill b " +
+			"    WHERE b.finishAt BETWEEN :dateStart AND :dateEnd " +
+			") " +
+			"AND (:gender IS NULL OR a.gender = :gender) " +
+			"AND (LOWER(a.username) LIKE LOWER(CONCAT('%', :search, '%')) " +
+			"OR LOWER(a.fullname) LIKE LOWER(CONCAT('%', :search, '%')) " +
+			"OR LOWER(a.email) LIKE LOWER(CONCAT('%', :search, '%')) " +
+			"OR LOWER(a.phone) LIKE LOWER(CONCAT('%', :search, '%')))")
+	List<Account> findByFinishAtBetweenAndGenderAndSearch(
+			@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd,
+			@Param("gender") Boolean gender,
+			@Param("search") String search);
 
-    List<Bill> findByOrderStatus(OrderStatus orderStatus);
-	List<Bill> findByOrderStatusAndAccount(OrderStatus orderStatus,Account account);
+	List<Bill> findByOrderStatus(OrderStatus orderStatus);
+
+	List<Bill> findByOrderStatusAndAccount(OrderStatus orderStatus, Account account);
 
 }

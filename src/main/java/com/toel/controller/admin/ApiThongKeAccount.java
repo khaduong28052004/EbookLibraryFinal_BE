@@ -40,10 +40,10 @@ public class ApiThongKeAccount {
                         @RequestParam(value = "size", defaultValue = "5") Integer size,
                         @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
                         @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
-                double[] currentMonthValues = service_Thongke_DoanhThu.calculateMonthlyRevenue(dateStart, dateEnd);
+                double[] currentMonthValues = service_Thongke_DoanhThu.calculateMonthlyRevenue(dateStart, dateEnd, search, gender);
                 return ApiResponse.<Page_TKDT_Seller>build()
                                 .result(Page_TKDT_Seller.builder()
-                                                .tkdt_seller((service_Thongke_DoanhThu.get_TKDT_Seller(dateStart,
+                                                .thongke((service_Thongke_DoanhThu.get_TKDT_Seller(dateStart,
                                                                 dateEnd, search, gender,
                                                                 page, size,
                                                                 sortBy,
