@@ -18,6 +18,7 @@ import com.toel.dto.user.response.Response_Bill_Product_User;
 //import com.toel.exception.CustomException;
 import com.toel.model.Account;
 import com.toel.model.Bill;
+import com.toel.model.BillDetail;
 import com.toel.model.Cart;
 import com.toel.model.Evalue;
 import com.toel.model.OrderStatus;
@@ -66,10 +67,13 @@ public class Service_BillDetail_User {
 		Map<Integer, Response_BillDetail_User> billMap = new HashMap<>();
 		List<Object[]> billDetail = billDetailRepository.findBillDetailById(billId);
 		List<Response_BillDetail_User> productDetail = new ArrayList<>();
+		
 		for (Object[] product : billDetail) {
 			Integer billID = Integer.parseInt(product[1].toString());
+			
 			Response_BillDetail_User billData = billMap.getOrDefault(billID, createBillDetailUser(product));
 			Response_Bill_Product_User productData = createBillProductUser(product);
+			
 			billData.getProducts().add(productData);
 			billMap.put(billID, billData);
 		}
@@ -139,13 +143,20 @@ public class Service_BillDetail_User {
 		productData.setProductPrice(productPrice);
 		productData.setProductDiscountPrice(productDiscountPrice);
 		productData.setProductImageURL(productImageURL);
-		Evalue isEvalued = evaluateRepository.findByProductIdAndAccountId(userID, productID, billID);
-		productData.setIsEvaluate(isEvalued != null);
+
+
+		Integer billDetailId = billDetailRepository.findBillDetailByProductIdAndAccountId(userID, productID,	billID);
+		productData.setBillDetailId(billDetailId);
+		
+		System.out.println("billDetailId "+billDetailId);
+		Integer isEvalued = evaluateRepository.isEvaluate(billDetailId, productID, userID);
+		productData.setIsEvaluate(isEvalued == 1);
+		
+		
 		return productData;
 	}
 
 	public void cancelBill(Integer billId) {
-
 		checkBillDetailStatus(billId, 1);
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
@@ -201,10 +212,10 @@ public class Service_BillDetail_User {
 
 	private void checkBillDetailStatus(Integer billId, Integer orderStatusId) {
 		if (billRepository.findById(billId).isEmpty() || billId == null) {
-//			throw new CustomException("Đơn hàng không tồn tại", "error");
+			// throw new CustomException("Đơn hàng không tồn tại", "error");
 		}
 		if (orderStatusRepository.findById(orderStatusId).isEmpty()) {
-//			throw new CustomException("Trạng thái đơn hàng không tồn tại", "error");
+			// throw new CustomException("Trạng thái đơn hàng không tồn tại", "error");
 		}
 	}
 

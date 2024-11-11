@@ -1,5 +1,7 @@
 package com.toel.service.admin;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,13 +16,15 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.request.Account.Request_AccountCreate;
 import com.toel.dto.admin.response.Response_Account;
-import com.toel.dto.admin.response.Response_TK_Seller;
+import com.toel.dto.admin.response.ThongKe.Response_TK_Seller;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.AccountMapper;
 import com.toel.model.Account;
 import com.toel.model.Role;
+import com.toel.repository.AccountReportRepository;
 import com.toel.repository.AccountRepository;
+import com.toel.repository.BillRepository;
 import com.toel.repository.EvalueRepository;
 import com.toel.repository.FollowerRepository;
 import com.toel.repository.ProductRepository;
@@ -40,6 +44,10 @@ public class Service_Account {
         ProductRepository productRepository;
         @Autowired
         EvalueRepository evalueRepository;
+        @Autowired
+        BillRepository billRepository;
+        @Autowired
+        AccountReportRepository accountReportRepository;
 
         public PageImpl<?> getAll(String rolename,
                         String search, Boolean gender, Integer page, Integer size, Boolean sortBy, String sortColumn) {
@@ -49,33 +57,47 @@ public class Service_Account {
                 Page<Account> pageAccount = null;
                 if (search == null || search.isBlank()) {
                         pageAccount = (gender == null)
-                                        ? accountRepository.findAllByRoleAndStatus(role, true, pageable)
-                                        : accountRepository.findAllByRoleAndStatusAndGender(role, true, gender,
+                                        ? accountRepository.findAllByRole(role, pageable)
+                                        : accountRepository.findAllByRoleAndGender(role, gender,
                                                         pageable);
                 } else {
-                        pageAccount = (gender == null)
-                                        ? accountRepository
-                                                        .findAllByUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContainingAndStatusAndRole(
-                                                                        search, search, search, search, true,
-                                                                        role,
-                                                                        pageable)
-                                        : accountRepository
-                                                        .findAllByGenderAndStatusAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                                                                        gender, true, role, search, search,
-                                                                        search,
-                                                                        search, pageable);
+                        pageAccount = accountRepository
+                                        .findAllByGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+                                                        gender, role, search, search, search, search,
+                                                        pageable);
                 }
+                Calendar calStart = Calendar.getInstance();
+                calStart.set(Calendar.DAY_OF_MONTH, 1);
+                Calendar calEnd = Calendar.getInstance();
+                calEnd.set(Calendar.DAY_OF_MONTH, calEnd.getActualMaximum(Calendar.DAY_OF_MONTH));
+
                 List<?> list = pageAccount.stream()
                                 .map(account -> {
                                         if (rolename.equalsIgnoreCase("Seller")) {
+                                                Double doanhSo = (billRepository.getTongDoanhSo(size,
+                                                                calStart.getTime(), calEnd.getTime()) == null)
+                                                                                ? 0
+                                                                                : billRepository.getTongDoanhSo(size,
+                                                                                                calStart.getTime(),
+                                                                                                calEnd.getTime());
+                                                Double doanhThu = (billRepository.getTongDoanhThu(size,
+                                                                calStart.getTime(), calEnd.getTime()) == null)
+                                                                                ? 0
+                                                                                : billRepository.getTongDoanhThu(size,
+                                                                                                calStart.getTime(),
+                                                                                                calEnd.getTime());
                                                 Response_TK_Seller accountnew = accountMapper
                                                                 .to_TK_Seller(account);
-                                                accountnew.setSumFollow(followerRepository
+                                                accountnew.setSumFollower(followerRepository
                                                                 .findAllByShopId(account.getId()).size());
                                                 accountnew.setSumProduct(
                                                                 productRepository.findAllByAccount(account).size());
-                                                accountnew.setAgvEvalue(evalueRepository
+                                                accountnew.setSumReport(accountReportRepository.countByCreateAtBetween(
+                                                                calStart.getTime(), calEnd.getTime()));
+                                                accountnew.setAvgStar(evalueRepository
                                                                 .calculateAverageStarByAccountId(account.getId()));
+                                                accountnew.setDoanhSo(doanhSo);
+                                                accountnew.setDoanhThu(doanhThu);
                                                 return accountnew;
                                         } else {
                                                 return accountMapper.toAccount(account);
@@ -121,7 +143,7 @@ public class Service_Account {
         public Response_Account updateStatus(int id, Boolean status) {
                 Account entity = accountRepository.findById(id)
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
-                if (Boolean.FALSE) {
+                if (status != null && !status) {
                         entity.setStatus(false);
                 } else {
                         entity.setStatus(!entity.isStatus());
@@ -134,6 +156,7 @@ public class Service_Account {
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
                 Role role = roleRepository.findByNameIgnoreCase("Seller");
                 entity.setRole(role);
+                entity.setCreateAtSeller(new Date());
                 return accountMapper.toAccount(accountRepository.saveAndFlush(entity));
         }
 
@@ -141,6 +164,7 @@ public class Service_Account {
                 Account account = accountMapper.toAccountCreate(entity);
                 account.setRole(roleRepository.findByNameIgnoreCase(rolename));
                 account.setStatus(true);
+                account.setCreateAt(new Date());
                 return accountMapper.toAccount(accountRepository.saveAndFlush(account));
         }
 

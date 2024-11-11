@@ -62,7 +62,7 @@ public class ApiAccountAdmin {
                 .result(service_Account.getAllSellerNotBorwse(search, gender, page, size, sortBy, sortColumn));
     }
 
-    @PostMapping("nhanvien")
+    @PostMapping("adminv1")
     public ApiResponse<Response_Account> post(@RequestBody @Valid Request_AccountCreate entity) {
         return ApiResponse.<Response_Account>build()
                 .result(service_Account.create("ADMINV1", entity));

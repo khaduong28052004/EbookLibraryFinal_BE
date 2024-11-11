@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Response_DoanhThu {
-    Double value;
-    Integer month;
+public class Response_ImageEvalue {
+    Integer id;
+    String name;
 }
