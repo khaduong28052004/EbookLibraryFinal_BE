@@ -80,6 +80,11 @@ public class Service_ProductSeller {
                 return productMapper.response_Product(productRepository.saveAndFlush(product));
         }
 
+        public Response_Product edit(
+                        Integer product_id) {
+                return productMapper.response_Product(productRepository.findById(product_id).get());
+        }
+
         public void delete(
                         Integer product_id) {
                 productRepository.findById(product_id).ifPresent(

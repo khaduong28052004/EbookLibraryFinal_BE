@@ -43,6 +43,14 @@ public class ApiProductSeller {
                                                 search));
         }
 
+        @GetMapping("/edit")
+        public ApiResponse<Response_Product> edit(
+                        @RequestParam(value = "product_id", defaultValue = "0") Integer product_id) {
+                return ApiResponse.<Response_Product>build()
+                                .result(service_ProductSeller.edit(product_id));
+
+        }
+
         @PostMapping("/create")
         public ApiResponse<Response_Product> create(
                         @RequestBody @Valid Request_ProductCreate request_Product) throws IOException {

@@ -15,6 +15,7 @@ public class Response_Product {
     String writerName;
     double price;
     double sale;
+    double weight;
     Integer quantity;
     boolean isDelete;
     boolean isActive;

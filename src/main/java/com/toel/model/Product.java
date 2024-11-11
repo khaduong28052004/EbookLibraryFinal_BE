@@ -36,6 +36,8 @@ public class Product {
 
 	double sale;
 
+	double weight;
+
 	String name;
 
 	String introduce;
