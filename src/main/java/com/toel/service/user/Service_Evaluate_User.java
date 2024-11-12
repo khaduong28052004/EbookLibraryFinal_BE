@@ -117,10 +117,12 @@ public class Service_Evaluate_User {
 		Evalue evaluate = new Evalue();
 		evaluate.setCreateAt(new Date());
 		evaluate.setIdParent(0);
-
 		evaluate.setStar(requestEvaluateDTO.getStar());
 		evaluate.setContent(requestEvaluateDTO.getContent());
 
+		for (MultipartFile image : requestEvaluateDTO.getImages()) {
+			System.out.println("image: "+image+"\n");
+		}
 		Account account = accountRepository.findById(requestEvaluateDTO.getAccountId())
 				.orElseThrow(() -> new EntityNotFoundException("Tài khoản không tồn tại"));
 		evaluate.setAccount(account);
@@ -169,12 +171,9 @@ public class Service_Evaluate_User {
 		int height = bufferedImage.getHeight();
 		long size = image.getSize();
 
-		if (width > 1920 || height > 1080) {
-			throw new IllegalArgumentException("Độ phân giải ảnh không vượt quá 1920 x 1080");
+		if (size > 5 * 1024 * 1024) {
+			throw new IllegalArgumentException("Kích thước ảnh không vượt quá 5MB");
 		}
-//		if (size > 5 * 1024 * 1024) {
-//			throw new IllegalArgumentException("Kích thước ảnh không vượt quá 5MB");
-//		}
 
 	}
 
