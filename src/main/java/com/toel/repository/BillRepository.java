@@ -111,11 +111,10 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	List<Integer> getDistinctYears(Integer account_id);
 
 	// Thong Ke Seller
-
 	@Query("SELECT SUM(b.totalPrice) FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id =?1 AND b.finishAt BETWEEN  ?2 AND ?3")
 	Double getTongDoanhSo(Integer account_id, Date dateStart, Date dateEnd);
 
-	@Query("SELECT b.totalPrice * (1 - (b.discountRate.discount / 100.0)) FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id =?1 AND b.finishAt BETWEEN  ?2 AND ?3")
+	@Query("SELECT SUM(b.totalPrice * (1 - (b.discountRate.discount / 100))) FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id =?1 AND b.finishAt BETWEEN  ?2 AND ?3")
 	Double getTongDoanhThu(Integer account_id, Date dateStart, Date dateEnd);
 
 	@Query("SELECT b FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id =?1 AND b.finishAt BETWEEN  ?2 AND ?3")
@@ -163,12 +162,15 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	@Query("SELECT COALESCE(SUM(b.totalPrice),0) FROM Bill b WHERE b.account =?1")
 	double calculateAGVTotalPriceByAccount(Account account);
 
+	// thống kê khách hàng
 	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN ?1 AND ?2")
 	Page<Account> selectAllByAccountAndFinishAt(Date dateStart, Date dateEnd, Pageable pageable);
 
+	// thống kê khách hàng
 	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN ?1 AND ?2 And b.account.gender = ?3")
 	Page<Account> selectAllByAccountAndGenderFinishAt(Date dateStart, Date dateEnd, Boolean gender, Pageable pageable);
 
+	// thống kê khách hàng
 	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN :finishDateStart AND :finishDateEnd " +
 			"AND (:gender IS NULL OR b.account.gender = :gender)" +
 			"AND (b.account.username LIKE %:username% OR b.account.fullname LIKE %:fullname% " +
@@ -213,6 +215,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	// @Param("phone") String phone,
 	// Pageable pageable);
 
+	// thống kê seller
 	@Query("SELECT a FROM Account a " +
 			"WHERE a.id IN ( " +
 			"    SELECT DISTINCT p.account.id " +
@@ -260,12 +263,15 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	List<Bill> findAllByFinishAtBetweenAndOrderStatus(Date dateStart, Date dateEnd, OrderStatus orderStatus);
 
+	// thống kê khách hàng
 	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN ?1 AND ?2")
 	List<Account> selectAllByAccountAndFinishAt(Date dateStart, Date dateEnd);
 
+	// thống kê khách hàng
 	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN ?1 AND ?2 And b.account.gender = ?3")
 	List<Account> selectAllByAccountAndGenderFinishAt(Date dateStart, Date dateEnd, Boolean gender);
 
+	// thống kê khách hàng
 	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN :finishDateStart AND :finishDateEnd " +
 			"AND (:gender IS NULL OR b.account.gender = :gender)" +
 			"AND (b.account.username LIKE %:username% OR b.account.fullname LIKE %:fullname% " +

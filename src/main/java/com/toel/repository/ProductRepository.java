@@ -72,13 +72,24 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
                         @Param("dateStart") Date dateStart,
                         @Param("dateEnd") Date dateEnd);
 
+        // thống kê seller
         @Query("SELECT b.account FROM Product b WHERE b.createAt BETWEEN ?1 AND ?2")
         Page<Account> selectAllByProductAndCreateAt(Date dateStart, Date dateEnd, Pageable pageable);
 
+        // thống kê seller
+        @Query("SELECT b.account FROM Product b WHERE b.createAt BETWEEN ?1 AND ?2")
+        List<Account> selectAllByProductAndCreateAt(Date dateStart, Date dateEnd);
+
+        // thống kê seller
         @Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN ?1 AND ?2 And b.account.gender = ?3")
         Page<Account> selectAllByProductAndGenderFinishAt(Date dateStart, Date dateEnd, Boolean gender,
                         Pageable pageable);
 
+        // thống kê seller
+        @Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN ?1 AND ?2 And b.account.gender = ?3")
+        List<Account> selectAllByProductAndGenderFinishAt(Date dateStart, Date dateEnd, Boolean gender);
+
+        // thống kê seller
         @Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN :finishDateStart AND :finishDateEnd " +
                         "AND (:gender IS NULL OR b.account.gender = :gender)" +
                         "AND (b.account.username LIKE %:username% OR b.account.fullname LIKE %:fullname% " +
@@ -92,6 +103,20 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
                         @Param("email") String email,
                         @Param("phone") String phone,
                         Pageable pageable);
+
+        // thống kê seller
+        @Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN :finishDateStart AND :finishDateEnd " +
+                        "AND (:gender IS NULL OR b.account.gender = :gender)" +
+                        "AND (b.account.username LIKE %:username% OR b.account.fullname LIKE %:fullname% " +
+                        "OR b.account.email LIKE %:email% OR b.account.phone LIKE %:phone%) ")
+        List<Account> findAllByProductCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+                        @Param("finishDateStart") Date finishDateStart,
+                        @Param("finishDateEnd") Date finishDateEnd,
+                        @Param("gender") Boolean gender,
+                        @Param("username") String username,
+                        @Param("fullname") String fullname,
+                        @Param("email") String email,
+                        @Param("phone") String phone);
         // @Query("SELECT p FROM Product p WHERE p.id IN (SELECT fl.product.id FROM
         // FlashSaleDetail fl Where fl.id =?1)")
         // Page<Product> selectAllProductInFlashSale(Integer flashSaleId, Pageable

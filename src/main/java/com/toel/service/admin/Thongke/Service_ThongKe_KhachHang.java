@@ -16,10 +16,8 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.response.ThongKe.Page_TK_KhachHang;
 import com.toel.dto.admin.response.ThongKe.Response_TK_Account;
-import com.toel.dto.admin.response.ThongKe.Response_TK_Product;
 import com.toel.mapper.AccountMapper;
 import com.toel.model.Account;
-import com.toel.model.Product;
 import com.toel.model.Role;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.BillRepository;
@@ -38,69 +36,6 @@ public class Service_ThongKe_KhachHang {
         BillRepository billRepository;
         @Autowired
         AccountMapper accountMapper;
-
-        // public Page_TK_KhachHang get_TK_KhachHang(Date dateStart, Date dateEnd,
-        // String option,
-        // String search, Boolean gender, int page, int size,
-        // Boolean sortBy, String sortColumn) {
-        // Pageable pageable = PageRequest.of(page, size,
-        // Sort.by(sortBy ? Sort.Direction.DESC : Sort.Direction.ASC, sortColumn));
-        // Role role = roleRepository.findByNameIgnoreCase("user");
-        // Date finalDateStart = getDateStart(dateStart);
-        // Date finalDateEnd = getDateEnd(dateEnd);
-        // List<Account> listAccounts;
-        // Page<Account> pageAccount;
-        // if (option.equalsIgnoreCase("macdinh")) {
-        // // account có thể mua hàng hông để chỉnh sửa
-        // pageAccount = getPage(role, search, gender, pageable);
-        // } else if (option.equalsIgnoreCase("khachhangmoi")) {
-        // pageAccount = getPageByCreateAt(role, finalDateStart, finalDateEnd, search,
-        // gender, pageable);
-        // } else if (option.equalsIgnoreCase("muanhieunhat")) {
-        // pageAccount = getPageKhachHangByBillFinalAt(finalDateStart, finalDateEnd,
-        // search, gender,
-        // pageable);
-        // } else {
-        // pageAccount = getPageByCreateAt(role, finalDateStart, finalDateEnd, search,
-        // gender, pageable);
-        // }
-        // AtomicInteger KhachHangDangHoatDong = new AtomicInteger(0);
-        // AtomicInteger KhachHangNgungHoatDong = new AtomicInteger(0);
-        // List<Response_TK_Account> list = pageAccount.stream()
-        // .map(account -> {
-        // if (account.isStatus()) {
-        // KhachHangDangHoatDong.incrementAndGet();
-        // } else {
-        // KhachHangNgungHoatDong.incrementAndGet();
-        // }
-        // return calculateProductRevenue(account, finalDateStart, finalDateEnd);
-        // })
-        // .collect(Collectors.toList());
-
-        // Integer sumBill =
-        // list.stream().mapToInt(Response_TK_Account::getSumDonHang).sum();
-        // Page_TK_KhachHang page_TK_KhachHang = Page_TK_KhachHang.builder()
-        // .thongke(new PageImpl<>(list, pageable, pageAccount.getTotalElements()))
-        // .tongDonHang(sumBill)
-        // .tongKhachHang(KhachHangDangHoatDong.get() + KhachHangNgungHoatDong.get())
-        // .KhachHangDangHoatDong(KhachHangDangHoatDong.get())
-        // .KhachHangNgungHoatDong(KhachHangNgungHoatDong.get())
-        // .build();
-        // return page_TK_KhachHang;
-        // }
-
-        // private Response_TK_Account calculateProductRevenue(Account account, Date
-        // startDate, Date endDate) {
-        // Response_TK_Account response = accountMapper.tResponse_TK_Account(account);
-        // int sumBill = billRepository.countByAccount(account) == null ? 0
-        // : billRepository.countByAccount(account);
-        // response.setAvgdonhang(
-        // billRepository.calculateAGVTotalPriceByAccount(account));
-        // response.setAvgStar(
-        // evalueRepository.calculateAverageStarByKhachHang(account));
-        // response.setSumDonHang(sumBill);
-        // return response;
-        // }
 
         public Page_TK_KhachHang get_TK_KhachHang(Date dateStart, Date dateEnd, String option,
                         String search, Boolean gender, int page, int size,

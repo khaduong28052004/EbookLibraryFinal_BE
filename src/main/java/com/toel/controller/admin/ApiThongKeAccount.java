@@ -3,7 +3,6 @@ package com.toel.controller.admin;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.admin.response.ThongKe.Page_TKDT_Seller;
 import com.toel.dto.admin.response.ThongKe.Page_TK_KhachHang;
-import com.toel.dto.admin.response.ThongKe.Response_TKDT_Seller;
-import com.toel.dto.admin.response.ThongKe.Response_TK_Account;
-import com.toel.dto.admin.response.ThongKe.Response_TK_Seller;
+import com.toel.dto.admin.response.ThongKe.Page_TK_Seller;
 import com.toel.service.admin.Thongke.Service_ThongKe_KhachHang;
 import com.toel.service.admin.Thongke.Service_ThongKe_Seller;
 import com.toel.service.admin.Thongke.Service_Thongke_DoanhThu;
@@ -75,7 +72,7 @@ public class ApiThongKeAccount {
         }
 
         @GetMapping("seller")
-        public ApiResponse<PageImpl<Response_TK_Seller>> get_TK_Seller(
+        public ApiResponse<Page_TK_Seller> get_TK_Seller(
                         @RequestParam(value = "dateStart", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date dateStart,
                         @RequestParam(value = "dateEnd", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date dateEnd,
                         @RequestParam(value = "search", required = false) String search,
@@ -85,7 +82,7 @@ public class ApiThongKeAccount {
                         @RequestParam(value = "size", defaultValue = "5") Integer size,
                         @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
                         @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
-                return ApiResponse.<PageImpl<Response_TK_Seller>>build()
+                return ApiResponse.<Page_TK_Seller>build()
                                 .result(service_ThongKe_Seller.get_TK_Seller(dateStart, dateEnd, option, search, gender,
                                                 page, size, sortBy, sortColumn));
         }

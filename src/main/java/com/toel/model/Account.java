@@ -126,8 +126,8 @@ public class Account {
 	List<AccountReport> accountReports;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "shop_id")
-	List<AccountReport> ShopReports;
+	@OneToMany(mappedBy = "shop")
+	List<AccountReport> shopReports;
 
 //    14 Log
 	@JsonIgnore
