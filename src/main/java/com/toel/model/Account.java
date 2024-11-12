@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.hibernate.annotations.Nationalized;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;

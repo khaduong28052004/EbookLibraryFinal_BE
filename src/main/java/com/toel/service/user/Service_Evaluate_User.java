@@ -26,7 +26,6 @@ import com.toel.model.ImageEvalue;
 import com.toel.model.Product;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.BillDetailRepository;
-import com.toel.repository.BillRepository;
 import com.toel.repository.EvalueRepository;
 import com.toel.repository.ImageEvalueRepository;
 import com.toel.repository.ProductRepository;

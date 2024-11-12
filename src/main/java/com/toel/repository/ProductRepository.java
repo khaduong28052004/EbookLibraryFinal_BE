@@ -3,6 +3,7 @@ package com.toel.repository;
 import java.util.Date;
 import java.util.List;
 
+import org.antlr.v4.runtime.atn.SemanticContext.AND;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,11 +23,18 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
                         @Param("price") Double price,
                         Pageable pageable);
 
-        @Query("SELECT p FROM Product p WHERE p.isActive = true and p.isDelete=false " +
+        @Query("SELECT p FROM Product p WHERE p.isActive = true " +
                         "AND (:price IS NULL OR p.price = :price OR p.sale = :price )" +
                         "AND (:key iS NULL OR p.name LIKE %:key% OR p.introduce LIKE %:key% " +
                         "OR p.writerName LIKE %:key% OR p.publishingCompany LIKE %:key%)")
         Page<Product> selectAllByActiveAndMatchingKey(@Param("key") String key, @Param("price") Double price,
+                        Pageable pageable);
+
+        @Query("SELECT p FROM Product p WHERE p.isActive != false And p.isDelete != true " +
+                        "AND (:price IS NULL OR p.price = :price OR p.sale = :price )" +
+                        "AND (:key iS NULL OR p.name LIKE %:key% OR p.introduce LIKE %:key% " +
+                        "OR p.writerName LIKE %:key% OR p.publishingCompany LIKE %:key%)")
+        Page<Product> selectAllMatchingKey(@Param("key") String key, @Param("price") Double price,
                         Pageable pageable);
 
         @Query("SELECT p FROM Product p where p.account.id = ?1 AND p.isDelete = false " +
@@ -39,6 +47,10 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
         Page<Product> findAllByIsDeleteAndIsActive(Boolean isDelete, Boolean isActive, Pageable pageable);
 
         List<Product> findAllByAccount(Account account);
+
+        @Query(value = "SELECT * FROM products WHERE id not IN( SELECT id FROM products WHERE isActive = ?1 and isDelete = ?2)",nativeQuery = true)
+        Page<Product> findAllByIsActiveNotAndIsDeleteNot(Boolean isActive, Boolean isDelete, Pageable pageable);
+
 
         Page<Product> findByIsActive(boolean isActive, Pageable pageable);
 

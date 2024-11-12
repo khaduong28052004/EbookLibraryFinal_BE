@@ -1,6 +1,5 @@
 package com.toel.service.admin.Thongke;
 
-import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import com.toel.dto.admin.response.ThongKe.Response_TKDT_Seller;
 import com.toel.mapper.AccountMapper;
 import com.toel.model.Account;
-import com.toel.model.Role;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
@@ -50,7 +48,7 @@ public class Service_Thongke_DoanhThu {
                         Boolean sortBy, String sortColumn) {
                 Pageable pageable = PageRequest.of(page, size,
                                 Sort.by(sortBy ? Sort.Direction.DESC : Sort.Direction.ASC, sortColumn));
-                Role role = roleRepository.findByNameIgnoreCase("seller");
+                roleRepository.findByNameIgnoreCase("seller");
 
                 Date finalDateStart = getDateStart(dateStart);
                 Date finalDateEnd = getDateEnd(dateEnd);

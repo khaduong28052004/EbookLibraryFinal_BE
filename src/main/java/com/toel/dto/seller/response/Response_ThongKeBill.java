@@ -1,7 +1,5 @@
 package com.toel.dto.seller.response;
 
-import java.util.List;
-
 import org.springframework.data.domain.PageImpl;
 
 import lombok.AllArgsConstructor;

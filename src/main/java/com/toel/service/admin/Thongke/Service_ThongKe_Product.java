@@ -14,10 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.response.ThongKe.Page_TK_Product;
-import com.toel.dto.admin.response.ThongKe.Response_TKDT_Seller;
 import com.toel.dto.admin.response.ThongKe.Response_TK_Product;
 import com.toel.mapper.ProductMapper;
-import com.toel.model.Account;
 import com.toel.model.Product;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.EvalueRepository;

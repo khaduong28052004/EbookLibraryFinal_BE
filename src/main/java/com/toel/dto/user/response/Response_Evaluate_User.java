@@ -1,8 +1,5 @@
 package com.toel.dto.user.response;
 
-import java.util.Date;
-
-import org.mapstruct.Mapper;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;

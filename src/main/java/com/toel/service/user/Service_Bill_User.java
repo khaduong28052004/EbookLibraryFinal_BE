@@ -1,36 +1,27 @@
 package com.toel.service.user;
 
-import java.security.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_Bill_User;
-import com.toel.dto.user.response.Response_Bill_Shop_User;
 import com.toel.dto.user.response.Response_Bill_Product_User;
 import com.toel.dto.user.resquest.Request_Bill_User;
 
 import com.toel.model.Account;
-import com.toel.model.Address;
 import com.toel.model.Bill;
 import com.toel.model.Cart;
-import com.toel.model.Evalue;
 import com.toel.model.OrderStatus;
 import com.toel.model.Product;
 import com.toel.repository.AccountRepository;

@@ -3,6 +3,7 @@ package com.toel.dto.admin.response.ThongKe;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.toel.dto.admin.response.Response_Account;
 import com.toel.model.Category;
 import com.toel.model.FlashSaleDetail;
@@ -23,6 +24,7 @@ public class Response_TK_Product {
     String introduce;
     String writerName;
     String publishingCompany;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", timezone = "UTC")
     Date createAt;
     boolean isDelete;
     Integer quantity;
