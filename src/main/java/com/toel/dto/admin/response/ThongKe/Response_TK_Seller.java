@@ -1,6 +1,10 @@
 package com.toel.dto.admin.response.ThongKe;
 
+import java.util.Date;
+
 import org.hibernate.internal.build.AllowPrintStacktrace;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +20,8 @@ public class Response_TK_Seller {
     String shopName;
     String avatar;
     boolean status;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", timezone = "UTC")
+    Date createAt;
     Integer sumProduct;
     Integer sumFollower;
     Double avgStar;
