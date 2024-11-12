@@ -12,11 +12,9 @@ import org.springframework.stereotype.Repository;
 import com.toel.dto.seller.response.Response_DoanhSo;
 import com.toel.dto.seller.response.Response_DoanhThu;
 import com.toel.model.Account;
-// import com.toel.dto.user.response.Response_Bill;
 import com.toel.model.Bill;
 
 import com.toel.model.OrderStatus;
-import com.toel.model.Role;
 
 @Repository
 public interface BillRepository extends JpaRepository<Bill, Integer> {

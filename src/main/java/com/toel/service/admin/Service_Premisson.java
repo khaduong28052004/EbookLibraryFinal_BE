@@ -91,7 +91,7 @@ public class Service_Premisson {
     }
 
     public Response_Permission create(Request_PermissionCreate entity) {
-        Role role = roleRepository.findById(entity.getRole())
+        roleRepository.findById(entity.getRole())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Role"));
         Permission permission = permissionRepository.save(permissionMapper.toPermissionCreate(entity));
         Request_RolePermissionCreate rolePermission = new Request_RolePermissionCreate();

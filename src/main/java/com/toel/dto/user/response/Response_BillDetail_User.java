@@ -1,9 +1,6 @@
 package com.toel.dto.user.response;
 
-import java.util.Date;
 import java.util.List;
-
-import org.mapstruct.Mapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

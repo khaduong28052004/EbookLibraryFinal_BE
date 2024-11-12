@@ -2,10 +2,6 @@ package com.toel.dto;
 
 import java.util.List;
 
-import com.toel.model.Permission;
-import com.toel.model.Role;
-import com.toel.model.RolePermission;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

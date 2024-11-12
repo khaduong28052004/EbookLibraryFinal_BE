@@ -1,7 +1,6 @@
 package com.toel.controller.seller;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -13,13 +12,10 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.google.cloud.Role;
 import com.toel.model.Account;
-import com.toel.model.RolePermission;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.RolePermissionRepository;
 import com.toel.repository.RoleRepository;
