@@ -80,7 +80,8 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	// Seller (Update Shop)
 
-	@Query("SELECT b FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id = ?1 AND (?2 IS NULL OR b.account.fullname LIKE CONCAT('%', ?2, '%'))")
+	@Query("SELECT b FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id = ?1 " +
+			"AND (?2 IS NULL OR b.account.fullname LIKE CONCAT('%', ?2, '%'))")
 	Page<Bill> findAllByShopId(Integer shopId, String search, Pageable pageable);
 
 	// Home Seller
@@ -115,10 +116,10 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	@Query("SELECT SUM(b.totalPrice) FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id =?1 AND b.finishAt BETWEEN  ?2 AND ?3")
 	Double getTongDoanhSo(Integer account_id, Date dateStart, Date dateEnd);
 
-	@Query("SELECT b.totalPrice * (1 - (b.discountRate.discount / 100.0)) FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id =?1 AND b.finishAt BETWEEN  ?2 AND ?3")
+	@Query("SELECT SUM(b.totalPrice * (1 - (b.discountRate.discount / 100.0))) FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id =?1 AND b.finishAt BETWEEN  ?2 AND ?3")
 	Double getTongDoanhThu(Integer account_id, Date dateStart, Date dateEnd);
 
-	@Query("SELECT b FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id =?1 AND b.finishAt BETWEEN  ?2 AND ?3")
+	@Query("SELECT b FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id =?1 AND b.createAt BETWEEN  ?2 AND ?3")
 	Page<Bill> getListThongKeBill(Integer account_id, Date dateStart, Date dateEnd, Pageable pageable);
 
 	@Query("SELECT b.account.fullname, " +

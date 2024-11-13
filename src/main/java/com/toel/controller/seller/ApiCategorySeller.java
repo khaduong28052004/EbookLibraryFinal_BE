@@ -17,6 +17,7 @@ import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.request.Category.Request_CategoryCreate;
 import com.toel.dto.seller.request.Category.Request_CategoryUpdate;
 import com.toel.dto.seller.response.Response_Category;
+import com.toel.dto.seller.response.Response_CategorySeller;
 import com.toel.service.seller.Service_CategorySeller;
 
 import jakarta.validation.Valid;
@@ -39,6 +40,17 @@ public class ApiCategorySeller {
                                 .result(categoryService.getAll(page, size, sortBy, sortColumn, search));
         }
 
+        @GetMapping("/getAllSeller")
+        public ApiResponse<PageImpl<Response_CategorySeller>> getAllSeller(
+                        @RequestParam(value = "page", defaultValue = "0") Integer page,
+                        @RequestParam(value = "size", defaultValue = "5") Integer size,
+                        @RequestParam(value = "sortBy", defaultValue = "true") boolean sortBy,
+                        @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn,
+                        @RequestParam(value = "search", required = false) String search) {
+                return ApiResponse.<PageImpl<Response_CategorySeller>>build()
+                                .result(categoryService.getAllSeller(page, size, sortBy, sortColumn, search));
+        }
+
         @GetMapping("/getAllList")
         public ApiResponse<List<Response_Category>> getAllList() {
                 return ApiResponse.<List<Response_Category>>build()
@@ -50,6 +62,13 @@ public class ApiCategorySeller {
                         @RequestParam(value = "idParent", defaultValue = "0") Integer idParent) {
                 return ApiResponse.<List<Response_Category>>build()
                                 .result(categoryService.getIdParent(idParent));
+        }
+
+        @GetMapping("/edit")
+        public ApiResponse<Response_Category> edit(
+                        @RequestParam(value = "category_id", defaultValue = "0") Integer category_id) {
+                return ApiResponse.<Response_Category>build()
+                                .result(categoryService.edit(category_id));
         }
 
         @PostMapping("/create")

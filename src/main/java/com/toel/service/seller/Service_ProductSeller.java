@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.toel.dto.seller.request.Product.Request_ProductCreate;
 import com.toel.dto.seller.request.Product.Request_ProductUpdate;
@@ -38,6 +39,7 @@ public class Service_ProductSeller {
         AccountRepository accountRepository;
         @Autowired
         CategoryRepository categoryRepository;
+        Product product;
 
         public PageImpl<Response_Product> getAll(
                         Integer page, Integer size, boolean sortBy, String sortColum, Integer account_id,
@@ -55,8 +57,8 @@ public class Service_ProductSeller {
 
         public Response_Product create(
                         Request_ProductCreate request_Product) throws IOException {
-                Product product = productMapper.productCreate(request_Product);
-                checkCreate(product);
+                product = productMapper.productCreate(request_Product);
+                // checkCreate(product);
                 product.setAccount(accountRepository.findById(request_Product.getAccount())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
                 product.setCategory(
@@ -64,20 +66,23 @@ public class Service_ProductSeller {
                                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
                                                                 "Category")));
                 product.setCreateAt(new Date());
-                service_ImageProductSeller.createProductImages(product, request_Product.getImageProducts());
                 return productMapper.response_Product(productRepository.saveAndFlush(product));
         }
 
         public Response_Product update(
                         Request_ProductUpdate request_Product) throws IOException {
-                Product product = productMapper.productUpdate(request_Product);
-                checkUpdate(product);
+                product = productMapper.productUpdate(request_Product);
+                // checkUpdate(product);
                 product.setAccount(accountRepository.findById(request_Product.getAccount())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
                 product.setCategory(categoryRepository.findById(request_Product.getCategory())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Category")));
-                service_ImageProductSeller.updateProductImages(product, request_Product.getImageProducts());
                 return productMapper.response_Product(productRepository.saveAndFlush(product));
+        }
+
+        public void saveImg(
+                        List<MultipartFile> images) throws IOException {
+                service_ImageProductSeller.createProductImages(product, images);
         }
 
         public Response_Product edit(

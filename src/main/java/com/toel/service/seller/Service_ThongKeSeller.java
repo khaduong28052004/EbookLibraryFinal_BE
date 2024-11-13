@@ -38,15 +38,13 @@ public class Service_ThongKeSeller {
 
     public Double getTongDoanhSo(
             Integer account_id, Date dateStart, Date dateEnd) {
-        Double tongDoanhSo = billRepository.getTongDoanhSo(account_id, dateStart == null ? new Date() : dateStart,
-                dateEnd == null ? new Date() : dateEnd);
+        Double tongDoanhSo = billRepository.getTongDoanhSo(account_id, dateStart, dateEnd);
         return tongDoanhSo == null ? 0.0 : tongDoanhSo;
     }
 
     public Double getTongDoanhThu(
             Integer account_id, Date dateStart, Date dateEnd) {
-        Double tongDoanhThu = billRepository.getTongDoanhThu(account_id, dateStart == null ? new Date() : dateStart,
-                dateEnd == null ? new Date() : dateEnd);
+        Double tongDoanhThu = billRepository.getTongDoanhThu(account_id, dateStart, dateEnd);
         return tongDoanhThu == null ? 0.0 : tongDoanhThu;
     }
 
@@ -54,9 +52,7 @@ public class Service_ThongKeSeller {
             Integer account_id, Date dateStart, Date dateEnd, Integer page, Integer size, boolean sortBy,
             String sortColumn) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
-        Page<Bill> pageBill = billRepository.getListThongKeBill(account_id,
-                dateStart == null ? new Date() : dateStart,
-                dateEnd == null ? new Date() : dateEnd, pageable);
+        Page<Bill> pageBill = billRepository.getListThongKeBill(account_id, dateStart, dateEnd, pageable);
         List<Response_Bill> list = pageBill.stream()
                 .map(bill -> billMapper.response_Bill(bill))
                 .collect(Collectors.toList());
@@ -91,7 +87,8 @@ public class Service_ThongKeSeller {
             String name = (String) result[0];
             String theLoai = (String) result[1];
             Integer luotBan = ((Number) result[2]).intValue();
-            Integer luotDanhGia = ((Number) result[3]).intValue();;
+            Integer luotDanhGia = ((Number) result[3]).intValue();
+            ;
             double trungBinhDanhGia = ((Number) result[4]).doubleValue();
             Integer luotYeuThich = ((Number) result[5]).intValue();
             pageSanPham.add(

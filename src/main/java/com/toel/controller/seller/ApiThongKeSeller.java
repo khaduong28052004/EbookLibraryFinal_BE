@@ -1,5 +1,7 @@
 package com.toel.controller.seller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,26 +27,38 @@ public class ApiThongKeSeller {
 
         @GetMapping("/bill")
         public ApiResponse<Response_ThongKeBill> getThongKeBill(
-                        @RequestParam(value = "account_id", defaultValue = "0") Integer account_id,
-                        @RequestParam(value = "dateStart", required = false) Date dateStart,
-                        @RequestParam(value = "dateEnd", required = false) Date dateEnd,
-                        @RequestParam(value = "page", defaultValue = "0") Integer page,
-                        @RequestParam(value = "size", defaultValue = "5") Integer size,
-                        @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
-                        @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
-                return ApiResponse.<Response_ThongKeBill>build()
-                                .result(Response_ThongKeBill.builder()
-                                                .chietKhau(service_ThongKe.getChietKhau())
-                                                .tongDoanhSo(service_ThongKe.getTongDoanhSo(account_id, dateStart,
-                                                                dateEnd))
-                                                .tongDoanhThu(service_ThongKe.getTongDoanhThu(account_id, dateStart,
-                                                                dateEnd))
-                                                .bill(service_ThongKe.getListThongKeBill(account_id, dateStart, dateEnd,
-                                                                page, size, sortBy,
-                                                                sortColumn))
-                                                .build());
+                @RequestParam(value = "account_id", defaultValue = "0") Integer account_id,
+                @RequestParam(value = "dateStart", required = false) String dateStartStr,
+                @RequestParam(value = "dateEnd", required = false) String dateEndStr,
+                @RequestParam(value = "page", defaultValue = "0") Integer page,
+                @RequestParam(value = "size", defaultValue = "5") Integer size,
+                @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
+                @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
+        
+            Date dateStart = null;
+            Date dateEnd = null;
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        
+            try {
+                if (dateStartStr != null) {
+                    dateStart = formatter.parse(dateStartStr);
+                }
+                if (dateEndStr != null) {
+                    dateEnd = formatter.parse(dateEndStr);
+                }
+            } catch (ParseException e) {
+                System.out.println(e);
+            }
+        
+            return ApiResponse.<Response_ThongKeBill>build()
+                    .result(Response_ThongKeBill.builder()
+                            .chietKhau(service_ThongKe.getChietKhau())
+                            .tongDoanhSo(service_ThongKe.getTongDoanhSo(account_id, dateStart, dateEnd))
+                            .tongDoanhThu(service_ThongKe.getTongDoanhThu(account_id, dateStart, dateEnd))
+                            .bill(service_ThongKe.getListThongKeBill(account_id, dateStart, dateEnd, page, size, sortBy, sortColumn))
+                            .build());
         }
-
+        
         @GetMapping("/khachHang")
         public ApiResponse<PageImpl<Response_ThongKeKhachHang>> getThongKeKhachHang(
                         @RequestParam(value = "account_id", defaultValue = "0") Integer account_id,

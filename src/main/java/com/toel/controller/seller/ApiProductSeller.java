@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.request.Product.Request_ProductCreate;
@@ -65,6 +67,12 @@ public class ApiProductSeller {
                 return ApiResponse.<Response_Product>build()
                                 .message("Cập nhật sản phẩm thành công")
                                 .result(service_ProductSeller.update(request_Product));
+        }
+
+        @PostMapping("/saveImg")
+        public void update(
+                        @RequestPart("imageProducts") List<MultipartFile> images) throws IOException {
+                service_ProductSeller.saveImg(images);
         }
 
         @DeleteMapping("/delete")

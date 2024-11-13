@@ -30,8 +30,6 @@ public class Request_ProductUpdate {
     @NotBlank(message = "FIELD_REQUIRED")
     String publishingCompany;
     @NotNull(message = "FIELD_REQUIRED")
-    Date createAt;
-    @NotNull(message = "FIELD_REQUIRED")
     boolean isDelete;
     @NotNull(message = "FIELD_REQUIRED")
     Integer quantity;

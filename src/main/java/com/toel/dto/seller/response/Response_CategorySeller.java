@@ -7,7 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Response_BillDetail {
+public class Response_CategorySeller {
     Integer id;
-    Response_Product product;
+    String name;
+    Integer idParent;
+    String nameDanhMuc;
+    Boolean hasProducts;
 }

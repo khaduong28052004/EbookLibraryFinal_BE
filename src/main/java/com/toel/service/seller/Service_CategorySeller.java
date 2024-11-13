@@ -17,10 +17,14 @@ import org.springframework.stereotype.Service;
 import com.toel.dto.seller.request.Category.Request_CategoryCreate;
 import com.toel.dto.seller.request.Category.Request_CategoryUpdate;
 import com.toel.dto.seller.response.Response_Category;
+import com.toel.dto.seller.response.Response_CategorySeller;
+import com.toel.dto.seller.response.Response_Product;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.CategoryMapper;
+import com.toel.mapper.ProductMapper;
 import com.toel.model.Category;
+import com.toel.model.Product;
 import com.toel.repository.CategoryRepository;
 
 @Service
@@ -31,6 +35,8 @@ public class Service_CategorySeller {
 
         @Autowired
         CategoryRepository categoryRepository;
+        @Autowired
+        ProductMapper productMapper;
 
         public PageImpl<Response_Category> getAll(
                         Integer page, Integer size, boolean sortBy, String sortColumn, String search) {
@@ -40,6 +46,28 @@ public class Service_CategorySeller {
                 List<Response_Category> list = pageCategory.stream()
                                 .map(category -> categoryMapper.response_Category(category))
                                 .collect(Collectors.toList());
+                return new PageImpl<>(list, pageable, pageCategory.getTotalElements());
+        }
+
+        public PageImpl<Response_CategorySeller> getAllSeller(Integer page, Integer size, boolean sortBy,
+                        String sortColum,
+                        String search) {
+                Pageable pageable = PageRequest.of(page, size,
+                                Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColum));
+                Page<Object[]> pageCategory = categoryRepository.findCategoriesWithParentName(search, pageable);
+
+                List<Response_CategorySeller> list = pageCategory.stream()
+                                .map(objects -> {
+                                        Integer id = (Integer) objects[0];
+                                        String name = (String) objects[1];
+                                        Integer idParent = (Integer) objects[2];
+                                        String parentName = (String) objects[3];
+                                        Boolean hasProducts = (Boolean) objects[4]; // hasProducts
+                                        return new Response_CategorySeller(id, name, idParent,
+                                                        parentName != null ? parentName : "No Parent", hasProducts);
+                                })
+                                .collect(Collectors.toList());
+
                 return new PageImpl<>(list, pageable, pageCategory.getTotalElements());
         }
 
@@ -83,6 +111,12 @@ public class Service_CategorySeller {
                                                 category -> {
                                                         categoryRepository.delete(category);
                                                 });
+        }
+
+        public Response_Category edit(
+                        Integer id) {
+                return categoryMapper.response_Category(categoryRepository.findById(id)
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Thể Loại")));
         }
 
         public boolean checkCategory(Category category) {
