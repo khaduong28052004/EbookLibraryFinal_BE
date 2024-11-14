@@ -1,6 +1,7 @@
 package com.toel.controller.user;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,10 +61,15 @@ public class ApiHome {
 			@RequestParam(name = "id_Shop", defaultValue = "0") Integer id_Shop,
 			@RequestParam(name = "size", defaultValue = "8") Integer size,
 			@RequestParam(name = "sort", defaultValue = "price") String sort) {
+		List<FlashSaleDetail> flashSaleDetails = new ArrayList<FlashSaleDetail>();
+		try {
+			LocalDateTime localDateTime = LocalDateTime.now();
+			FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime).getFirst();
+			flashSaleDetails = flashSaleDetailRepo.findAllByFlashSale(flashSale);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 
-		LocalDateTime localDateTime = LocalDateTime.now();
-		FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime).getFirst();
-		List<FlashSaleDetail> flashSaleDetails = flashSaleDetailRepo.findAllByFlashSale(flashSale);
 		Map<String, Object> response = serviceSellectAll.selectAll(flashSaleDetails, id_Shop, 0, size, sort);
 		if (response.get("error") != null) {
 			return ApiResponse.<Map<String, Object>>build().message("not fault").code(1002);

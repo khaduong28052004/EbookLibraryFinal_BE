@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_FlashSaleDetail;
 import com.toel.dto.user.response.Response_Product;
-import com.toel.mapper.user.ProductMaper;
+import com.toel.mapper.user.ProductMaperUser;
 import com.toel.model.FlashSaleDetail;
 import com.toel.model.Product;
 import com.toel.repository.ProductRepository;
@@ -28,7 +28,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PACKAGE)
 public class Service_SelectAllProductHome {
 	final ProductRepository productRepo;
-	final ProductMaper productMaper;
+	final ProductMaperUser productMaper;
 
 	public Map<String, Object> selectAll(List<FlashSaleDetail> list, Integer idShop, Integer page, Integer size,
 			String sort) {
