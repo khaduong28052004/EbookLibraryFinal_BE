@@ -1,7 +1,5 @@
 package com.toel.dto.user.response;
 
-import com.toel.model.Product;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

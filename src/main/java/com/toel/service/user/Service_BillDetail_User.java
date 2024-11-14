@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,10 +17,7 @@ import com.toel.dto.user.response.Response_Bill_Product_User;
 //import com.toel.exception.CustomException;
 import com.toel.model.Account;
 import com.toel.model.Bill;
-import com.toel.model.BillDetail;
 import com.toel.model.Cart;
-import com.toel.model.Evalue;
-import com.toel.model.OrderStatus;
 import com.toel.model.Product;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.AddressRepository;
@@ -39,8 +35,6 @@ public class Service_BillDetail_User {
 	private BillDetailRepository billDetailRepository;
 	@Autowired
 	private OrderStatusRepository orderStatusRepository;
-	@Autowired
-	private AccountRepository accountRepository;
 	@Autowired
 	private EvalueRepository evaluateRepository;
 	@Autowired

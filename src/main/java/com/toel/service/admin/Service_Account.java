@@ -92,8 +92,10 @@ public class Service_Account {
                                                                 .findAllByShopId(account.getId()).size());
                                                 accountnew.setSumProduct(
                                                                 productRepository.findAllByAccount(account).size());
-                                                accountnew.setSumReport(accountReportRepository.countByCreateAtBetween(
-                                                                calStart.getTime(), calEnd.getTime()));
+                                                accountnew.setSumReport(accountReportRepository
+                                                                .countByCreateAtBetweenAndShop(
+                                                                                calStart.getTime(), calEnd.getTime(),
+                                                                                account));
                                                 accountnew.setAvgStar(evalueRepository
                                                                 .calculateAverageStarByAccountId(account.getId()));
                                                 accountnew.setDoanhSo(doanhSo);
