@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.toel.model.Category;
 import com.toel.model.FlashSaleDetail;
+import com.toel.model.ImageProduct;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,5 +28,6 @@ public class Response_ProductListFlashSale {
     boolean isActive;
     Response_Account account;
     Category category;
+    List<ImageProduct> imageProducts;
     List<FlashSaleDetail> flashSaleDetails;
 }

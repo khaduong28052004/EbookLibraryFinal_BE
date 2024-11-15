@@ -36,7 +36,7 @@ public class AccountReport {
 	String content;
 	@ManyToOne
 	@JoinColumn(name = "shop_id")
-	Account shop_id;
+	Account shop;
 	// Integer parent_id;
 	// @ManyToOne
 	// @JoinColumn(name = "product_id")

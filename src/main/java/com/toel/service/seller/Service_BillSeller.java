@@ -19,8 +19,10 @@ import com.toel.dto.seller.response.Response_Bill;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.BillMapper;
+import com.toel.model.Account;
 import com.toel.model.Bill;
 import com.toel.model.OrderStatus;
+import com.toel.repository.AccountRepository;
 import com.toel.repository.BillRepository;
 import com.toel.repository.OrderStatusRepository;
 
@@ -32,6 +34,8 @@ public class Service_BillSeller {
     BillRepository billRepository;
     @Autowired
     OrderStatusRepository orderStatusRepository;
+    @Autowired
+    AccountRepository accountRepository;
 
     public PageImpl<Response_Bill> getAll(Integer page, Integer size, boolean sortBy, String sortColumn,
             Integer account_id, String search) {
@@ -60,4 +64,59 @@ public class Service_BillSeller {
         bill.setUpdateAt(new Date());
         return billMapper.response_Bill(billRepository.saveAndFlush(bill));
     }
+
+    public String QuantityBillStatus(Integer idOrder, Integer idAccount) {
+        try {
+            Optional<OrderStatus> orderOptional = orderStatusRepository.findById(idOrder);
+            if (!orderOptional.isPresent()) {   
+                return "0";      // return "Order status not found";
+            }
+            OrderStatus order = orderOptional.get();          // Check if Account exists
+            Optional<Account> accountOptional = accountRepository.findById(idAccount);
+            if (!accountOptional.isPresent()) {
+                return "0";         // return "Account not found";
+            }
+            Account account = accountOptional.get();
+            List<Bill> bills = billRepository.findByOrderStatusAndAccount(order, account);
+            if (bills.isEmpty()) {
+                return "0";        // return "NULL"; // No bills found for the given criteria
+            } 
+            return Integer.toString(bills.size());// Return the quantity as a string
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            return "0";
+        }
+    }
+
+    public String QuantityBillStatus(Integer idOder) {
+        try {
+            OrderStatus order = orderStatusRepository.findById(idOder).get();
+            List<Bill> bill = billRepository.findByOrderStatus(order);
+            if (bill.isEmpty()) {
+                return "CHUA CO";
+            }
+            Integer quantity = bill.size();
+            return Integer.toString(quantity);
+        } catch (Exception e) {
+            System.out.println("lor " + e);
+            return "ERROR";
+        }
+    }
+
+    // public String quantityBillStatus(Integer idOrder) {
+    // OrderStatus order = orderStatusRepository.findById(idOrder).orElse(null);
+
+    // if (order == null) {
+    // return "0"; // Return 0 if the order is not found
+    // }
+
+    // // Filter the bills based on a condition (example condition: check if the
+    // bill is active)
+    // long count = billRepository.findByOrderStatus(order).stream()
+    // .filter(bill -> bill.) // Replace `isActive` with your actual condition
+    // .count();
+
+    // return Long.toString(count);
+    // }
+
 }

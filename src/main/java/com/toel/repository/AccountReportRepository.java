@@ -27,19 +27,30 @@ public interface AccountReportRepository extends JpaRepository<AccountReport, In
                         String title, String content,
                         Pageable pageable);
 
-        int countByCreateAtBetween(Date dateStart, Date dateEnd);
+        int countByCreateAtBetweenAndShop(Date dateStart, Date dateEnd, Account shop);
 
-        @Query("SELECT a.shop_id FROM AccountReport a WHERE a.createAt BETWEEN ?1 AND ?2")
+        // thống kê seller
+        @Query("SELECT a.shop FROM AccountReport a WHERE a.createAt BETWEEN ?1 AND ?2")
         Page<Account> selectAllByProductAndCreateAt(Date dateStart, Date dateEnd, Pageable pageable);
 
-        @Query("SELECT a.shop_id FROM AccountReport a WHERE a.createAt BETWEEN ?1 AND ?2 And a.shop_id.gender = ?3")
+        // thống kê seller
+        @Query("SELECT a.shop FROM AccountReport a WHERE a.createAt BETWEEN ?1 AND ?2")
+        List<Account> selectAllByProductAndCreateAt(Date dateStart, Date dateEnd);
+
+        // thống kê seller
+        @Query("SELECT a.shop FROM AccountReport a WHERE a.createAt BETWEEN ?1 AND ?2 And a.shop.gender = ?3")
         Page<Account> selectAllByProductAndGenderFinishAt(Date dateStart, Date dateEnd, Boolean gender,
                         Pageable pageable);
 
-        @Query("SELECT a.shop_id FROM AccountReport a WHERE a.createAt BETWEEN :finishDateStart AND :finishDateEnd " +
-                        "AND (:gender IS NULL OR a.shop_id.gender = :gender)" +
-                        "AND (a.shop_id.username LIKE %:username% OR a.shop_id.fullname LIKE %:fullname% " +
-                        "OR a.shop_id.email LIKE %:email% OR a.shop_id.phone LIKE %:phone%) ")
+        // thống kê seller
+        @Query("SELECT a.shop FROM AccountReport a WHERE a.createAt BETWEEN ?1 AND ?2 And a.shop.gender = ?3")
+        List<Account> selectAllByProductAndGenderFinishAt(Date dateStart, Date dateEnd, Boolean gender);
+
+        // thống kê seller
+        @Query("SELECT a.shop FROM AccountReport a WHERE a.createAt BETWEEN :finishDateStart AND :finishDateEnd " +
+                        "AND (:gender IS NULL OR a.shop.gender = :gender)" +
+                        "AND (a.shop.username LIKE %:username% OR a.shop.fullname LIKE %:fullname% " +
+                        "OR a.shop.email LIKE %:email% OR a.shop.phone LIKE %:phone%) ")
         Page<Account> findAllByProductCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
                         @Param("finishDateStart") Date finishDateStart,
                         @Param("finishDateEnd") Date finishDateEnd,
@@ -49,4 +60,18 @@ public interface AccountReportRepository extends JpaRepository<AccountReport, In
                         @Param("email") String email,
                         @Param("phone") String phone,
                         Pageable pageable);
+
+        // thống kê seller
+        @Query("SELECT a.shop FROM AccountReport a WHERE a.createAt BETWEEN :finishDateStart AND :finishDateEnd " +
+                        "AND (:gender IS NULL OR a.shop.gender = :gender)" +
+                        "AND (a.shop.username LIKE %:username% OR a.shop.fullname LIKE %:fullname% " +
+                        "OR a.shop.email LIKE %:email% OR a.shop.phone LIKE %:phone%) ")
+        List<Account> findAllByProductCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+                        @Param("finishDateStart") Date finishDateStart,
+                        @Param("finishDateEnd") Date finishDateEnd,
+                        @Param("gender") Boolean gender,
+                        @Param("username") String username,
+                        @Param("fullname") String fullname,
+                        @Param("email") String email,
+                        @Param("phone") String phone);
 }

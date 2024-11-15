@@ -1,4 +1,4 @@
-package com.toel.dto.seller.response;
+package com.toel.dto.admin.response.ThongKe;
 
 import org.springframework.data.domain.PageImpl;
 
@@ -11,9 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Response_ThongKeBill {
-    Integer chietKhau;
-    double tongDoanhSo;
+public class Page_TKDT_Seller {
+    Integer tongShop;
     double tongDoanhThu;
-    PageImpl<Response_Bill> bill;
+    double tongPhi;
+    double tongLoiNhuan; 
+    PageImpl<Response_TKDT_Seller> thongke;
 }

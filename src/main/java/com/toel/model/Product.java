@@ -79,4 +79,8 @@ public class Product {
 	@OneToMany(mappedBy = "product")
 	List<Evalue> evalues;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "product")
+	List<BillDetail> billDetails;
+
 }

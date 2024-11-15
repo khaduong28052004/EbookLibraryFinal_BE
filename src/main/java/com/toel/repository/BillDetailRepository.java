@@ -2,9 +2,7 @@ package com.toel.repository;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
-import org.antlr.v4.runtime.atn.SemanticContext.AND;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,7 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.toel.model.BillDetail;
-import com.toel.model.Evalue;
 import com.toel.model.Product;
 
 public interface BillDetailRepository extends JpaRepository<BillDetail, Integer> {
@@ -69,6 +66,14 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 	Page<Product> selectAllByFinishAt(@Param("key") String key, @Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd,
 			Pageable pageable);
+
+	@Query("SELECT p FROM Product p WHERE p.id IN (SELECT DISTINCT bd.product.id FROM BillDetail bd WHERE bd.bill.finishAt BETWEEN :dateStart AND :dateEnd)")
+	List<Product> selectAll(@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd);
+
+	@Query("SELECT p FROM Product p WHERE p.id IN (Select DISTINCT bd.product.id FROM BillDetail bd WHERE bd.bill.finishAt BETWEEN :dateStart AND :dateEnd AND (:key iS NULL OR bd.product.name LIKE %:key% OR bd.product.introduce LIKE %:key% OR bd.product.writerName LIKE %:key% OR bd.product.publishingCompany LIKE %:key%)) ")
+	List<Product> selectAllByFinishAt(@Param("key") String key, @Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd);
 
 	@Query("Select COUNT(bd) FROM BillDetail bd WHERE bd.product = :product AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd)")
 	Integer calculateByFinishAtAndProduct(@Param("dateStart") Date dateStart,

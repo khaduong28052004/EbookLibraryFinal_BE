@@ -1,8 +1,5 @@
 package com.toel.controller.user;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,22 +16,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.user.response.Response_BillDetail_User;
-import com.toel.dto.user.response.Response_Bill_User;
-import com.toel.dto.user.resquest.Request_Bill_User;
-import com.toel.model.Bill;
-import com.toel.model.Evalue;
-import com.toel.repository.AccountRepository;
-import com.toel.repository.BillDetailRepository;
-import com.toel.repository.CartRepository;
-import com.toel.repository.EvalueRepository;
-import com.toel.repository.OrderStatusRepository;
-import com.toel.repository.config.admin.Config_Repo_Account;
-import com.toel.repository.config.user.Config_Repo_CartDetail;
 import com.toel.service.user.Service_BillDetail_User;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/billdetail")
+@RequestMapping("/api/v1/user/billdetail")
 public class ApiBillDetailUser {
 
 	@Autowired
@@ -98,7 +84,7 @@ public class ApiBillDetailUser {
 		Map<String, Object> response = new HashMap<>();
 		try {
 
-			service_BillDetail_User.confirmBill(billId);
+			service_BillDetail_User.reOrder(billId);
 			response.put("message", "Đã thêm vào giỏ hàng");
 			response.put("status", "successfully");
 			return ResponseEntity.ok(response);
