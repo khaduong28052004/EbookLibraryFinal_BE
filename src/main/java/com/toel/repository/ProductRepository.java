@@ -41,7 +41,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
                         "AND (?2 IS NULL OR p.name LIKE CONCAT('%', ?2, '%'))")
         Page<Product> findByAccountId(Integer account_id, String search, Pageable pageable);
 
-        @Query("SELECT p FROM Product p WHERE p.isDelete=false and p.id NOT IN (SELECT fl.product.id FROM FlashSaleDetail fl Where fl.id =?1)")
+        @Query("SELECT p FROM Product p WHERE p.isDelete=false and p.id NOT IN (SELECT fl.product.id FROM FlashSaleDetail fl Where fl.flashSale.id =?1)")
         Page<Product> selectAllProductNotInFlashSale(Integer flashSaleId, Pageable pageable);
 
         Page<Product> findAllByIsDeleteAndIsActive(Boolean isDelete, Boolean isActive, Pageable pageable);
