@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.toel.dto.admin.request.FlashSaleDetail.Resquest_FlashSaleDetailsCreate;
 import com.toel.dto.admin.request.FlashSaleDetail.Resquest_FlashSaleDetailsUpdate;
 import com.toel.dto.admin.response.Response_FlashSaleDetail;
+import com.toel.dto.seller.response.Response_Product;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.FlashSaleDetailsMapper;
@@ -39,30 +40,20 @@ public class Service_FlashSaleDetail {
     @Autowired
     ProductMapper productMapper;
 
-    public PageImpl<?> getAll(int page, int size, Boolean sortBy, String column, Boolean status, Integer idFlashSale) {
+    public PageImpl<Response_Product> getAll(int page, int size, Boolean sortBy, String column, Boolean status, Integer idFlashSale) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));
-        Page<?> pageItems;
-        FlashSale flashSale = null;
-
+        Page<Product> pageItems;
         if (idFlashSale != null) {
-            flashSale = flashSaleRepository.findById(idFlashSale)
+            FlashSale flashSale = flashSaleRepository.findById(idFlashSale)
                     .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Flash sale"));
         }
         if (Boolean.TRUE.equals(status)) {
-            pageItems = flashSaleDetailRepository.findAllByFlashSale(flashSale, pageable);
-        } else if (Boolean.FALSE.equals(status)) {
-            pageItems = productRepository.selectAllProductNotInFlashSale(idFlashSale, pageable);
+            pageItems = productRepository.selectAllProductInFlashSale(idFlashSale, pageable);
         } else {
-            pageItems = flashSaleDetailRepository.findAll(pageable);
+            pageItems = productRepository.selectAllProductNotInFlashSale(idFlashSale, pageable);
         }
-        List<?> list = pageItems.stream()
-                .map(item ->{
-                    if (status == true) {
-                        return flashSaleDetailsMapper.toFlashSaleDetail((FlashSaleDetail) item);
-                    } else {
-                        return productMapper.response_Product((Product) item);
-                    }
-                })
+        List<Response_Product> list = pageItems.stream()
+                .map(item -> productMapper.response_Product(item))
                 .collect(Collectors.toList());
 
         return new PageImpl<>(list, pageable, pageItems.getTotalElements());
