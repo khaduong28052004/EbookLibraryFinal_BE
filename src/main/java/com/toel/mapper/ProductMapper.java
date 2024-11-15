@@ -15,7 +15,7 @@ import com.toel.model.Product;
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
-    @Mapping(target = "imageProducts", ignore = true)
+
     Response_Product response_Product(Product product);
 
     @Mapping(target = "category", ignore = true)

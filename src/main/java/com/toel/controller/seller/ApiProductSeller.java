@@ -69,10 +69,16 @@ public class ApiProductSeller {
                                 .result(service_ProductSeller.update(request_Product));
         }
 
-        @PostMapping("/saveImg")
-        public void update(
+        @PostMapping("/create/saveImg")
+        public void createSaveImage(
                         @RequestPart("imageProducts") List<MultipartFile> images) throws IOException {
-                service_ProductSeller.saveImg(images);
+                service_ProductSeller.saveImgCreate(images);
+        }
+
+        @PostMapping("/update/saveImg")
+        public void updateSaveImage(
+                        @RequestPart("imageProducts") List<MultipartFile> images) throws IOException {
+                service_ProductSeller.saveImgCreate(images);
         }
 
         @DeleteMapping("/delete")

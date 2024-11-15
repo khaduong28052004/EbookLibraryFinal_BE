@@ -22,13 +22,12 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
     Page<Category> findALlBySearch(String search, Pageable pageable);
 
     @Query("SELECT c.id AS id, c.name AS name, c.idParent, parent.name AS parentName, " +
-    "CASE WHEN COUNT(p) > 0 THEN true ELSE false END AS hasProducts " +
-    "FROM Category c LEFT JOIN Category parent ON c.idParent = parent.id " +
-    "LEFT JOIN Product p ON p.category.id = c.id " +
-    "WHERE c.idParent != 0 " +
-    "AND (?1 IS NULL OR c.name LIKE CONCAT('%', ?1, '%')) " +
-    "GROUP BY c.id, parent.name")
-Page<Object[]> findCategoriesWithParentName(String search, Pageable pageable);
-
+            "CASE WHEN COUNT(p) > 0 THEN true ELSE false END AS hasProducts " +
+            "FROM Category c LEFT JOIN Category parent ON c.idParent = parent.id " +
+            "LEFT JOIN Product p ON p.category.id = c.id " +
+            "WHERE c.idParent != 0 " +
+            "AND (?1 IS NULL OR c.name LIKE CONCAT('%', ?1, '%')) " +
+            "GROUP BY c.id, parent.name")
+    Page<Object[]> findCategoriesWithParentName(String search, Pageable pageable);
 
 }

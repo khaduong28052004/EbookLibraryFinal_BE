@@ -80,9 +80,14 @@ public class Service_ProductSeller {
                 return productMapper.response_Product(productRepository.saveAndFlush(product));
         }
 
-        public void saveImg(
+        public void saveImgCreate(
                         List<MultipartFile> images) throws IOException {
                 service_ImageProductSeller.createProductImages(product, images);
+        }
+
+        public void saveImgUpdate(
+                        List<MultipartFile> images) throws IOException {
+                service_ImageProductSeller.updateProductImages(product, images);
         }
 
         public Response_Product edit(

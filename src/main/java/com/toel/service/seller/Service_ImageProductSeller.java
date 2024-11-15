@@ -56,7 +56,7 @@ public class Service_ImageProductSeller {
         imageProductRepository.saveAll(imageProducts);
     }
 
-    public void updateProductImages(Product product, List<Request_ImageProduct> images) {
+    public void updateProductImages(Product product, List<MultipartFile> images) {
 
         product.getImageProducts().forEach(image -> {
             deleteImage.deleteFileByUrl(image.getName());
@@ -65,8 +65,8 @@ public class Service_ImageProductSeller {
         List<ImageProduct> imageProducts = images.stream()
                 .map(requestImage -> {
                     try {
-                        MultipartFile imageFile = requestImage.getImageFile();
-                        String name = uploadImage.uploadFile("product", imageFile);
+                        // MultipartFile imageFile = requestImage.getImageFile();
+                        String name = uploadImage.uploadFile("product", requestImage);
 
                         ImageProduct imageProduct = new ImageProduct();
                         imageProduct.setName(name);

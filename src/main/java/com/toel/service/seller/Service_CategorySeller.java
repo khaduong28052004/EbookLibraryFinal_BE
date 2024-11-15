@@ -2,7 +2,6 @@ package com.toel.service.seller;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +17,11 @@ import com.toel.dto.seller.request.Category.Request_CategoryCreate;
 import com.toel.dto.seller.request.Category.Request_CategoryUpdate;
 import com.toel.dto.seller.response.Response_Category;
 import com.toel.dto.seller.response.Response_CategorySeller;
-import com.toel.dto.seller.response.Response_Product;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.CategoryMapper;
 import com.toel.mapper.ProductMapper;
 import com.toel.model.Category;
-import com.toel.model.Product;
 import com.toel.repository.CategoryRepository;
 
 @Service
@@ -35,6 +32,7 @@ public class Service_CategorySeller {
 
         @Autowired
         CategoryRepository categoryRepository;
+
         @Autowired
         ProductMapper productMapper;
 

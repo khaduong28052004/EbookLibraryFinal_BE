@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Response_ThongKeSanPham {
+public class Response_ListSanPham {
     String name;
     String theLoai;
     Integer luotBan;

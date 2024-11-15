@@ -2,7 +2,6 @@ package com.toel.dto.seller.response;
 
 import java.util.List;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,6 +25,4 @@ public class Response_Product {
     boolean isActive;
     Response_Category category;
     List<Response_ImageProduct> imageProducts;
-    List<byte[]> imagesByte;
-
 }

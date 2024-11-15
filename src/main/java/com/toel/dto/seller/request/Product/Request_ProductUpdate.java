@@ -39,6 +39,6 @@ public class Request_ProductUpdate {
     Integer account;
     @NotNull(message = "FIELD_REQUIRED")
     Integer category;
-    @NotNull(message = "FIELD_REQUIRED")
-    List<Request_ImageProduct> imageProducts;
+    // @NotNull(message = "FIELD_REQUIRED")
+    // List<Request_ImageProduct> imageProducts;
 }
