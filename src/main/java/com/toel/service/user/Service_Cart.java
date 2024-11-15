@@ -87,7 +87,17 @@ public class Service_Cart {
 
 	public Map<String, Object> addCart(Integer id_user, Integer quantity, Integer id_product) {
 		Cart cart = new Cart();
-		cart.setQuantity(quantity);
+		try {
+			cart = cartRepo.findByProductAndAccount(productRepo.findById(id_product).get(),
+					accountRepo.findById(id_user).get());
+			cart.setQuantity(cart.getQuantity() + quantity);
+			Map<String, Object> response = new HashMap<>();
+			response.put("cart", cartRepo.save(cart));
+			return response;
+		} catch (Exception e) {
+		}
+		cart = new Cart();
+		cart.setQuantity( quantity);
 		cart.setProduct(productRepo.findById(id_product).get());
 		cart.setAccount(accountRepo.findById(id_user).get());
 		Map<String, Object> response = new HashMap<>();
@@ -98,7 +108,13 @@ public class Service_Cart {
 
 	public Map<String, Object> removeCart(Integer id_cart) {
 		Map<String, Object> response = new HashMap<>();
+	try {
+		cartRepo.deleteById(id_cart);
 		response.put("cart", "success");
 		return response;
+	} catch (Exception e) {
+		// TODO: handle exception
+	}
+	return null;
 	}
 }

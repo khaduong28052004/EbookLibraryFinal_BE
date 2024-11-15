@@ -1,6 +1,6 @@
 package com.toel.dto.user.response;
 
-import com.toel.model.Product;
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,17 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
-public class Response_FlashSaleDetail {
+public class Response_Favorite {
 
 	Integer id;
-
-	Integer quantity;
-
-	Integer sale;
-
-	double maxDiscount;
-
+	Date createAt;
 	Response_Product product;
 
 }

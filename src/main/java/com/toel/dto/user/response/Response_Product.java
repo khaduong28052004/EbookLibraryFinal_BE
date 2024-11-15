@@ -31,4 +31,6 @@ public class Response_Product {
 	List<Response_ImageProduct> imageProducts;
 	Account account;
 
+	Response_FlashSaleDetail response_FlashSaleDetail = null;
+
 }

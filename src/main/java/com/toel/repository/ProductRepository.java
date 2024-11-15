@@ -73,6 +73,10 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
 	Page<Product> findAllByNameContainingAndIsActiveTrueAndIsDeleteFalse(String name, Pageable pageable);
 
-	Page<Product> findByCategoryInAndIdNotIn(List<Category> categories, List<Integer> idProduct, Pageable pageable);
+	Page<Product> findByCategoryInAndIdIn(List<Category> categories, List<Integer> idProduct, Pageable pageable);
+
+	@Query("SELECT p FROM Product p WHERE ((p.price- ((p.price*p.sale)/100)) between ?1 AND ?2) AND (id IN ?3)")
+	Page<Product> findByPriceBetweenAndIdIn(double priceMin, double priceMax, List<Integer> idProduct,
+			Pageable pageable);
 
 }

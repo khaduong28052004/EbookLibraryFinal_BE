@@ -56,7 +56,7 @@ public class Service_Search {
 		}
 		List<Integer> listIdProducts = listProducts.stream().map(product -> product.getId())
 				.collect(Collectors.toList());
-		Page<Product> pageProducts = productRepo.findByCategoryInAndIdNotIn(listCategories, listIdProducts, pageable);
+		Page<Product> pageProducts = productRepo.findByCategoryInAndIdIn(listCategories, listIdProducts, pageable);
 
 		listProductByCategory = pageProducts.getContent();
 
@@ -68,15 +68,14 @@ public class Service_Search {
 		response.put("datas", listResponse_Products);
 		return response;
 	}
-	public Map<String, Object> filterProductByPrice(List<Integer> id_categories, Integer size, String sort) {
+
+	public Map<String, Object> filterProductByPrice(double priceMin, double priceMax, Integer size, String sort) {
 		Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, sort));
-		List<Category> listCategories = new ArrayList<Category>();
-		for (Integer id_catgory : id_categories) {
-			listCategories.add(categoryRepo.findById(id_catgory).get());
-		}
+
 		List<Integer> listIdProducts = listProducts.stream().map(product -> product.getId())
 				.collect(Collectors.toList());
-		Page<Product> pageProducts = productRepo.findByCategoryInAndIdNotIn(listCategories, listIdProducts, pageable);
+		Page<Product> pageProducts = productRepo.findByPriceBetweenAndIdIn(priceMin, priceMax, listIdProducts,
+				pageable);
 
 		listProductByCategory = pageProducts.getContent();
 
@@ -88,7 +87,5 @@ public class Service_Search {
 		response.put("datas", listResponse_Products);
 		return response;
 	}
-	
-
 
 }

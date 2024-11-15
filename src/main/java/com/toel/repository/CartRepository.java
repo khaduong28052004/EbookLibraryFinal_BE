@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.toel.model.Account;
 import com.toel.model.Cart;
+import com.toel.model.Product;
 
 public interface CartRepository extends JpaRepository<Cart, Integer> {
 
@@ -17,5 +18,7 @@ public interface CartRepository extends JpaRepository<Cart, Integer> {
 	Cart findCartByAccountIdAndProductId(@Param("productId") Integer productId, @Param("accountId") Integer accountId);
 
 	List<Cart> findAllByAccount(Account user);
+
+	Cart findByProductAndAccount(Product product, Account account);
 
 }
