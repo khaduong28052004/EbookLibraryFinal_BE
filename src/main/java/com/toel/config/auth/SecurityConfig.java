@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         // Public access for login, home, and some user routes
 
-                        .requestMatchers("/api/v1/login", "/api/v1/**", "/api/v1/otp/**").permitAll()
+                        .requestMatchers("/api/v1/login", "/api/v1/**", "/api/v1/otp/**","/user/loginGoogle").permitAll()
 
                         // Product permissions
                         .requestMatchers("/api/v1/product/create").hasRole("CREATE_PRODUCT")
