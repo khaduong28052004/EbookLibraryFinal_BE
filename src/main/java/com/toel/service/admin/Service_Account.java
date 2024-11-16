@@ -153,12 +153,16 @@ public class Service_Account {
                 return accountMapper.toAccount(accountRepository.saveAndFlush(entity));
         }
 
-        public Response_Account updateActive(int id) {
+        public Response_Account updateActive(int id, Boolean status) {
                 Account entity = accountRepository.findById(id)
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
                 Role role = roleRepository.findByNameIgnoreCase("Seller");
-                entity.setRole(role);
-                entity.setCreateAtSeller(new Date());
+                if (status) {
+                        entity.setRole(role);
+                        entity.setCreateAtSeller(new Date());
+                } else {
+                        entity.setNumberId(null);
+                }
                 return accountMapper.toAccount(accountRepository.saveAndFlush(entity));
         }
 

@@ -30,7 +30,8 @@ public class ApiRolePermissionAdmin {
     }
 
     @DeleteMapping
-    public ApiResponse<Response_RolePermission> delete(@RequestParam(value = "id", required = false) Integer id) {
+    public ApiResponse<Response_RolePermission> delete(
+        @RequestParam(value = "id", required = false) Integer id) {
         service_RolePermission.delete(id);
         return ApiResponse.<Response_RolePermission>build()
                 .message("Xóa quyền thành công");

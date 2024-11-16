@@ -16,24 +16,28 @@ import java.util.Date;
 
 public interface AccountRepository extends JpaRepository<Account, Integer> {
 
-        // Page<Account> findAllByRoleAndStatus(Role role, boolean status, Pageable pageable);
+        // Page<Account> findAllByRoleAndStatus(Role role, boolean status, Pageable
+        // pageable);
 
-        // Page<Account> findAllByRoleAndStatusAndGender(Role role, boolean status, boolean gender, Pageable pageable);
+        // Page<Account> findAllByRoleAndStatusAndGender(Role role, boolean status,
+        // boolean gender, Pageable pageable);
 
-        // @Query("SELECT a FROM Account a WHERE (:gender IS NULL OR a.gender = :gender) " +
-        //                 "AND a.status = :status " +
-        //                 "AND a.role = :role " +
-        //                 "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
-        //                 "OR a.email LIKE %:email% OR a.phone LIKE %:phone%)")
-        // Page<Account> findAllByGenderAndStatusAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-        //                 @Param("gender") Boolean gender,
-        //                 @Param("status") boolean status,
-        //                 @Param("role") Role role,
-        //                 @Param("username") String username,
-        //                 @Param("fullname") String fullname,
-        //                 @Param("email") String email,
-        //                 @Param("phone") String phone,
-        //                 Pageable pageable);
+        // @Query("SELECT a FROM Account a WHERE (:gender IS NULL OR a.gender = :gender)
+        // " +
+        // "AND a.status = :status " +
+        // "AND a.role = :role " +
+        // "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
+        // "OR a.email LIKE %:email% OR a.phone LIKE %:phone%)")
+        // Page<Account>
+        // findAllByGenderAndStatusAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+        // @Param("gender") Boolean gender,
+        // @Param("status") boolean status,
+        // @Param("role") Role role,
+        // @Param("username") String username,
+        // @Param("fullname") String fullname,
+        // @Param("email") String email,
+        // @Param("phone") String phone,
+        // Pageable pageable);
 
         // thống kê khách hàng - seller
         Page<Account> findAllByRole(Role role, Pageable pageable);
@@ -147,5 +151,6 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
                         @Param("phone") String phone,
                         @Param("dateStart") Date dateStart,
                         @Param("dateEnd") Date dateEnd);
+
 
 }

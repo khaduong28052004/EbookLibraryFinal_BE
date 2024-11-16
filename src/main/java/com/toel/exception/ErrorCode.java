@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
-    UNCATEGORIZED_EXCEPTION(1000, "Lỗi hệ thống", HttpStatus.INTERNAL_SERVER_ERROR),
+    UNCATEGORIZED_EXCEPTION(9999, "Lỗi hệ thống", HttpStatus.INTERNAL_SERVER_ERROR),
     UNAUTHENTICATED(1001, "Không được xác thực", HttpStatus.UNAUTHORIZED),
     INVALID_REQUEST(1002, "Yêu cầu không hợp lệ", HttpStatus.BAD_REQUEST),
     PAGE_NUMBER_INVALID(1003, "Số trang không hợp lệ", HttpStatus.BAD_REQUEST),

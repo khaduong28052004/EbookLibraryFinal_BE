@@ -1,7 +1,8 @@
 package com.toel.dto.admin.request.RolePermission;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Data
@@ -9,9 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 public class Request_RolePermissionCreate {
     @NotNull(message = "FIELD_REQUIRED")
-    @Min(value = 1, message = "FIELD_INVALID_ID")
     Integer permission;
-    @NotNull(message = "FIELD_REQUIRED")
-    @Min(value = 1, message = "FIELD_INVALID_ID")
-    Integer role;
+    @NotBlank(message = "FIELD_REQUIRED")
+    String role;
 }
