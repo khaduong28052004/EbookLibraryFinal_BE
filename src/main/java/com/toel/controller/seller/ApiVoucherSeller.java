@@ -43,9 +43,10 @@ public class ApiVoucherSeller {
         @PostMapping("/create")
         public ApiResponse<Response_Voucher> create(
                         @RequestBody @Valid Request_VoucherCreate request_Voucher) {
+
                 return ApiResponse.<Response_Voucher>build()
                                 .message("Thêm voucher thành công")
-                                .result(service_Voucher.create(request_Voucher));
+                                .result(service_Voucher.create(service_Voucher.checkVoucherCreate(request_Voucher)));
         }
 
         @PostMapping("/update")

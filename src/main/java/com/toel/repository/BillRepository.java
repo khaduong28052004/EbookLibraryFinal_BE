@@ -120,21 +120,21 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	// Thong Ke Seller
 
 	@Query("SELECT SUM(b.totalPrice) FROM Bill b JOIN b.billDetails bd " +
-			"WHERE bd.product.account.id = :accountId AND b.finishAt BETWEEN COALESCE(:startDate, CURRENT_DATE) AND COALESCE(:endDate, CURRENT_DATE)")
+			"WHERE bd.product.account.id = :accountId AND b.orderStatus.id = 5 AND b.createAt BETWEEN COALESCE(:startDate, CURRENT_DATE) AND COALESCE(:endDate, CURRENT_DATE)")
 	Double getTongDoanhSo(
 			@Param("accountId") Integer accountId,
 			@Param("startDate") Date dateStart,
 			@Param("endDate") Date dateEnd);
 
 	@Query("SELECT SUM(b.totalPrice * (1 - (b.discountRate.discount / 100.0))) FROM Bill b JOIN b.billDetails bd " +
-			"WHERE bd.product.account.id = :accountId AND b.finishAt BETWEEN COALESCE(:startDate, CURRENT_DATE) AND COALESCE(:endDate, CURRENT_DATE)")
+			"WHERE bd.product.account.id = :accountId AND b.orderStatus.id = 5 AND b.createAt BETWEEN COALESCE(:startDate, CURRENT_DATE) AND COALESCE(:endDate, CURRENT_DATE)")
 	Double getTongDoanhThu(
 			@Param("accountId") Integer accountId,
 			@Param("startDate") Date dateStart,
 			@Param("endDate") Date dateEnd);
 
 	@Query("SELECT b FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id = :accountId " +
-			"AND b.createAt BETWEEN COALESCE(:startDate, CURRENT_DATE) AND COALESCE(:endDate, CURRENT_DATE)")
+			"AND b.createAt BETWEEN COALESCE(:startDate, CURRENT_DATE) AND COALESCE(:endDate, CURRENT_DATE) GROUP BY b.id, b.account.fullname, b.createAt, b.totalQuantity, b.totalPrice, b.orderStatus.id")
 	Page<Bill> getListThongKeBill(
 			@Param("accountId") Integer accountId,
 			@Param("startDate") Date dateStart,
@@ -164,8 +164,9 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			"AND (:search IS NULL OR b.account.fullname LIKE CONCAT('%', :search, '%'))")
 	Double tongSotTien(@Param("accountId") Integer accountId, @Param("search") String search);
 
-	@Query("SELECT b.account.fullname, " +
-			"SUM(bd.quantity), COUNT(b), COUNT(e), SUM(b.totalPrice) " +
+	@Query("SELECT b.account.fullname AS khachHang, " +
+			"SUM(bd.quantity) AS soSanPham , COUNT(b) AS luotMua, COUNT(e) AS luotDanhGia, SUM(b.totalPrice) AS soTien "
+			+
 			"FROM Bill b JOIN b.billDetails bd " +
 			"JOIN bd.evalue e " +
 			"WHERE bd.product.account.id = :accountId  " +
@@ -189,7 +190,8 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	@Query("SELECT AVG(bd.evalue.star) FROM Bill b JOIN b.billDetails bd JOIN bd.product p WHERE bd.product.account.id = :accountId AND (:search IS NULL OR p.name LIKE %:search%) ")
 	Double tongTrungBinhLuotDanhGia(@Param("accountId") Integer account_id, @Param("search") String search);
 
-	@Query("SELECT p.name, c.name, SUM(bd.quantity), COUNT(e.id), AVG(e.star), COUNT(l.id) " +
+	@Query("SELECT p.name AS nameSP , c.name AS theLoai, SUM(bd.quantity) AS luotBan, COUNT(e.id) AS luotDanhGia, AVG(e.star) AS trungBinhDanhGia, COUNT(l.id) AS luotYeuThich "
+			+
 			"FROM Bill b JOIN b.billDetails bd " +
 			"LEFT JOIN bd.evalue e LEFT JOIN bd.product.likes l " +
 			"JOIN bd.product p JOIN p.category c " +

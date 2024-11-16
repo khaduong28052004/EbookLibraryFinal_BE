@@ -21,7 +21,9 @@ import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.CategoryMapper;
 import com.toel.mapper.ProductMapper;
+import com.toel.model.Account;
 import com.toel.model.Category;
+import com.toel.repository.AccountRepository;
 import com.toel.repository.CategoryRepository;
 
 @Service
@@ -35,6 +37,9 @@ public class Service_CategorySeller {
 
         @Autowired
         ProductMapper productMapper;
+
+        @Autowired
+        AccountRepository accountRepository;
 
         public PageImpl<Response_Category> getAll(
                         Integer page, Integer size, boolean sortBy, String sortColumn, String search) {
@@ -86,20 +91,32 @@ public class Service_CategorySeller {
                         Request_CategoryCreate request_Category) {
                 return Optional.of(request_Category)
                                 .map(categoryMapper::categoryCreate)
+                                .map(category -> {
+                                        category.setAccount(accountRepository.findById(request_Category.getAccount())
+                                                        .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
+                                                                        "Account")));
+                                        return category;
+                                })
                                 .filter(this::checkCategory)
                                 .map(categoryRepository::saveAndFlush)
                                 .map(categoryMapper::response_Category)
-                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Tên sản phẩm đã tồn tại"));
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Tên thể loại đã tồn tại"));
         }
 
         public Response_Category update(
                         Request_CategoryUpdate request_Category) {
                 return Optional.of(request_Category)
                                 .map(categoryMapper::categoryUpdate)
+                                .map(category -> {
+                                        category.setAccount(accountRepository.findById(request_Category.getAccount())
+                                                        .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
+                                                                        "Account")));
+                                        return category;
+                                })
                                 .filter(this::checkCategory)
                                 .map(categoryRepository::saveAndFlush)
                                 .map(categoryMapper::response_Category)
-                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Tên sản phẩm đã tồn tại"));
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Tên thể loại đã tồn tại"));
         }
 
         public void delete(

@@ -68,19 +68,19 @@ public class Service_BillSeller {
     public String QuantityBillStatus(Integer idOrder, Integer idAccount) {
         try {
             Optional<OrderStatus> orderOptional = orderStatusRepository.findById(idOrder);
-            if (!orderOptional.isPresent()) {   
-                return "0";      // return "Order status not found";
+            if (!orderOptional.isPresent()) {
+                return "0"; // return "Order status not found";
             }
-            OrderStatus order = orderOptional.get();          // Check if Account exists
+            OrderStatus order = orderOptional.get(); // Check if Account exists
             Optional<Account> accountOptional = accountRepository.findById(idAccount);
             if (!accountOptional.isPresent()) {
-                return "0";         // return "Account not found";
+                return "0"; // return "Account not found";
             }
             Account account = accountOptional.get();
             List<Bill> bills = billRepository.findByOrderStatusAndAccount(order, account);
             if (bills.isEmpty()) {
-                return "0";        // return "NULL"; // No bills found for the given criteria
-            } 
+                return "0"; // return "NULL"; // No bills found for the given criteria
+            }
             return Integer.toString(bills.size());// Return the quantity as a string
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
