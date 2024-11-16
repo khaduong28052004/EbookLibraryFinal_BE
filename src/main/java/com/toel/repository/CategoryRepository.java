@@ -14,6 +14,9 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
         @Query("SELECT c FROM Category c WHERE c.idParent = ?1 AND c.account.id = ?2")
         List<Category> findALlByIdParent(Integer idParent, Integer accountId);
 
+        @Query("SELECT c FROM Category c WHERE  c.account.id = ?1")
+        List<Category> findALlByIdAccount(Integer accountId);
+
         @Query("SELECT c FROM Category c WHERE c.idParent = 0")
         List<Category> findALlByIdParentZero();
 

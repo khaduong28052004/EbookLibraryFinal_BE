@@ -136,8 +136,10 @@ public class Service_CategorySeller {
         }
 
         public boolean checkCategory(Category category) {
-                return categoryRepository.findAll().stream().noneMatch(categoryCheck -> category.getName()
-                                .equals(categoryCheck.getName())
-                                && (category.getId() == null || !category.getId().equals(categoryCheck.getId())));
+                return categoryRepository.findALlByIdAccount(category.getAccount().getId()).stream()
+                                .noneMatch(categoryCheck -> category.getName()
+                                                .equals(categoryCheck.getName())
+                                                && (category.getId() == null
+                                                                || !category.getId().equals(categoryCheck.getId())));
         }
 }
