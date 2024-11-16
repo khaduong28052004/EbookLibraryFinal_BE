@@ -54,10 +54,11 @@ public class Service_CategorySeller {
 
         public PageImpl<Response_CategorySeller> getAllSeller(Integer page, Integer size, boolean sortBy,
                         String sortColum,
-                        String search) {
+                        String search, Integer account_id) {
                 Pageable pageable = PageRequest.of(page, size,
                                 Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColum));
-                Page<Object[]> pageCategory = categoryRepository.findCategoriesWithParentName(search, pageable);
+                Page<Object[]> pageCategory = categoryRepository.findCategoriesWithParentName(search, account_id,
+                                pageable);
 
                 List<Response_CategorySeller> list = pageCategory.stream()
                                 .map(objects -> {
@@ -81,8 +82,8 @@ public class Service_CategorySeller {
         }
 
         public List<Response_Category> getIdParent(
-                        Integer idParent) {
-                return categoryRepository.findALlByIdParent(idParent).stream()
+                        Integer idParent, Integer account_id) {
+                return categoryRepository.findALlByIdParent(idParent, account_id).stream()
                                 .map(category -> categoryMapper.response_Category(category))
                                 .collect(Collectors.toList());
         }

@@ -46,9 +46,11 @@ public class ApiCategorySeller {
                         @RequestParam(value = "size", defaultValue = "5") Integer size,
                         @RequestParam(value = "sortBy", defaultValue = "true") boolean sortBy,
                         @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn,
-                        @RequestParam(value = "search", required = false) String search) {
+                        @RequestParam(value = "search", required = false) String search,
+                        @RequestParam(value = "account_id", defaultValue = "0") Integer account_id) {
                 return ApiResponse.<PageImpl<Response_CategorySeller>>build()
-                                .result(categoryService.getAllSeller(page, size, sortBy, sortColumn, search));
+                                .result(categoryService.getAllSeller(page, size, sortBy, sortColumn, search,
+                                                account_id));
         }
 
         @GetMapping("/getAllList")
@@ -59,9 +61,10 @@ public class ApiCategorySeller {
 
         @GetMapping("/getListByIdParent")
         public ApiResponse<List<Response_Category>> getListByIdParent(
-                        @RequestParam(value = "idParent", defaultValue = "0") Integer idParent) {
+                        @RequestParam(value = "idParent", defaultValue = "0") Integer idParent,
+                        @RequestParam(value = "account_id", defaultValue = "0") Integer account_id) {
                 return ApiResponse.<List<Response_Category>>build()
-                                .result(categoryService.getIdParent(idParent));
+                                .result(categoryService.getIdParent(idParent, account_id));
         }
 
         @GetMapping("/edit")
