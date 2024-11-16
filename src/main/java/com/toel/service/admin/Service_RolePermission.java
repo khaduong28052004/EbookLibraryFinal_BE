@@ -28,9 +28,9 @@ public class Service_RolePermission {
 
     public Response_RolePermission create(Request_RolePermissionCreate entity) {
         Permission permission = permissionRepository.findById(entity.getPermission())
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,"Permission"));
-        Role role = roleRepository.findById(entity.getRole())
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Role"));
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Permission"));
+        Role role = roleRepository.findByNameIgnoreCase(entity.getRole());
+        // .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Role"));
         RolePermission rolePermission = new RolePermission();
         rolePermission.setPermission(permission);
         rolePermission.setRole(role);
