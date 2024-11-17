@@ -1,5 +1,6 @@
 package com.toel.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -9,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.toel.model.Account;
+import com.toel.model.TypeVoucher;
 import com.toel.model.Voucher;
 
 public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
@@ -26,5 +28,8 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
 	List<Voucher> findAllListByIdAccount(Integer idAccount);
 
 	List<Voucher> findAllByAccount(Account account);
+
+	@Query("SELECT v FROM Voucher v WHERE (v.typeVoucher = ?1) AND (?2 BETWEEN v.dateStart AND v.dateEnd) AND (isDelete = false)")
+	List<Voucher> findAllByTypeVoucher(TypeVoucher typeVoucher, Date now);
 
 }

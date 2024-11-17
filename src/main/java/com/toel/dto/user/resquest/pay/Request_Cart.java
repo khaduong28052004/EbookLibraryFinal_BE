@@ -1,5 +1,7 @@
 package com.toel.dto.user.resquest.pay;
 
+import com.toel.dto.user.response.Response_Product;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +15,7 @@ import lombok.experimental.FieldDefaults;
 public class Request_Cart {
 
 	private int id;
-	private double service_fee;
+	private Integer quantity;
+	private Response_Product product;
 
 }

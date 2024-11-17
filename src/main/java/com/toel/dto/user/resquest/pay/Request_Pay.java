@@ -2,6 +2,8 @@ package com.toel.dto.user.resquest.pay;
 
 import java.util.List;
 
+import com.toel.model.Voucher;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,5 +16,5 @@ public class Request_Pay {
 	double sale;
 	double service_fee;
 	double total;
-	Integer idVoucher;
+	Voucher voucher;
 }

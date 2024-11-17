@@ -1,6 +1,7 @@
 package com.toel.service.user;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +17,12 @@ import com.toel.mapper.user.CartMapper;
 import com.toel.mapper.user.UserMapper;
 import com.toel.model.Account;
 import com.toel.model.Cart;
+import com.toel.model.TypeVoucher;
 import com.toel.model.Voucher;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.CartRepository;
 import com.toel.repository.ProductRepository;
+import com.toel.repository.TypeVoucherRepository;
 import com.toel.repository.VoucherRepository;
 
 @Service
@@ -47,6 +50,9 @@ public class Service_Cart {
 
 	@Autowired
 	ProductRepository productRepo;
+
+	@Autowired
+	TypeVoucherRepository typeVoucherRepository;
 
 	public Map<String, Object> getCart(Integer id_User) {
 
@@ -97,7 +103,7 @@ public class Service_Cart {
 		} catch (Exception e) {
 		}
 		cart = new Cart();
-		cart.setQuantity( quantity);
+		cart.setQuantity(quantity);
 		cart.setProduct(productRepo.findById(id_product).get());
 		cart.setAccount(accountRepo.findById(id_user).get());
 		Map<String, Object> response = new HashMap<>();
@@ -108,13 +114,20 @@ public class Service_Cart {
 
 	public Map<String, Object> removeCart(Integer id_cart) {
 		Map<String, Object> response = new HashMap<>();
-	try {
-		cartRepo.deleteById(id_cart);
-		response.put("cart", "success");
-		return response;
-	} catch (Exception e) {
-		// TODO: handle exception
+		try {
+			cartRepo.deleteById(id_cart);
+			response.put("cart", "success");
+			return response;
+		} catch (Exception e) {
+		}
+		return null;
 	}
-	return null;
+
+	public Map<String, Object> getVoucherAdmin() {
+		TypeVoucher typeVoucher = typeVoucherRepository.findById(1).get();
+		List<Voucher> listVouchers = voucherRepository.findAllByTypeVoucher(typeVoucher, new Date());
+		Map<String, Object> response = new HashMap<String, Object>();
+		response.put("datas", listVouchers);
+		return response;
 	}
 }
