@@ -104,6 +104,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/cart/**").hasAnyRole("ADMIN", "USER"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+
                 .formLogin(form -> form.loginPage("http://localhost:3000/login").permitAll())
                 .logout(logout -> logout.logoutSuccessUrl("http://localhost:3000").deleteCookies("JSESSIONID")
                         .permitAll())
