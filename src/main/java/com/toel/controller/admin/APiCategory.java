@@ -40,12 +40,12 @@ public class APiCategory {
                 .result(service_CategorySeller.getAll(page, size, sortBy, sortColumn, search));
     }
 
-    @GetMapping("/getListByIdParent")
-    public ApiResponse<List<Response_Category>> getListByIdParent(
-            @RequestParam(value = "idParent", defaultValue = "0") Integer idParent) {
-        return ApiResponse.<List<Response_Category>>build()
-                .result(service_CategorySeller.getIdParent(idParent));
-    }
+//    @GetMapping("/getListByIdParent")
+//    public ApiResponse<List<Response_Category>> getListByIdParent(
+//            @RequestParam(value = "idParent", defaultValue = "0") Integer idParent) {
+//        return ApiResponse.<List<Response_Category>>build()
+//                .result(service_CategorySeller.getIdParent(idParent));
+//    }
 
     @PostMapping
     public ApiResponse<Response_Category> post(
