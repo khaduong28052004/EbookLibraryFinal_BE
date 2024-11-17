@@ -1,8 +1,6 @@
 package com.toel.service.admin;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.response.Home.Response_ChartAccount;
 import com.toel.dto.admin.response.Home.Response_ChartDoanhThu;
-import com.toel.dto.admin.response.Home.Response_PieChart;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.model.Role;
@@ -55,9 +52,9 @@ public class Service_Home {
 
     private Response_ChartDoanhThu createChartDoanhThu(String key, int i) {
         Response_ChartDoanhThu chart = new Response_ChartDoanhThu();
-        chart.setKey(key);
+        chart.setLabels(key);
         double[] value = doanhthu_loinhuan();
-        chart.setValue(value[i]);
+        chart.setSeries(value[i]);
         return chart;
     }
 
@@ -71,8 +68,8 @@ public class Service_Home {
 
     private Response_ChartAccount createChartAccount(String key, int roleId) {
         Response_ChartAccount chartAccount = new Response_ChartAccount();
-        chartAccount.setKey(key);
-        chartAccount.setValue(getCountByRole(roleId));
+        chartAccount.setLabels(key);
+        chartAccount.setSeries(getCountByRole(roleId));
         return chartAccount;
     }
 

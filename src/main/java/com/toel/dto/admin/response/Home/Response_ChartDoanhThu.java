@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Response_ChartDoanhThu {
-    Double value;
-    String key;
+    Double series;
+    String labels;
 }

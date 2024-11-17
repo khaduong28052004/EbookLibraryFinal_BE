@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.admin.response.Response_Permission;
 import com.toel.dto.admin.response.Response_Permission_Role;
-import com.toel.dto.admin.response.Response_RolePermission;
 import com.toel.service.admin.Service_Premisson;
 
 import org.springframework.web.bind.annotation.GetMapping;

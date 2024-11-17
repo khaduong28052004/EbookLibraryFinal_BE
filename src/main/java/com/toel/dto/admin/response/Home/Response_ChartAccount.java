@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Response_ChartAccount {
-    Integer value;
-    String key;
+    Integer series;
+    String labels;
 }
