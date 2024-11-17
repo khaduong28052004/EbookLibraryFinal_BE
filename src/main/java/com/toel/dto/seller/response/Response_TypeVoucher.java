@@ -1,5 +1,6 @@
 package com.toel.dto.seller.response;
 
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Response_BillDetail {
+public class Response_TypeVoucher {
     Integer id;
-    Response_Product product;
+    String name;
 }

@@ -1,9 +1,5 @@
 package com.toel.dto.user.resquest;
 
-import java.util.Date;
-
-import org.mapstruct.Mapper;
-
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;

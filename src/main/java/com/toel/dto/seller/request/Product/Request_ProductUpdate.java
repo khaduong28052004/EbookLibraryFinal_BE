@@ -30,8 +30,6 @@ public class Request_ProductUpdate {
     @NotBlank(message = "FIELD_REQUIRED")
     String publishingCompany;
     @NotNull(message = "FIELD_REQUIRED")
-    Date createAt;
-    @NotNull(message = "FIELD_REQUIRED")
     boolean isDelete;
     @NotNull(message = "FIELD_REQUIRED")
     Integer quantity;
@@ -41,6 +39,6 @@ public class Request_ProductUpdate {
     Integer account;
     @NotNull(message = "FIELD_REQUIRED")
     Integer category;
-    @NotNull(message = "FIELD_REQUIRED")
-    List<Request_ImageProduct> imageProducts;
+    // @NotNull(message = "FIELD_REQUIRED")
+    // List<Request_ImageProduct> imageProducts;
 }

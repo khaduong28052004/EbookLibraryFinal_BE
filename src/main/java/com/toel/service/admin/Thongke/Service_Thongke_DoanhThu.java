@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import com.toel.dto.admin.response.ThongKe.Response_TKDT_Seller;
 import com.toel.mapper.AccountMapper;
 import com.toel.model.Account;
-import com.toel.model.Role;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
@@ -49,54 +48,55 @@ public class Service_Thongke_DoanhThu {
                         Boolean sortBy, String sortColumn) {
                 Pageable pageable = PageRequest.of(page, size,
                                 Sort.by(sortBy ? Sort.Direction.DESC : Sort.Direction.ASC, sortColumn));
-                Role role = roleRepository.findByNameIgnoreCase("seller");
+                roleRepository.findByNameIgnoreCase("seller");
 
                 Date finalDateStart = getDateStart(dateStart);
                 Date finalDateEnd = getDateEnd(dateEnd);
-
-                Page<Account> pageAccount = getPage(role, search, gender, pageable);
+                Page<Account> pageAccount = billRepository.findByFinishAtBetweenAndGenderAndSearch(finalDateStart,
+                                finalDateEnd, gender, search, pageable);
                 List<Response_TKDT_Seller> list = pageAccount.stream()
-                                .map(account -> {
-                                        Response_TKDT_Seller accountnew = accountMapper.tResponse_TKDT_Seller(account);
-                                        accountnew.setDTshop(
-                                                        billDetailRepository.calculateAverageBillByShop(account.getId(),
-                                                                        finalDateStart, finalDateEnd));
-                                        System.out.println("Doanh thu shop: " + accountnew.getDTshop());
-                                        accountnew.setDTSan(
-                                                        billDetailRepository.calculateChietKhauByShop_San(
-                                                                        account.getId(),
-                                                                        finalDateStart, finalDateEnd));
-                                        System.out.println("Doanh thu sàn: " + accountnew.getDTSan());
-                                        accountnew.setPhi(billRepository.calculateVoucherByShop_San(account.getId(),
-                                                        finalDateStart, finalDateEnd));
-                                        System.out.println("Phí: " + accountnew.getPhi());
-                                        accountnew.setLoiNhuan(
-                                                        billDetailRepository.calculateChietKhauByShop_San(
-                                                                        account.getId(), finalDateStart, finalDateEnd)
-                                                                        - billRepository.calculateVoucherByShop_San(
-                                                                                        account.getId(), finalDateStart,
-                                                                                        finalDateEnd));
-                                        System.out.println("Lợi nhuận: " + accountnew.getLoiNhuan());
-                                        return accountnew;
-                                })
+                                .map(account -> calculateSellerRevenue(account, finalDateStart, finalDateEnd))
                                 .collect(Collectors.toList());
 
                 return new PageImpl<>(list, pageable, pageAccount.getTotalElements());
         }
 
-        public Page<Account> getPage(Role role, String search, Boolean gender, Pageable pageable) {
-                Page<Account> pageAccount = null;
-                if (search == null || search.isBlank()) {
-                        pageAccount = (gender == null)
-                                        ? accountRepository.findAllByRoleAndStatus(role, true, pageable)
-                                        : accountRepository.findAllByRoleAndStatusAndGender(role, true, gender,
-                                                        pageable);
-                } else {
-                        pageAccount = accountRepository
-                                        .findAllByGenderAndStatusAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                                                        gender, true, role, search, search, search, search, pageable);
+        private Response_TKDT_Seller calculateSellerRevenue(Account account, Date startDate, Date endDate) {
+                Response_TKDT_Seller response = accountMapper.tResponse_TKDT_Seller(account);
+                // DecimalFormat decimalFormat = new DecimalFormat("#.##");
+
+                double doanhThuShop = billDetailRepository.calculateAverageBillByShop(account.getId(), startDate,
+                                endDate);
+                double doanhThuSan = billDetailRepository.calculateChietKhauByShop_San(account.getId(), startDate,
+                                endDate);
+                double phi = billRepository.calculateVoucherByShop_San(account.getId(),
+                                startDate, endDate);
+                double loiNhuan = doanhThuSan - phi;
+
+                response.setDTshop(doanhThuShop);
+                response.setDTSan(doanhThuSan);
+                response.setPhi(phi);
+                response.setLoiNhuan(loiNhuan);
+                return response;
+        }
+
+        public double[] calculateMonthlyRevenue(Date dateStart, Date dateEnd, String search, Boolean gender) {
+                Date finalDateStart = getDateStart(dateStart);
+                Date finalDateEnd = getDateEnd(dateEnd);
+                double tongShop = 0, doanhThuSan = 0, phi = 0, loiNhuan = 0;
+                tongShop = billRepository
+                                .findByFinishAtBetweenAndGenderAndSearch(finalDateStart, finalDateEnd, gender, search)
+                                .size();
+                for (Account account : billRepository.findByFinishAtBetweenAndGenderAndSearch(finalDateStart,
+                                finalDateEnd, gender, search)) {
+                        doanhThuSan += billDetailRepository.calculateChietKhauByShop_San(account.getId(),
+                                        finalDateStart,
+                                        finalDateEnd);
+                        phi += billRepository.calculateVoucherByShop_San(account.getId(), finalDateStart, finalDateEnd);
                 }
-                return pageAccount;
+                loiNhuan = doanhThuSan - phi;
+
+                return new double[] { tongShop, doanhThuSan, phi, loiNhuan };
         }
 
         public Date getDateStart(Date dateStart) {

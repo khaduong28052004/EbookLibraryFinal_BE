@@ -16,27 +16,29 @@ import java.util.Date;
 
 public interface AccountRepository extends JpaRepository<Account, Integer> {
 
-        Page<Account> findAllByRoleAndStatus(Role role, boolean status, Pageable pageable);
+        // Page<Account> findAllByRoleAndStatus(Role role, boolean status, Pageable pageable);
 
-        Page<Account> findAllByRoleAndStatusAndGender(Role role, boolean status, boolean gender, Pageable pageable);
+        // Page<Account> findAllByRoleAndStatusAndGender(Role role, boolean status, boolean gender, Pageable pageable);
 
-        @Query("SELECT a FROM Account a WHERE (:gender IS NULL OR a.gender = :gender) " +
-                        "AND a.status = :status " +
-                        "AND a.role = :role " +
-                        "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
-                        "OR a.email LIKE %:email% OR a.phone LIKE %:phone%)")
-        Page<Account> findAllByGenderAndStatusAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                        @Param("gender") Boolean gender,
-                        @Param("status") boolean status,
-                        @Param("role") Role role,
-                        @Param("username") String username,
-                        @Param("fullname") String fullname,
-                        @Param("email") String email,
-                        @Param("phone") String phone,
-                        Pageable pageable);
+        // @Query("SELECT a FROM Account a WHERE (:gender IS NULL OR a.gender = :gender) " +
+        //                 "AND a.status = :status " +
+        //                 "AND a.role = :role " +
+        //                 "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
+        //                 "OR a.email LIKE %:email% OR a.phone LIKE %:phone%)")
+        // Page<Account> findAllByGenderAndStatusAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+        //                 @Param("gender") Boolean gender,
+        //                 @Param("status") boolean status,
+        //                 @Param("role") Role role,
+        //                 @Param("username") String username,
+        //                 @Param("fullname") String fullname,
+        //                 @Param("email") String email,
+        //                 @Param("phone") String phone,
+        //                 Pageable pageable);
 
+        // thống kê khách hàng - seller
         Page<Account> findAllByRole(Role role, Pageable pageable);
 
+        // thống kê khách hàng
         List<Account> findAllByRole(Role role);
 
         Page<Account> findAllByRoleAndStatusAndNumberIdIsNotNull(Role role, boolean status, Pageable pageable);
@@ -55,9 +57,11 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
                         boolean gender, boolean status, Role role, String username, String fullname, String email,
                         String phone, Pageable pageable);
 
+        // thống kê khách hàng - seller
         Page<Account> findAllByRoleAndGender(Role role, boolean gender, Pageable pageable);
 
-        @Query("SELECT a FROM Account a WHERE a.status=true and (:gender IS NULL OR a.gender = :gender) " +
+        // thống kê khách hàng - seller
+        @Query("SELECT a FROM Account a WHERE (:gender IS NULL OR a.gender = :gender) " +
                         "AND a.role = :role " +
                         "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
                         "OR a.email LIKE %:email% OR a.phone LIKE %:phone%)")
@@ -76,12 +80,15 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
         Account findByEmail(String email);
 
+        // thống kê khách hàng - seller
         Page<Account> findAllByCreateAtBetweenAndRole(Date dateStart, Date dateEnd, Role role, Pageable pageable);
 
+        // thống kê khách hàng - seller
         Page<Account> findAllByCreateAtBetweenAndRoleAndGender(Date dateStart, Date dateEnd, Role role, boolean gender,
                         Pageable pageable);
 
-        @Query("SELECT a FROM Account a WHERE a.status=true and (:gender IS NULL OR a.gender = :gender) " +
+        // thống kê khách hàng - seller
+        @Query("SELECT a FROM Account a WHERE (:gender IS NULL OR a.gender = :gender) " +
                         "AND a.role = :role " +
                         "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
                         "OR a.email LIKE %:email% OR a.phone LIKE %:phone%) " +
@@ -102,5 +109,43 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
         Account findByIdAndPassword(Integer id, String Password);
 
         boolean existsByNumberId(String cccdNumber);
+
+        // thống kê khách hàng
+        List<Account> findAllByRoleAndGender(Role role, boolean gender);
+
+        // thống kê khách hàng
+        @Query("SELECT a FROM Account a WHERE (:gender IS NULL OR a.gender = :gender) " +
+                        "AND a.role = :role " +
+                        "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
+                        "OR a.email LIKE %:email% OR a.phone LIKE %:phone%)")
+        List<Account> findAllByGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+                        @Param("gender") Boolean gender,
+                        @Param("role") Role role,
+                        @Param("username") String username,
+                        @Param("fullname") String fullname,
+                        @Param("email") String email,
+                        @Param("phone") String phone);
+
+        // thống kê khách hàng
+        List<Account> findAllByCreateAtBetweenAndRole(Date dateStart, Date dateEnd, Role role);
+
+        // thống kê khách hàng
+        List<Account> findAllByCreateAtBetweenAndRoleAndGender(Date dateStart, Date dateEnd, Role role, boolean gender);
+
+        // thống kê khách hàng
+        @Query("SELECT a FROM Account a WHERE (:gender IS NULL OR a.gender = :gender) " +
+                        "AND a.role = :role " +
+                        "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
+                        "OR a.email LIKE %:email% OR a.phone LIKE %:phone%) " +
+                        "AND a.createAt BETWEEN :dateStart AND :dateEnd")
+        List<Account> findAllByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+                        @Param("gender") Boolean gender,
+                        @Param("role") Role role,
+                        @Param("username") String username,
+                        @Param("fullname") String fullname,
+                        @Param("email") String email,
+                        @Param("phone") String phone,
+                        @Param("dateStart") Date dateStart,
+                        @Param("dateEnd") Date dateEnd);
 
 }

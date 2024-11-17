@@ -36,6 +36,8 @@ public class Product {
 
 	double sale;
 
+	double weight;
+
 	String name;
 
 	String introduce;
@@ -76,5 +78,9 @@ public class Product {
 	@JsonIgnore
 	@OneToMany(mappedBy = "product")
 	List<Evalue> evalues;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "product")
+	List<BillDetail> billDetails;
 
 }

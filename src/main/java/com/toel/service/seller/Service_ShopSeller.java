@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import com.toel.dto.seller.request.Request_Account;
 import com.toel.dto.seller.response.Response_Account;
 import com.toel.mapper.ShopMapper;
-import com.toel.model.Account;
 import com.toel.repository.AccountRepository;
 
 @Service
