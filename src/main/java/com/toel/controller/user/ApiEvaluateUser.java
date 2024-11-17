@@ -20,13 +20,13 @@ import jakarta.validation.Valid;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/evaluate")
+@RequestMapping("/api/v1/user/evaluate")
 public class ApiEvaluateUser {
 
 	@Autowired
 	private Service_Evaluate_User serviceEvaluate_User;
 
-	@PostMapping("/create")
+	@PostMapping("/create/saveImg")
 	public ResponseEntity<Map<String, Object>> getAllOrdersByOrderStatus(
 			@Valid @ModelAttribute Request_Evaluate_User requestEvaluateDTO, BindingResult bindingResult) {
 

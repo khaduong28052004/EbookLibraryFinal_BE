@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import com.toel.dto.admin.response.ThongKe.Response_TKDT_Seller;
 import com.toel.mapper.AccountMapper;
 import com.toel.model.Account;
-import com.toel.model.Role;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
@@ -45,69 +44,72 @@ public class Service_Thongke_DoanhThu {
         AccountMapper accountMapper;
 
         public PageImpl<Response_TKDT_Seller> get_TKDT_Seller(Date dateStart, Date dateEnd,
-                        String search, Boolean gender, Integer page, Integer size, Boolean sortBy, String sortColumn) {
-
-                Role role = roleRepository.findByNameIgnoreCase("Seller");
+                        String search, Boolean gender, int page, int size,
+                        Boolean sortBy, String sortColumn) {
                 Pageable pageable = PageRequest.of(page, size,
                                 Sort.by(sortBy ? Sort.Direction.DESC : Sort.Direction.ASC, sortColumn));
-                Page<Account> pageAccount = null;
-                Calendar calStart = Calendar.getInstance();
-                calStart.set(Calendar.DAY_OF_MONTH, 1);
-                Date finalDateStart = (dateStart == null) ? calStart.getTime() : dateStart;
-                Calendar calEnd = Calendar.getInstance();
-                calEnd.set(Calendar.DAY_OF_MONTH, calEnd.getActualMaximum(Calendar.DAY_OF_MONTH));
-                Date finalDateEnd = (dateEnd == null) ? calEnd.getTime() : dateEnd;
-                if (search == null || search.isBlank()) {
-                        pageAccount = (gender == null)
-                                        ? accountRepository.findAllByRole(role, pageable)
-                                        : accountRepository.findAllByRoleAndGender(role, gender, pageable);
-                } else {
-                        pageAccount = (gender == null)
-                                        ? accountRepository
-                                                        .findAllByUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContainingAndRole(
-                                                                        search, search, search, search, role, pageable)
-                                        : accountRepository
-                                                        .findAllByGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                                                                        gender, role, search, search, search, search,
-                                                                        pageable);
-                }
+                roleRepository.findByNameIgnoreCase("seller");
 
+                Date finalDateStart = getDateStart(dateStart);
+                Date finalDateEnd = getDateEnd(dateEnd);
+                Page<Account> pageAccount = billRepository.findByFinishAtBetweenAndGenderAndSearch(finalDateStart,
+                                finalDateEnd, gender, search, pageable);
                 List<Response_TKDT_Seller> list = pageAccount.stream()
-                                .map(account -> {
-                                        Response_TKDT_Seller accountnew = accountMapper.tResponse_TKDT_Seller(account);
-                                        accountnew.setDTshop(
-                                                        billDetailRepository.calculateAverageBillByShop(account.getId(),
-                                                                        finalDateStart, finalDateEnd));
-                                        System.out.println("Doanh thu shop: " + accountnew.getDTshop());
-                                        accountnew.setDTSan(
-                                                        billDetailRepository.calculateChietKhauByShop_San(
-                                                                        account.getId(),
-                                                                        finalDateStart, finalDateEnd));
-                                        System.out.println("Doanh thu sàn: " + accountnew.getDTSan());
-                                        accountnew.setPhi(billRepository.calculateVoucherByShop_San(account.getId(),
-                                                        finalDateStart, finalDateEnd));
-                                        System.out.println("Phí: " + accountnew.getPhi());
-                                        accountnew.setLoiNhuan(
-                                                        billDetailRepository.calculateChietKhauByShop_San(
-                                                                        account.getId(), finalDateStart, finalDateEnd)
-                                                                        - billRepository.calculateVoucherByShop_San(
-                                                                                        account.getId(), finalDateStart,
-                                                                                        finalDateEnd));
-                                        System.out.println("Lợi nhuận: " + accountnew.getLoiNhuan());
-                                        return accountnew;
-                                })
+                                .map(account -> calculateSellerRevenue(account, finalDateStart, finalDateEnd))
                                 .collect(Collectors.toList());
 
                 return new PageImpl<>(list, pageable, pageAccount.getTotalElements());
         }
 
-        // public PageImpl<Response_TK_Bill> getAll_TK_DonHang(LocalDate dateStart,
-        // LocalDate dateEnd, Integer page,
-        // Integer size, Boolean sortBy, String sortColumn) {
-        // Pageable pageable = PageRequest.of(page, size,
-        // Sort.by(sortBy ? Sort.Direction.DESC : Sort.Direction.ASC, sortColumn));
-        // Page<Bill> pageBill;
+        private Response_TKDT_Seller calculateSellerRevenue(Account account, Date startDate, Date endDate) {
+                Response_TKDT_Seller response = accountMapper.tResponse_TKDT_Seller(account);
+                // DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
-        // }
+                double doanhThuShop = billDetailRepository.calculateAverageBillByShop(account.getId(), startDate,
+                                endDate);
+                double doanhThuSan = billDetailRepository.calculateChietKhauByShop_San(account.getId(), startDate,
+                                endDate);
+                double phi = billRepository.calculateVoucherByShop_San(account.getId(),
+                                startDate, endDate);
+                double loiNhuan = doanhThuSan - phi;
 
+                response.setDTshop(doanhThuShop);
+                response.setDTSan(doanhThuSan);
+                response.setPhi(phi);
+                response.setLoiNhuan(loiNhuan);
+                return response;
+        }
+
+        public double[] calculateMonthlyRevenue(Date dateStart, Date dateEnd, String search, Boolean gender) {
+                Date finalDateStart = getDateStart(dateStart);
+                Date finalDateEnd = getDateEnd(dateEnd);
+                double tongShop = 0, doanhThuSan = 0, phi = 0, loiNhuan = 0;
+                tongShop = billRepository
+                                .findByFinishAtBetweenAndGenderAndSearch(finalDateStart, finalDateEnd, gender, search)
+                                .size();
+                for (Account account : billRepository.findByFinishAtBetweenAndGenderAndSearch(finalDateStart,
+                                finalDateEnd, gender, search)) {
+                        doanhThuSan += billDetailRepository.calculateChietKhauByShop_San(account.getId(),
+                                        finalDateStart,
+                                        finalDateEnd);
+                        phi += billRepository.calculateVoucherByShop_San(account.getId(), finalDateStart, finalDateEnd);
+                }
+                loiNhuan = doanhThuSan - phi;
+
+                return new double[] { tongShop, doanhThuSan, phi, loiNhuan };
+        }
+
+        public Date getDateStart(Date dateStart) {
+                Calendar calStart = Calendar.getInstance();
+                calStart.set(Calendar.DAY_OF_MONTH, 1);
+                Date finalDateStart = (dateStart == null) ? calStart.getTime() : dateStart;
+                return finalDateStart;
+        }
+
+        public Date getDateEnd(Date dateEnd) {
+                Calendar calEnd = Calendar.getInstance();
+                calEnd.set(Calendar.DAY_OF_MONTH, calEnd.getActualMaximum(Calendar.DAY_OF_MONTH));
+                Date finalDateEnd = (dateEnd == null) ? calEnd.getTime() : dateEnd;
+                return finalDateEnd;
+        }
 }

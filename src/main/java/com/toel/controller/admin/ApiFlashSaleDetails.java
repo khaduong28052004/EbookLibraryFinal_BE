@@ -28,8 +28,8 @@ public class ApiFlashSaleDetails {
         Service_FlashSaleDetail service_FlashSaleDetail;
 
         @GetMapping
-        public ApiResponse<PageImpl<?>> getAll(
-                        @RequestParam(value = "id", required = false) Integer idFlashSale,
+        public ApiResponse<PageImpl<?>> getAllByidFlashSale(
+                        @RequestParam(value = "idFlashSale", required = false) Integer idFlashSale,
                         @RequestParam(value = "page", defaultValue = "0") Integer page,
                         @RequestParam(value = "size", defaultValue = "5") Integer size,
                         @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
@@ -41,7 +41,7 @@ public class ApiFlashSaleDetails {
 
         @GetMapping("notflashsale")
         public ApiResponse<PageImpl<?>> getAllNotFlashSale(
-                        @RequestParam(value = "id", required = false) Integer idFlashSale,
+                        @RequestParam(value = "idFlashSale", required = false) Integer idFlashSale,
                         @RequestParam(value = "page", defaultValue = "0") Integer page,
                         @RequestParam(value = "size", defaultValue = "5") Integer size,
                         @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,

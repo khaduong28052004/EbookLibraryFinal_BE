@@ -1,18 +1,17 @@
 package com.toel.service.seller;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.toel.dto.seller.request.ImageProduct.Request_ImageProduct;
-import com.toel.dto.seller.response.Response_ImageProduct;
 import com.toel.mapper.ProductMapper;
 import com.toel.model.ImageProduct;
 import com.toel.model.Product;
@@ -31,12 +30,12 @@ public class Service_ImageProductSeller {
     @Autowired
     DeleteImage deleteImage;
 
-    public void createProductImages(Product product, List<Request_ImageProduct> images) throws IOException {
+    public void createProductImages(Product product, List<MultipartFile> images) throws IOException {
         List<ImageProduct> imageProducts = images.stream()
                 .map(requestImage -> {
                     try {
-                        MultipartFile imageFile = requestImage.getImageFile();
-                        String name = uploadImage.uploadFile("product", imageFile); // Tải lên ảnh
+                        // MultipartFile imageFile = requestImage.getImageFile();
+                        String name = uploadImage.uploadFile("product", requestImage); // Tải lên ảnh
 
                         ImageProduct imageProduct = new ImageProduct();
                         imageProduct.setName(name);
@@ -54,7 +53,7 @@ public class Service_ImageProductSeller {
         imageProductRepository.saveAll(imageProducts);
     }
 
-    public void updateProductImages(Product product, List<Request_ImageProduct> images) {
+    public void updateProductImages(Product product, List<MultipartFile> images) {
 
         product.getImageProducts().forEach(image -> {
             deleteImage.deleteFileByUrl(image.getName());
@@ -63,8 +62,8 @@ public class Service_ImageProductSeller {
         List<ImageProduct> imageProducts = images.stream()
                 .map(requestImage -> {
                     try {
-                        MultipartFile imageFile = requestImage.getImageFile();
-                        String name = uploadImage.uploadFile("product", imageFile);
+                        // MultipartFile imageFile = requestImage.getImageFile();
+                        String name = uploadImage.uploadFile("product", requestImage);
 
                         ImageProduct imageProduct = new ImageProduct();
                         imageProduct.setName(name);
@@ -75,7 +74,7 @@ public class Service_ImageProductSeller {
                         return null;
                     }
                 })
-                .filter(Objects::nonNull) 
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         imageProductRepository.saveAll(imageProducts);

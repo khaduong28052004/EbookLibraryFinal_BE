@@ -1,10 +1,5 @@
 package com.toel.dto.user.response;
 
-import java.util.Date;
-import java.util.List;
-
-import org.mapstruct.Mapper;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -25,5 +20,6 @@ public class Response_Bill_Product_User {
 	Double productDiscountPrice;
 	String productImageURL;
 	Boolean isEvaluate;
+	Integer billDetailId;
 
 }

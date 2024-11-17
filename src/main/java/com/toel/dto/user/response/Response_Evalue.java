@@ -2,8 +2,6 @@ package com.toel.dto.user.response;
 
 import java.util.Date;
 
-import org.hibernate.annotations.Nationalized;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

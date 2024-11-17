@@ -1,16 +1,20 @@
 package com.toel.dto.seller.response;
 
+import org.springframework.data.domain.PageImpl;
+
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Response_ThongKeKhachHang {
-    String name;
-    Integer soSanPham;
-    Integer luotMua;
-    Integer luotDanhGia;
-    double soTien;
+    Integer tongSoLuotMua;
+    Integer tongSoSP;
+    Integer tongSoLuotDanhGia;
+    Double tongSoTien;
+    PageImpl<Response_ListKhachHang> khachHang;
 }

@@ -50,7 +50,7 @@ public class ApiAccountAdmin {
                 .result(pageImpl);
     }
 
-    @GetMapping("seller/browse")
+    @GetMapping("seller/notbrowse")
     public ApiResponse<PageImpl<Response_Account>> getAllSellerBrowse(
             @RequestParam(value = "search", required = false) String search,
             @RequestParam(value = "gender", required = false) Boolean gender,
@@ -62,7 +62,7 @@ public class ApiAccountAdmin {
                 .result(service_Account.getAllSellerNotBorwse(search, gender, page, size, sortBy, sortColumn));
     }
 
-    @PostMapping("nhanvien")
+    @PostMapping("adminv1")
     public ApiResponse<Response_Account> post(@RequestBody @Valid Request_AccountCreate entity) {
         return ApiResponse.<Response_Account>build()
                 .result(service_Account.create("ADMINV1", entity));
@@ -75,9 +75,11 @@ public class ApiAccountAdmin {
     }
 
     @PutMapping("seller/browse")
-    public ApiResponse<Response_Account> putActive(@RequestParam(value = "id", required = false) Integer id) {
+    public ApiResponse<Response_Account> putActive(
+            @RequestParam(value = "id", required = false) Integer id,
+            @RequestParam(value = "status", required = false) Boolean status) {
         return ApiResponse.<Response_Account>build()
-                .result(service_Account.updateActive(id));
+                .result(service_Account.updateActive(id, status));
     }
 
     @DeleteMapping

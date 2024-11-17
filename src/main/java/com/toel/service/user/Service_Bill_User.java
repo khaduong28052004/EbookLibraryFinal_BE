@@ -1,36 +1,27 @@
 package com.toel.service.user;
 
-import java.security.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_Bill_User;
-import com.toel.dto.user.response.Response_Bill_Shop_User;
 import com.toel.dto.user.response.Response_Bill_Product_User;
 import com.toel.dto.user.resquest.Request_Bill_User;
 
 import com.toel.model.Account;
-import com.toel.model.Address;
 import com.toel.model.Bill;
 import com.toel.model.Cart;
-import com.toel.model.Evalue;
 import com.toel.model.OrderStatus;
 import com.toel.model.Product;
 import com.toel.repository.AccountRepository;
@@ -66,14 +57,13 @@ public class Service_Bill_User {
 	@Autowired
 	EmailService emailService;
 
-
 	public Map<String, Object> getBills(Request_Bill_User requestBillDTO) {
 		Map<String, Object> response = new HashMap<String, Object>();
 		try {
 			List<Object[]> productsInBill = getBillsByOrderStatus(requestBillDTO);
 			List<Response_Bill_User> shopListInBill = createBillsWithProductsInBillDetail(productsInBill);
 			response.put("data", shopListInBill);
-			response.put("status", "success");
+			response.put("status", "successfully");
 			response.put("message", "Retrieve data successfully");
 		} catch (Exception e) {
 			response.put("status", "error");
@@ -88,25 +78,24 @@ public class Service_Bill_User {
 		String orderStatus = BillShopRequestDTO.getOrderStatusFind() == null ? ""
 				: BillShopRequestDTO.getOrderStatusFind();
 
-
-		System.out.println("orderstatusL "+orderStatus);
-		System.out.println("userId "+orderStatus);
+		System.out.println("orderstatusL " + orderStatus);
+		System.out.println("userId " + userId);
 
 		switch (orderStatus) {
-		case "CHODUYET":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByCreateAt(userId, 1);
-		case "DANGXULY":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 2);
-		case "DANGGIAO":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 3);
-		case "DAGIAO":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 4);
-		case "HOANTHANH":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 5);
-		case "DAHUY":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 6);
-		default:
-			return billRepository.getBillsByUserIdAll(userId);
+			case "CHODUYET":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByCreateAt(userId, 1);
+			case "DANGXULY":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 2);
+			case "DANGGIAO":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 3);
+			case "DAGIAO":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 4);
+			case "HOANTHANH":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 5);
+			case "DAHUY":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 6);
+			default:
+				return billRepository.getBillsByUserIdAll(userId);
 
 		}
 	}
@@ -138,11 +127,10 @@ public class Service_Bill_User {
 			String shopName = product[19].toString();
 			String shopAvatar = product[20].toString();
 			Integer billPaymentMethodId = Integer.parseInt(product[21].toString());
-			
+
 			String orderStatus = orderStatusRepository.findById(orderStatusID).get().getName();
 			String billPaymentMethod = paymentMethodRepository.findById(billPaymentMethodId).get().getName();
 
-			
 			Response_Bill_User billData = billMap.get(billID);
 			if (billData == null) {
 				billData = new Response_Bill_User();
@@ -175,11 +163,18 @@ public class Service_Bill_User {
 			productData.setProductDiscountPrice(productDiscountPrice);
 			productData.setProductImageURL(productImageURL);
 
-			Evalue isEvalued = evaluateRepository.findByProductIdAndAccountId(userID, productID, billID);
-			productData.setIsEvaluate(isEvalued != null);
+			Integer billDetailId = billDetailRepository.findBillDetailByProductIdAndAccountId(userID, productID,
+					billID);
+			productData.setBillDetailId(billDetailId);
+
+			System.out.println("billDetailId " + billDetailId);
+			Integer isEvalued = evaluateRepository.isEvaluate(billDetailId, productID, userID);
+			productData.setIsEvaluate(isEvalued == 1);
 			billData.getProducts().add(productData);
 		}
 		bills.addAll(billMap.values());
+		bills.sort((bill1, bill2) -> bill2.getCreatedDatetime().compareTo(bill1.getCreatedDatetime())); // Sắp xếp giảm
+																										// dần
 		return bills;
 	}
 
@@ -202,7 +197,7 @@ public class Service_Bill_User {
 
 		billRepository.saveAndFlush(bill);
 
-}
+	}
 
 	public void reOrder(Integer billId) {
 		checkBillStatus(billId, 6);
@@ -216,8 +211,7 @@ public class Service_Bill_User {
 			Integer accountId = Integer.parseInt(billDetail[1].toString());
 			Integer productId = Integer.parseInt(billDetail[2].toString());
 
-
-		Cart existingCartDetail = cartRepository.findCartByAccountIdAndProductId(productId, accountId);
+			Cart existingCartDetail = cartRepository.findCartByAccountIdAndProductId(productId, accountId);
 			if (existingCartDetail != null) {
 				existingCartDetail.setQuantity(existingCartDetail.getQuantity() + quantityToAdd);
 				cartRepository.saveAndFlush(existingCartDetail);
@@ -244,14 +238,15 @@ public class Service_Bill_User {
 
 	private void checkBillStatus(Integer billId, Integer orderStatusId) {
 		if (billRepository.findById(billId).isEmpty() || billId == null) {
-//			throw new CustomException("Đơn hàng không tồn tại", "error");
+			// throw new CustomException("Đơn hàng không tồn tại", "error");
 		}
 		if (orderStatusRepository.findById(orderStatusId).isEmpty()) {
-//			throw new CustomException("Trạng thái đơn hàng không tồn tại", "error");
+			// throw new CustomException("Trạng thái đơn hàng không tồn tại", "error");
 		}
 	}
 
-	@Scheduled(cron = "0 0 0 * * ?") public void updateOrdersAutomatically() {
+	@Scheduled(cron = "0 0 0 * * ?")
+	public void updateOrdersAutomatically() {
 		List<Bill> bills = billRepository.findByOrderStatusId(4);
 		LocalDateTime now = LocalDateTime.now();
 		for (Bill bill : bills) {
@@ -260,7 +255,7 @@ public class Service_Bill_User {
 				sendNotification(bill);
 			} else if (ChronoUnit.DAYS.between(lastUpdate, now) >= 7) {
 				OrderStatus updateOrderStatus = oderStatusRepository.findById(5).orElse(null);
-				
+
 				sendNotification(bill);
 				if (updateOrderStatus != null) {
 					System.out.println("GỬI MEO NÈ");
@@ -283,20 +278,20 @@ public class Service_Bill_User {
 		emailService.push(email, subject, content);
 	}
 
-	  public static String formatDate(String inputDate) {
-	        // Định dạng đầu vào
-	        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
-	        // Định dạng đầu ra
-	        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy/MM/dd");
-	        
-	        try {
-	            // Phân tích chuỗi đầu vào thành đối tượng Date
-	            Date date = inputFormat.parse(inputDate);
-	            // Định dạng lại đối tượng Date thành chuỗi đầu ra
-	            return outputFormat.format(date);
-	        } catch (ParseException e) {
-	            e.printStackTrace();
-	            return null; // Hoặc xử lý lỗi theo cách khác
-	        }
-	    }
+	public static String formatDate(String inputDate) {
+		// Định dạng đầu vào
+		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+		// Định dạng đầu ra
+		SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy/MM/dd");
+
+		try {
+			// Phân tích chuỗi đầu vào thành đối tượng Date
+			Date date = inputFormat.parse(inputDate);
+			// Định dạng lại đối tượng Date thành chuỗi đầu ra
+			return outputFormat.format(date);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return null; // Hoặc xử lý lỗi theo cách khác
+		}
+	}
 }

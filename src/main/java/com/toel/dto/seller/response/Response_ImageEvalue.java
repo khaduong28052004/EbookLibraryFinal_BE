@@ -7,11 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Response_ThongKeSanPham {
+public class Response_ImageEvalue {
+    Integer id;
     String name;
-    String theLoai;
-    Integer luotBan;
-    Integer luotDanhGia;
-    Double trungBinhDanhGia;
-    Integer luotYeuThich;
 }

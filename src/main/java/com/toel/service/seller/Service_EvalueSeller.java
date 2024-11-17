@@ -1,5 +1,6 @@
 package com.toel.service.seller;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,9 +33,9 @@ public class Service_EvalueSeller {
     ProductRepository productRepository;
 
     public PageImpl<Response_Evalue> getAll(
-            Integer page, Integer size, boolean sortBy, String sortColum, Integer account_id) {
+            Integer page, Integer size, boolean sortBy, String sortColum, Integer account_id, String search) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColum));
-        Page<Evalue> pageEvalue = evalueRepository.findByAccountId(account_id, pageable);
+        Page<Evalue> pageEvalue = evalueRepository.findByAccountId(account_id, search, pageable);
         List<Response_Evalue> list = pageEvalue.stream()
                 .map(evlue -> evalueMapper.response_Evalue(evlue))
                 .collect(Collectors.toList());
@@ -45,6 +46,7 @@ public class Service_EvalueSeller {
         Evalue evalue = evalueMapper.evalue(request_Evalue);
         evalue.setAccount(accountRepository.findById(request_Evalue.getAccount()).get());
         evalue.setProduct(productRepository.findById(request_Evalue.getProduct()).get());
+        evalue.setCreateAt(new Date());
         return evalueMapper.response_Evalue(evalueRepository.saveAndFlush(evalue));
     }
 }

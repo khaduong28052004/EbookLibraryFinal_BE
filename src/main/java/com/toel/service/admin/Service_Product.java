@@ -27,18 +27,38 @@ public class Service_Product {
     ProductMapper productMapper;
 
     public PageImpl<Response_ProductListFlashSale> getAll(int page, int size, Boolean sortBy, String column,
-            String key) {
+            String key, String option) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));
         Page<Product> pageProduct;
         Double priceOrSale = parseStringToDouble(key);
-
-        if (key.isBlank() || key == null) {
-            pageProduct = productRepository.findByIsActive(true, pageable);
-        } else if (priceOrSale != null) {
-            pageProduct = productRepository.selectAllByActiveAndMatchingKey(null, priceOrSale, pageable);
+        if (option.equalsIgnoreCase("choduyet")) {
+            if (key.isBlank()) {
+                pageProduct = productRepository.findAllByIsDeleteAndIsActive(false, false, pageable);
+            } else if (priceOrSale != null) {
+                pageProduct = productRepository.selectAllByActiveAndDeleteAndMatchingAttributes(null, priceOrSale,
+                        pageable);
+            } else {
+                pageProduct = productRepository.selectAllByActiveAndDeleteAndMatchingAttributes(key, null,
+                        pageable);
+            }
+        } else if (option.equalsIgnoreCase("daduyet")) {
+            if (key.isBlank() || key == null) {
+                pageProduct = productRepository.findByIsActive(true, pageable);
+            } else if (priceOrSale != null) {
+                pageProduct = productRepository.selectAllByActiveAndMatchingKey(null, priceOrSale, pageable);
+            } else {
+                pageProduct = productRepository.selectAllByActiveAndMatchingKey(key, null,
+                        pageable);
+            }
         } else {
-            pageProduct = productRepository.selectAllByActiveAndMatchingKey(key, null,
-                    pageable);
+            if (key.isBlank() || key == null) {
+                pageProduct = productRepository.findAllByIsActiveNotAndIsDeleteNot(false, true, pageable);
+            } else if (priceOrSale != null) {
+                pageProduct = productRepository.selectAllMatchingKey(null, priceOrSale, pageable);
+            } else {
+                pageProduct = productRepository.selectAllMatchingKey(key, null,
+                        pageable);
+            }
         }
         List<Response_ProductListFlashSale> list = pageProduct.stream()
                 .map(Product -> productMapper.tProductListFlashSale(Product))
@@ -80,10 +100,15 @@ public class Service_Product {
         return productMapper.tProductListFlashSale(productRepository.save(entity));
     }
 
-    public Response_ProductListFlashSale updateActive(int id) {
+    public Response_ProductListFlashSale updateActive(int id, Boolean status) {
         Product entity = productRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Product"));
-        entity.setActive(true);
+        if (status) {
+            entity.setActive(true);
+        } else {
+            entity.setActive(false);
+            entity.setDelete(true);
+        }
         return productMapper.tProductListFlashSale(productRepository.save(entity));
     }
 

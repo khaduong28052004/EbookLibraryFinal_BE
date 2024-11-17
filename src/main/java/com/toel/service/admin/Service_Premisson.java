@@ -17,9 +17,11 @@ import com.toel.dto.admin.request.Permission.Requset_PermissionUpdate;
 import com.toel.dto.admin.request.RolePermission.Request_RolePermissionCreate;
 import com.toel.dto.admin.response.Response_Permission;
 import com.toel.dto.admin.response.Response_Permission_Role;
+import com.toel.dto.admin.response.Response_RolePermission;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.PermissionMapper;
+import com.toel.mapper.RolePermissionMapper;
 import com.toel.model.Permission;
 import com.toel.model.Role;
 import com.toel.model.RolePermission;
@@ -39,30 +41,51 @@ public class Service_Premisson {
     @Autowired
     PermissionMapper permissionMapper;
     @Autowired
+    RolePermissionMapper rolePermissionmapper;
+    @Autowired
     RolePermissionRepository rolePermissionRepository;
     @Autowired
     Service_RolePermission service_RolePermission;
 
-    public PageImpl<Response_Permission> getAll(
+    public PageImpl<?> getAll(
             String search, String role, Integer page, Integer size, Boolean sortBy, String sortColumn) {
+
         Pageable pageable = PageRequest.of(page, size,
                 Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
-        Page<Permission> pagePermission = null;
+
         Role roleEntity = (role == null) ? null : roleRepository.findByNameIgnoreCase(role);
+
         if (search == null && role == null) {
-            pagePermission = permissionRepository.findAll(pageable);
-        } else if (search == null) {
-            pagePermission = permissionRepository.findAllByRole(roleEntity, pageable);
-        } else if (role == null) {
-            pagePermission = permissionRepository.findAllByCotSlugContainingOrDescriptionContaining(search, search,
-                    pageable);
-        } else {
-            pagePermission = permissionRepository.findAllKeyAndByRole(roleEntity, search, pageable);
+            Page<Permission> pagePermission = permissionRepository.findAll(pageable);
+            List<Response_Permission> list = pagePermission.stream()
+                    .map(permissionMapper::toPermission)
+                    .collect(Collectors.toList());
+            return new PageImpl<>(list, pageable, pagePermission.getTotalElements());
         }
-        List<Response_Permission> list = pagePermission.stream()
-                .map(permissionRepository -> permissionMapper.toPermission(permissionRepository))
+
+        if (search == null) {
+            Page<RolePermission> pageRolePermission = rolePermissionRepository.findAllByRole(roleEntity, pageable);
+            List<Response_RolePermission> list = pageRolePermission.stream()
+                    .map(rolePermissionmapper::toRolePermission)
+                    .collect(Collectors.toList());
+            return new PageImpl<>(list, pageable, pageRolePermission.getTotalElements());
+        }
+
+        if (role == null) {
+            Page<Permission> pagePermission = permissionRepository
+                    .findAllByCotSlugContainingOrDescriptionContaining(search, search, pageable);
+            List<Response_Permission> list = pagePermission.stream()
+                    .map(permissionMapper::toPermission)
+                    .collect(Collectors.toList());
+            return new PageImpl<>(list, pageable, pagePermission.getTotalElements());
+        }
+
+        Page<RolePermission> pageRolePermission = rolePermissionRepository
+                .findAllKeyAndByRole(roleEntity, search, pageable);
+        List<Response_RolePermission> list = pageRolePermission.stream()
+                .map(rolePermissionmapper::toRolePermission)
                 .collect(Collectors.toList());
-        return new PageImpl<>(list, pageable, pagePermission.getTotalElements());
+        return new PageImpl<>(list, pageable, pageRolePermission.getTotalElements());
     }
 
     public Response_Permission_Role getByID(Integer id) {
@@ -77,10 +100,9 @@ public class Service_Premisson {
         return permission_Role;
     }
 
-    public PageImpl<Response_Permission> getAllNotRole(Integer idrole, Integer page, Integer size, Boolean sortBy,
+    public PageImpl<Response_Permission> getAllNotRole(String Namerole, Integer page, Integer size, Boolean sortBy,
             String sortColumn) {
-        Role role = roleRepository.findById(idrole)
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Role"));
+        Role role = roleRepository.findByNameIgnoreCase(Namerole);
         Pageable pageable = PageRequest.of(page, size,
                 Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
         Page<Permission> pagePermission = permissionRepository.findAllPermissionsNotInRole(role, pageable);
@@ -90,23 +112,26 @@ public class Service_Premisson {
         return new PageImpl<>(list, pageable, pagePermission.getTotalElements());
     }
 
-    public Response_Permission create(Request_PermissionCreate entity) {
-        Role role = roleRepository.findById(entity.getRole())
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Role"));
-        Permission permission = permissionRepository.save(permissionMapper.toPermissionCreate(entity));
-        Request_RolePermissionCreate rolePermission = new Request_RolePermissionCreate();
-        rolePermission.setPermission(permission.getId());
-        rolePermission.setRole(entity.getRole());
-        service_RolePermission.create(rolePermission);
-        return permissionMapper.toPermission(permissionRepository.save(permission));
-    }
+    // public Response_Permission create(Request_PermissionCreate entity) {
+    // roleRepository.findById(entity.getRole())
+    // .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Role"));
+    // Permission permission =
+    // permissionRepository.save(permissionMapper.toPermissionCreate(entity));
+    // Request_RolePermissionCreate rolePermission = new
+    // Request_RolePermissionCreate();
+    // rolePermission.setPermission(permission.getId());
+    // rolePermission.setRole(entity.getRole());
+    // service_RolePermission.create(rolePermission);
+    // return permissionMapper.toPermission(permissionRepository.save(permission));
+    // }
 
-    public Response_Permission update(Requset_PermissionUpdate entity) {
-        Permission permission = permissionRepository.findById(entity.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Permission"));
-        permissionMapper.toPermissionUpdate(permission, entity);
-        return permissionMapper.toPermission(permissionRepository.save(permission));
-    }
+    // public Response_Permission update(Requset_PermissionUpdate entity) {
+    // Permission permission = permissionRepository.findById(entity.getId())
+    // .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
+    // "Permission"));
+    // permissionMapper.toPermissionUpdate(permission, entity);
+    // return permissionMapper.toPermission(permissionRepository.save(permission));
+    // }
 
     public void delete(Integer id) {
         Permission entity = permissionRepository.findById(id)
