@@ -7,11 +7,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.response.ThongKe.Response_TKDT_Seller;
@@ -43,27 +41,6 @@ public class Service_Thongke_DoanhThu {
         LikeRepository likeRepository;
         @Autowired
         AccountMapper accountMapper;
-
-        // public PageImpl<Response_TKDT_Seller> get_TKDT_Seller(Date dateStart, Date
-        // dateEnd,
-        // String search, Boolean gender, int page, int size,
-        // Boolean sortBy, String sortColumn) {
-        // Pageable pageable = PageRequest.of(page, size,
-        // Sort.by(sortBy ? Sort.Direction.DESC : Sort.Direction.ASC, sortColumn));
-        // roleRepository.findByNameIgnoreCase("seller");
-
-        // Date finalDateStart = getDateStart(dateStart);
-        // Date finalDateEnd = getDateEnd(dateEnd);
-        // Page<Account> pageAccount =
-        // billRepository.findByFinishAtBetweenAndGenderAndSearch(finalDateStart,
-        // finalDateEnd, gender, search, pageable);
-        // List<Response_TKDT_Seller> list = pageAccount.stream()
-        // .map(account -> calculateSellerRevenue(account, finalDateStart,
-        // finalDateEnd))
-        // .collect(Collectors.toList());
-
-        // return new PageImpl<>(list, pageable, pageAccount.getTotalElements());
-        // }
 
         public PageImpl<Response_TKDT_Seller> get_TKDT_Seller(Date dateStart, Date dateEnd,
                         String search, Boolean gender, int page, int size,

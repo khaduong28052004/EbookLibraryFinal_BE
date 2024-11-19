@@ -1,16 +1,15 @@
 package com.toel.service.admin.Thongke;
 
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.response.ThongKe.Page_TK_Product;
@@ -37,14 +36,10 @@ public class Service_ThongKe_Product {
 
         public Page_TK_Product get_TKDT_Product(Date dateStart, Date dateEnd, String option,
                         String search, Integer page, Integer size, Boolean sortBy, String sortColumn) {
-
-                Pageable pageable = PageRequest.of(page, size,
-                                Sort.by(sortBy ? Sort.Direction.DESC : Sort.Direction.ASC, sortColumn));
                 Date finalDateStart = getDateStart(dateStart);
                 Date finalDateEnd = getDateEnd(dateEnd);
 
                 List<Product> allProducts;
-                Page<Product> pageProduct;
 
                 if (option.equalsIgnoreCase("bill")) {
                         allProducts = (search == null || search.isBlank())
@@ -81,45 +76,56 @@ public class Service_ThongKe_Product {
                                                 .getSumEvalue())
                                 .sum();
 
-                if (option.equalsIgnoreCase("bill")) {
-                        pageProduct = (search == null || search.isBlank())
-                                        ? billDetailRepository.selectAll(finalDateStart, finalDateEnd, pageable)
-                                        : billDetailRepository.selectAllByFinishAt(search, finalDateStart, finalDateEnd,
-                                                        pageable);
-                } else if (option.equalsIgnoreCase("danhgia")) {
-                        pageProduct = (search == null || search.isBlank())
-                                        ? evalueRepository.sellectAll(finalDateStart, finalDateEnd, pageable)
-                                        : evalueRepository.sellectAllByCreateAt(search, finalDateStart, finalDateEnd,
-                                                        pageable);
-                } else if (option.equalsIgnoreCase("yeuthich")) {
-                        pageProduct = (search == null || search.isBlank())
-                                        ? likeRepository.selectAllProduct(finalDateStart, finalDateEnd, pageable)
-                                        : likeRepository.selectAllProductByDateStartDateEnd(search, finalDateStart,
-                                                        finalDateEnd,
-                                                        pageable);
-                } else {
-                        pageProduct = (search == null || search.isBlank())
-                                        ? productRepository.findAllByIsDeleteAndIsActiveAndCreateAtBetween(false, true,
-                                                        finalDateStart, finalDateEnd, pageable)
-                                        : productRepository.selectAllMatchingAttributesByDateStartAndDateEnd(search,
-                                                        finalDateStart, finalDateEnd, pageable);
-                }
-
-                List<Response_TK_Product> list = pageProduct.stream()
+                List<Response_TK_Product> list = allProducts.stream()
                                 .map(product -> calculateProductRevenue(product, finalDateStart, finalDateEnd))
                                 .collect(Collectors.toList());
 
                 Integer totalProducts = allProducts.size();
-
+                Comparator<Response_TK_Product> comparator = getComparator(sortColumn, sortBy);
+                list.sort(comparator);
+                Pageable pageable = PageRequest.of(page, size);
+                int start = (int) pageable.getOffset();
+                int end = Math.min(start + pageable.getPageSize(), allProducts.size());
+                List<Response_TK_Product> paginatedList = list.subList(start, end);
                 Page_TK_Product pageTKProduct = Page_TK_Product.builder()
                                 .tongSP(totalProducts)
                                 .tongLike(totalLikes)
                                 .tongBill(totalBills)
                                 .tongEvalue(totalEvalues)
-                                .thongke(new PageImpl<>(list, pageable, pageProduct.getTotalElements()))
+                                .thongke(new PageImpl<>(paginatedList, pageable, list.size()))
                                 .build();
 
                 return pageTKProduct;
+        }
+
+        private Comparator<Response_TK_Product> getComparator(String sortColumn, Boolean sortBy) {
+                Comparator<Response_TK_Product> comparator;
+                switch (sortColumn.toLowerCase()) {
+                        case "id":
+                                comparator = Comparator.comparing(Response_TK_Product::getId);
+                                break;
+                        case "name":
+                                comparator = Comparator.comparing(Response_TK_Product::getName);
+                                break;
+                        case "price":
+                                comparator = Comparator.comparing(Response_TK_Product::getPrice);
+                                break;
+                        case "sumbill":
+                                comparator = Comparator.comparing(Response_TK_Product::getSumBill);
+                                break;
+                        case "sumevalue":
+                                comparator = Comparator.comparing(Response_TK_Product::getSumEvalue);
+                                break;
+                        case "sumlike":
+                                comparator = Comparator.comparing(Response_TK_Product::getSumLike);
+                                break;
+                        case "avgstar":
+                                comparator = Comparator.comparing(Response_TK_Product::getAvgStar);
+                                break;
+                        default:
+                                throw new IllegalArgumentException("Invalid sort column: " + sortColumn);
+                }
+                return sortBy ? comparator.reversed() : comparator;
         }
 
         private Response_TK_Product calculateProductRevenue(Product product, Date startDate, Date endDate) {

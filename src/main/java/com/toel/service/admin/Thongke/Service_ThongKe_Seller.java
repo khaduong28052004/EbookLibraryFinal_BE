@@ -1,6 +1,7 @@
 package com.toel.service.admin.Thongke;
 
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -10,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.response.ThongKe.Page_TK_Seller;
@@ -48,74 +48,81 @@ public class Service_ThongKe_Seller {
         AccountReportRepository accountReportRepository;
         @Autowired
         FollowerRepository followerRepository;
-
         @Autowired
         AccountMapper accountMapper;
 
         public Page_TK_Seller get_TK_Seller(Date dateStart, Date dateEnd, String option,
                         String search, Boolean gender, int page, int size,
                         Boolean sortBy, String sortColumn) {
-                Pageable pageable = PageRequest.of(page, size,
-                                Sort.by(sortBy ? Sort.Direction.DESC : Sort.Direction.ASC, sortColumn));
                 Role role = roleRepository.findByNameIgnoreCase("seller");
                 Date finalDateStart = getDateStart(dateStart);
                 Date finalDateEnd = getDateEnd(dateEnd);
-                Page<Account> pageAccount = null;
-                // List<Account> listAccount;
-                // if (option.equalsIgnoreCase("macdinh")) {
-                // listAccount = getPage(role, search, gender);
-                // } else if (option.equalsIgnoreCase("shopmoi")) {
-                // listAccount = getPageByCreateAtSeller(role, dateStart, dateEnd, search,
-                // gender);
-                // } else if (option.equalsIgnoreCase("donhang")) {
-                // listAccount = billRepository.findByFinishAtBetweenAndGenderAndSearch(
-                // finalDateStart,
-                // finalDateEnd, gender, search);
-                // } else if (option.equalsIgnoreCase("sanpham")) {
-                // listAccount = getPageShopByProductCreateAt(finalDateStart, finalDateEnd,
-                // search, gender);
-                // } else if (option.equalsIgnoreCase("baocao")) {
-                // listAccount = getPageShopByReportCreateAt(finalDateStart, finalDateEnd,
-                // search, gender);
-                // } else {
-                // listAccount = getPageByCreateAtSeller(role, dateStart, dateEnd, search,
-                // gender);
-                // }
-
-                // Integer totalShop = listAccount.size();
-
+                // Page<Account> pageAccount = null;
+                List<Account> listAccount;
                 if (option.equalsIgnoreCase("macdinh")) {
-                        pageAccount = getPage(role, search, gender, pageable);
+                        listAccount = getPage(role, search, gender);
                 } else if (option.equalsIgnoreCase("shopmoi")) {
-                        pageAccount = getPageByCreateAtSeller(role, dateStart, dateEnd, search, gender,
-                                        pageable);
+                        listAccount = getPageByCreateAtSeller(role, dateStart, dateEnd, search,
+                                        gender);
                 } else if (option.equalsIgnoreCase("donhang")) {
-                        pageAccount = billRepository.findByFinishAtBetweenAndGenderAndSearch(
+                        listAccount = billRepository.findByFinishAtBetweenAndGenderAndSearch(
                                         finalDateStart,
-                                        finalDateEnd, gender, search, pageable);
+                                        finalDateEnd, gender, search);
                 } else if (option.equalsIgnoreCase("sanpham")) {
-                        pageAccount = getPageShopByProductCreateAt(finalDateStart, finalDateEnd, search, gender,
-                                        pageable);
+                        listAccount = getPageShopByProductCreateAt(finalDateStart, finalDateEnd,
+                                        search, gender);
                 } else if (option.equalsIgnoreCase("baocao")) {
-                        pageAccount = getPageShopByReportCreateAt(finalDateStart, finalDateEnd, search, gender,
-                                        pageable);
+                        listAccount = getPageShopByReportCreateAt(finalDateStart, finalDateEnd,
+                                        search, gender);
                 } else {
-                        pageAccount = getPageByCreateAtSeller(role, dateStart, dateEnd, search, gender,
-                                        pageable);
+                        listAccount = getPageByCreateAtSeller(role, dateStart, dateEnd, search,
+                                        gender);
                 }
-                List<Response_TK_Seller> list = pageAccount.stream()
+
+                Integer totalShop = listAccount.size();
+
+                List<Response_TK_Seller> list = listAccount.stream()
                                 .map(account -> calculateTk_Seller(account, finalDateStart, finalDateEnd))
                                 .collect(Collectors.toList());
-                Integer totalShop = (int) pageAccount.getTotalElements();
-                // Page_TK_Seller page_TK_Seller = Page_TK_Seller.builder()
-                // .thongke(new PageImpl<>(list, pageable, pageAccount.getTotalElements()))
-                // .build();
+                Comparator<Response_TK_Seller> comparator = getComparator(sortColumn, sortBy);
+                list.sort(comparator);
+                Pageable pageable = PageRequest.of(page, size);
+                int start = (int) pageable.getOffset();
+                int end = Math.min(start + pageable.getPageSize(), list.size());
+                List<Response_TK_Seller> paginatedList = list.subList(start, end);
                 Page_TK_Seller page_TK_Seller = new Page_TK_Seller();
                 page_TK_Seller.setTongShop(totalShop);
-                page_TK_Seller.setThongke(new PageImpl<>(list, pageable, pageAccount.getTotalElements()));
+                page_TK_Seller.setThongke(new PageImpl<>(paginatedList, pageable, listAccount.size()));
 
                 return page_TK_Seller;
 
+        }
+
+        private Comparator<Response_TK_Seller> getComparator(String sortColumn, Boolean sortBy) {
+                Comparator<Response_TK_Seller> comparator;
+                switch (sortColumn.toLowerCase()) {
+                        case "id":
+                                comparator = Comparator.comparing(Response_TK_Seller::getId);
+                                break;
+                        case "shopname":
+                                comparator = Comparator.comparing(Response_TK_Seller::getShopName);
+                                break;
+                        case "sumfollower":
+                                comparator = Comparator.comparing(Response_TK_Seller::getSumFollower);
+                                break;
+                        case "sumproduct":
+                                comparator = Comparator.comparing(Response_TK_Seller::getSumProduct);
+                                break;
+                        case "sumreport":
+                                comparator = Comparator.comparing(Response_TK_Seller::getSumReport);
+                                break;
+                        case "avgstar":
+                                comparator = Comparator.comparing(Response_TK_Seller::getAvgStar);
+                                break;
+                        default:
+                                throw new IllegalArgumentException("Invalid sort column: " + sortColumn);
+                }
+                return sortBy ? comparator.reversed() : comparator;
         }
 
         public Response_TK_Seller calculateTk_Seller(Account account, Date finalDateStart, Date finalDateEnd) {
@@ -144,21 +151,6 @@ public class Service_ThongKe_Seller {
                 return entity;
         }
 
-        public Page<Account> getPage(Role role, String search, Boolean gender, Pageable pageable) {
-                Page<Account> pageAccount = null;
-                if (search == null || search.isBlank()) {
-                        pageAccount = (gender == null)
-                                        ? accountRepository.findAllByRole(role, pageable)
-                                        : accountRepository.findAllByRoleAndGender(role, gender,
-                                                        pageable);
-                } else {
-                        pageAccount = accountRepository
-                                        .findAllByGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                                                        gender, role, search, search, search, search, pageable);
-                }
-                return pageAccount;
-        }
-
         public List<Account> getPage(Role role, String search, Boolean gender) {
                 List<Account> listAccounts = null;
                 if (search == null || search.isBlank()) {
@@ -172,30 +164,6 @@ public class Service_ThongKe_Seller {
                                                         gender, role, search, search, search, search);
                 }
                 return listAccounts;
-        }
-
-        public Page<Account> getPageByCreateAtSeller(Role role, Date dateStart, Date dateEnd,
-                        String search, Boolean gender, Pageable pageable) {
-                Page<Account> pageAccount;
-
-                Date finalDateStart = getDateStart(dateStart);
-                Date finalDateEnd = getDateEnd(dateEnd);
-
-                if (search == null || search.isBlank()) {
-                        pageAccount = (gender == null)
-                                        ? accountRepository.findAllByCreateAtBetweenAndRole(finalDateStart,
-                                                        finalDateEnd, role, pageable)
-                                        : accountRepository.findAllByCreateAtBetweenAndRoleAndGender(
-                                                        finalDateStart,
-                                                        finalDateEnd, role,
-                                                        gender, pageable);
-                } else {
-                        pageAccount = accountRepository
-                                        .findAllByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                                                        gender, role, search, search, search, search, finalDateStart,
-                                                        finalDateEnd, pageable);
-                }
-                return pageAccount;
         }
 
         public List<Account> getPageByCreateAtSeller(Role role, Date dateStart, Date dateEnd,
@@ -222,50 +190,6 @@ public class Service_ThongKe_Seller {
                 return pageAccount;
         }
 
-        // public Page<Account> getPageShopByBillFinalAt(Date dateStart, Date dateEnd,
-        // String search, Boolean gender, Pageable pageable) {
-        // Page<Account> pageAccount;
-
-        // Date finalDateStart = getDateStart(dateStart);
-        // Date finalDateEnd = getDateEnd(dateEnd);
-
-        // if (search == null || search.isBlank()) {
-        // pageAccount = (gender == null)
-        // ? billRepository.selectAllByShopAndFinishAt(finalDateStart, finalDateEnd,
-        // pageable)
-        // : billRepository.selectAllByShopAndGenderFinishAt(finalDateStart,
-        // finalDateEnd, gender, pageable);
-        // } else {
-        // pageAccount = billRepository
-        // .findAllShopByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-        // finalDateStart, finalDateEnd, gender, search, search, search,
-        // search, pageable);
-        // }
-        // return pageAccount;
-        // }
-
-        public Page<Account> getPageShopByProductCreateAt(Date dateStart, Date dateEnd,
-                        String search, Boolean gender, Pageable pageable) {
-                Page<Account> pageAccount;
-
-                Date finalDateStart = getDateStart(dateStart);
-                Date finalDateEnd = getDateEnd(dateEnd);
-
-                if (search == null || search.isBlank()) {
-                        pageAccount = (gender == null)
-                                        ? productRepository.selectAllByProductAndCreateAt(finalDateStart, finalDateEnd,
-                                                        pageable)
-                                        : productRepository.selectAllByProductAndGenderFinishAt(finalDateStart,
-                                                        finalDateEnd, gender, pageable);
-                } else {
-                        pageAccount = productRepository
-                                        .findAllByProductCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                                                        finalDateStart, finalDateEnd, gender, search, search, search,
-                                                        search, pageable);
-                }
-                return pageAccount;
-        }
-
         public List<Account> getPageShopByProductCreateAt(Date dateStart, Date dateEnd,
                         String search, Boolean gender) {
                 List<Account> list;
@@ -285,29 +209,6 @@ public class Service_ThongKe_Seller {
                                                         search);
                 }
                 return list;
-        }
-
-        public Page<Account> getPageShopByReportCreateAt(Date dateStart, Date dateEnd,
-                        String search, Boolean gender, Pageable pageable) {
-                Page<Account> pageAccount;
-
-                Date finalDateStart = getDateStart(dateStart);
-                Date finalDateEnd = getDateEnd(dateEnd);
-
-                if (search == null || search.isBlank()) {
-                        pageAccount = (gender == null)
-                                        ? accountReportRepository.selectAllByProductAndCreateAt(finalDateStart,
-                                                        finalDateEnd,
-                                                        pageable)
-                                        : accountReportRepository.selectAllByProductAndGenderFinishAt(finalDateStart,
-                                                        finalDateEnd, gender, pageable);
-                } else {
-                        pageAccount = accountReportRepository
-                                        .findAllByProductCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                                                        finalDateStart, finalDateEnd, gender, search, search, search,
-                                                        search, pageable);
-                }
-                return pageAccount;
         }
 
         public List<Account> getPageShopByReportCreateAt(Date dateStart, Date dateEnd,

@@ -3,8 +3,6 @@ package com.toel.repository;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -57,15 +55,6 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 	@Query(value = "SELECT * FROM billdetails JOIN bills WHERE billdetails.id = :billDetailID AND billdetails.product_id = :product_id AND bills.account_id = :account_id ", nativeQuery = true)
 	Object[] hasExistOrder(@Param("billDetailID") Integer billDetailID, @Param("product_id") Integer productId,
 			@Param("account_id") Integer accountId);
-
-	@Query("SELECT p FROM Product p WHERE p.id IN (SELECT DISTINCT bd.product.id FROM BillDetail bd WHERE bd.bill.finishAt BETWEEN :dateStart AND :dateEnd)")
-	Page<Product> selectAll(@Param("dateStart") Date dateStart,
-			@Param("dateEnd") Date dateEnd, Pageable pageable);
-
-	@Query("SELECT p FROM Product p WHERE p.id IN (Select DISTINCT bd.product.id FROM BillDetail bd WHERE bd.bill.finishAt BETWEEN :dateStart AND :dateEnd AND (:key iS NULL OR bd.product.name LIKE %:key% OR bd.product.introduce LIKE %:key% OR bd.product.writerName LIKE %:key% OR bd.product.publishingCompany LIKE %:key%)) ")
-	Page<Product> selectAllByFinishAt(@Param("key") String key, @Param("dateStart") Date dateStart,
-			@Param("dateEnd") Date dateEnd,
-			Pageable pageable);
 
 	@Query("SELECT p FROM Product p WHERE p.id IN (SELECT DISTINCT bd.product.id FROM BillDetail bd WHERE bd.bill.finishAt BETWEEN :dateStart AND :dateEnd)")
 	List<Product> selectAll(@Param("dateStart") Date dateStart,
