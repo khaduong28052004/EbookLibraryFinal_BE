@@ -59,6 +59,7 @@ public class ApiDiscountRateAdmin {
     @PostMapping
     public ApiResponse<Response_DiscountRate> post(@RequestBody @Valid Request_DiscountRateCreate entity) {
         return ApiResponse.<Response_DiscountRate>build()
+                .message("Cập nhật chiết khẩu thành công")
                 .result(discountReateService.create(entity));
     }
 
