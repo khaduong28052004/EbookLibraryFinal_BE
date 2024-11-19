@@ -19,10 +19,13 @@ public class ApiHomeAdmin {
 
     @GetMapping
     public ApiResponse<Response_Home> getHome() {
+        double[] thongke = service_Home.doanhthu_loinhuan();
         return ApiResponse.<Response_Home>build()
                 .result(Response_Home.builder()
                         .sumShop(service_Home.getCountByRole(3))
                         .sumAccount(service_Home.getCountByRole(4))
+                        .doanhThu(thongke[0])
+                        .loiNhuan(thongke[2])
                         .listAccount(service_Home.getCharAccount())
                         .listDoanhThu(service_Home.getCharttDoanhThu())
                         .build());

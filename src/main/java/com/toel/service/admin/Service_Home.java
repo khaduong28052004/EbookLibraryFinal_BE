@@ -35,7 +35,7 @@ public class Service_Home {
     }
 
     public double[] doanhthu_loinhuan() {
-        double[] thongke = service_Thongke_DoanhThu.calculateMonthlyRevenue(null, null, null, null);
+        double[] thongke = service_Thongke_DoanhThu.calculateMonthlyRevenue(null, null, "", null);
         double doanhThu = thongke[1];
         double phi = thongke[2];
         double loinhuan = thongke[3];
