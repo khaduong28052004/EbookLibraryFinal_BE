@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.request.Account.Request_AccountCreate;
@@ -29,6 +30,7 @@ import com.toel.repository.EvalueRepository;
 import com.toel.repository.FollowerRepository;
 import com.toel.repository.ProductRepository;
 import com.toel.repository.RoleRepository;
+import com.toel.service.ServiceToel;
 
 @Service
 public class Service_Account {
@@ -48,6 +50,8 @@ public class Service_Account {
         BillRepository billRepository;
         @Autowired
         AccountReportRepository accountReportRepository;
+        // @Autowired
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
         public PageImpl<?> getAll(String rolename,
                         String search, Boolean gender, Integer page, Integer size, Boolean sortBy, String sortColumn) {
@@ -171,6 +175,9 @@ public class Service_Account {
                 account.setRole(roleRepository.findByNameIgnoreCase(rolename));
                 account.setStatus(true);
                 account.setCreateAt(new Date());
+                // Mã hóa mật khẩu mới
+                String hashPass = passwordEncoder.encode(entity.getPassword());
+                account.setPassword(hashPass);
                 return accountMapper.toAccount(accountRepository.saveAndFlush(account));
         }
 

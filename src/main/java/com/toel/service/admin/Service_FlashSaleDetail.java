@@ -44,7 +44,7 @@ public class Service_FlashSaleDetail {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));
         Page<Product> pageItems;
         if (idFlashSale != null) {
-            FlashSale flashSale = flashSaleRepository.findById(idFlashSale)
+            flashSaleRepository.findById(idFlashSale)
                     .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Flash sale"));
         }
         if (Boolean.TRUE.equals(status)) {

@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.response.Response_ThongKeBill;
 import com.toel.dto.seller.response.Response_ThongKeKhachHang;
-import com.toel.dto.seller.response.Response_ListKhachHang;
-import com.toel.dto.seller.response.Response_ListSanPham;
 import com.toel.dto.seller.response.Response_ThonKeSanPham;
 import com.toel.service.seller.Service_ThongKeSeller;
 

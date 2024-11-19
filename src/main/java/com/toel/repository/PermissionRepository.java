@@ -7,8 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.toel.model.Permission;
 import com.toel.model.Role;
-import java.util.List;
-
 
 public interface PermissionRepository extends JpaRepository<Permission, Integer> {
     Page<Permission> findAllByCotSlugContainingOrDescriptionContaining(String cotSlug, String description,

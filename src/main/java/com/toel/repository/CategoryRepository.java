@@ -12,7 +12,10 @@ import com.toel.model.Category;
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
         @Query("SELECT c FROM Category c WHERE c.idParent = ?1 AND c.account.id = ?2")
-        List<Category> findALlByIdParent(Integer idParent, Integer accountId);
+        List<Category> findALlByIdParentAndAccount(Integer idParent, Integer accountId);
+
+        @Query("SELECT c FROM Category c WHERE c.idParent = ?1")
+        List<Category> findALlByIdParent(Integer idParent);
 
         @Query("SELECT c FROM Category c WHERE  c.account.id = ?1")
         List<Category> findALlByIdAccount(Integer accountId);

@@ -12,7 +12,6 @@ import org.springframework.data.repository.query.Param;
 import com.toel.model.Account;
 import com.toel.model.Evalue;
 import com.toel.model.Product;
-import com.toel.model.Account;
 
 public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
 

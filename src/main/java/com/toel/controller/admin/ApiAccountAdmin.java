@@ -82,12 +82,12 @@ public class ApiAccountAdmin {
                 .result(service_Account.updateActive(id, status));
     }
 
-    @DeleteMapping
-    public ApiResponse<Response_Account> delete(
-            @RequestParam(value = "id", required = false) Integer id) {
-        service_Account.updateStatus(id, false);
-        return ApiResponse.<Response_Account>build()
-                .message("Xóa nhân viên thành công");
-    }
+    // @DeleteMapping
+    // public ApiResponse<Response_Account> delete(
+    //         @RequestParam(value = "id", required = false) Integer id) {
+    //     service_Account.updateStatus(id, false);
+    //     return ApiResponse.<Response_Account>build()
+    //             .message("Xóa nhân viên thành công");
+    // }
 
 }

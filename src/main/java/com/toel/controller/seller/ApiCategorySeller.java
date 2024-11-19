@@ -64,7 +64,7 @@ public class ApiCategorySeller {
                         @RequestParam(value = "idParent", defaultValue = "0") Integer idParent,
                         @RequestParam(value = "account_id", defaultValue = "0") Integer account_id) {
                 return ApiResponse.<List<Response_Category>>build()
-                                .result(categoryService.getIdParent(idParent, account_id));
+                                .result(categoryService.getIdParentAndAccount(idParent, account_id));
         }
 
         @GetMapping("/edit")

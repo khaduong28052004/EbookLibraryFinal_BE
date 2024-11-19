@@ -3,7 +3,6 @@ package com.toel.repository;
 import java.util.Date;
 import java.util.List;
 
-import org.antlr.v4.runtime.atn.SemanticContext.AND;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

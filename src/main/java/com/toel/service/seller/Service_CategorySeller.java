@@ -21,7 +21,6 @@ import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.CategoryMapper;
 import com.toel.mapper.ProductMapper;
-import com.toel.model.Account;
 import com.toel.model.Category;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.CategoryRepository;
@@ -81,9 +80,15 @@ public class Service_CategorySeller {
                                 .collect(Collectors.toList());
         }
 
-        public List<Response_Category> getIdParent(
+        public List<Response_Category> getIdParentAndAccount(
                         Integer idParent, Integer account_id) {
-                return categoryRepository.findALlByIdParent(idParent, account_id).stream()
+                return categoryRepository.findALlByIdParentAndAccount(idParent, account_id).stream()
+                                .map(category -> categoryMapper.response_Category(category))
+                                .collect(Collectors.toList());
+        }
+        public List<Response_Category> getIdParent(
+                        Integer idParent) {
+                return categoryRepository.findALlByIdParent(idParent).stream()
                                 .map(category -> categoryMapper.response_Category(category))
                                 .collect(Collectors.toList());
         }

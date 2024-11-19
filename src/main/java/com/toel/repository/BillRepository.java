@@ -9,8 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.toel.dto.seller.response.Response_DoanhSo;
-import com.toel.dto.seller.response.Response_DoanhThu;
 import com.toel.model.Account;
 import com.toel.model.Bill;
 
