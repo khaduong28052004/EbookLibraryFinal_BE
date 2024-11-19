@@ -26,6 +26,7 @@ public class ApiRolePermissionAdmin {
     @PostMapping
     public ApiResponse<Response_RolePermission> create(@RequestBody @Valid Request_RolePermissionCreate entity) {
         return ApiResponse.<Response_RolePermission>build()
+                .message("Thêm quyền thành công")
                 .result(service_RolePermission.create(entity));
     }
 
