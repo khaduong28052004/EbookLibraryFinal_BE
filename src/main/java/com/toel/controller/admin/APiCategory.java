@@ -18,8 +18,6 @@ import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.request.Category.Request_CategoryCreate;
 import com.toel.dto.seller.request.Category.Request_CategoryUpdate;
 import com.toel.dto.seller.response.Response_Category;
-import com.toel.exception.AppException;
-import com.toel.exception.ErrorCode;
 import com.toel.repository.CategoryRepository;
 import com.toel.service.seller.Service_CategorySeller;
 
@@ -34,48 +32,54 @@ public class APiCategory {
     @Autowired
     CategoryRepository categoryRepository;
 
-        @GetMapping
-        public ApiResponse<PageImpl<Response_Category>> getAll(
-                        @RequestParam(value = "page", defaultValue = "0") Integer page,
-                        @RequestParam(value = "size", defaultValue = "5") Integer size,
-                        @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
-                        @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn,
-                        @RequestParam(value = "search", required = false) String search) {
-                return ApiResponse.<PageImpl<Response_Category>>build()
-                                .result(service_CategorySeller.getAll(page, size, sortBy, sortColumn, search));
-        }
+    @GetMapping
+    public ApiResponse<PageImpl<Response_Category>> getAll(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "5") Integer size,
+            @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
+            @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn,
+            @RequestParam(value = "search", required = false) String search) {
+        return ApiResponse.<PageImpl<Response_Category>>build()
+                .result(service_CategorySeller.getAll(page, size, sortBy, sortColumn, search));
+    }
 
-        @GetMapping("/getListByIdParent")
-        public ApiResponse<List<Response_Category>> getListByIdParent(
-                        @RequestParam(value = "idParent", defaultValue = "0") Integer idParent) {
-                return ApiResponse.<List<Response_Category>>build()
-                                .result(service_CategorySeller.getIdParent(idParent));
-        }
+    @GetMapping("/getListByIdParent")
+    public ApiResponse<List<Response_Category>> getListByIdParent(
+            @RequestParam(value = "idParent", defaultValue = "0") Integer idParent) {
+        return ApiResponse.<List<Response_Category>>build()
+                .result(service_CategorySeller.getIdParent(idParent));
+    }
 
     @PostMapping
     public ApiResponse<Response_Category> post(
             @RequestBody @Valid Request_CategoryCreate request_Category) {
-        if (!checkName(request_Category.getName(), request_Category.getIdParent())) {
-            throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Tên");
+        if (!checkName(request_Category.getName())) {
+            return ApiResponse.<Response_Category>build()
+                    .code(2002)
+                    .message("Tên đã tồn tại");
         }
         return ApiResponse.<Response_Category>build()
                 .message("Thêm thể loại thành công")
                 .result(service_CategorySeller.create(request_Category));
     }
 
-        @PutMapping
-        public ApiResponse<Response_Category> put(
-                        @RequestBody @Valid Request_CategoryUpdate request_Category) {
-                return ApiResponse.<Response_Category>build()
-                                .message("Cập nhật thể loại sản phẩm thành công")
-                                .result(service_CategorySeller.update(request_Category));
+    @PutMapping
+    public ApiResponse<Response_Category> put(
+            @RequestBody @Valid Request_CategoryUpdate request_Category) {
+        if (!checkNameUpdate(request_Category.getName(), request_Category.getId())) {
+            return ApiResponse.<Response_Category>build()
+                    .code(2002)
+                    .message("Tên đã tồn tại");
         }
+        return ApiResponse.<Response_Category>build()
+                .message("Cập nhật thể loại sản phẩm thành công")
+                .result(service_CategorySeller.update(request_Category));
+    }
 
     @DeleteMapping
     public ApiResponse<Response_Category> delete(@RequestParam(value = "id", required = false) Integer id) {
         Integer count = categoryRepository.findALlByIdParent(id).size();
         if (count > 0) {
-            // throw new AppException(ErrorCode.OBJECT_ACTIVE, "Danh mục");
             return ApiResponse.<Response_Category>build()
                     .code(2003)
                     .message("Danh mục đang hoạt động");
@@ -85,16 +89,16 @@ public class APiCategory {
                 .message("Xóa thành công");
     }
 
-    private Boolean checkName(String name, Integer idParent) {
-        return categoryRepository.findALlByIdParent(idParent)
+    private Boolean checkName(String name) {
+        return categoryRepository.findALlByIdParent(0)
                 .stream()
                 .noneMatch(category -> category.getName().equalsIgnoreCase(name));
     }
 
-    // private Boolean checkNameUpdate(String name, Integer id) {
-    //     for (Category entity : categoryRepository.findALlByIdParent(0)) {
-            
-    //     }
-    // }
+    private Boolean checkNameUpdate(String name, Integer id) {
+        return categoryRepository.findALlByIdParent(0)
+                .stream()
+                .noneMatch(entity -> entity.getName().equalsIgnoreCase(name) && entity.getId() != id);
+    }
 
 }

@@ -104,4 +104,11 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
                         @Param("dateStart") Date dateStart,
                         @Param("dateEnd") Date dateEnd);
 
+        //check - nhanvien
+        boolean existsByUsernameIgnoreCase(String username);
+
+        boolean existsByPhoneIgnoreCase(String phone);
+
+        boolean existsByEmailIgnoreCase(String email);
+
 }
