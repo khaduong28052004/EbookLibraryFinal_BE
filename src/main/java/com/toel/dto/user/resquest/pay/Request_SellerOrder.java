@@ -18,6 +18,10 @@ public class Request_SellerOrder {
 
 	private int id;
 	List<Request_Cart> cart;
-	private Voucher vouchers;
+	private Voucher voucher;
+	private Voucher voucherAdmin;
+	private double total;
+	private double service_fee;
+	private double sale;
 
 }
