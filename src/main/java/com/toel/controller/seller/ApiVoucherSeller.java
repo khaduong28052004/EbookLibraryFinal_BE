@@ -43,9 +43,10 @@ public class ApiVoucherSeller {
         @PostMapping("/create")
         public ApiResponse<Response_Voucher> create(
                         @RequestBody @Valid Request_VoucherCreate request_Voucher) {
+
                 return ApiResponse.<Response_Voucher>build()
                                 .message("Thêm voucher thành công")
-                                .result(service_Voucher.create(request_Voucher));
+                                .result(service_Voucher.create(service_Voucher.checkVoucherCreate(request_Voucher)));
         }
 
         @PostMapping("/update")
@@ -67,7 +68,7 @@ public class ApiVoucherSeller {
         public ApiResponse delete(
                         @RequestParam("voucher_id") Integer voucher_id) {
                 return ApiResponse.build()
-                                .message(service_Voucher.delete(voucher_id) ? "Khôi phục hoạt động thành công"
+                                .message(!service_Voucher.delete(voucher_id) ? "Khôi phục hoạt động thành công"
                                                 : "Ngừng hoạt động thành công");
         }
 
@@ -77,8 +78,10 @@ public class ApiVoucherSeller {
                         @RequestParam(value = "size", defaultValue = "5") Integer size,
                         @RequestParam(value = "sortBy", defaultValue = "true") boolean sortBy,
                         @RequestParam(value = "sortColum", defaultValue = "id") String sortColum,
-                        @RequestParam(value = "voucher_id", defaultValue = "0") Integer voucher_id) {
+                        @RequestParam(value = "voucher_id", defaultValue = "3") Integer voucher_id,
+                        @RequestParam(value = "search", required = false) String search) {
                 return ApiResponse.<PageImpl<Response_VoucherDetail>>build()
-                                .result(service_Voucher.getAllDetail(page, size, sortBy, sortColum, voucher_id));
+                                .result(service_Voucher.getAllDetail(page, size, sortBy, sortColum, voucher_id,
+                                                search));
         }
 }

@@ -15,27 +15,7 @@ import io.lettuce.core.dynamic.annotation.Param;
 import java.util.Date;
 
 public interface AccountRepository extends JpaRepository<Account, Integer> {
-
-        // Page<Account> findAllByRoleAndStatus(Role role, boolean status, Pageable pageable);
-
-        // Page<Account> findAllByRoleAndStatusAndGender(Role role, boolean status, boolean gender, Pageable pageable);
-
-        // @Query("SELECT a FROM Account a WHERE (:gender IS NULL OR a.gender = :gender) " +
-        //                 "AND a.status = :status " +
-        //                 "AND a.role = :role " +
-        //                 "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
-        //                 "OR a.email LIKE %:email% OR a.phone LIKE %:phone%)")
-        // Page<Account> findAllByGenderAndStatusAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-        //                 @Param("gender") Boolean gender,
-        //                 @Param("status") boolean status,
-        //                 @Param("role") Role role,
-        //                 @Param("username") String username,
-        //                 @Param("fullname") String fullname,
-        //                 @Param("email") String email,
-        //                 @Param("phone") String phone,
-        //                 Pageable pageable);
-
-        // thống kê khách hàng - seller
+        // account
         Page<Account> findAllByRole(Role role, Pageable pageable);
 
         // thống kê khách hàng
@@ -57,10 +37,10 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
                         boolean gender, boolean status, Role role, String username, String fullname, String email,
                         String phone, Pageable pageable);
 
-        // thống kê khách hàng - seller
+        // account
         Page<Account> findAllByRoleAndGender(Role role, boolean gender, Pageable pageable);
 
-        // thống kê khách hàng - seller
+        // account
         @Query("SELECT a FROM Account a WHERE (:gender IS NULL OR a.gender = :gender) " +
                         "AND a.role = :role " +
                         "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
@@ -79,30 +59,6 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
         boolean existsByEmail(String email);
 
         Account findByEmail(String email);
-
-        // thống kê khách hàng - seller
-        Page<Account> findAllByCreateAtBetweenAndRole(Date dateStart, Date dateEnd, Role role, Pageable pageable);
-
-        // thống kê khách hàng - seller
-        Page<Account> findAllByCreateAtBetweenAndRoleAndGender(Date dateStart, Date dateEnd, Role role, boolean gender,
-                        Pageable pageable);
-
-        // thống kê khách hàng - seller
-        @Query("SELECT a FROM Account a WHERE (:gender IS NULL OR a.gender = :gender) " +
-                        "AND a.role = :role " +
-                        "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
-                        "OR a.email LIKE %:email% OR a.phone LIKE %:phone%) " +
-                        "AND a.createAt BETWEEN :dateStart AND :dateEnd")
-        Page<Account> findAllByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                        @Param("gender") Boolean gender,
-                        @Param("role") Role role,
-                        @Param("username") String username,
-                        @Param("fullname") String fullname,
-                        @Param("email") String email,
-                        @Param("phone") String phone,
-                        @Param("dateStart") Date dateStart,
-                        @Param("dateEnd") Date dateEnd,
-                        Pageable pageable);
 
         boolean existsByUsername(String username);
 

@@ -14,4 +14,7 @@ public class Request_CategoryCreate {
     String name;
     @NotNull(message = "FIELD_REQUIRED")
     Integer idParent;
+    @NotNull(message = "FIELD_REQUIRED")
+    Integer account;
+
 }

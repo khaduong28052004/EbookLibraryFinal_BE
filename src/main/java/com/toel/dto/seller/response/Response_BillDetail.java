@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Response_BillDetail {
     Integer id;
+    Response_Product product;
 }

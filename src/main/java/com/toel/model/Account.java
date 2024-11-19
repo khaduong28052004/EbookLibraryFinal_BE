@@ -75,51 +75,51 @@ public class Account {
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<VoucherDetail> voucherDetails;
-//    2
+	// 2
 	@ManyToOne
 	@JoinColumn(name = "role_id")
 	Role role;
-//    3
+	// 3
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<Address> addresses;
-//    4
+	// 4
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<Voucher> vouchers;
-//    5
+	// 5
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<Follower> followers;
-//    6
+	// 6
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<Transaction> transections;
-//    7
+	// 7
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<Bill> bills;
-//    8
+	// 8
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<Cart> carts;
-//    9
+	// 9
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<Evalue> evalues;
-//    10
+	// 10
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<Like> likes;
-//    11
+	// 11
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<Product> products;
-//    12 chiet khau
+	// 12 chiet khau
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<DiscountRate> discountRates;
-//    13 report
+	// 13 report
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<AccountReport> accountReports;
@@ -128,17 +128,20 @@ public class Account {
 	@OneToMany(mappedBy = "shop")
 	List<AccountReport> shopReports;
 
-//    14 Log
+	// 14 Log
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<Log> logs;
-//    15 pending request
+	// 15 pending request
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<PendingRequest> pendingRequests;
-//    16 flash sale
+	// 16 flash sale
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<FlashSale> flashSales;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "account")
+	List<Category> categories;
 }

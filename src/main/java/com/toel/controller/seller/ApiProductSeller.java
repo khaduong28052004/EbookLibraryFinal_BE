@@ -1,6 +1,7 @@
 package com.toel.controller.seller;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
@@ -11,7 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.request.Product.Request_ProductCreate;
@@ -42,6 +45,14 @@ public class ApiProductSeller {
                                                 search));
         }
 
+        @GetMapping("/edit")
+        public ApiResponse<Response_Product> edit(
+                        @RequestParam(value = "product_id", defaultValue = "0") Integer product_id) {
+                return ApiResponse.<Response_Product>build()
+                                .result(service_ProductSeller.edit(product_id));
+
+        }
+
         @PostMapping("/create")
         public ApiResponse<Response_Product> create(
                         @RequestBody @Valid Request_ProductCreate request_Product) throws IOException {
@@ -56,6 +67,18 @@ public class ApiProductSeller {
                 return ApiResponse.<Response_Product>build()
                                 .message("Cập nhật sản phẩm thành công")
                                 .result(service_ProductSeller.update(request_Product));
+        }
+
+        @PostMapping("/create/saveImg")
+        public void createSaveImage(
+                        @RequestPart("imageProducts") List<MultipartFile> images) throws IOException {
+                service_ProductSeller.saveImgCreate(images);
+        }
+
+        @PostMapping("/update/saveImg")
+        public void updateSaveImage(
+                        @RequestPart("imageProducts") List<MultipartFile> images) throws IOException {
+                service_ProductSeller.saveImgCreate(images);
         }
 
         @DeleteMapping("/delete")

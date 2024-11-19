@@ -1,5 +1,7 @@
 package com.toel.mapper;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -13,6 +15,7 @@ import com.toel.model.Product;
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
+
     Response_Product response_Product(Product product);
 
     @Mapping(target = "category", ignore = true)
@@ -28,5 +31,7 @@ public interface ProductMapper {
     Response_ProductListFlashSale tProductListFlashSale(Product product);
 
     Response_TK_Product toResponse_TK_Product(Product product);
+
+    List<Response_Product> listResponse_Products(List<Product> products);
 
 }

@@ -7,11 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Response_ThongKeSanPham {
+public class Response_CategorySeller {
+    Integer id;
     String name;
-    String theLoai;
-    Integer luotBan;
-    Integer luotDanhGia;
-    Double trungBinhDanhGia;
-    Integer luotYeuThich;
+    Integer idParent;
+    String nameDanhMuc;
+    Boolean hasProducts;
 }

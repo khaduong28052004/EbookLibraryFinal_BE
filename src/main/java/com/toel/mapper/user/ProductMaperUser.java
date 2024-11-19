@@ -1,5 +1,7 @@
 package com.toel.mapper.user;
 
+import java.util.List;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
@@ -9,7 +11,7 @@ import com.toel.model.Product;
 
 @Component
 @Mapper(componentModel = "spring")
-public interface ProductMaper {
+public interface ProductMaperUser {
 	@Mapping(target = "star", expression = "java(product.getEvalues().stream().mapToDouble(Evalue::getStar).average().orElse(5.0))")
 	@Mapping(target = "quantityEvalue", expression = "java(product.getEvalues().size())")
 	Response_Product productToResponse_Product(Product product);

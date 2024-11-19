@@ -11,4 +11,5 @@ public class Response_Category {
     Integer id;
     String name;
     Integer idParent;
+    Response_Account account;
 }

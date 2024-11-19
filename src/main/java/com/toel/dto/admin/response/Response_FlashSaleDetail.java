@@ -1,6 +1,6 @@
 package com.toel.dto.admin.response;
 
-import com.toel.model.Product;
+import com.toel.dto.seller.response.Response_Product;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +13,6 @@ public class Response_FlashSaleDetail {
     Integer id;
     Integer quantity;
     Integer sale;
-    Product product;
+    Response_Product product;
     Response_FlashSale flashSale;
 }

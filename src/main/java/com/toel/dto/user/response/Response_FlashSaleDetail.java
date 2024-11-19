@@ -16,6 +16,8 @@ public class Response_FlashSaleDetail {
 
 	Integer sale;
 
+	double maxDiscount;
+
 	Response_Product product;
 
 }

@@ -1,6 +1,5 @@
 package com.toel.service.seller;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,8 +14,8 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.seller.response.Response_Bill;
-import com.toel.dto.seller.response.Response_ThongKeKhachHang;
-import com.toel.dto.seller.response.Response_ThongKeSanPham;
+import com.toel.dto.seller.response.Response_ListKhachHang;
+import com.toel.dto.seller.response.Response_ListSanPham;
 import com.toel.mapper.BillMapper;
 import com.toel.model.Bill;
 import com.toel.repository.BillRepository;
@@ -38,66 +37,114 @@ public class Service_ThongKeSeller {
 
     public Double getTongDoanhSo(
             Integer account_id, Date dateStart, Date dateEnd) {
-        Double tongDoanhSo = billRepository.getTongDoanhSo(account_id, dateStart == null ? new Date() : dateStart,
-                dateEnd == null ? new Date() : dateEnd);
+        Double tongDoanhSo = billRepository.getTongDoanhSo(account_id, dateStart, dateEnd);
         return tongDoanhSo == null ? 0.0 : tongDoanhSo;
     }
 
     public Double getTongDoanhThu(
             Integer account_id, Date dateStart, Date dateEnd) {
-        Double tongDoanhThu = billRepository.getTongDoanhThu(account_id, dateStart == null ? new Date() : dateStart,
-                dateEnd == null ? new Date() : dateEnd);
+        Double tongDoanhThu = billRepository.getTongDoanhThu(account_id, dateStart, dateEnd);
         return tongDoanhThu == null ? 0.0 : tongDoanhThu;
+    }
+
+    public Integer getTongSoLuotMua(
+            Integer account_id, String search) {
+        Integer tongSoLuotMua = billRepository.tongSoLuotMua(account_id, search);
+        return tongSoLuotMua == null ? 0 : tongSoLuotMua;
+    }
+
+    public Integer getTongSoSP(
+            Integer account_id, String search) {
+        Integer tongSoSP = billRepository.tongSoSP(account_id, search);
+        return tongSoSP == null ? 0 : tongSoSP;
+    }
+
+    public Integer getTongSoLuotDanhGia(
+            Integer account_id, String search) {
+        Integer tongSoLuotDanhGia = billRepository.tongSoLuotDanhGia(account_id, search);
+        return tongSoLuotDanhGia == null ? 0 : tongSoLuotDanhGia;
+    }
+
+    public Double getTongTien(
+            Integer account_id, String search) {
+        Double tongTien = billRepository.tongSotTien(account_id, search);
+        return tongTien == null ? 0.0 : tongTien;
+    }
+
+    public Integer getTongLuotBanSanPham(
+            Integer account_id, String search) {
+        Integer tongLuotBanSanPham = billRepository.tongLuotBanSanPham(account_id, search);
+        return tongLuotBanSanPham == null ? 0 : tongLuotBanSanPham;
+    }
+
+    public Integer getTongLuotDanhGiaSanPham(
+            Integer account_id, String search) {
+        Integer tongLuotDanhGia = billRepository.tongLuotDanhGia(account_id, search);
+        return tongLuotDanhGia == null ? 0 : tongLuotDanhGia;
+    }
+
+    public Integer getTongLuotYeuThichSanPham(
+            Integer account_id, String search) {
+        Integer tongLuotYeuThichSanPham = billRepository.tongLuotYeuThich(account_id, search);
+        return tongLuotYeuThichSanPham == null ? 0 : tongLuotYeuThichSanPham;
+    }
+
+    public Double getTongTrungBinhDanhGiaSanPham(
+            Integer account_id, String search) {
+        Double tongTrungBinhDanhGia = billRepository.tongTrungBinhLuotDanhGia(account_id, search);
+        return tongTrungBinhDanhGia == null ? 0 : tongTrungBinhDanhGia;
     }
 
     public PageImpl<Response_Bill> getListThongKeBill(
             Integer account_id, Date dateStart, Date dateEnd, Integer page, Integer size, boolean sortBy,
             String sortColumn) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
-        Page<Bill> pageBill = billRepository.getListThongKeBill(account_id,
-                dateStart == null ? new Date() : dateStart,
-                dateEnd == null ? new Date() : dateEnd, pageable);
+        Page<Bill> pageBill = billRepository.getListThongKeBill(account_id, dateStart, dateEnd, pageable);
         List<Response_Bill> list = pageBill.stream()
                 .map(bill -> billMapper.response_Bill(bill))
                 .collect(Collectors.toList());
         return new PageImpl<>(list, pageable, pageBill.getTotalElements());
     }
 
-    public PageImpl<Response_ThongKeKhachHang> getListThongKeKhachHang(
-            Integer account_id, Integer page, Integer size, boolean sortBy, String sortColumn) {
+    public PageImpl<Response_ListKhachHang> getListThongKeKhachHang(
+            Integer account_id, Integer page, Integer size, boolean sortBy, String sortColumn, String search) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
-        List<Object[]> results = billRepository.getListThongKeKhachHang(account_id);
-        List<Response_ThongKeKhachHang> pageKhachHang = new ArrayList<>();
-        for (Object[] result : results) {
-            String name = (String) result[0]; // fullname
-            Integer soSanPham = ((Number) result[1]).intValue(); // SUM(bd.quantity)
-            Integer luotMua = ((Number) result[2]).intValue(); // COUNT(b)
-            Integer luotDanhGia = ((Number) result[3]).intValue(); // COUNT(e)
-            double soTien = ((Number) result[4]).doubleValue(); // SUM(b.totalPrice)
+        Page<Object[]> results = billRepository.getListThongKeKhachHang(account_id, search, pageable);
 
-            pageKhachHang.add(new Response_ThongKeKhachHang(name, soSanPham, luotMua, luotDanhGia, soTien));
-        }
+        List<Response_ListKhachHang> pageKhachHang = results.stream().map(result -> {
+            String name = (String) result[0];
+            Integer soSanPham = ((Number) result[1]).intValue();
+            Integer luotMua = ((Number) result[2]).intValue();
+            Integer luotDanhGia = ((Number) result[3]).intValue();
+            double soTien = ((Number) result[4]).doubleValue();
 
-        return new PageImpl<>(pageKhachHang, pageable, results.size());
+            return new Response_ListKhachHang(name, soSanPham, luotMua, luotDanhGia, soTien);
+        }).collect(Collectors.toList());
+
+        return new PageImpl<>(pageKhachHang, pageable, results.getTotalElements());
     }
 
-    public PageImpl<Response_ThongKeSanPham> getListThongKeSanPham(
-            Integer account_id, Integer page, Integer size, boolean sortBy, String sortColumn) {
+    public PageImpl<Response_ListSanPham> getListThongKeSanPham(
+            Integer account_id, Integer page, Integer size, boolean sortBy, String sortColumn, String search) {
+
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
-        List<Object[]> results = billRepository.getListThongKeSanPham(account_id);
-        List<Response_ThongKeSanPham> pageSanPham = new ArrayList<>();
-        for (Object[] result : results) {
-            String name = (String) result[0];
-            String theLoai = (String) result[1];
-            Integer luotBan = ((Number) result[2]).intValue();
-            Integer luotDanhGia = ((Number) result[3]).intValue();;
-            double trungBinhDanhGia = ((Number) result[4]).doubleValue();
-            Integer luotYeuThich = ((Number) result[5]).intValue();
-            pageSanPham.add(
-                    new Response_ThongKeSanPham(name, theLoai, luotBan, luotDanhGia, trungBinhDanhGia, luotYeuThich));
-        }
-        return new PageImpl<>(pageSanPham, pageable, results.size());
+        Page<Object[]> results = billRepository.getListThongKeSanPham(account_id, search, pageable);
+
+        List<Response_ListSanPham> pageSanPham = results.stream().map(result -> {
+            String name = result[0] != null ? (String) result[0] : "";
+            String theLoai = result[1] != null ? (String) result[1] : "";
+            Integer luotBan = result[2] != null ? ((Number) result[2]).intValue() : 0;
+            Integer luotDanhGia = result[3] != null ? ((Number) result[3]).intValue() : 0;
+            double trungBinhDanhGia = (result[4] != null && result[4] instanceof Number)
+                    ? ((Number) result[4]).doubleValue()
+                    : 0.0;
+            Integer luotYeuThich = result[5] != null ? ((Number) result[5]).intValue() : 0;
+
+            return new Response_ListSanPham(name, theLoai, luotBan, luotDanhGia, trungBinhDanhGia, luotYeuThich);
+        }).collect(Collectors.toList());
+
+        return new PageImpl<>(pageSanPham, pageable, results.getTotalElements());
     }
 
 }

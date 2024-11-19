@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         // Public access for login, home, and some user routes
 
-                        .requestMatchers("/api/v1/login", "/api/v1/**", "/api/v1/otp/**").permitAll()
+                        .requestMatchers("/api/v1/login", "/api/v1/**", "/api/v1/otp/**","/user/loginGoogle").permitAll()
 
                         // Product permissions
                         .requestMatchers("/api/v1/product/create").hasRole("CREATE_PRODUCT")
@@ -104,6 +104,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/cart/**").hasAnyRole("ADMIN", "USER"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+
                 .formLogin(form -> form.loginPage("http://localhost:3000/login").permitAll())
                 .logout(logout -> logout.logoutSuccessUrl("http://localhost:3000").deleteCookies("JSESSIONID")
                         .permitAll())

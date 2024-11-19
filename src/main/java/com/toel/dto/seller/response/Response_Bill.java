@@ -1,9 +1,7 @@
 package com.toel.dto.seller.response;
 
 import java.util.Date;
-
-import com.toel.dto.seller.request.Request_Account;
-import com.toel.dto.user.response.Response_OrderStatus;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,8 +19,9 @@ public class Response_Bill {
     Date finishAt;
     Date createAt;
     Date updateAt;
+    List<Response_BillDetail> billDetails;
     Response_OrderStatus orderStatus;
-    Request_Account account;
+    Response_Account account;
     Response_PaymentMethod paymentMethod;
     Response_Address address;
 }

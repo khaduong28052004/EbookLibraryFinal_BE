@@ -26,4 +26,9 @@ public class Response_Account {
     boolean status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", timezone = "UTC")
     Date createAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", timezone = "UTC")
+    Date createAtSeller;
+    String numberId;
+    String beforeIdImage;
+    String afterIdImage;
 }

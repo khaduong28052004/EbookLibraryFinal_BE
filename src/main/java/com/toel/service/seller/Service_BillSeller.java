@@ -48,15 +48,17 @@ public class Service_BillSeller {
     }
 
     public Response_Bill updateOrderStatus(Request_Bill request_Bill) {
-        Bill bill = billMapper.bill(request_Bill);
-        bill.setOrderStatus(orderStatusRepository.findById(bill.getOrderStatus().getId() + 1)
+        Bill bill = billRepository.findById(request_Bill.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Bill"));
+        bill.setOrderStatus(orderStatusRepository.findById(request_Bill.getOrderStatus() + 1)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "OrderStatus")));
         bill.setUpdateAt(new Date());
         return billMapper.response_Bill(billRepository.saveAndFlush(bill));
     }
 
     public Response_Bill huy(Request_Bill request_Bill) {
-        Bill bill = billMapper.bill(request_Bill);
+        Bill bill = billRepository.findById(request_Bill.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Bill"));
         bill.setOrderStatus(orderStatusRepository.findById(6)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "OrderStatus")));
         bill.setUpdateAt(new Date());
@@ -66,19 +68,19 @@ public class Service_BillSeller {
     public String QuantityBillStatus(Integer idOrder, Integer idAccount) {
         try {
             Optional<OrderStatus> orderOptional = orderStatusRepository.findById(idOrder);
-            if (!orderOptional.isPresent()) {   
-                return "0";      // return "Order status not found";
+            if (!orderOptional.isPresent()) {
+                return "0"; // return "Order status not found";
             }
-            OrderStatus order = orderOptional.get();          // Check if Account exists
+            OrderStatus order = orderOptional.get(); // Check if Account exists
             Optional<Account> accountOptional = accountRepository.findById(idAccount);
             if (!accountOptional.isPresent()) {
-                return "0";         // return "Account not found";
+                return "0"; // return "Account not found";
             }
             Account account = accountOptional.get();
             List<Bill> bills = billRepository.findByOrderStatusAndAccount(order, account);
             if (bills.isEmpty()) {
-                return "0";        // return "NULL"; // No bills found for the given criteria
-            } 
+                return "0"; // return "NULL"; // No bills found for the given criteria
+            }
             return Integer.toString(bills.size());// Return the quantity as a string
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());

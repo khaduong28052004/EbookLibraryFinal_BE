@@ -11,6 +11,7 @@ import com.toel.model.Voucher;
 public interface VoucherDetailRepository extends JpaRepository<VoucherDetail, Integer> {
     Page<VoucherDetail> findAllByVoucher(Voucher voucher, Pageable pageable);
 
-    @Query("SELECT vd FROM VoucherDetail vd WHERE vd.voucher.account.id = ?1")
-    Page<VoucherDetail> findAllByVoucherId(Integer voucher_id, Pageable pageable);
+    @Query("SELECT vd FROM VoucherDetail vd WHERE vd.voucher.id = ?1 " +
+            "AND (?2 IS NULL OR vd.account.fullname LIKE CONCAT('%', ?2, '%'))")
+    Page<VoucherDetail> findAllByVoucherId(Integer voucher_id, String search, Pageable pageable);
 }

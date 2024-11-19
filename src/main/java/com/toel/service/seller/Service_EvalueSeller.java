@@ -1,5 +1,6 @@
 package com.toel.service.seller;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +46,7 @@ public class Service_EvalueSeller {
         Evalue evalue = evalueMapper.evalue(request_Evalue);
         evalue.setAccount(accountRepository.findById(request_Evalue.getAccount()).get());
         evalue.setProduct(productRepository.findById(request_Evalue.getProduct()).get());
+        evalue.setCreateAt(new Date());
         return evalueMapper.response_Evalue(evalueRepository.saveAndFlush(evalue));
     }
 }
