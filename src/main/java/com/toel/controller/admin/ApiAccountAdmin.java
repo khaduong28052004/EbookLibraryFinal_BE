@@ -64,13 +64,17 @@ public class ApiAccountAdmin {
     @PostMapping("adminv1")
     public ApiResponse<Response_Account> post(@RequestBody @Valid Request_AccountCreate entity) {
         return ApiResponse.<Response_Account>build()
-                .result(service_Account.create("ADMINV1", entity));
+                .result(service_Account.create("ADMINV1", entity))
+                .message("Thêm nhân viên thành công");
     }
 
     @PutMapping
     public ApiResponse<Response_Account> putStatus(@RequestParam(value = "id", required = false) Integer id) {
+        Response_Account entity = service_Account.updateStatus(id, null);
         return ApiResponse.<Response_Account>build()
-                .result(service_Account.updateStatus(id, null));
+                .result(entity)
+                .message(entity.isStatus() ? "Khôi phục hoạt động thành công"
+                        : "Ngừng hoạt động thành công");
     }
 
     @PutMapping("seller/browse")
@@ -78,7 +82,8 @@ public class ApiAccountAdmin {
             @RequestParam(value = "id", required = false) Integer id,
             @RequestParam(value = "status", required = false) Boolean status) {
         return ApiResponse.<Response_Account>build()
-                .result(service_Account.updateActive(id, status));
+                .result(service_Account.updateActive(id, status))
+                .message(status ? "Duyệt thành công" : "Hủy thành công");
     }
 
     // @DeleteMapping

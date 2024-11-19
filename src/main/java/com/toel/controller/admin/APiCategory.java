@@ -34,23 +34,23 @@ public class APiCategory {
     @Autowired
     CategoryRepository categoryRepository;
 
-    @GetMapping
-    public ApiResponse<PageImpl<Response_Category>> getAll(
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "5") Integer size,
-            @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
-            @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn,
-            @RequestParam(value = "search", required = false) String search) {
-        return ApiResponse.<PageImpl<Response_Category>>build()
-                .result(service_CategorySeller.getAll(page, size, sortBy, sortColumn, search));
-    }
+        @GetMapping
+        public ApiResponse<PageImpl<Response_Category>> getAll(
+                        @RequestParam(value = "page", defaultValue = "0") Integer page,
+                        @RequestParam(value = "size", defaultValue = "5") Integer size,
+                        @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
+                        @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn,
+                        @RequestParam(value = "search", required = false) String search) {
+                return ApiResponse.<PageImpl<Response_Category>>build()
+                                .result(service_CategorySeller.getAll(page, size, sortBy, sortColumn, search));
+        }
 
-    @GetMapping("/getListByIdParent")
-    public ApiResponse<List<Response_Category>> getListByIdParent(
-            @RequestParam(value = "idParent", defaultValue = "0") Integer idParent) {
-        return ApiResponse.<List<Response_Category>>build()
-                .result(service_CategorySeller.getIdParent(idParent));
-    }
+        @GetMapping("/getListByIdParent")
+        public ApiResponse<List<Response_Category>> getListByIdParent(
+                        @RequestParam(value = "idParent", defaultValue = "0") Integer idParent) {
+                return ApiResponse.<List<Response_Category>>build()
+                                .result(service_CategorySeller.getIdParent(idParent));
+        }
 
     @PostMapping
     public ApiResponse<Response_Category> post(
@@ -63,13 +63,13 @@ public class APiCategory {
                 .result(service_CategorySeller.create(request_Category));
     }
 
-    @PutMapping
-    public ApiResponse<Response_Category> put(
-            @RequestBody @Valid Request_CategoryUpdate request_Category) {
-        return ApiResponse.<Response_Category>build()
-                .message("Cập nhật thể loại sản phẩm thành công")
-                .result(service_CategorySeller.update(request_Category));
-    }
+        @PutMapping
+        public ApiResponse<Response_Category> put(
+                        @RequestBody @Valid Request_CategoryUpdate request_Category) {
+                return ApiResponse.<Response_Category>build()
+                                .message("Cập nhật thể loại sản phẩm thành công")
+                                .result(service_CategorySeller.update(request_Category));
+        }
 
     @DeleteMapping
     public ApiResponse<Response_Category> delete(@RequestParam(value = "id", required = false) Integer id) {
