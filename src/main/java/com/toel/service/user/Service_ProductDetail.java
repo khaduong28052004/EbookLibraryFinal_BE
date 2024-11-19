@@ -28,11 +28,14 @@ public class Service_ProductDetail {
 	ProductMaperUser productMaper;
 	@Autowired
 	CategoryRepository categoryRepo;
+	@Autowired
+	FlashSaleService flashSaleService;
 	Response_Product product = new Response_Product();
 	Account seller = new Account();
 
 	public Map<String, Object> getProduct(Integer id_Product) {
 		product = productMaper.productToResponse_Product(productRepo.findById(id_Product).get());
+		product.setFlashSaleDetail(flashSaleService.getFlashSaleDetailForProduct(product.getId()));
 		seller = product.getAccount();
 		Map<String, Object> response = new HashMap<String, Object>();
 		response.put("seller", seller);

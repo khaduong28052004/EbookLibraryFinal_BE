@@ -2,11 +2,9 @@ package com.toel.dto.user.response;
 
 import java.util.Date;
 import java.util.List;
-
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.toel.model.Account;
 import com.toel.model.Category;
+import com.toel.model.FlashSaleDetail;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,7 +29,6 @@ public class Response_Product {
 	float quantityEvalue;
 	List<Response_ImageProduct> imageProducts;
 	Account account;
-
-	Response_FlashSaleDetail response_FlashSaleDetail = null;
+	FlashSaleDetail flashSaleDetail = null;
 
 }

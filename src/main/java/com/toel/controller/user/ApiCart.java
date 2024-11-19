@@ -41,7 +41,7 @@ public class ApiCart {
 		}
 	}
 
-	@RequestMapping("voucheradmin")
+	@RequestMapping("pay/voucheradmin")
 	public ApiResponse<Map<String, Object>> getVoucherAdmin() {
 		return ApiResponse.<Map<String, Object>>build().message("success").result(service_Cart.getVoucherAdmin());
 	}
