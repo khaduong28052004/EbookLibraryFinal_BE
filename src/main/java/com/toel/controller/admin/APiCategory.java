@@ -18,8 +18,6 @@ import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.request.Category.Request_CategoryCreate;
 import com.toel.dto.seller.request.Category.Request_CategoryUpdate;
 import com.toel.dto.seller.response.Response_Category;
-import com.toel.exception.AppException;
-import com.toel.exception.ErrorCode;
 import com.toel.repository.CategoryRepository;
 import com.toel.service.seller.Service_CategorySeller;
 
@@ -55,8 +53,10 @@ public class APiCategory {
     @PostMapping
     public ApiResponse<Response_Category> post(
             @RequestBody @Valid Request_CategoryCreate request_Category) {
-        if (!checkName(request_Category.getName(), request_Category.getIdParent())) {
-            throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Tên");
+        if (!checkName(request_Category.getName())) {
+            return ApiResponse.<Response_Category>build()
+                    .code(2002)
+                    .message("Tên đã tồn tại");
         }
         return ApiResponse.<Response_Category>build()
                 .message("Thêm thể loại thành công")
@@ -66,6 +66,11 @@ public class APiCategory {
     @PutMapping
     public ApiResponse<Response_Category> put(
             @RequestBody @Valid Request_CategoryUpdate request_Category) {
+        if (!checkNameUpdate(request_Category.getName(), request_Category.getId())) {
+            return ApiResponse.<Response_Category>build()
+                    .code(2002)
+                    .message("Tên đã tồn tại");
+        }
         return ApiResponse.<Response_Category>build()
                 .message("Cập nhật thể loại sản phẩm thành công")
                 .result(service_CategorySeller.update(request_Category));
@@ -75,7 +80,6 @@ public class APiCategory {
     public ApiResponse<Response_Category> delete(@RequestParam(value = "id", required = false) Integer id) {
         Integer count = categoryRepository.findALlByIdParent(id).size();
         if (count > 0) {
-            // throw new AppException(ErrorCode.OBJECT_ACTIVE, "Danh mục");
             return ApiResponse.<Response_Category>build()
                     .code(2003)
                     .message("Danh mục đang hoạt động");
@@ -85,16 +89,16 @@ public class APiCategory {
                 .message("Xóa thành công");
     }
 
-    private Boolean checkName(String name, Integer idParent) {
-        return categoryRepository.findALlByIdParent(idParent)
+    private Boolean checkName(String name) {
+        return categoryRepository.findALlByIdParent(0)
                 .stream()
                 .noneMatch(category -> category.getName().equalsIgnoreCase(name));
     }
 
-    // private Boolean checkNameUpdate(String name, Integer id) {
-    //     for (Category entity : categoryRepository.findALlByIdParent(0)) {
-            
-    //     }
-    // }
+    private Boolean checkNameUpdate(String name, Integer id) {
+        return categoryRepository.findALlByIdParent(0)
+                .stream()
+                .noneMatch(entity -> entity.getName().equalsIgnoreCase(name) && entity.getId() != id);
+    }
 
 }

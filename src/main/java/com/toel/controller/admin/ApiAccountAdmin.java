@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.admin.request.Account.Request_AccountCreate;
 import com.toel.dto.admin.response.Response_Account;
+import com.toel.dto.seller.response.Response_Category;
+import com.toel.repository.AccountRepository;
 import com.toel.service.admin.Service_Account;
 
 import jakarta.validation.Valid;
@@ -25,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class ApiAccountAdmin {
     @Autowired
     Service_Account service_Account;
+    @Autowired
+    AccountRepository accountRepository;
 
     @GetMapping
     public ApiResponse<PageImpl<?>> getAll(
@@ -63,30 +67,56 @@ public class ApiAccountAdmin {
 
     @PostMapping("adminv1")
     public ApiResponse<Response_Account> post(@RequestBody @Valid Request_AccountCreate entity) {
+        String message = checkName(entity.getUsername(), entity.getPhone(), entity.getEmail());
+        if (message != null) {
+            return ApiResponse.<Response_Account>build()
+                    .code(2002)
+                    .message(message);
+        }
         return ApiResponse.<Response_Account>build()
-                .result(service_Account.create("ADMINV1", entity));
+                .result(service_Account.create("ADMINV1", entity))
+                .message("Thêm nhân viên thành công");
     }
 
     @PutMapping
     public ApiResponse<Response_Account> putStatus(@RequestParam(value = "id", required = false) Integer id) {
+        Response_Account entity = service_Account.updateStatus(id, null);
         return ApiResponse.<Response_Account>build()
-                .result(service_Account.updateStatus(id, null));
+                .result(entity)
+                .message(entity.isStatus() ? "Khôi phục hoạt động thành công"
+                        : "Ngừng hoạt động thành công");
     }
 
     @PutMapping("seller/browse")
     public ApiResponse<Response_Account> putActive(
             @RequestParam(value = "id", required = false) Integer id,
             @RequestParam(value = "status", required = false) Boolean status) {
+        Response_Account entity = service_Account.updateActive(id, status);
         return ApiResponse.<Response_Account>build()
-                .result(service_Account.updateActive(id, status));
+                .message(entity.isStatus() ? "Duyệt thành công" : "Hủy thành công")
+                .result(entity);
     }
 
+    private String checkName(String name, String sdt, String email) {
+        boolean checkName = accountRepository.existsByUsernameIgnoreCase(name);
+        boolean checkPhone = accountRepository.existsByPhoneIgnoreCase(sdt);
+        boolean checkEmail = accountRepository.existsByEmailIgnoreCase(email);
+        if (!checkName) {
+            return "Tài khoản đã tồn tại";
+        } else if (!checkPhone) {
+            return "Số điện thoại đã tồn tại";
+        } else if (!checkEmail) {
+            return "Email đã tồn tại";
+        } else {
+            return null;
+        }
+    }
     // @DeleteMapping
     // public ApiResponse<Response_Account> delete(
-    //         @RequestParam(value = "id", required = false) Integer id) {
-    //     service_Account.updateStatus(id, false);
-    //     return ApiResponse.<Response_Account>build()
-    //             .message("Xóa nhân viên thành công");
+    // @RequestParam(value = "id", required = false) Integer id) {
+    // service_Account.updateStatus(id, false);
+    // return ApiResponse.<Response_Account>build()
+    // .message("Xóa nhân viên thành công");
     // }
 
 }
