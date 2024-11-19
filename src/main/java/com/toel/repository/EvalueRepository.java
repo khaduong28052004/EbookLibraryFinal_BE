@@ -12,7 +12,6 @@ import org.springframework.data.repository.query.Param;
 import com.toel.model.Account;
 import com.toel.model.Evalue;
 import com.toel.model.Product;
-import com.toel.model.Account;
 
 public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
 
@@ -32,14 +31,6 @@ public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
 	List<Evalue> findAllByProduct(Product product);
 
 	Integer countByProduct(Product product);
-
-	@Query("SELECT p FROM Product p WHERE p.id IN (SELECT DISTINCT e.product.id FROM Evalue e WHERE e.createAt BETWEEN :dateStart AND :dateEnd )")
-	Page<Product> sellectAll(@Param("dateStart") Date dateStart,
-			@Param("dateEnd") Date dateEnd, Pageable pageable);
-
-	@Query("SELECT p FROM Product p WHERE p.id IN (SELECT DISTINCT e.product.id FROM Evalue e WHERE e.createAt BETWEEN :dateStart AND :dateEnd AND (:key iS NULL OR e.product.name LIKE %:key% OR e.product.introduce LIKE %:key% OR e.product.writerName LIKE %:key% OR e.product.publishingCompany LIKE %:key%))")
-	Page<Product> sellectAllByCreateAt(@Param("key") String key, @Param("dateStart") Date dateStart,
-			@Param("dateEnd") Date dateEnd, Pageable pageable);
 
 	@Query("SELECT p FROM Product p WHERE p.id IN (SELECT DISTINCT e.product.id FROM Evalue e WHERE e.createAt BETWEEN :dateStart AND :dateEnd )")
 	List<Product> sellectAll(@Param("dateStart") Date dateStart,

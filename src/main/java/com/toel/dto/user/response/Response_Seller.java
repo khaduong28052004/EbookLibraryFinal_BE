@@ -3,14 +3,7 @@ package com.toel.dto.user.response;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.hibernate.annotations.Nationalized;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.toel.model.Voucher;
-
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

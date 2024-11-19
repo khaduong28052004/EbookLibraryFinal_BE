@@ -20,7 +20,7 @@ public class Response_AccountReport {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", timezone = "UTC")
     Date resolve_at;
     String content;
-    Response_TK_Seller shop_id;
+    Response_TK_Seller shop;
     int parent_id;
     Response_Account account;
 }

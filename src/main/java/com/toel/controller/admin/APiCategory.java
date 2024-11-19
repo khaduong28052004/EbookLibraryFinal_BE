@@ -18,6 +18,9 @@ import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.request.Category.Request_CategoryCreate;
 import com.toel.dto.seller.request.Category.Request_CategoryUpdate;
 import com.toel.dto.seller.response.Response_Category;
+import com.toel.exception.AppException;
+import com.toel.exception.ErrorCode;
+import com.toel.repository.CategoryRepository;
 import com.toel.service.seller.Service_CategorySeller;
 
 import jakarta.validation.Valid;
@@ -28,6 +31,8 @@ import jakarta.validation.Valid;
 public class APiCategory {
     @Autowired
     Service_CategorySeller service_CategorySeller;
+    @Autowired
+    CategoryRepository categoryRepository;
 
     @GetMapping
     public ApiResponse<PageImpl<Response_Category>> getAll(
@@ -40,16 +45,19 @@ public class APiCategory {
                 .result(service_CategorySeller.getAll(page, size, sortBy, sortColumn, search));
     }
 
-//    @GetMapping("/getListByIdParent")
-//    public ApiResponse<List<Response_Category>> getListByIdParent(
-//            @RequestParam(value = "idParent", defaultValue = "0") Integer idParent) {
-//        return ApiResponse.<List<Response_Category>>build()
-//                .result(service_CategorySeller.getIdParent(idParent));
-//    }
+    @GetMapping("/getListByIdParent")
+    public ApiResponse<List<Response_Category>> getListByIdParent(
+            @RequestParam(value = "idParent", defaultValue = "0") Integer idParent) {
+        return ApiResponse.<List<Response_Category>>build()
+                .result(service_CategorySeller.getIdParent(idParent));
+    }
 
     @PostMapping
     public ApiResponse<Response_Category> post(
             @RequestBody @Valid Request_CategoryCreate request_Category) {
+        if (!checkName(request_Category.getName(), request_Category.getIdParent())) {
+            throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Tên");
+        }
         return ApiResponse.<Response_Category>build()
                 .message("Thêm thể loại thành công")
                 .result(service_CategorySeller.create(request_Category));
@@ -65,8 +73,28 @@ public class APiCategory {
 
     @DeleteMapping
     public ApiResponse<Response_Category> delete(@RequestParam(value = "id", required = false) Integer id) {
+        Integer count = categoryRepository.findALlByIdParent(id).size();
+        if (count > 0) {
+            // throw new AppException(ErrorCode.OBJECT_ACTIVE, "Danh mục");
+            return ApiResponse.<Response_Category>build()
+                    .code(2003)
+                    .message("Danh mục đang hoạt động");
+        }
         service_CategorySeller.delete(id);
         return ApiResponse.<Response_Category>build()
                 .message("Xóa thành công");
     }
+
+    private Boolean checkName(String name, Integer idParent) {
+        return categoryRepository.findALlByIdParent(idParent)
+                .stream()
+                .noneMatch(category -> category.getName().equalsIgnoreCase(name));
+    }
+
+    // private Boolean checkNameUpdate(String name, Integer id) {
+    //     for (Category entity : categoryRepository.findALlByIdParent(0)) {
+            
+    //     }
+    // }
+
 }

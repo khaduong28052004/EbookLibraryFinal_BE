@@ -14,7 +14,6 @@ import com.toel.service.admin.Service_Account;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -42,7 +41,7 @@ public class ApiAccountAdmin {
         } else if (role.equalsIgnoreCase("user")) {
             pageImpl = service_Account.getAll("USER", search, gender, page, size, sortBy, sortColumn);
         } else if (role.equalsIgnoreCase("seller")) {
-            pageImpl = service_Account.getAll("SELLER", search, gender, page, size, sortBy, sortColumn);
+            pageImpl = service_Account.getAllSeller("SELLER", search, gender, page, size, sortBy, sortColumn);
         } else {
             pageImpl = null;
         }
@@ -82,12 +81,12 @@ public class ApiAccountAdmin {
                 .result(service_Account.updateActive(id, status));
     }
 
-    @DeleteMapping
-    public ApiResponse<Response_Account> delete(
-            @RequestParam(value = "id", required = false) Integer id) {
-        service_Account.updateStatus(id, false);
-        return ApiResponse.<Response_Account>build()
-                .message("Xóa nhân viên thành công");
-    }
+    // @DeleteMapping
+    // public ApiResponse<Response_Account> delete(
+    //         @RequestParam(value = "id", required = false) Integer id) {
+    //     service_Account.updateStatus(id, false);
+    //     return ApiResponse.<Response_Account>build()
+    //             .message("Xóa nhân viên thành công");
+    // }
 
 }

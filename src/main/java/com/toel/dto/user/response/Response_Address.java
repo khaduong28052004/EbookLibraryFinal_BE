@@ -1,7 +1,5 @@
 package com.toel.dto.user.response;
 
-import org.hibernate.annotations.Nationalized;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

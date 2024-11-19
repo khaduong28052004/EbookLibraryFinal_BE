@@ -41,8 +41,6 @@ public class Service_ThongKe_DonHang {
                                 Sort.by(sortBy ? Sort.Direction.DESC : Sort.Direction.ASC, sortColumn));
                 Date finalDateStart = getDateStart(dateStart);
                 Date finalDateEnd = getDateEnd(dateEnd);
-                // System.out.println("Ngày bắt đầu: " + finalDateStart);
-                // System.out.println("Ngày Kết thúc: " + finalDateEnd);
                 Page<Bill> pageBill;
                 OrderStatus orderStatus = (orderStatusId != null) ? orderStatusRepository.findById(orderStatusId)
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Trạng thái")) : null;

@@ -1,8 +1,6 @@
 package com.toel.service.seller;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -11,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.toel.dto.seller.request.ImageProduct.Request_ImageProduct;
 import com.toel.mapper.ProductMapper;
 import com.toel.model.ImageProduct;
 import com.toel.model.Product;
