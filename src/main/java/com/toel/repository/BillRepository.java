@@ -82,7 +82,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	// Home Seller
 
-	@Query("SELECT COUNT(b) FROM Bill b JOIN b.billDetails bd WHERE b.orderStatus.id = 1 AND bd.product.account.id = ?1")
+	@Query("SELECT COUNT(b.id) FROM Bill b JOIN b.billDetails bd WHERE b.orderStatus.id = 1 AND bd.product.account.id = ?1 GROUP By b.id")
 	Integer getDonChoDuyet(Integer account_id);
 
 	@Query("SELECT SUM(b.totalPrice) FROM Bill b JOIN b.billDetails bd WHERE b.finishAt = CURRENT_DATE AND bd.product.account.id = ?1 ")

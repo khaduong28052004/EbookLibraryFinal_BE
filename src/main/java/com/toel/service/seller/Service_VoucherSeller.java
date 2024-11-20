@@ -119,4 +119,21 @@ public class Service_VoucherSeller {
                 return request_VoucherCreate;
         }
 
+        public Request_VoucherUpdate checkVoucherUpdate(Request_VoucherUpdate request_VoucherUpdate) {
+                boolean nameExists = voucherRepository.findAllListByIdAccount(request_VoucherUpdate.getAccount())
+                                .stream()
+                                .anyMatch(voucherCheck -> request_VoucherUpdate.getName()
+                                                .equalsIgnoreCase(voucherCheck.getName())
+                                                && !request_VoucherUpdate
+                                                                .getId().equals(voucherCheck.getId()));
+                if (nameExists) {
+                        throw new AppException(ErrorCode.OBJECT_SETUP, "Tên voucher đã tồn tại");
+                }
+
+                if (request_VoucherUpdate.getDateStart().after(request_VoucherUpdate.getDateEnd())) {
+                        throw new AppException(ErrorCode.OBJECT_SETUP, "Ngày bắt đầu không thể lớn hơn ngày kết thúc");
+                }
+                return request_VoucherUpdate;
+        }
+
 }
