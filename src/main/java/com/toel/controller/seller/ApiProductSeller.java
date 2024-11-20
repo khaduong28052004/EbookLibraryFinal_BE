@@ -58,7 +58,8 @@ public class ApiProductSeller {
                         @RequestBody @Valid Request_ProductCreate request_Product) throws IOException {
                 return ApiResponse.<Response_Product>build()
                                 .message("Thêm sản phẩm thành công")
-                                .result(service_ProductSeller.create(request_Product));
+                                .result(service_ProductSeller
+                                                .create(service_ProductSeller.checkCreate(request_Product)));
         }
 
         @PostMapping("/update")
@@ -66,7 +67,8 @@ public class ApiProductSeller {
                         @RequestBody @Valid Request_ProductUpdate request_Product) throws IOException {
                 return ApiResponse.<Response_Product>build()
                                 .message("Cập nhật sản phẩm thành công")
-                                .result(service_ProductSeller.update(request_Product));
+                                .result(service_ProductSeller
+                                                .update(service_ProductSeller.checkUpdate(request_Product)));
         }
 
         @PostMapping("/create/saveImg")

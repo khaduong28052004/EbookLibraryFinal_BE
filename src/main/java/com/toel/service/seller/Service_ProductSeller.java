@@ -104,7 +104,7 @@ public class Service_ProductSeller {
                                 });
         }
 
-        public void checkCreate(Product product) {
+        public Request_ProductCreate checkCreate(Request_ProductCreate request_ProductCreate) {
 
                 if (productRepository.findAll().stream()
                                 .anyMatch(productCheck -> product.getName().equalsIgnoreCase(productCheck.getName()))) {
@@ -116,9 +116,10 @@ public class Service_ProductSeller {
                                         : "Giá sản phẩm phải lớn hơn giá giảm.";
                         throw new AppException(ErrorCode.OBJECT_SETUP, message);
                 }
+                return request_ProductCreate;
         }
 
-        public void checkUpdate(Product product) {
+        public Request_ProductUpdate checkUpdate(Request_ProductUpdate request_ProductUpdate) {
 
                 if (productRepository.findAll().stream()
                                 .anyMatch(productCheck -> !product.getId().equals(productCheck.getId())
@@ -131,5 +132,6 @@ public class Service_ProductSeller {
                                         : "Giá sản phẩm phải lớn hơn giá giảm.";
                         throw new AppException(ErrorCode.OBJECT_SETUP, message);
                 }
+                return request_ProductUpdate;
         }
 }
