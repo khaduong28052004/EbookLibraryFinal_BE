@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.admin.request.Account.Request_AccountCreate;
 import com.toel.dto.admin.response.Response_Account;
-import com.toel.dto.seller.response.Response_Category;
+import com.toel.exception.AppException;
+import com.toel.exception.ErrorCode;
 import com.toel.repository.AccountRepository;
 import com.toel.service.admin.Service_Account;
 
@@ -69,9 +70,7 @@ public class ApiAccountAdmin {
     public ApiResponse<Response_Account> post(@RequestBody @Valid Request_AccountCreate entity) {
         String message = checkName(entity.getUsername(), entity.getPhone(), entity.getEmail());
         if (message != null) {
-            return ApiResponse.<Response_Account>build()
-                    .code(2002)
-                    .message(message);
+            throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, message);
         }
         return ApiResponse.<Response_Account>build()
                 .result(service_Account.create("ADMINV1", entity))
@@ -101,12 +100,12 @@ public class ApiAccountAdmin {
         boolean checkName = accountRepository.existsByUsernameIgnoreCase(name);
         boolean checkPhone = accountRepository.existsByPhoneIgnoreCase(sdt);
         boolean checkEmail = accountRepository.existsByEmailIgnoreCase(email);
-        if (!checkName) {
-            return "Tài khoản đã tồn tại";
-        } else if (!checkPhone) {
-            return "Số điện thoại đã tồn tại";
-        } else if (!checkEmail) {
-            return "Email đã tồn tại";
+        if (checkName) {
+            return "Tài khoản";
+        } else if (checkPhone) {
+            return "Số điện thoại";
+        } else if (checkEmail) {
+            return "Email";
         } else {
             return null;
         }

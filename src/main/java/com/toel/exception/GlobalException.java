@@ -37,7 +37,8 @@ public class GlobalException {
                 Map<String, Object> attributes = violation.getConstraintDescriptor().getAttributes();
                 if (attributes.containsKey("value")) {
                     String value = attributes.get("value").toString();
-                    if (enumString.equalsIgnoreCase("FIELD_MIN_VALUE")) {
+                    if (enumString.equalsIgnoreCase("FIELD_MIN_VALUE")
+                            || enumString.equalsIgnoreCase("FIELD_MIN_KEY")) {
                         formattedMessage = formattedMessage.replace("{min}", value);
                     } else if (enumString.equalsIgnoreCase("FIELD_MAX_VALUE")) {
                         formattedMessage = formattedMessage.replace("{max}", value);
