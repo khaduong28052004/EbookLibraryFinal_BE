@@ -2,8 +2,11 @@ package com.toel.service.user;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.toel.dto.user.response.Response_Evalue;
 import com.toel.dto.user.response.Response_Product;
 import com.toel.mapper.user.ProductMaperUser;
 import com.toel.model.Account;
@@ -36,6 +40,27 @@ public class Service_ProductDetail {
 	public Map<String, Object> getProduct(Integer id_Product) {
 		product = productMaper.productToResponse_Product(productRepo.findById(id_Product).get());
 		product.setFlashSaleDetail(flashSaleService.getFlashSaleDetailForProduct(product.getId()));
+		List<Response_Evalue> evalues = new ArrayList<>();
+		Set<Integer> idEvalues = new HashSet<>(); // Sử dụng Set để tránh trùng lặp ID
+
+		if (product.getEvalues() != null) { // Kiểm tra null
+			for (Response_Evalue item : product.getEvalues()) {
+				if (!idEvalues.contains(item.getId())) {
+					evalues.add(item); // Thêm item vào danh sách kết quả
+					idEvalues.add(item.getId()); // Lưu ID để tránh trùng lặp
+
+					// Tìm các item con (idParent khớp với ID của item)
+					for (Response_Evalue item2 : product.getEvalues()) {
+						if (item2.getIdParent() == item.getId() && !idEvalues.contains(item2.getId())) {
+							evalues.add(item2); // Thêm item con
+							idEvalues.add(item2.getId()); // Đánh dấu ID của item con
+						}
+					}
+				}
+			}
+		}
+
+		product.setEvalues(evalues);
 		seller = product.getAccount();
 		Map<String, Object> response = new HashMap<String, Object>();
 		response.put("seller", seller);
