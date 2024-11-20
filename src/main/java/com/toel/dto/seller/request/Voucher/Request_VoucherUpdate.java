@@ -23,6 +23,8 @@ public class Request_VoucherUpdate {
     @NotBlank(message = "FIELD_REQUIRED")
     String note;
     @NotNull(message = "FIELD_REQUIRED")
+    double minOrder;
+    @NotNull(message = "FIELD_REQUIRED")
     double totalPriceOrder;
     @NotNull(message = "FIELD_REQUIRED")
     double sale;

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.toel.model.DiscountRate;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DiscountRateRepository extends JpaRepository<DiscountRate, Integer> {
@@ -28,4 +29,5 @@ public interface DiscountRateRepository extends JpaRepository<DiscountRate, Inte
 	@Query("SELECT r FROM DiscountRate r WHERE ?1 < r.dateStart AND ?1 != r.dateDelete")
 	DiscountRate find(LocalDateTime now);
 
+	Optional<DiscountRate> findTopByOrderByIdDesc();
 }

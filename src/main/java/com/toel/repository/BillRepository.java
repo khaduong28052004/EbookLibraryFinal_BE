@@ -82,7 +82,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	// Home Seller
 
-	@Query("SELECT COUNT(b) FROM Bill b JOIN b.billDetails bd WHERE b.orderStatus.id = 1 AND bd.product.account.id = ?1")
+	@Query("SELECT COUNT(b.id) FROM Bill b JOIN b.billDetails bd WHERE b.orderStatus.id = 1 AND bd.product.account.id = ?1 GROUP By b.id")
 	Integer getDonChoDuyet(Integer account_id);
 
 	@Query("SELECT SUM(b.totalPrice) FROM Bill b JOIN b.billDetails bd WHERE b.finishAt = CURRENT_DATE AND bd.product.account.id = ?1 ")
@@ -176,7 +176,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			@Param("search") String search,
 			Pageable pageable);
 
-	@Query("SELECT SUM(bd.quantity) FROM Bill b JOIN b.billDetails bd JOIN bd.product p WHERE bd.product.account.id = :accountId AND (:search IS NULL OR p.name LIKE %:search%)")
+	@Query("SELECT SUM(b.totalQuantity) FROM Bill b JOIN b.billDetails bd JOIN bd.product p WHERE p.account.id = :accountId AND (:search IS NULL OR p.name LIKE %:search%) ")
 	Integer tongLuotBanSanPham(@Param("accountId") Integer account_id, @Param("search") String search);
 
 	@Query("SELECT COUNT(bd.evalue.id) FROM Bill b JOIN b.billDetails bd JOIN bd.product p WHERE bd.product.account.id = :accountId AND (:search IS NULL OR p.name LIKE %:search%)")
@@ -188,7 +188,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	@Query("SELECT AVG(bd.evalue.star) FROM Bill b JOIN b.billDetails bd JOIN bd.product p WHERE bd.product.account.id = :accountId AND (:search IS NULL OR p.name LIKE %:search%) ")
 	Double tongTrungBinhLuotDanhGia(@Param("accountId") Integer account_id, @Param("search") String search);
 
-	@Query("SELECT p.name AS nameSP , c.name AS theLoai, SUM(bd.quantity) AS luotBan, COUNT(e.id) AS luotDanhGia, AVG(e.star) AS trungBinhDanhGia, COUNT(l.id) AS luotYeuThich "
+	@Query("SELECT p.name AS nameSP , c.name AS theLoai, SUM(b.totalQuantity) AS luotBan, COUNT(e.id) AS luotDanhGia, AVG(e.star) AS trungBinhDanhGia, COUNT(l.id) AS luotYeuThich "
 			+
 			"FROM Bill b JOIN b.billDetails bd " +
 			"LEFT JOIN bd.evalue e LEFT JOIN bd.product.likes l " +

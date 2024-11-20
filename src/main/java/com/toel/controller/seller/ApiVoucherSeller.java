@@ -54,7 +54,7 @@ public class ApiVoucherSeller {
                         @RequestBody @Valid Request_VoucherUpdate request_Voucher) {
                 return ApiResponse.<Response_Voucher>build()
                                 .message("Cập nhật voucher thành công")
-                                .result(service_Voucher.update(request_Voucher));
+                                .result(service_Voucher.update(service_Voucher.checkVoucherUpdate(request_Voucher)));
         }
 
         @GetMapping("edit")

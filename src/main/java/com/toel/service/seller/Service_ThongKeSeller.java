@@ -18,6 +18,7 @@ import com.toel.dto.seller.response.Response_ListKhachHang;
 import com.toel.dto.seller.response.Response_ListSanPham;
 import com.toel.mapper.BillMapper;
 import com.toel.model.Bill;
+import com.toel.model.DiscountRate;
 import com.toel.repository.BillRepository;
 import com.toel.repository.DiscountRateRepository;
 
@@ -31,8 +32,9 @@ public class Service_ThongKeSeller {
     BillMapper billMapper;
 
     public Integer getChietKhau() {
-        Integer chietKhau = discountRateRepository.getChietKhau();
-        return chietKhau == null ? 0 : chietKhau;
+        return discountRateRepository.findTopByOrderByIdDesc()
+                .map(DiscountRate::getDiscount)
+                .orElse(0);
     }
 
     public Double getTongDoanhSo(
