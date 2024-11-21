@@ -20,13 +20,14 @@ public class TemplateBuilder {
 
     private static String DangkyV2Template(String... data) {
         // HTML for success email template
-        String fullname  = data.length > 0 ? data[0] : "User"; // Optional data handling for username
+        String fullname = data.length > 0 ? data[0] : "User"; // Optional data handling for username
         String phone = data.length > 0 ? data[1] : "User"; // Optional data handling for username
         String email = data.length > 0 ? data[2] : "User"; // Optional data handling for username
-        String username  = data.length > 0 ? data[3] : "User"; // Optional data handling for username
+        String username = data.length > 0 ? data[3] : "User"; // Optional data handling for username
         String password = data.length > 0 ? data[4] : "User"; // Optional data handling for username
-        String link = data.length > 1 ? data[5] : "http://localhost:8080/api/v2/user/registerv_1"; // Optional data handling
-        String otp = data.length > 0 ? data[6]:"";
+        String link = data.length > 1 ? data[5] : "http://localhost:8080/api/v2/user/registerv_1"; // Optional data
+                                                                                                   // handling
+        String otp = data.length > 0 ? data[6] : "";
         String form = "<!DOCTYPE html>\r\n" +
                 "<html lang=\"vi\">\r\n" +
                 "<head>\r\n" +
@@ -89,15 +90,15 @@ public class TemplateBuilder {
                 " <p>Mật khẩu của bạn đã được thay đổi thành công. Bạn có thể đăng nhập lại và sử dụng tài khoản của mình bình thường.</p>\r\n"
                 +
 
-                "<form action=\'"+link+"' method=\"POST\">\r\n" + //
+                "<form action=\'" + link + "' method=\"POST\">\r\n" + //
                 "    <!-- OTP -->\r\n" + //
-                // "    <input type=\"hidden\" name=\"otp\" value='"+otp+"' />\r\n" + //
+                // " <input type=\"hidden\" name=\"otp\" value='"+otp+"' />\r\n" + //
                 "    <!-- Dữ liệu cứng -->\r\n" + //
-                "    <input type=\"text\" name=\"email\" value='"+email+"' />\r\n" + //
-                "    <input type=\"text\" name=\"phone\" value='"+phone+"' />\r\n" + //
-                "    <input type=\"text\" name=\"fullname\" value='"+fullname+"'\" />\r\n" + //
-                "    <input type=\"text\" name=\"username\" value='"+username+"' />\r\n" + //
-                "    <input type=\"password\" name=\"password\" value='"+password+"' />\r\n" + //
+                "    <input type=\"text\" name=\"email\" value='" + email + "' />\r\n" + //
+                "    <input type=\"text\" name=\"phone\" value='" + phone + "' />\r\n" + //
+                "    <input type=\"text\" name=\"fullname\" value='" + fullname + "'\" />\r\n" + //
+                "    <input type=\"text\" name=\"username\" value='" + username + "' />\r\n" + //
+                "    <input type=\"password\" name=\"password\" value='" + password + "' />\r\n" + //
                 "    <!-- Nút xác nhận -->\r\n" + //
                 "    <button type=\"submit\" style=\"background-color: #4CAF50; color: white;\">\r\n" + //
                 "        Xác nhận đăng ký\r\n" + //
@@ -276,13 +277,8 @@ public class TemplateBuilder {
                 " <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản của mình. Dưới đây là mã OTP để xác nhận quá trình này:</p>\r\n"
                 +
                 " <div class=\"otp-box\">Mã OTP của bạn là: [" + otp
-                + "] >>><a href='https://www.w3schools.com'>Đổi mật khẩu ngay!</a></div>\r\n" +
+                + "] >>><a href='" + link + "'>Đổi mật khẩu ngay!</a></div>\r\n" +
                 " <p>Xin vui lòng nhập mã này vào trang đặt lại mật khẩu để tiếp tục quá trình đặt lại mật khẩu.</p>\r\n"
-                +
-                "<a href='https://www.w3schools.com'>Đổi mật khẩu ngay!</a>"
-                +
-                "<a href='" + link + "'>Đổi mật khẩu ngay!</a>"
-                + " lỏ nè" + link
                 +
                 " <p>Lưu ý rằng mã OTP sẽ hết hạn sau 1 phút kể từ lúc nhận được mail.</p>\r\n" +
                 " <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>\r\n" +

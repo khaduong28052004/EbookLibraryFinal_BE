@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 // import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 // import org.springframework.web.server.ResponseStatusException;
 
@@ -150,7 +151,21 @@ public class ApiController {
 
     @GetMapping("/api/v1/flashsale/create")
     public String falshsale() {
-        return "oke create flashsale";
+        return "";
+    }
+
+    @GetMapping("/api/v1/re")
+    public ResponseEntity<?> renewToken(@RequestHeader("Authorization") String token) {
+        String actualToken = token.replace("Bearer ", "");
+        System.out.println(actualToken);
+        Map<String, Object> map = new HashMap<>(); // Information to include in the new JWT
+        if (jwtService.isTokenExpired(actualToken)) {
+            String username = jwtService.extractUsername(actualToken);
+            String newToken = jwtService.GenerateToken(username, map);
+            return ResponseEntity.ok(newToken);
+        }
+
+        return ResponseEntity.noContent().build(); // Không cần gia hạn
     }
 
     @PostMapping("/api/v1/user/token")
@@ -158,14 +173,43 @@ public class ApiController {
         String accessToken = entity.getAccessToken();
         if (!jwtService.isTokenExpired(accessToken)) {
             String username = jwtService.extractUsername(accessToken);
+            Account account = accountRepository.findByUsername(username);
             System.out.println(username);
             Map<String, Object> map = new HashMap<>(); // Information to include in the new JWT
             String newToken = jwtService.GenerateToken(username, map); // Generate a new token
             System.out.println("Generated Token: " + newToken);
             System.out.println("t o ke=====:" + jwtService.isTokenExpired(accessToken));
-            return ResponseEntity.ok(newToken);
+            //
+
+            Role role = account.getRole();
+            List<RolePermission> permissions = rolesPermissionRepository.findByRole(role); // Ensure this retrieves
+
+            List<PermissionDTO> dtos = permissions.stream()
+                    .map(pr -> new PermissionDTO(
+                            pr.getId(),
+                            pr.getPermission().getDescription(),
+                            pr.getPermission().getCotSlug()))
+                    .collect(Collectors.toList());
+
+            // Map<String, Object> map = new HashMap<>(); // Infor mation to include in the
+            // JWT
+            String token = jwtService.GenerateToken(account.getUsername(), map);
+            System.out.println("Generated Token: " + token); // Debugging log
+
+            // Return the JWT response
+            return ResponseEntity.ok(JwtResponseDTO.builder()
+                    .accessToken(token)
+                    .username(account.getUsername())
+                    .id_account(account.getId())
+                    .avatar(null)
+                    .roles(role.getName())
+                    .Permission(dtos)
+                    .fullname(account.getFullname())
+                    .avatar(account.getAvatar())
+                    .build());
+            // return ResponseEntity.ok(newToken);
         } else {
-            return ResponseEntity.ok("lỗi");
+            return ResponseEntity.badRequest().body("đã hết hạn");
         }
     }
 
@@ -206,6 +250,126 @@ public class ApiController {
         }
     }
 
+
+    // @PostMapping("/user/loginGoogle1")
+    // public ResponseEntity<?> AuthGG(@RequestBody Account entity, @RequestParam String acctoken) {
+    //     String email = entity.getEmail();
+    //     Account account = accountRepository.findByEmail(email);
+
+    //     if (account != null) {
+    //         // Decode the acctoken
+    //         String decodedToken = decodeAccessToken(acctoken);
+
+    //         // You might want to verify the token here
+    //         if (!verifyGoogleToken(decodedToken)) {
+    //             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Google token");
+    //         }
+
+    //         Map<String, Object> claims = new HashMap<>();
+    //         claims.put("email", email);
+    //         // Add more claims as needed
+
+    //         String token = jwtService.GenerateToken(account.getUsername(), claims);
+    //         System.out.println("Generated Token: " + token); // Debugging log
+
+    //         // List<Permission> permissionList = permissionRepository.findAll();
+    //         // List<PermissionDTO> permissionDTOList = permissionList.stream()
+    //         // .map(this::convertToPermissionDTO)
+    //         // .collect(Collectors.toList());
+
+    //         // List<Permission> list1List = permissionRepository.findAll();
+    //         // List<PermissionDTO> permissionDTOList = new ArrayList();
+    //         // PermissionDTO per = new PermissionDTO();
+    //         // for (Permission iterable_element : list1List) {
+    //         //     // per.setId(null);
+    //         //     per.getId();
+    //         //     per.getCotSlug();
+    //         //     per.getDescription();
+    //         //     permissionDTOList.add(per);
+    //         // }
+
+    //         // return ResponseEntity.ok(JwtResponseDTO.builder()
+    //         //         .accessToken(token)
+    //         //         .username(account.getUsername())
+    //         //         .id_account(account.getId())
+    //         //         .avatar(account.getAvatar())
+    //         //         .roles("USER") // You might want to fetch actual roles
+    //         //         .Permission(permissionDTOList)
+    //         //         .build());
+
+    //         Role role = account.getRole();
+    //         List<RolePermission> permissions = rolesPermissionRepository.findByRole(role); // Ensure this retrieves
+
+    //         List<PermissionDTO> dtos = permissions.stream()
+    //                 .map(pr -> new PermissionDTO(
+    //                         pr.getId(),
+    //                         pr.getPermission().getDescription(),
+    //                         pr.getPermission().getCotSlug()))
+    //                 .collect(Collectors.toList());
+
+    //         return ResponseEntity.ok(JwtResponseDTO.builder().accessToken(token)
+    //                 .username(account.getUsername())
+    //                 .id_account(account.getId())
+    //                 .avatar(account.getAvatar())
+    //                 .roles(role.getName())
+    //                 .Permission(dtos)
+    //                 .build());
+    //     } else {
+    //         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email account not registered!");
+    //     }
+    // }
+
+    // private String decodeAccessToken(String acctoken) {
+    //     // Implement the logic to decode the access token
+    //     // This might involve using a library like java-jwt or your custom logic
+    //     // For example:
+    //     // return JWT.decode(acctoken).getClaim("sub").asString();
+    //     // Return the decoded token or relevant information
+    //     return "Decoded token"; // Placeholder
+    // }
+
+    // private boolean verifyGoogleToken(String decodedToken) {
+    //     // Implement the logic to verify the Google token
+    //     // This might involve making a call to Google's tokeninfo endpoint
+    //     // or using Google's client library
+    //     // Return true if the token is valid, false otherwise
+    //     return true; // Placeholder
+    // }
+
+    // // private PermissionDTO convertToPermissionDTO(Permission permission) {
+    // // return PermissionDTO.builder()
+    // // .id(permission.getId())
+    // // .cotSlug(permission.getCotSlug())
+    // // .description(permission.getDescription())
+    // // .build();
+    // // // return ;
+    // // }
+
+    // @PostMapping("/user/register")
+    // public ResponseEntity<?> RegisterAcoount(@RequestBody Account entity) {
+    //     if(accountRepository.existsByUsername(entity.getUsername())){
+    //         return ResponseEntity.badRequest().body("Tên đăng nhập đã tồn tại!");
+    //     }
+    //     if(accountRepository.existsByEmail(entity.getEmail())){
+    //         return ResponseEntity.badRequest().body("Email đã tồn tại!");
+    //     }
+    //     Account account = new Account();
+    //     Role role = roleRepository.findById(3).orElseThrow(() -> new RuntimeException("Role not found"));
+    //     // RoleDetail roleDetail = new RoleDetail();
+    //     account.setUsername(entity.getUsername());
+    //     account.setEmail(entity.getEmail());
+    //     account.setFullname(entity.getFullname());
+    //     account.setPhone(entity.getPhone());
+
+    //     String encryptedPassword = passwordEncoder.encode(entity.getPassword());
+    //     account.setPassword(encryptedPassword);
+    //     account.setAvatar("noimg.png");
+    //     account.setRole(role);
+    //     accountRepository.save(account);
+    //     emailService.push(account.getEmail(), "Wellcom Toel Shop!", EmailTemplateType.WELCOME,account.getFullname());
+    //     return ResponseEntity.ok().body("Đăng ký thành công!");
+    // }
+
     @PostMapping("/api/v1/user/loginGoogle")
     public ResponseEntity<?> verifyGoogleToken(@RequestBody Map<String, String> body) {
         Account account = new Account();
@@ -225,7 +389,7 @@ public class ApiController {
             String accessToken = jwtService.GenerateToken(account.getUsername(), claims);
             System.out.println("Generated Token: " + accessToken); // Debugging log
 
-            Role role =  account.getRole();
+            Role role = account.getRole();
             List<RolePermission> permissions = rolesPermissionRepository.findByRole(role); // Ensure this retrieves
             List<PermissionDTO> dtos = permissions.stream()
                     .map(pr -> new PermissionDTO(
@@ -236,9 +400,11 @@ public class ApiController {
             return ResponseEntity.ok(JwtResponseDTO.builder().accessToken(accessToken)
                     .username(account.getUsername())
                     .id_account(account.getId())
-                    .avatar(account.getAvatar())
+                    .avatar(null)
                     .roles(role.getName())
                     .Permission(dtos)
+                    .fullname(account.getFullname())
+                    .avatar(account.getAvatar())
                     .build());
         } else {
             return ResponseEntity.status(HttpStatus.FOUND) // Đường dẫn đến trang đăng ký
@@ -260,10 +426,7 @@ public class ApiController {
 
         try {
             Role role = roleRepository.findById(3).orElseThrow(() -> new RuntimeException("Role not found"));
-            account.setUsername(entity.getUsername());
-            account.setEmail(entity.getEmail());
-            account.setFullname(entity.getFullname());
-            account.setPhone(entity.getPhone());
+
             account.setRole(role);
             String encryptedPassword = passwordEncoder.encode(entity.getPassword());
             account.setPassword(encryptedPassword);

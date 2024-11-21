@@ -47,10 +47,14 @@ public class Service_ThongKe_DonHang {
                 if (orderStatus == null) {
                         pageBill = billRepository.selectAllByCreateAtBetweenAndOrderStatus(finalDateStart, finalDateEnd,
                                         pageable);
-                } else if (orderStatus.getName().equalsIgnoreCase("Hoàn thành")) {
+                } else if (orderStatus.getId() == 5) {
                         pageBill = billRepository.selectAllByFinishAtBetweenAndOrderStatus(
                                         finalDateStart, finalDateEnd, orderStatus.getId(), pageable);
                         System.out.println("hoàn thành");
+                } else if (orderStatus.getId() == 1) {
+                        pageBill = billRepository.selectAllByCreateAtBetweenAndOrderStatus(
+                                        finalDateStart, finalDateEnd, orderStatus.getId(), pageable);
+                        System.out.println("chờ duyệt");
                 } else {
                         pageBill = billRepository.selectAllByUpdateAtBetweenAndOrderStatus(
                                         finalDateStart, finalDateEnd, orderStatus.getId(), pageable);
@@ -60,13 +64,13 @@ public class Service_ThongKe_DonHang {
                                 .map(billMapper::toResponse_TK_Bill)
                                 .collect(Collectors.toList());
 
-                Integer tongDangChoXuLy = billRepository.findAllByCreateAtBetweenAndOrderStatus(finalDateStart,
+                Integer tongDangChoXuLy = billRepository.findAllByUpdateAtBetweenAndOrderStatus(finalDateStart,
                                 finalDateEnd, orderStatusRepository.findById(2).get()).size();
-                Integer tongDangGiao = billRepository.findAllByCreateAtBetweenAndOrderStatus(finalDateStart,
+                Integer tongDangGiao = billRepository.findAllByUpdateAtBetweenAndOrderStatus(finalDateStart,
                                 finalDateEnd, orderStatusRepository.findById(3).get()).size();
                 Integer tongHoanThanh = billRepository.findAllByFinishAtBetweenAndOrderStatus(finalDateStart,
-                                finalDateEnd, orderStatusRepository.findById(5).get()).size();
-                Integer tongHuy = billRepository.findAllByCreateAtBetweenAndOrderStatus(finalDateStart,
+                                finalDateEnd, orderStatusRepository.findById(5).get().getId()).size();
+                Integer tongHuy = billRepository.findAllByUpdateAtBetweenAndOrderStatus(finalDateStart,
                                 finalDateEnd, orderStatusRepository.findById(6).get()).size();
 
                 Page_TK_Bill page_TK_Bill = Page_TK_Bill.builder()

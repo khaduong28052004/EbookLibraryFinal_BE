@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,10 +81,18 @@ public class Service_ThongKe_Seller {
                 }
 
                 Integer totalShop = listAccount.size();
+                Integer tongSP = 0;
+                Integer tongTheoDoi = 0;
+                Integer tongBaoCao = 0;
 
                 List<Response_TK_Seller> list = listAccount.stream()
                                 .map(account -> calculateTk_Seller(account, finalDateStart, finalDateEnd))
                                 .collect(Collectors.toList());
+                for (Response_TK_Seller account : list) {
+                        tongSP += account.getSumProduct();
+                        tongTheoDoi += account.getSumFollower();
+                        tongBaoCao += account.getSumReport();
+                }
                 Comparator<Response_TK_Seller> comparator = getComparator(sortColumn, sortBy);
                 list.sort(comparator);
                 Pageable pageable = PageRequest.of(page, size);
@@ -91,7 +100,11 @@ public class Service_ThongKe_Seller {
                 int end = Math.min(start + pageable.getPageSize(), list.size());
                 List<Response_TK_Seller> paginatedList = list.subList(start, end);
                 Page_TK_Seller page_TK_Seller = new Page_TK_Seller();
+
                 page_TK_Seller.setTongShop(totalShop);
+                page_TK_Seller.setTongSP(tongSP);
+                page_TK_Seller.setTongTheoDoi(tongTheoDoi);
+                page_TK_Seller.setTongBaoCao(tongBaoCao);
                 page_TK_Seller.setThongke(new PageImpl<>(paginatedList, pageable, listAccount.size()));
 
                 return page_TK_Seller;
