@@ -40,6 +40,17 @@ public class ApiVoucherSeller {
                                 .result(service_Voucher.getAll(page, size, sortBy, sortColumn, account_id, search));
         }
 
+        @GetMapping("/getAllAdmin")
+        public ApiResponse<PageImpl<Response_Voucher>> getAllAdmin(
+                        @RequestParam(value = "page", defaultValue = "0") Integer page,
+                        @RequestParam(value = "size", defaultValue = "5") Integer size,
+                        @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
+                        @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn,
+                        @RequestParam(value = "search", required = false) String search) {
+                return ApiResponse.<PageImpl<Response_Voucher>>build()
+                                .result(service_Voucher.getAllAdmin(page, size, sortBy, sortColumn, search));
+        }
+
         @PostMapping("/create")
         public ApiResponse<Response_Voucher> create(
                         @RequestBody @Valid Request_VoucherCreate request_Voucher) {

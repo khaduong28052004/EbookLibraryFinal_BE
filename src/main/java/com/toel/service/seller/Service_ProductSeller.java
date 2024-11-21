@@ -58,7 +58,6 @@ public class Service_ProductSeller {
         public Response_Product create(
                         Request_ProductCreate request_Product) throws IOException {
                 product = productMapper.productCreate(request_Product);
-                // checkCreate(product);
                 product.setAccount(accountRepository.findById(request_Product.getAccount())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
                 product.setCategory(
@@ -72,7 +71,6 @@ public class Service_ProductSeller {
         public Response_Product update(
                         Request_ProductUpdate request_Product) throws IOException {
                 product = productMapper.productUpdate(request_Product);
-                // checkUpdate(product);
                 product.setAccount(accountRepository.findById(request_Product.getAccount())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
                 product.setCategory(categoryRepository.findById(request_Product.getCategory())
@@ -106,12 +104,13 @@ public class Service_ProductSeller {
 
         public Request_ProductCreate checkCreate(Request_ProductCreate request_ProductCreate) {
 
-                if (productRepository.findAll().stream()
-                                .anyMatch(productCheck -> product.getName().equalsIgnoreCase(productCheck.getName()))) {
+                if (productRepository.findByAccountId(request_ProductCreate.getAccount()).stream()
+                                .anyMatch(productCheck -> request_ProductCreate.getName()
+                                                .equalsIgnoreCase(productCheck.getName()))) {
                         throw new AppException(ErrorCode.OBJECT_SETUP, "Tên sản phẩm đã tồn tại.");
                 }
 
-                if (product.getPrice() < 1000 || product.getPrice() < product.getSale()) {
+                if (request_ProductCreate.getPrice() < 1000 || request_ProductCreate.getPrice() < product.getSale()) {
                         String message = (product.getPrice() < 1000) ? "Giá sản phẩm phải lớn hơn 1000đ."
                                         : "Giá sản phẩm phải lớn hơn giá giảm.";
                         throw new AppException(ErrorCode.OBJECT_SETUP, message);
@@ -121,14 +120,16 @@ public class Service_ProductSeller {
 
         public Request_ProductUpdate checkUpdate(Request_ProductUpdate request_ProductUpdate) {
 
-                if (productRepository.findAll().stream()
-                                .anyMatch(productCheck -> !product.getId().equals(productCheck.getId())
-                                                && product.getName().equalsIgnoreCase(productCheck.getName()))) {
+                if (productRepository.findByAccountId(request_ProductUpdate.getAccount()).stream()
+                                .anyMatch(productCheck -> !request_ProductUpdate.getId().equals(productCheck.getId())
+                                                && request_ProductUpdate.getName()
+                                                                .equalsIgnoreCase(productCheck.getName()))) {
                         throw new AppException(ErrorCode.OBJECT_SETUP, "Tên sản phẩm đã tồn tại.");
                 }
 
-                if (product.getPrice() < 1000 || product.getPrice() < product.getSale()) {
-                        String message = (product.getPrice() < 1000) ? "Giá sản phẩm phải lớn hơn 1000đ."
+                if (request_ProductUpdate.getPrice() < 1000
+                                || request_ProductUpdate.getPrice() < request_ProductUpdate.getSale()) {
+                        String message = (request_ProductUpdate.getPrice() < 1000) ? "Giá sản phẩm phải lớn hơn 1000đ."
                                         : "Giá sản phẩm phải lớn hơn giá giảm.";
                         throw new AppException(ErrorCode.OBJECT_SETUP, message);
                 }

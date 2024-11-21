@@ -57,6 +57,18 @@ public class Service_VoucherSeller {
                 return new PageImpl<>(list, pageable, pageVoucher.getTotalElements());
         }
 
+        public PageImpl<Response_Voucher> getAllAdmin(
+                        Integer page, Integer size, boolean sortBy, String sortColumn, String search) {
+                Pageable pageable = PageRequest.of(page, size,
+                                Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
+                Page<Voucher> pageVoucher = voucherRepository.findAllByIdAccountSearch(search,
+                                pageable);
+                List<Response_Voucher> list = pageVoucher.stream()
+                                .map(voucher -> voucherMapper.response_Voucher(voucher))
+                                .collect(Collectors.toList());
+                return new PageImpl<>(list, pageable, pageVoucher.getTotalElements());
+        }
+
         public Response_Voucher edit(Integer voucher_id) {
                 return voucherMapper.response_Voucher(voucherRepository.findById(voucher_id).get());
         }
