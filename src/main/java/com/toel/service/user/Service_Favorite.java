@@ -84,4 +84,14 @@ public class Service_Favorite {
 		return response;
 	}
 
+	public Boolean deleteFavorite(Integer id) {
+		try {
+			likeRepo.deleteById(id);
+			return true;
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return false;
+	}
+
 }

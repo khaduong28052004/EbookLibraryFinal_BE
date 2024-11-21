@@ -17,10 +17,14 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_Evalue;
 import com.toel.dto.user.response.Response_Product;
+import com.toel.dto.user.response.Response_SellerProductDetail;
+import com.toel.mapper.user.AccountMapperUser;
 import com.toel.mapper.user.ProductMaperUser;
 import com.toel.model.Account;
 import com.toel.model.Category;
+import com.toel.model.Evalue;
 import com.toel.model.Product;
+import com.toel.repository.AccountRepository;
 import com.toel.repository.CategoryRepository;
 import com.toel.repository.ProductRepository;
 
@@ -34,6 +38,10 @@ public class Service_ProductDetail {
 	CategoryRepository categoryRepo;
 	@Autowired
 	FlashSaleService flashSaleService;
+	@Autowired
+	AccountRepository accountRepository;
+	@Autowired
+	AccountMapperUser accountMapperUser;
 	Response_Product product = new Response_Product();
 	Account seller = new Account();
 
@@ -41,19 +49,18 @@ public class Service_ProductDetail {
 		product = productMaper.productToResponse_Product(productRepo.findById(id_Product).get());
 		product.setFlashSaleDetail(flashSaleService.getFlashSaleDetailForProduct(product.getId()));
 		List<Response_Evalue> evalues = new ArrayList<>();
-		Set<Integer> idEvalues = new HashSet<>(); // Sử dụng Set để tránh trùng lặp ID
+		Set<Integer> idEvalues = new HashSet<>();
 
-		if (product.getEvalues() != null) { // Kiểm tra null
+		if (product.getEvalues() != null) {
 			for (Response_Evalue item : product.getEvalues()) {
 				if (!idEvalues.contains(item.getId())) {
-					evalues.add(item); // Thêm item vào danh sách kết quả
-					idEvalues.add(item.getId()); // Lưu ID để tránh trùng lặp
+					evalues.add(item);
+					idEvalues.add(item.getId());
 
-					// Tìm các item con (idParent khớp với ID của item)
 					for (Response_Evalue item2 : product.getEvalues()) {
 						if (item2.getIdParent() == item.getId() && !idEvalues.contains(item2.getId())) {
-							evalues.add(item2); // Thêm item con
-							idEvalues.add(item2.getId()); // Đánh dấu ID của item con
+							evalues.add(item2);
+							idEvalues.add(item2.getId());
 						}
 					}
 				}
@@ -61,9 +68,19 @@ public class Service_ProductDetail {
 		}
 
 		product.setEvalues(evalues);
-		seller = product.getAccount();
+		seller = accountRepository.findById(product.getAccount().getId()).get();
+		Response_SellerProductDetail response_SellerProductDetail = accountMapperUser
+				.response_SellerProductDetailToAccount(seller);
+		Integer totalEvalue = 0;
+		double totalStar = 0;
+		for (Response_Product item : response_SellerProductDetail.getProducts()) {
+			totalEvalue += item.getEvalues().size();
+			totalStar += item.getEvalues().stream().mapToDouble(Response_Evalue::getStar).sum();
+		}
+		response_SellerProductDetail.setTotalEvalue(totalEvalue);
+		response_SellerProductDetail.setTotalStar(totalStar / totalEvalue);
 		Map<String, Object> response = new HashMap<String, Object>();
-		response.put("seller", seller);
+		response.put("seller", response_SellerProductDetail);
 		response.put("product", product);
 		return response;
 	}

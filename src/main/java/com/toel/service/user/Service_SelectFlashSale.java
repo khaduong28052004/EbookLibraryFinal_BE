@@ -3,6 +3,7 @@ package com.toel.service.user;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_FlashSaleDetail;
@@ -10,6 +11,7 @@ import com.toel.mapper.user.FlashSaleDetailMapper;
 import com.toel.model.FlashSale;
 import com.toel.model.FlashSaleDetail;
 import com.toel.repository.FlashSaleDetailRepository;
+import com.toel.service.user.FlashSaleService;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,8 @@ public class Service_SelectFlashSale {
 
 	final FlashSaleDetailRepository flashSaleDetailRepo;
 	final FlashSaleDetailMapper flashSaleDetailMapper;
+	@Autowired
+	FlashSaleService flashSaleService;
 
 	public List<Response_FlashSaleDetail> selectFlashSale(FlashSale flashSale, Integer id_Shop) {
 
@@ -35,6 +39,8 @@ public class Service_SelectFlashSale {
 					&& item.getProduct().isDelete() == false) {
 				Response_FlashSaleDetail response_FlashSaleDetail = flashSaleDetailMapper
 						.flashSaleDetailToResponseFlashSaleDetail(item);
+				response_FlashSaleDetail.getProduct().setFlashSaleDetail(
+						flashSaleService.getFlashSaleDetailForProduct(response_FlashSaleDetail.getProduct().getId()));
 				response_FlashSaleDetails.add(response_FlashSaleDetail);
 			}
 

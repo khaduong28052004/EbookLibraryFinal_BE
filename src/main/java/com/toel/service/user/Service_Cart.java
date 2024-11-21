@@ -135,4 +135,15 @@ public class Service_Cart {
 		response.put("datas", listVouchers);
 		return response;
 	}
+
+	public Boolean updateQuantity(Integer idCart, Integer quantity) {
+		try {
+			Cart cart = cartRepo.findById(idCart).get();
+			cart.setQuantity(quantity);
+			cartRepo.save(cart);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 }

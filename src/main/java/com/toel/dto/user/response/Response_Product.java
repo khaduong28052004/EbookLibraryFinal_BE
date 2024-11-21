@@ -29,6 +29,7 @@ public class Response_Product {
 	float quantityEvalue;
 	List<Response_ImageProduct> imageProducts;
 	Account account;
+	double weight;
 	FlashSaleDetail flashSaleDetail = null;
 
 }
