@@ -44,7 +44,7 @@ public class ApiHome {
 		LocalDateTime localDateTime = LocalDateTime.now();
 
 		try {
-			FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime).getFirst();
+			FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime);
 			List<Response_FlashSaleDetail> response = service_SelectFlashSale.selectFlashSale(flashSale, id_Shop);
 			map.put("datas", response);
 			map.put("lastDate", flashSale.getDateEnd());
@@ -64,7 +64,7 @@ public class ApiHome {
 		List<FlashSaleDetail> flashSaleDetails = new ArrayList<FlashSaleDetail>();
 		try {
 			LocalDateTime localDateTime = LocalDateTime.now();
-			FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime).getFirst();
+			FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime);
 			flashSaleDetails = flashSaleDetailRepo.findAllByFlashSale(flashSale);
 		} catch (Exception e) {
 			// TODO: handle exception

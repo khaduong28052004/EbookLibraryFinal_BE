@@ -23,6 +23,7 @@ public enum ErrorCode {
     FIELD_MIN_VALUE(3003, "{key} phải lớn hơn hoặc bằng {min}!", HttpStatus.BAD_REQUEST),
     FIELD_MAX_VALUE(3004, "{key} phải bé hơn hoặc bằng {max}!", HttpStatus.BAD_REQUEST),
     FIELD_INVALID_ID(3005, "Id {key} không hợp lệ!", HttpStatus.BAD_REQUEST),
+    FIELD_MIN_KEY(3006, "{key} phải lớn hơn hoặc bằng {min} kí tự!", HttpStatus.BAD_REQUEST),
 
     TIME_RANGE_ERROR(4001, "Thời gian bắt đầu phải trước thời gian kết thúc", HttpStatus.BAD_REQUEST),
     EMAIL_FORMAT_ERROR(4002, "Email không hợp lệ!", HttpStatus.BAD_REQUEST);

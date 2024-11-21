@@ -41,9 +41,15 @@ public class ApiCart {
 		}
 	}
 
-	@RequestMapping("voucheradmin")
+	@RequestMapping("pay/voucheradmin")
 	public ApiResponse<Map<String, Object>> getVoucherAdmin() {
 		return ApiResponse.<Map<String, Object>>build().message("success").result(service_Cart.getVoucherAdmin());
+	}
+
+	@RequestMapping("cart/update/{id}")
+	public ApiResponse<Boolean> updateCart(@PathVariable("id") Integer idCart,
+			@RequestParam("quantity") Integer quantity) {
+		return ApiResponse.<Boolean>build().result(service_Cart.updateQuantity(idCart, quantity));
 	}
 
 }

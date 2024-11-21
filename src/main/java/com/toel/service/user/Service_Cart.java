@@ -10,7 +10,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.toel.dto.user.response.Response_Cart;
 import com.toel.dto.user.response.Response_Seller;
+import com.toel.dto.user.response.Response_User;
 import com.toel.mapper.user.AccountMapperUser;
 import com.toel.mapper.user.CartMapper;
 import com.toel.mapper.user.UserMapper;
@@ -52,6 +54,8 @@ public class Service_Cart {
 
 	@Autowired
 	TypeVoucherRepository typeVoucherRepository;
+	@Autowired
+	FlashSaleService flashSaleService;
 
 	public Map<String, Object> getCart(Integer id_User) {
 
@@ -74,8 +78,11 @@ public class Service_Cart {
 			Response_Seller responseSeller = sellerMap.computeIfAbsent(sellerId,
 					id -> accountMapper.Response_Seller_MapperTo_Account(item.getProduct().getAccount()));
 
-			// Thêm sản phẩm vào giỏ hàng của seller
-			responseSeller.getCart().add(cartMapper.response_Cart_MapperTo_Cart(item));
+			Response_Cart response_Cart = cartMapper.response_Cart_MapperTo_Cart(item);
+			response_Cart.getProduct().setFlashSaleDetail(
+					flashSaleService.getFlashSaleDetailForProduct(response_Cart.getProduct().getId()));
+			responseSeller.getCart().add(response_Cart);
+
 			List<Voucher> listVoucher = voucherRepository.findAllByAccount(item.getProduct().getAccount());
 			responseSeller.setVouchers(new ArrayList<Voucher>());
 			for (Voucher voucher : listVoucher) {
@@ -84,7 +91,6 @@ public class Service_Cart {
 			System.out.println("dem --------------------------");
 		}
 
-		// Thêm các seller vào response
 		response.put("datas", new ArrayList<>(sellerMap.values()));
 		response.put("user", userMapper.UserMapperToAccount(user));
 		return response;
@@ -128,5 +134,16 @@ public class Service_Cart {
 		Map<String, Object> response = new HashMap<String, Object>();
 		response.put("datas", listVouchers);
 		return response;
+	}
+
+	public Boolean updateQuantity(Integer idCart, Integer quantity) {
+		try {
+			Cart cart = cartRepo.findById(idCart).get();
+			cart.setQuantity(quantity);
+			cartRepo.save(cart);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 }

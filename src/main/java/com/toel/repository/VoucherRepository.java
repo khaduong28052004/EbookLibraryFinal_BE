@@ -18,6 +18,10 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
 	@Query("SELECT v FROM Voucher v WHERE v.account.id = ?1 " + "AND (?2 IS NULL OR v.name LIKE CONCAT('%', ?2, '%'))")
 	Page<Voucher> findAllByIdAccountSearch(Integer idAccount, String search, Pageable pageable);
 
+	@Query("SELECT v FROM Voucher v WHERE v.typeVoucher.id = 2 "
+			+ "AND (?1 IS NULL OR v.name LIKE CONCAT('%', ?1, '%'))")
+	Page<Voucher> findAllByIdAccountSearch(String search, Pageable pageable);
+
 	@Query("SELECT v FROM Voucher v WHERE v.account.id = ?1 ")
 	Page<Voucher> findAllByIdAccount(Integer idAccount, Pageable pageable);
 

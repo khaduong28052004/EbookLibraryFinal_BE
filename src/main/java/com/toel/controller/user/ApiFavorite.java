@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,4 +36,15 @@ public class ApiFavorite {
 	public ApiResponse<Map<String, Object>> getAll(@PathVariable("id") Integer id_user) {
 		return ApiResponse.<Map<String, Object>>build().result(service_Favorite.getAllFavorite(id_user));
 	}
+
+	@DeleteMapping("favorite/delete/{id}")
+	public ApiResponse<Map<String, Object>> delete(@PathVariable("id") Integer id_favorite,
+			@RequestParam("id_user") Integer id_user) {
+		if (service_Favorite.deleteFavorite(id_favorite)) {
+			return ApiResponse.<Map<String, Object>>build().result(service_Favorite.getAllFavorite(id_user));
+		}
+		return ApiResponse.<Map<String, Object>>build().result(null).code(1002);
+
+	}
+
 }

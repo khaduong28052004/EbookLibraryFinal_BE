@@ -33,8 +33,7 @@ public class FlashSaleDetail {
 	@ManyToOne
 	@JoinColumn(name = "product_id")
 	Product product;
-	
-	
+
 	@ManyToOne
 	@JoinColumn(name = "flashsale_id")
 	FlashSale flashSale;

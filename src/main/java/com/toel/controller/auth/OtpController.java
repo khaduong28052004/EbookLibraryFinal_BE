@@ -37,8 +37,10 @@ public class OtpController {
         if (isvalid) {
             String otp = otpService.generateOtp(entity.getEmail());
             String hashOTP = serviceToel.hashPassword(otp);
+            System.out.println("otp nè: "+otp +" hashOTP "+hashOTP + " , mail "+ entity.getEmail() + isvalid);
+
             emailService.push(entity.getEmail(), "Mã otp của bạn", EmailTemplateType.OTP, otp,
-                    "http://localhost:5173/change-password?otp=" + hashOTP);
+                    "http://localhost:5173/change-password?otp=" + otp);
             return ResponseEntity.ok("OTP generated: " + otp);
 
         } else {

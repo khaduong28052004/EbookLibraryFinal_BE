@@ -21,6 +21,8 @@ public class Request_VoucherCreate {
     @NotBlank(message = "FIELD_REQUIRED")
     String note;
     @NotNull(message = "FIELD_REQUIRED")
+    double minOrder;
+    @NotNull(message = "FIELD_REQUIRED")
     double totalPriceOrder;
     @NotNull(message = "FIELD_REQUIRED")
     double sale;

@@ -49,12 +49,14 @@ public class ApiFlashSale {
     @PostMapping
     public ApiResponse<Response_FlashSale> post(@RequestBody @Valid Request_FlashSaleCreate entity) {
         return ApiResponse.<Response_FlashSale>build()
+                .message("Thêm flash sale thành công")
                 .result(service_FlashSale.create(entity));
     }
 
     @PutMapping
     public ApiResponse<Response_FlashSale> put(@RequestBody @Valid Request_FlashSaleUpdate entity) {
         return ApiResponse.<Response_FlashSale>build()
+                .message("Cập nhật flash sale thành công")
                 .result(service_FlashSale.update(entity));
     }
 
