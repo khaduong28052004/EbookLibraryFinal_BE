@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 // import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 // import org.springframework.web.server.ResponseStatusException;
 
@@ -150,7 +151,21 @@ public class ApiController {
 
     @GetMapping("/api/v1/flashsale/create")
     public String falshsale() {
-        return "oke create flashsale";
+        return "";
+    }
+
+    @GetMapping("/api/v1/re")
+    public ResponseEntity<?> renewToken(@RequestHeader("Authorization") String token) {
+        String actualToken = token.replace("Bearer ", "");
+        System.out.println(actualToken);
+        Map<String, Object> map = new HashMap<>(); // Information to include in the new JWT
+        if (jwtService.isTokenExpired(actualToken)) {
+            String username = jwtService.extractUsername(actualToken);
+            String newToken = jwtService.GenerateToken(username, map);
+            return ResponseEntity.ok(newToken);
+        }
+
+        return ResponseEntity.noContent().build(); // Không cần gia hạn
     }
 
     @PostMapping("/api/v1/user/token")
@@ -158,14 +173,43 @@ public class ApiController {
         String accessToken = entity.getAccessToken();
         if (!jwtService.isTokenExpired(accessToken)) {
             String username = jwtService.extractUsername(accessToken);
+            Account account = accountRepository.findByUsername(username);
             System.out.println(username);
             Map<String, Object> map = new HashMap<>(); // Information to include in the new JWT
             String newToken = jwtService.GenerateToken(username, map); // Generate a new token
             System.out.println("Generated Token: " + newToken);
             System.out.println("t o ke=====:" + jwtService.isTokenExpired(accessToken));
-            return ResponseEntity.ok(newToken);
+            //
+
+            Role role = account.getRole();
+            List<RolePermission> permissions = rolesPermissionRepository.findByRole(role); // Ensure this retrieves
+
+            List<PermissionDTO> dtos = permissions.stream()
+                    .map(pr -> new PermissionDTO(
+                            pr.getId(),
+                            pr.getPermission().getDescription(),
+                            pr.getPermission().getCotSlug()))
+                    .collect(Collectors.toList());
+
+            // Map<String, Object> map = new HashMap<>(); // Infor mation to include in the
+            // JWT
+            String token = jwtService.GenerateToken(account.getUsername(), map);
+            System.out.println("Generated Token: " + token); // Debugging log
+
+            // Return the JWT response
+            return ResponseEntity.ok(JwtResponseDTO.builder()
+                    .accessToken(token)
+                    .username(account.getUsername())
+                    .id_account(account.getId())
+                    .avatar(null)
+                    .roles(role.getName())
+                    .Permission(dtos)
+                    .fullname(account.getFullname())
+                    .avatar(account.getAvatar())
+                    .build());
+            // return ResponseEntity.ok(newToken);
         } else {
-            return ResponseEntity.ok("lỗi");
+            return ResponseEntity.badRequest().body("đã hết hạn");
         }
     }
 
@@ -225,7 +269,7 @@ public class ApiController {
             String accessToken = jwtService.GenerateToken(account.getUsername(), claims);
             System.out.println("Generated Token: " + accessToken); // Debugging log
 
-            Role role =  account.getRole();
+            Role role = account.getRole();
             List<RolePermission> permissions = rolesPermissionRepository.findByRole(role); // Ensure this retrieves
             List<PermissionDTO> dtos = permissions.stream()
                     .map(pr -> new PermissionDTO(
@@ -236,9 +280,11 @@ public class ApiController {
             return ResponseEntity.ok(JwtResponseDTO.builder().accessToken(accessToken)
                     .username(account.getUsername())
                     .id_account(account.getId())
-                    .avatar(account.getAvatar())
+                    .avatar(null)
                     .roles(role.getName())
                     .Permission(dtos)
+                    .fullname(account.getFullname())
+                    .avatar(account.getAvatar())
                     .build());
         } else {
             return ResponseEntity.status(HttpStatus.FOUND) // Đường dẫn đến trang đăng ký
@@ -260,10 +306,7 @@ public class ApiController {
 
         try {
             Role role = roleRepository.findById(3).orElseThrow(() -> new RuntimeException("Role not found"));
-            account.setUsername(entity.getUsername());
-            account.setEmail(entity.getEmail());
-            account.setFullname(entity.getFullname());
-            account.setPhone(entity.getPhone());
+
             account.setRole(role);
             String encryptedPassword = passwordEncoder.encode(entity.getPassword());
             account.setPassword(encryptedPassword);
