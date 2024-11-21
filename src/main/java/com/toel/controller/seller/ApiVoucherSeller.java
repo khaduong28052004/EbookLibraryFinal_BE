@@ -54,7 +54,6 @@ public class ApiVoucherSeller {
         @PostMapping("/create")
         public ApiResponse<Response_Voucher> create(
                         @RequestBody @Valid Request_VoucherCreate request_Voucher) {
-
                 return ApiResponse.<Response_Voucher>build()
                                 .message("Thêm voucher thành công")
                                 .result(service_Voucher.create(service_Voucher.checkVoucherCreate(request_Voucher)));
@@ -76,7 +75,7 @@ public class ApiVoucherSeller {
         }
 
         @DeleteMapping("/delete")
-        public ApiResponse delete(
+        public ApiResponse<?> delete(
                         @RequestParam("voucher_id") Integer voucher_id) {
                 return ApiResponse.build()
                                 .message(!service_Voucher.delete(voucher_id) ? "Khôi phục hoạt động thành công"

@@ -50,7 +50,6 @@ public class ApiProductSeller {
                         @RequestParam(value = "product_id", defaultValue = "0") Integer product_id) {
                 return ApiResponse.<Response_Product>build()
                                 .result(service_ProductSeller.edit(product_id));
-
         }
 
         @PostMapping("/create")
@@ -72,19 +71,29 @@ public class ApiProductSeller {
         }
 
         @PostMapping("/create/saveImg")
-        public void createSaveImage(
+        public ApiResponse<?> createSaveImage(
+                        @RequestParam(value = "product_id", defaultValue = "0") Integer product_id,
                         @RequestPart("imageProducts") List<MultipartFile> images) throws IOException {
-                service_ProductSeller.saveImgCreate(images);
+                return ApiResponse.build()
+                                .message(service_ProductSeller.saveImgCreate(product_id, images)
+                                                ? "Thêm Hình Sản Phẩm Thành Công"
+                                                : "Thêm Hình Sản Phẩm Thất Bại");
+
         }
 
         @PostMapping("/update/saveImg")
-        public void updateSaveImage(
+        public ApiResponse<?> updateSaveImage(
+                        @RequestParam(value = "product_id", defaultValue = "0") Integer product_id,
                         @RequestPart("imageProducts") List<MultipartFile> images) throws IOException {
-                service_ProductSeller.saveImgCreate(images);
+
+                return ApiResponse.build()
+                                .message(service_ProductSeller.saveImgUpdate(product_id, images)
+                                                ? "Cập Nhật Hình Ảnh Thành Công"
+                                                : "Cập Nhật Hình Ảnh Thất Bại");
         }
 
         @DeleteMapping("/delete")
-        public ApiResponse delete(@RequestParam("product_id") Integer product_id) {
+        public ApiResponse<?> delete(@RequestParam("product_id") Integer product_id) {
                 service_ProductSeller.delete(product_id);
                 return ApiResponse.build()
                                 .message("Xóa sản phẩm thành công");
