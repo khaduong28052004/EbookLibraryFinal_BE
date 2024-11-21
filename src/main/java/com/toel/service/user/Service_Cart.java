@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_Cart;
 import com.toel.dto.user.response.Response_Seller;
+import com.toel.dto.user.response.Response_User;
 import com.toel.mapper.user.AccountMapperUser;
 import com.toel.mapper.user.CartMapper;
 import com.toel.mapper.user.UserMapper;
@@ -90,7 +91,6 @@ public class Service_Cart {
 			System.out.println("dem --------------------------");
 		}
 
-		// Thêm các seller vào response
 		response.put("datas", new ArrayList<>(sellerMap.values()));
 		response.put("user", userMapper.UserMapperToAccount(user));
 		return response;
@@ -134,5 +134,16 @@ public class Service_Cart {
 		Map<String, Object> response = new HashMap<String, Object>();
 		response.put("datas", listVouchers);
 		return response;
+	}
+
+	public Boolean updateQuantity(Integer idCart, Integer quantity) {
+		try {
+			Cart cart = cartRepo.findById(idCart).get();
+			cart.setQuantity(quantity);
+			cartRepo.save(cart);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 }
