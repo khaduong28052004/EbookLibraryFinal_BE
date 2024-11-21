@@ -213,6 +213,11 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			@Param("dateEnd") Date dateEnd,
 			@Param("idOrderStatus") Integer idOrderStatus, Pageable pageable);
 
+	@Query("Select b From Bill b Where b.orderStatus.id = :idOrderStatus AND b.createAt BETWEEN  :dateStart AND :dateEnd")
+	Page<Bill> selectAllByCreateAtBetweenAndOrderStatus(@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd,
+			@Param("idOrderStatus") Integer idOrderStatus, Pageable pageable);
+
 	@Query(value = "SELECT * FROM Bills WHERE orderstatus_id = :orderstatusID", nativeQuery = true)
 	List<Bill> findByOrderStatusId(@Param("orderstatusID") Integer orderstatusId);
 
@@ -246,7 +251,14 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	List<Bill> findAllByCreateAtBetweenAndOrderStatus(Date dateStart, Date dateEnd, OrderStatus orderStatus);
 
-	List<Bill> findAllByFinishAtBetweenAndOrderStatus(Date dateStart, Date dateEnd, OrderStatus orderStatus);
+	List<Bill> findAllByUpdateAtBetweenAndOrderStatus(Date dateStart, Date dateEnd, OrderStatus orderStatus);
+
+	// List<Bill> findAllByFinishAtBetweenAndOrderStatus(Date dateStart, Date
+	// dateEnd, OrderStatus orderStatus);
+	@Query("Select b From Bill b Where b.orderStatus.id = :idOrderStatus AND b.finishAt BETWEEN  :dateStart AND :dateEnd ")
+	List<Bill> findAllByFinishAtBetweenAndOrderStatus(@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd,
+			@Param("idOrderStatus") Integer idOrderStatus);
 
 	// thống kê khách hàng
 	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN ?1 AND ?2")
