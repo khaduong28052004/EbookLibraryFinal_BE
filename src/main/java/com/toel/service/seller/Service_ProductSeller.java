@@ -58,7 +58,6 @@ public class Service_ProductSeller {
         public Response_Product create(
                         Request_ProductCreate request_Product) throws IOException {
                 product = productMapper.productCreate(request_Product);
-                // checkCreate(product);
                 product.setAccount(accountRepository.findById(request_Product.getAccount())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
                 product.setCategory(
@@ -72,7 +71,6 @@ public class Service_ProductSeller {
         public Response_Product update(
                         Request_ProductUpdate request_Product) throws IOException {
                 product = productMapper.productUpdate(request_Product);
-                // checkUpdate(product);
                 product.setAccount(accountRepository.findById(request_Product.getAccount())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
                 product.setCategory(categoryRepository.findById(request_Product.getCategory())
@@ -106,7 +104,7 @@ public class Service_ProductSeller {
 
         public Request_ProductCreate checkCreate(Request_ProductCreate request_ProductCreate) {
 
-                if (productRepository.findAll().stream()
+                if (productRepository.findByAccountId(request_ProductCreate.getAccount()).stream()
                                 .anyMatch(productCheck -> product.getName().equalsIgnoreCase(productCheck.getName()))) {
                         throw new AppException(ErrorCode.OBJECT_SETUP, "Tên sản phẩm đã tồn tại.");
                 }
@@ -121,7 +119,7 @@ public class Service_ProductSeller {
 
         public Request_ProductUpdate checkUpdate(Request_ProductUpdate request_ProductUpdate) {
 
-                if (productRepository.findAll().stream()
+                if (productRepository.findByAccountId(request_ProductUpdate.getAccount()).stream()
                                 .anyMatch(productCheck -> !product.getId().equals(productCheck.getId())
                                                 && product.getName().equalsIgnoreCase(productCheck.getName()))) {
                         throw new AppException(ErrorCode.OBJECT_SETUP, "Tên sản phẩm đã tồn tại.");
