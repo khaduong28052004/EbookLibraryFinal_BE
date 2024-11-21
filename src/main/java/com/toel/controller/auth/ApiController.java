@@ -225,27 +225,55 @@ public class ApiController {
             String accessToken = jwtService.GenerateToken(account.getUsername(), claims);
             System.out.println("Generated Token: " + accessToken); // Debugging log
 
-            Role role = new Role();
+            Role role =  account.getRole();
             List<RolePermission> permissions = rolesPermissionRepository.findByRole(role); // Ensure this retrieves
-
-            // List<PermissionDTO> dtos = permissions.stream()
-            // .map(pr -> new PermissionDTO(
-            // pr.getId(),
-            // pr.getPermission().getDescription(),
-            // pr.getPermission().getCotSlug()))
-            // .collect(Collectors.toList());
-
+            List<PermissionDTO> dtos = permissions.stream()
+                    .map(pr -> new PermissionDTO(
+                            pr.getId(),
+                            pr.getPermission().getDescription(),
+                            pr.getPermission().getCotSlug()))
+                    .collect(Collectors.toList());
             return ResponseEntity.ok(JwtResponseDTO.builder().accessToken(accessToken)
                     .username(account.getUsername())
                     .id_account(account.getId())
                     .avatar(account.getAvatar())
-                    .roles("role.getName()")
+                    .roles(role.getName())
+                    .Permission(dtos)
                     .build());
         } else {
             return ResponseEntity.status(HttpStatus.FOUND) // Đường dẫn đến trang đăng ký
                     .body("Email account not registered! Please sign up.");
         }
     }
+
+    @PostMapping("/api/v1/user/register")
+    public ResponseEntity<?> RegisterAccount(@RequestBody Account entity) {
+        if (accountRepository.existsByUsername(entity.getUsername())) {
+            return ResponseEntity.badRequest().body("Tên đăng nhập đã tồn tại!");
+        }
+        if (accountRepository.existsByEmail(entity.getEmail())) {
+            return ResponseEntity.badRequest().body("Email đã tồn tại!");
+        }
+        Account account = new Account();
+        emailService.push(entity.getEmail(), "Welcome Toel Shop!", EmailTemplateType.WELCOME,
+                entity.getFullname());
+
+        try {
+            Role role = roleRepository.findById(3).orElseThrow(() -> new RuntimeException("Role not found"));
+            account.setUsername(entity.getUsername());
+            account.setEmail(entity.getEmail());
+            account.setFullname(entity.getFullname());
+            account.setPhone(entity.getPhone());
+            account.setRole(role);
+            String encryptedPassword = passwordEncoder.encode(entity.getPassword());
+            account.setPassword(encryptedPassword);
+            accountRepository.save(account);
+            return ResponseEntity.ok().body("Đăng ký thành công!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi: " + e.getMessage());
+        }
+    }
+
     // @PostMapping("/user/loginGoogle")
     // public ResponseEntity<?> AuthGG1(@RequestBody String token) {
     // Account account = new Account();
@@ -348,37 +376,6 @@ public class ApiController {
     // // return ;
     // }
 
-    @PostMapping("/api/v1/user/register")
-    public ResponseEntity<?> RegisterAccount(@RequestBody Account entity) {
-        if (accountRepository.existsByUsername(entity.getUsername())) {
-            return ResponseEntity.badRequest().body("Tên đăng nhập đã tồn tại!");
-        }
-        if (accountRepository.existsByEmail(entity.getEmail())) {
-            return ResponseEntity.badRequest().body("Email đã tồn tại!");
-        }
-        Account account = new Account();
-        boolean emailSent = emailService.pushBoolean(entity.getEmail(), "Welcome Toel Shop!", EmailTemplateType.WELCOME,
-                entity.getFullname());
-        if (!emailSent) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Không thể gửi email. Vui lòng thử lại sau!");
-        }
-        try {
-            Role role = roleRepository.findById(3).orElseThrow(() -> new RuntimeException("Role not found"));
-            account.setUsername(entity.getUsername());
-            account.setEmail(entity.getEmail());
-            account.setFullname(entity.getFullname());
-            account.setPhone(entity.getPhone());
-            account.setRole(role);
-            String encryptedPassword = passwordEncoder.encode(entity.getPassword());
-            account.setPassword(encryptedPassword);
-            accountRepository.save(account);
-            return ResponseEntity.ok().body("Đăng ký thành công!");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi: " + e.getMessage());
-        }
-    }
-
     @PostMapping("/api/v2/user/register")
     public ResponseEntity<?> RegisterAcoountV2(@RequestBody Account entity) {
         Account account = new Account();
@@ -396,11 +393,6 @@ public class ApiController {
                     "http://localhost:8080/api/v2/user/register_1?otp=" + hashOTP);
             return ResponseEntity.ok("OTP generated: " + otp);
         }
-
-        // accountRepository.save(account);
-        // emailService.push(account.getEmail(), "Wellcom Toel Shop!",
-        // EmailTemplateType.WELCOME, account.getFullname());
-        // return ResponseEntity.ok().body("Đăng ký thành công!");
     }
 
     @PostMapping("/api/v2/user/register_1/{otp}")
