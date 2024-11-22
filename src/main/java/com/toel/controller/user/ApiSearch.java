@@ -24,19 +24,19 @@ public class ApiSearch {
 	@GetMapping("search")
 	public ApiResponse<Map<String, Object>> search(@RequestParam("text") String text) {
 		return ApiResponse.<Map<String, Object>>build().message("success")
-				.result(service_Search.getProductByName(text, 10, "createAt"));
+				.result(service_Search.getProductByName(text, 10000, "createAt"));
 	}
 
 	@GetMapping("filtercategory")
 	public ApiResponse<Map<String, Object>> filtercategory(@RequestParam("id_categories") List<Integer> id_categories) {
 		return ApiResponse.<Map<String, Object>>build().message("success")
-				.result(service_Search.filterProductByCategory(id_categories, 10, "createAt"));
+				.result(service_Search.filterProductByCategory(id_categories, 100000, "createAt"));
 	}
 
 	@GetMapping("filterprice")
 	public ApiResponse<Map<String, Object>> filterPrice(@RequestParam("priceMin") double priceMin,
 			@RequestParam("priceMax") double priceMax) {
 		return ApiResponse.<Map<String, Object>>build().message("success")
-				.result(service_Search.filterProductByPrice(priceMin, priceMax, 10, "createAt"));
+				.result(service_Search.filterProductByPrice(priceMin, priceMax, 1000000, "createAt"));
 	}
 }
