@@ -26,8 +26,10 @@ public enum ErrorCode {
     FIELD_MIN_KEY(3006, "{key} phải lớn hơn hoặc bằng {min} kí tự!", HttpStatus.BAD_REQUEST),
 
     TIME_RANGE_ERROR(4001, "Thời gian bắt đầu phải trước thời gian kết thúc", HttpStatus.BAD_REQUEST),
-    EMAIL_FORMAT_ERROR(4002, "Email không hợp lệ!", HttpStatus.BAD_REQUEST);
+    EMAIL_FORMAT_ERROR(4002, "Email không hợp lệ!", HttpStatus.BAD_REQUEST),
 
+
+    TIME_ERROR(5001, "Khung thời gian đã tồn tại", HttpStatus.BAD_REQUEST);
     private final int code;
     private final String message;
     private final HttpStatus httpStatus;
