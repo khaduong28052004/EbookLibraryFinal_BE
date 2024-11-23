@@ -11,7 +11,6 @@ import com.toel.mapper.user.FlashSaleDetailMapper;
 import com.toel.model.FlashSale;
 import com.toel.model.FlashSaleDetail;
 import com.toel.repository.FlashSaleDetailRepository;
-import com.toel.service.user.FlashSaleService;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.toel.dto.user.response.Response_FlashSaleDetail;
-import com.toel.mapper.user.FlashSaleDetailMapper;
 import com.toel.model.FlashSale;
 import com.toel.model.FlashSaleDetail;
 import com.toel.repository.FlashSaleRepository;
