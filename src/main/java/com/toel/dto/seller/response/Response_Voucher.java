@@ -12,6 +12,7 @@ public class Response_Voucher {
     Integer id;
     String name;
     String note;
+    double minOrder;
     double totalPriceOrder;
     double sale;
     int quantity;

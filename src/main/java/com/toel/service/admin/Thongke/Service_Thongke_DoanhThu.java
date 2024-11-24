@@ -102,10 +102,12 @@ public class Service_Thongke_DoanhThu {
                                 endDate);
                 double doanhThuSan = billDetailRepository.calculateChietKhauByShop_San(account.getId(), startDate,
                                 endDate);
-                double phi = billRepository.calculateVoucherByShop_San(account.getId(),
+                double phiVoucher = billDetailRepository.calculateVoucherByShop_San(account.getId(),
                                 startDate, endDate);
+                double phiFlashSale = billDetailRepository.calculateFlashSaleByShop_San(account.getId(),
+                                startDate, endDate);
+                double phi = phiVoucher + phiFlashSale;
                 double loiNhuan = doanhThuSan - phi;
-
                 response.setDTshop(doanhThuShop);
                 response.setDTSan(doanhThuSan);
                 response.setPhi(phi);
@@ -116,17 +118,22 @@ public class Service_Thongke_DoanhThu {
         public double[] calculateMonthlyRevenue(Date dateStart, Date dateEnd, String search, Boolean gender) {
                 Date finalDateStart = getDateStart(dateStart);
                 Date finalDateEnd = getDateEnd(dateEnd);
-                double tongShop = 0, doanhThuSan = 0, phi = 0, loiNhuan = 0;
+                double tongShop = 0, doanhThuSan = 0, phi = 0, loiNhuan = 0, phiVoucher = 0, phiFlashSale = 0;
                 tongShop = billRepository
                                 .findByFinishAtBetweenAndGenderAndSearch(finalDateStart, finalDateEnd, gender, search)
                                 .size();
+
                 for (Account account : billRepository.findByFinishAtBetweenAndGenderAndSearch(finalDateStart,
                                 finalDateEnd, gender, search)) {
                         doanhThuSan += billDetailRepository.calculateChietKhauByShop_San(account.getId(),
                                         finalDateStart,
                                         finalDateEnd);
-                        phi += billRepository.calculateVoucherByShop_San(account.getId(), finalDateStart, finalDateEnd);
+                        phiVoucher += billDetailRepository.calculateVoucherByShop_San(account.getId(),
+                                        finalDateStart, finalDateEnd);
+                        phiFlashSale += billDetailRepository.calculateFlashSaleByShop_San(account.getId(),
+                                        finalDateStart, finalDateEnd);
                 }
+                phi = phiVoucher + phiFlashSale;
                 loiNhuan = doanhThuSan - phi;
 
                 return new double[] { tongShop, doanhThuSan, phi, loiNhuan };

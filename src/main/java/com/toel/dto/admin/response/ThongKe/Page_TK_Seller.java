@@ -13,5 +13,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Page_TK_Seller {
     Integer tongShop;
+    Integer tongSP;
+    Integer tongTheoDoi;
+    Integer tongBaoCao;
     PageImpl<Response_TK_Seller> thongke;
 }

@@ -78,7 +78,7 @@ public ResponseEntity<Map<String, Object>> updateAccount(
             .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
     
     // Cập nhật các trường thông tin từ entity vào tài khoản
-    account.setShopName(entity.getShopName());
+    // account.setShopName(entity.getShopName());
     account.setUsername(entity.getUsername());
     account.setFullname(entity.getFullname());
     account.setEmail(entity.getEmail());

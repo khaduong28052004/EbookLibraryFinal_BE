@@ -3,8 +3,6 @@ package com.toel.dto.user.response;
 import java.util.Date;
 import java.util.List;
 
-import com.toel.model.Product;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -23,7 +23,8 @@ public class OtpService {
         String hashOtp = servicetoel.hashPassword(otp);
         String key = "OTP:" + email;
         redisTemplate.opsForValue().set(key, hashOtp, OTP_EXPIRATION_MINUTES, TimeUnit.MINUTES);
-        return otp + " hash " + hashOtp;
+        System.out.println(otp + " hash " + hashOtp);
+        return hashOtp;
         // return "oke";
     }
 

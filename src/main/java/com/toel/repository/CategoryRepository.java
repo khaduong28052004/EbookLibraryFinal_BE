@@ -32,7 +32,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
                         "FROM Category c LEFT JOIN Category parent ON c.idParent = parent.id " +
                         "LEFT JOIN Product p ON p.category.id = c.id " +
                         "WHERE c.idParent != 0 " +
-                        "AND c.account.id = ?2" +
+                        "AND c.account.id = ?2 " +
                         "AND (?1 IS NULL OR c.name LIKE CONCAT('%', ?1, '%')) " +
                         "GROUP BY c.id, parent.name")
         Page<Object[]> findCategoriesWithParentName(String search, Integer accountId, Pageable pageable);

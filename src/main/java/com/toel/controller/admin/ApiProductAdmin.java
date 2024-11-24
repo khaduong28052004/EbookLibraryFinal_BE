@@ -31,12 +31,15 @@ public class ApiProductAdmin {
                 return ApiResponse.<PageImpl<Response_ProductListFlashSale>>build()
                                 .result(service_Product.getAll(page, size, sortBy, sortColumn, search, option));
         }
-        
+
         @PutMapping
         public ApiResponse<Response_ProductListFlashSale> putStatus(
                         @RequestParam(value = "id", required = false) Integer id) {
+                Response_ProductListFlashSale entity = service_Product.updateStatus(id);
                 return ApiResponse.<Response_ProductListFlashSale>build()
-                                .result(service_Product.updateStatus(id));
+                                .message(!entity.isDelete() ? "Khôi phục hoạt động thành công"
+                                                : "Ngừng hoạt động thành công")
+                                .result(entity);
         }
 
         @PutMapping("browse")
@@ -44,6 +47,7 @@ public class ApiProductAdmin {
                         @RequestParam(value = "id", required = false) Integer id,
                         @RequestParam(value = "status", required = false) Boolean status) {
                 return ApiResponse.<Response_ProductListFlashSale>build()
+                                .message(status ? "Duyệt thành công" : "Hủy thành công")
                                 .result(service_Product.updateActive(id, status));
         }
 }

@@ -91,7 +91,7 @@ public class ApiCategorySeller {
         }
 
         @DeleteMapping("/delete")
-        public ApiResponse delete(@RequestParam("id") Integer id_category) {
+        public ApiResponse<?> delete(@RequestParam("id") Integer id_category) {
                 categoryService.delete(id_category);
                 return ApiResponse.build()
                                 .message("Xóa thành công thể loại");

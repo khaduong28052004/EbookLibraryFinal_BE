@@ -1,9 +1,8 @@
 package com.toel.service.seller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,53 +26,61 @@ public class Service_ImageProductSeller {
     @Autowired
     DeleteImage deleteImage;
 
-    public void createProductImages(Product product, List<MultipartFile> images) throws IOException {
-        List<ImageProduct> imageProducts = images.stream()
-                .map(requestImage -> {
-                    try {
-                        // MultipartFile imageFile = requestImage.getImageFile();
-                        String name = uploadImage.uploadFile("product", requestImage); // Tải lên ảnh
-
-                        ImageProduct imageProduct = new ImageProduct();
-                        imageProduct.setName(name);
-                        imageProduct.setProduct(product);
-                        return imageProduct;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull) // Lọc bỏ những ảnh bị lỗi
-                .collect(Collectors.toList());
-
-        // Lưu tất cả ImageProduct vào cơ sở dữ liệu trong một lần
-        imageProductRepository.saveAll(imageProducts);
+    public boolean createProductImages(Product product, List<MultipartFile> images) {
+        List<ImageProduct> imageProducts = new ArrayList<>();
+        try {
+            for (MultipartFile requestImage : images) {
+                try {
+                    String name = uploadImage.uploadFile("product", requestImage);
+                    ImageProduct imageProduct = new ImageProduct();
+                    imageProduct.setName(name);
+                    imageProduct.setProduct(product);
+                    imageProducts.add(imageProduct);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
+            imageProductRepository.saveAll(imageProducts);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    public void updateProductImages(Product product, List<MultipartFile> images) {
+    public boolean updateProductImages(Product product, List<MultipartFile> images) {
+        try {
+            for (ImageProduct image : product.getImageProducts()) {
+                try {
+                    deleteImage.deleteFileByUrl(image.getName());
+                    imageProductRepository.delete(image);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
 
-        product.getImageProducts().forEach(image -> {
-            deleteImage.deleteFileByUrl(image.getName());
-            imageProductRepository.delete(image);
-        });
-        List<ImageProduct> imageProducts = images.stream()
-                .map(requestImage -> {
-                    try {
-                        // MultipartFile imageFile = requestImage.getImageFile();
-                        String name = uploadImage.uploadFile("product", requestImage);
+            List<ImageProduct> imageProducts = new ArrayList<>();
+            for (MultipartFile requestImage : images) {
+                try {
+                    String name = uploadImage.uploadFile("product", requestImage);
+                    ImageProduct imageProduct = new ImageProduct();
+                    imageProduct.setName(name);
+                    imageProduct.setProduct(product);
+                    imageProducts.add(imageProduct);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+            }
 
-                        ImageProduct imageProduct = new ImageProduct();
-                        imageProduct.setName(name);
-                        imageProduct.setProduct(product);
-                        return imageProduct;
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
-        imageProductRepository.saveAll(imageProducts);
+            imageProductRepository.saveAll(imageProducts);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
+
 }

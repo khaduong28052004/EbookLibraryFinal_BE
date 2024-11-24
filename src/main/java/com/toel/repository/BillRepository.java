@@ -82,7 +82,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	// Home Seller
 
-	@Query("SELECT COUNT(b) FROM Bill b JOIN b.billDetails bd WHERE b.orderStatus.id = 1 AND bd.product.account.id = ?1")
+	@Query("SELECT COUNT(b.id) FROM Bill b JOIN b.billDetails bd WHERE b.orderStatus.id = 1 AND bd.product.account.id = ?1 GROUP By b.id")
 	Integer getDonChoDuyet(Integer account_id);
 
 	@Query("SELECT SUM(b.totalPrice) FROM Bill b JOIN b.billDetails bd WHERE b.finishAt = CURRENT_DATE AND bd.product.account.id = ?1 ")
@@ -105,8 +105,8 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			"ORDER BY MONTH(b.finishAt)")
 	List<Object[]> getListDoanhThu(Integer year, Integer account_id);
 
-	@Query("SELECT COALESCE(AVG(b.discountPrice),0) FROM Bill b WHERE b.account.id =?1 AND ( ?2 IS NULL OR b.finishAt >= ?2) AND ( ?3 IS NULL OR b.finishAt <= ?3 )")
-	Double calculateVoucherByShop_San(Integer account, Date dateStart, Date dateEnd);
+	// @Query("SELECT COALESCE(SUM(b.discountPrice),0) FROM BillDetail bd WHERE bd.account.id =?1 AND ( ?2 IS NULL OR bd.bill.finishAt >= ?2) AND ( ?3 IS NULL OR bd.bill.finishAt <= ?3 )")
+	// Double calculateVoucherByShop_San(Integer account, Date dateStart, Date dateEnd);
 
 	// @Query("SELECT b FROM Bill b WHERE b.account.id =?1 AND ( ?2 IS NULL OR
 	// b.finishAt >= ?2) AND ( ?3 IS NULL OR b.finishAt <= ?3 )")
@@ -176,7 +176,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			@Param("search") String search,
 			Pageable pageable);
 
-	@Query("SELECT SUM(bd.quantity) FROM Bill b JOIN b.billDetails bd JOIN bd.product p WHERE bd.product.account.id = :accountId AND (:search IS NULL OR p.name LIKE %:search%)")
+	@Query("SELECT SUM(b.totalQuantity) FROM Bill b JOIN b.billDetails bd JOIN bd.product p WHERE p.account.id = :accountId AND (:search IS NULL OR p.name LIKE %:search%) ")
 	Integer tongLuotBanSanPham(@Param("accountId") Integer account_id, @Param("search") String search);
 
 	@Query("SELECT COUNT(bd.evalue.id) FROM Bill b JOIN b.billDetails bd JOIN bd.product p WHERE bd.product.account.id = :accountId AND (:search IS NULL OR p.name LIKE %:search%)")
@@ -188,7 +188,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	@Query("SELECT AVG(bd.evalue.star) FROM Bill b JOIN b.billDetails bd JOIN bd.product p WHERE bd.product.account.id = :accountId AND (:search IS NULL OR p.name LIKE %:search%) ")
 	Double tongTrungBinhLuotDanhGia(@Param("accountId") Integer account_id, @Param("search") String search);
 
-	@Query("SELECT p.name AS nameSP , c.name AS theLoai, SUM(bd.quantity) AS luotBan, COUNT(e.id) AS luotDanhGia, AVG(e.star) AS trungBinhDanhGia, COUNT(l.id) AS luotYeuThich "
+	@Query("SELECT p.name AS nameSP , c.name AS theLoai, SUM(b.totalQuantity) AS luotBan, COUNT(e.id) AS luotDanhGia, AVG(e.star) AS trungBinhDanhGia, COUNT(l.id) AS luotYeuThich "
 			+
 			"FROM Bill b JOIN b.billDetails bd " +
 			"LEFT JOIN bd.evalue e LEFT JOIN bd.product.likes l " +
@@ -213,10 +213,15 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			@Param("dateEnd") Date dateEnd,
 			@Param("idOrderStatus") Integer idOrderStatus, Pageable pageable);
 
+	@Query("Select b From Bill b Where b.orderStatus.id = :idOrderStatus AND b.createAt BETWEEN  :dateStart AND :dateEnd")
+	Page<Bill> selectAllByCreateAtBetweenAndOrderStatus(@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd,
+			@Param("idOrderStatus") Integer idOrderStatus, Pageable pageable);
+
 	@Query(value = "SELECT * FROM Bills WHERE orderstatus_id = :orderstatusID", nativeQuery = true)
 	List<Bill> findByOrderStatusId(@Param("orderstatusID") Integer orderstatusId);
 
-	@Query("SELECT COALESCE(SUM(b.totalPrice),0) FROM Bill b WHERE b.account =?1")
+	@Query("SELECT COALESCE(AVG(b.totalPrice),0) FROM Bill b WHERE b.account =?1")
 	double calculateAGVTotalPriceByAccount(Account account);
 
 	Integer countByAccount(Account account);
@@ -246,7 +251,14 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	List<Bill> findAllByCreateAtBetweenAndOrderStatus(Date dateStart, Date dateEnd, OrderStatus orderStatus);
 
-	List<Bill> findAllByFinishAtBetweenAndOrderStatus(Date dateStart, Date dateEnd, OrderStatus orderStatus);
+	List<Bill> findAllByUpdateAtBetweenAndOrderStatus(Date dateStart, Date dateEnd, OrderStatus orderStatus);
+
+	// List<Bill> findAllByFinishAtBetweenAndOrderStatus(Date dateStart, Date
+	// dateEnd, OrderStatus orderStatus);
+	@Query("Select b From Bill b Where b.orderStatus.id = :idOrderStatus AND b.finishAt BETWEEN  :dateStart AND :dateEnd ")
+	List<Bill> findAllByFinishAtBetweenAndOrderStatus(@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd,
+			@Param("idOrderStatus") Integer idOrderStatus);
 
 	// thống kê khách hàng
 	@Query("SELECT b.account FROM Bill b WHERE b.finishAt BETWEEN ?1 AND ?2")

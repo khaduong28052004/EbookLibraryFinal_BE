@@ -39,7 +39,6 @@ public class Service_ProductSeller {
         AccountRepository accountRepository;
         @Autowired
         CategoryRepository categoryRepository;
-        Product product;
 
         public PageImpl<Response_Product> getAll(
                         Integer page, Integer size, boolean sortBy, String sortColum, Integer account_id,
@@ -57,8 +56,7 @@ public class Service_ProductSeller {
 
         public Response_Product create(
                         Request_ProductCreate request_Product) throws IOException {
-                product = productMapper.productCreate(request_Product);
-                // checkCreate(product);
+                Product product = productMapper.productCreate(request_Product);
                 product.setAccount(accountRepository.findById(request_Product.getAccount())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
                 product.setCategory(
@@ -71,8 +69,7 @@ public class Service_ProductSeller {
 
         public Response_Product update(
                         Request_ProductUpdate request_Product) throws IOException {
-                product = productMapper.productUpdate(request_Product);
-                // checkUpdate(product);
+                Product product = productMapper.productUpdate(request_Product);
                 product.setAccount(accountRepository.findById(request_Product.getAccount())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
                 product.setCategory(categoryRepository.findById(request_Product.getCategory())
@@ -80,14 +77,20 @@ public class Service_ProductSeller {
                 return productMapper.response_Product(productRepository.saveAndFlush(product));
         }
 
-        public void saveImgCreate(
+        public boolean saveImgCreate(
+                        Integer product_id,
                         List<MultipartFile> images) throws IOException {
-                service_ImageProductSeller.createProductImages(product, images);
+                return service_ImageProductSeller.createProductImages(
+                                productRepository.findById(product_id).get(),
+                                images);
         }
 
-        public void saveImgUpdate(
+        public boolean saveImgUpdate(
+                        Integer product_id,
                         List<MultipartFile> images) throws IOException {
-                service_ImageProductSeller.updateProductImages(product, images);
+                return service_ImageProductSeller.updateProductImages(
+                                productRepository.findById(product_id).get(),
+                                images);
         }
 
         public Response_Product edit(
@@ -104,32 +107,38 @@ public class Service_ProductSeller {
                                 });
         }
 
-        public void checkCreate(Product product) {
+        public Request_ProductCreate checkCreate(Request_ProductCreate request_ProductCreate) {
 
-                if (productRepository.findAll().stream()
-                                .anyMatch(productCheck -> product.getName().equalsIgnoreCase(productCheck.getName()))) {
+                if (productRepository.findByAccountId(request_ProductCreate.getAccount()).stream()
+                                .anyMatch(productCheck -> request_ProductCreate.getName()
+                                                .equalsIgnoreCase(productCheck.getName()))) {
                         throw new AppException(ErrorCode.OBJECT_SETUP, "Tên sản phẩm đã tồn tại.");
                 }
 
-                if (product.getPrice() < 1000 || product.getPrice() < product.getSale()) {
-                        String message = (product.getPrice() < 1000) ? "Giá sản phẩm phải lớn hơn 1000đ."
+                if (request_ProductCreate.getPrice() < 1000
+                                || request_ProductCreate.getPrice() < request_ProductCreate.getSale()) {
+                        String message = (request_ProductCreate.getPrice() < 1000) ? "Giá sản phẩm phải lớn hơn 1000đ."
                                         : "Giá sản phẩm phải lớn hơn giá giảm.";
                         throw new AppException(ErrorCode.OBJECT_SETUP, message);
                 }
+                return request_ProductCreate;
         }
 
-        public void checkUpdate(Product product) {
+        public Request_ProductUpdate checkUpdate(Request_ProductUpdate request_ProductUpdate) {
 
-                if (productRepository.findAll().stream()
-                                .anyMatch(productCheck -> !product.getId().equals(productCheck.getId())
-                                                && product.getName().equalsIgnoreCase(productCheck.getName()))) {
+                if (productRepository.findByAccountId(request_ProductUpdate.getAccount()).stream()
+                                .anyMatch(productCheck -> !request_ProductUpdate.getId().equals(productCheck.getId())
+                                                && request_ProductUpdate.getName()
+                                                                .equalsIgnoreCase(productCheck.getName()))) {
                         throw new AppException(ErrorCode.OBJECT_SETUP, "Tên sản phẩm đã tồn tại.");
                 }
 
-                if (product.getPrice() < 1000 || product.getPrice() < product.getSale()) {
-                        String message = (product.getPrice() < 1000) ? "Giá sản phẩm phải lớn hơn 1000đ."
+                if (request_ProductUpdate.getPrice() < 1000
+                                || request_ProductUpdate.getPrice() < request_ProductUpdate.getSale()) {
+                        String message = (request_ProductUpdate.getPrice() < 1000) ? "Giá sản phẩm phải lớn hơn 1000đ."
                                         : "Giá sản phẩm phải lớn hơn giá giảm.";
                         throw new AppException(ErrorCode.OBJECT_SETUP, message);
                 }
+                return request_ProductUpdate;
         }
 }
