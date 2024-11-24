@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import com.toel.dto.admin.request.FlashSaleDetail.Resquest_FlashSaleDetailsCreate;
 import com.toel.dto.admin.request.FlashSaleDetail.Resquest_FlashSaleDetailsUpdate;
 import com.toel.dto.admin.response.Response_FlashSaleDetail;
-import com.toel.dto.seller.response.Response_Product;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.FlashSaleDetailsMapper;
