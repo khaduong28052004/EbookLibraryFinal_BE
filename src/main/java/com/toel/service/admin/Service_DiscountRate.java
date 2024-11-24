@@ -84,13 +84,13 @@ public class Service_DiscountRate {
         }
     }
 
-    // @Scheduled(fixedDelay = 100)
-    // public void run() {
-    // discountRateRepository.findAllBydateDeleteIsNull().forEach(rate -> {
-    // if (rate.getDateStart().isBefore(LocalDateTime.now()))
-    // rate.setDateDelete(LocalDateTime.now());
-    // discountRateRepository.save(rate);
-    // });
-    // }
+    @Scheduled(fixedDelay = 86400)
+    public void run() {
+        discountRateRepository.findAllBydateDeleteIsNull().forEach(rate -> {
+            if (rate.getDateStart().isBefore(LocalDateTime.now()))
+                rate.setDateDelete(LocalDateTime.now());
+            discountRateRepository.save(rate);
+        });
+    }
 
 }
