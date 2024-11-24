@@ -84,10 +84,11 @@ public class Service_DiscountRate {
         }
     }
 
-    @Scheduled(fixedDelay = 86400)
+    @Scheduled(fixedDelay = 60000)
     public void run() {
+        DiscountRate discountRate = discountRateRepository.findLatestDiscountRate().get(0);
         discountRateRepository.findAllBydateDeleteIsNull().forEach(rate -> {
-            if (rate.getDateStart().isBefore(LocalDateTime.now()))
+            if (rate.getDateStart().isBefore(LocalDateTime.now()) && rate.getId() != discountRate.getId())
                 rate.setDateDelete(LocalDateTime.now());
             discountRateRepository.save(rate);
         });
