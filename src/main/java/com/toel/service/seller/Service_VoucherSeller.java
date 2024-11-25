@@ -51,10 +51,9 @@ public class Service_VoucherSeller {
                                 Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
                 Page<Voucher> pageVoucher = voucherRepository.findAllByIdAccountSearch(account_id, search,
                                 pageable);
-                List<Response_Voucher> list = pageVoucher.stream()
+                return new PageImpl<>(pageVoucher.stream()
                                 .map(voucher -> voucherMapper.response_Voucher(voucher))
-                                .collect(Collectors.toList());
-                return new PageImpl<>(list, pageable, pageVoucher.getTotalElements());
+                                .collect(Collectors.toList()), pageable, pageVoucher.getTotalElements());
         }
 
         public PageImpl<Response_Voucher> getAllAdmin(
@@ -63,19 +62,20 @@ public class Service_VoucherSeller {
                                 Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
                 Page<Voucher> pageVoucher = voucherRepository.findAllByIdAccountSearch(search,
                                 pageable);
-                List<Response_Voucher> list = pageVoucher.stream()
+                return new PageImpl<>(pageVoucher.stream()
                                 .map(voucher -> voucherMapper.response_Voucher(voucher))
-                                .collect(Collectors.toList());
-                return new PageImpl<>(list, pageable, pageVoucher.getTotalElements());
+                                .collect(Collectors.toList()), pageable, pageVoucher.getTotalElements());
         }
 
-        public Response_Voucher edit(Integer voucher_id) {
-                return voucherMapper.response_Voucher(voucherRepository.findById(voucher_id).get());
+        public Response_Voucher edit(
+                        Integer voucher_id) {
+                return voucherMapper.response_Voucher(voucherRepository.findById(voucher_id)
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Voucher")));
         }
 
-        public Response_Voucher create(Request_VoucherCreate request_Voucher) {
+        public Response_Voucher create(
+                        Request_VoucherCreate request_Voucher) {
                 Voucher voucher = voucherMapper.voucherCreate(request_Voucher);
-                // checkVoucher(voucher);
                 voucher.setAccount(accountRepository.findById(request_Voucher.getAccount())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
                 voucher.setTypeVoucher(typeVoucherRepository.findById(request_Voucher.getTypeVoucher())
@@ -84,9 +84,9 @@ public class Service_VoucherSeller {
                                 .response_Voucher(voucherRepository.saveAndFlush(voucher));
         }
 
-        public Response_Voucher update(Request_VoucherUpdate request_Voucher) {
+        public Response_Voucher update(
+                        Request_VoucherUpdate request_Voucher) {
                 Voucher voucher = voucherMapper.voucherUpdate(request_Voucher);
-                // checkVoucher(voucher);
                 voucher.setAccount(accountRepository.findById(request_Voucher.getAccount())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
                 voucher.setTypeVoucher(typeVoucherRepository.findById(request_Voucher.getTypeVoucher())
@@ -95,11 +95,13 @@ public class Service_VoucherSeller {
                                 .response_Voucher(voucherRepository.saveAndFlush(voucher));
         }
 
-        public boolean delete(Integer voucher_id) {
-                Optional<Voucher> voucher = voucherRepository.findById(voucher_id);
-                voucher.get().setDelete(!voucher.get().isDelete());
-                voucherRepository.saveAndFlush(voucher.get());
-                return voucher.get().isDelete();
+        public boolean delete(
+                        Integer voucherId) {
+                return voucherRepository.findById(voucherId).map(voucher -> {
+                        voucher.setDelete(!voucher.isDelete());
+                        voucherRepository.saveAndFlush(voucher);
+                        return voucher.isDelete();
+                }).orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Voucher"));
         }
 
         public PageImpl<Response_VoucherDetail> getAllDetail(
@@ -116,7 +118,8 @@ public class Service_VoucherSeller {
                                 pageVoucherDetail.getTotalElements());
         }
 
-        public Request_VoucherCreate checkVoucherCreate(Request_VoucherCreate request_VoucherCreate) {
+        public Request_VoucherCreate checkVoucherCreate(
+                        Request_VoucherCreate request_VoucherCreate) {
                 boolean nameExists = voucherRepository.findAllListByIdAccount(request_VoucherCreate.getAccount())
                                 .stream()
                                 .anyMatch(voucherCheck -> request_VoucherCreate.getName()
@@ -133,7 +136,8 @@ public class Service_VoucherSeller {
                 return request_VoucherCreate;
         }
 
-        public Request_VoucherUpdate checkVoucherUpdate(Request_VoucherUpdate request_VoucherUpdate) {
+        public Request_VoucherUpdate checkVoucherUpdate(
+                        Request_VoucherUpdate request_VoucherUpdate) {
                 boolean nameExists = voucherRepository.findAllListByIdAccount(request_VoucherUpdate.getAccount())
                                 .stream()
                                 .anyMatch(voucherCheck -> request_VoucherUpdate.getName()
