@@ -11,8 +11,8 @@ import com.toel.model.BillDetail;
 import com.toel.model.Product;
 
 public interface BillDetailRepository extends JpaRepository<BillDetail, Integer> {
-	@Query("SELECT COALESCE(SUM( (bd.price * bd.quantity) - (bd.price * bd.quantity * "
-			+ "( SELECT COALESCE(vd.voucher.sale, 0)/ 100  FROM bd.bill.voucherDetails vd WHERE vd.bill = bd.bill and vd.voucher.typeVoucher.id=1))), 0)"
+	@Query("SELECT COALESCE(SUM( (bd.price * bd.quantity) * (1 - (bd.bill.discountRate.discount / 100.0)) - (bd.price * bd.quantity * "
+			+ "COALESCE((SELECT COALESCE(vd.voucher.sale, 0)/ 100  FROM bd.bill.voucherDetails vd WHERE vd.bill = bd.bill and vd.voucher.typeVoucher.id=1),0))), 0)"
 			+
 			"FROM BillDetail bd " +
 			"WHERE bd.product.account.id = :accountId " +
