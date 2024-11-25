@@ -100,4 +100,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	@Query("SELECT p FROM Product p WHERE p.id NOT IN :idProducts AND p.account.id != :idShop")
 	List<Product> findAllIdNotIn(@Param("idProducts") List<Integer> idProducts, @Param("idShop") Integer idShop);
 
+        @Query(value = "SELECT * FROM products p WHERE p.isDelete=false and p.isActive=false and p.createAt < NOW() - INTERVAL 7 DAY", nativeQuery = true)
+        List<Product> findAllCreatedBeforeSevenDays();
 }
