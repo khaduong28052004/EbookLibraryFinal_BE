@@ -104,11 +104,13 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
                         @Param("dateStart") Date dateStart,
                         @Param("dateEnd") Date dateEnd);
 
-        //check - nhanvien
+        // check - nhanvien
         boolean existsByUsernameIgnoreCase(String username);
 
         boolean existsByPhoneIgnoreCase(String phone);
 
         boolean existsByEmailIgnoreCase(String email);
 
+        @Query(value = "SELECT * FROM accounts a WHERE a.role_id = 4 AND a.numberId IS NOT NULL AND a.createAtSeller < NOW() - INTERVAL 7 DAY", nativeQuery = true)
+        List<Account> listAccountBeforeSevenDays();
 }
