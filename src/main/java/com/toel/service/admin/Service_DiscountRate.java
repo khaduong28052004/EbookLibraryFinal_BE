@@ -3,6 +3,7 @@ package com.toel.service.admin;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,7 +21,6 @@ import com.toel.dto.admin.response.Response_DiscountRate;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.DiscountRateMapper;
-import com.toel.model.Account;
 import com.toel.model.DiscountRate;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.DiscountRateRepository;
@@ -56,22 +56,36 @@ public class Service_DiscountRate {
         return discountRateMapper.tochChietKhauResponse(discountRate);
     }
 
-    public Response_DiscountRate update(Request_DiscountRateUpdate entity) {
-        DiscountRate discountRate = discountRateRepository.findById(entity.getId())
+    public Response_DiscountRate update(Request_DiscountRateUpdate discountRateUpdate) {
+        DiscountRate discountRate = discountRateRepository.findById(discountRateUpdate.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Chiết khấu"));
-        discountRate.setDateStart(entity.getDateStart());
-        discountRate.setDiscount(entity.getDiscount());
-        return discountRateMapper.tochChietKhauResponse(discountRateRepository.save(discountRate));
+        return Optional.of(discountRate)
+                .map(entity -> {
+                    entity.setDateStart(entity.getDateStart());
+                    entity.setDiscount(entity.getDiscount());
+                    return entity;
+                })
+                .filter(this::check)
+                .map(discountRateRepository::saveAndFlush)
+                .map(discountRateMapper::tochChietKhauResponse)
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Ngày áp dụng đã tồn tại"));
+
     }
 
     public Response_DiscountRate create(Request_DiscountRateCreate discountRate) {
-        Account account = accountRepository.findById(1)
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
-        DiscountRate entity = discountRateMapper.toDiscountRateCreate(discountRate);
-        entity.setAccount(account);
-        entity.setDateInsert(LocalDateTime.now());
-        entity.setDateStart(discountRate.getDateStart());
-        return discountRateMapper.tochChietKhauResponse(discountRateRepository.save(entity));
+        return Optional.of(discountRate)
+                .map(discountRateMapper::toDiscountRateCreate)
+                .map(entity -> {
+                    entity.setAccount(accountRepository.findById(1)
+                            .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
+                                    "Account")));
+                    return entity;
+                })
+                .filter(this::check)
+                .map(discountRateRepository::saveAndFlush)
+                .map(discountRateMapper::tochChietKhauResponse)
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Ngày áp dụng đã tồn tại"));
+
     }
 
     public void delete(Integer id) {
@@ -85,13 +99,21 @@ public class Service_DiscountRate {
     }
 
     @Scheduled(fixedDelay = 60000)
+    // @Scheduled(fixedDelay = 100)
     public void run() {
-        DiscountRate discountRate = discountRateRepository.findLatestDiscountRate().get(0);
-        discountRateRepository.findAllBydateDeleteIsNull().forEach(rate -> {
-            if (rate.getDateStart().isBefore(LocalDateTime.now()) && rate.getId() != discountRate.getId())
-                rate.setDateDelete(LocalDateTime.now());
-            discountRateRepository.save(rate);
-        });
+        if (discountRateRepository.findAllBydateDeleteIsNull().size() >= 2) {
+            DiscountRate discountRate = discountRateRepository.findLatestDiscountRate().get(0);
+            discountRateRepository.findAllBydateDeleteIsNull().forEach(rate -> {
+                if (rate.getDateStart().isBefore(LocalDateTime.now()) && rate.getId() != discountRate.getId())
+                    rate.setDateDelete(LocalDateTime.now());
+                discountRateRepository.save(rate);
+            });
+        }
     }
 
+    public boolean check(DiscountRate discountRate) {
+        return discountRateRepository.findAllBydateDeleteIsNull().stream()
+                .noneMatch(entity -> discountRate.getDateStart() == entity.getDateStart()
+                        && (discountRate.getId() == null || discountRate.getId() != entity.getId()));
+    }
 }
