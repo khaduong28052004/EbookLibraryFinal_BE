@@ -22,10 +22,10 @@ public class Service_Autosave {
     // @Scheduled(fixedDelay = 100)
     public void run() {
         productRepository.findAllCreatedBeforeSevenDays().forEach(product -> {
-            service_Product.updateActive(product.getId(), true);
+            service_Product.updateActive(product.getId(), true, null);
         });
         accountRepository.listAccountBeforeSevenDays().forEach(account -> {
-            service_Account.updateActive(account.getId(), true);
+            service_Account.updateActive(account.getId(), true,null);
         });
     }
 }
