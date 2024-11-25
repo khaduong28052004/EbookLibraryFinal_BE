@@ -13,7 +13,6 @@ import com.toel.model.Account;
 import com.toel.model.Address;
 import com.toel.model.Bill;
 import com.toel.model.BillDetail;
-import com.toel.model.Cart;
 import com.toel.model.DiscountRate;
 import com.toel.model.OrderStatus;
 import com.toel.model.PaymentMethod;
@@ -30,8 +29,6 @@ import com.toel.repository.PaymentMethodRepository;
 import com.toel.repository.ProductRepository;
 import com.toel.repository.VoucherDetailRepository;
 import com.toel.repository.VoucherRepository;
-
-import jakarta.mail.FetchProfile.Item;
 
 @Service
 public class Service_Pay {

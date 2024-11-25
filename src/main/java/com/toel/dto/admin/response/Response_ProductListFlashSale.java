@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import com.toel.model.Category;
-import com.toel.model.FlashSaleDetail;
 import com.toel.model.ImageProduct;
 
 import lombok.AllArgsConstructor;

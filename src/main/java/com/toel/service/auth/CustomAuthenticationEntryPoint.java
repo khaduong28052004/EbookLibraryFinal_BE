@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 @RestControllerAdvice
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
@@ -19,7 +20,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		response.setContentType("application/json");
 		response.getWriter().write("{\"error\":\"UnAuthorzed\",\"message\":  \""+"ban can dang nhap !! " + authException.getMessage() + "\"}");
-		// throw new UnsupportedOperationException("Unimplemented method 'commence'");
-    }
+		throw new UnsupportedOperationException("Unimplemented method 'commence'");
+    } 
     
 }
