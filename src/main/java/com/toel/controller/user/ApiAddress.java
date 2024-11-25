@@ -132,7 +132,7 @@ public class ApiAddress {
         map.put("status", "success");
         return map;
     }
-    @GetMapping("/rest/address/active/{id}") // Sử dụng GET để lấy địa chỉ
+    @GetMapping("/rest/address/active/{id}") // Theo md
     public ResponseEntity<Map<String, Object>> getAddresses(@PathVariable Integer id) {
         Map<String, Object> map = new HashMap<>();
 
