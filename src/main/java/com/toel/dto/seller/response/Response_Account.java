@@ -14,4 +14,5 @@ public class Response_Account {
     String phone;
     String background;
     String shopName;
+    Response_Address address;
 }

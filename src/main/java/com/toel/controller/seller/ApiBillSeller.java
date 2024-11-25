@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.request.Request_Bill;
 import com.toel.dto.seller.response.Response_Bill;
+import com.toel.service.Email.EmailService;
 import com.toel.service.seller.Service_BillSeller;
 
 import jakarta.validation.Valid;
@@ -47,10 +48,11 @@ public class ApiBillSeller {
 
         @PostMapping("huy")
         public ApiResponse<Response_Bill> huy(
+                        @RequestParam(value = "content", defaultValue = "") String content,
                         @RequestBody @Valid Request_Bill request_Bill) {
                 return ApiResponse.<Response_Bill>build()
                                 .message("Hủy đơn hàng thành công")
-                                .result(service_Bill.huy(request_Bill));
+                                .result(service_Bill.huy(content, request_Bill));
         }
 
 }
