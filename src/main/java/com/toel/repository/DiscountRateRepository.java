@@ -30,4 +30,9 @@ public interface DiscountRateRepository extends JpaRepository<DiscountRate, Inte
 	DiscountRate find(LocalDateTime now);
 
 	Optional<DiscountRate> findTopByOrderByIdDesc();
+	
+	@Query("SELECT r FROM DiscountRate r WHERE r.dateDelete IS NULL and r.dateStart < CURRENT_TIMESTAMP  ORDER BY r.id DESC")
+	List<DiscountRate> findLatestDiscountRate();
+	
+
 }

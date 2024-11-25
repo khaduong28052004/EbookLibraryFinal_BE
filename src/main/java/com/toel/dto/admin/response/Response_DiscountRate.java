@@ -1,7 +1,6 @@
 package com.toel.dto.admin.response;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.*;
 
 @Data
@@ -14,5 +13,4 @@ public class Response_DiscountRate {
     private LocalDateTime dateStart;
     private LocalDateTime dateInsert;
     private Response_Account account;
-    private List<Response_Bill> bills;
 }
