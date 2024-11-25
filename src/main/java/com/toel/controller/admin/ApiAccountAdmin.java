@@ -89,8 +89,10 @@ public class ApiAccountAdmin {
     }
 
     @PutMapping
-    public ApiResponse<Response_Account> putStatus(@RequestParam(value = "id", required = false) Integer id) {
-        Response_Account entity = service_Account.updateStatus(id, null);
+    public ApiResponse<Response_Account> putStatus(
+            @RequestParam(value = "id", required = false) Integer id,
+            @RequestParam(value = "contents", required = false) String contents) {
+        Response_Account entity = service_Account.updateStatus(id, contents);
         return ApiResponse.<Response_Account>build()
                 .result(entity)
                 .message(entity.isStatus() ? "Khôi phục hoạt động thành công"
@@ -100,8 +102,9 @@ public class ApiAccountAdmin {
     @PutMapping("seller/browse")
     public ApiResponse<Response_Account> putActive(
             @RequestParam(value = "id", required = false) Integer id,
-            @RequestParam(value = "status", required = false) Boolean status) {
-        Response_Account entity = service_Account.updateActive(id, status);
+            @RequestParam(value = "status", required = false) Boolean status,
+            @RequestParam(value = "contents", required = false) String contents) {
+        Response_Account entity = service_Account.updateActive(id, status,contents);
         return ApiResponse.<Response_Account>build()
                 .message(entity.isStatus() ? "Duyệt thành công" : "Hủy thành công")
                 .result(entity);
