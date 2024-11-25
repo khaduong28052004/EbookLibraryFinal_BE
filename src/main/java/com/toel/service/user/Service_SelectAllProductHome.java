@@ -34,7 +34,7 @@ public class Service_SelectAllProductHome {
 
 		List<Integer> idProducts = list.stream().map(p -> p.getProduct().getId()).collect(Collectors.toList());
 		Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
-		Page<Product> pageProducts = productRepo.findAllIdNotIn(idProducts, pageable);
+		List<Product> pageProducts = productRepo.findAllIdNotIn(idProducts, idShop);
 		List<Response_Product> response_Products = new ArrayList<Response_Product>();
 		for (Product product : pageProducts) {
 			if (product.getAccount().getId() != idShop) {
@@ -44,7 +44,7 @@ public class Service_SelectAllProductHome {
 		Map<String, Object> response = new HashMap<String, Object>();
 		if (response_Products.size() > 0) {
 			response.put("datas", response_Products);
-			response.put("totalPages", pageProducts.getTotalPages() * response_Products.size());
+//			response.put("totalPages", pageProducts.getTotalPages() * response_Products.size());
 		} else {
 			response.put("error", 1002);
 		}
