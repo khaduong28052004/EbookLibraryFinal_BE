@@ -111,6 +111,13 @@ public class Service_Pay {
 				billDetail = billDetailRepository.save(billDetail);
 				product.setQuantity(product.getQuantity() - cartItem.getQuantity());
 				product = productRepository.save(product);
+				try {
+					if (cartItem.getProduct().getFlashSaleDetail().getId() > 0) {
+						billDetail.setFlashSaleDetail(cartItem.getProduct().getFlashSaleDetail());
+					}
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
 				cartRepository.deleteById(cartItem.getId());
 				bil.setTotalQuantity(bil.getTotalQuantity() + cartItem.getQuantity());
 				bil = billRepository.save(bil);
