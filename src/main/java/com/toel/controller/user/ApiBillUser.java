@@ -38,7 +38,6 @@ public class ApiBillUser {
 		   Request_Bill_User requestBillDTO = new Request_Bill_User();
 		    requestBillDTO.setOrderStatusFind(orderStatusFind);
 		    requestBillDTO.setUserID(userId);
-		    System.out.println("orderStatusFind"+orderStatusFind);
 		    
 		Map<String, Object> response = service_Bill_User.getBills(requestBillDTO);
 
