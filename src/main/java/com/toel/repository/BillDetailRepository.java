@@ -11,7 +11,9 @@ import com.toel.model.BillDetail;
 import com.toel.model.Product;
 
 public interface BillDetailRepository extends JpaRepository<BillDetail, Integer> {
-	@Query("SELECT COALESCE(AVG((bd.price - bd.discountPrice) * bd.quantity), 0) " +
+	@Query("SELECT COALESCE(SUM( (bd.price * bd.quantity) - (bd.price * bd.quantity * "
+			+ "( SELECT COALESCE(vd.voucher.sale, 0)/ 100  FROM bd.bill.voucherDetails vd WHERE vd.bill = bd.bill and vd.voucher.typeVoucher.id=1))), 0)"
+			+
 			"FROM BillDetail bd " +
 			"WHERE bd.product.account.id = :accountId " +
 			"AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd) ")
@@ -19,7 +21,26 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 			@Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd);
 
-	@Query("SELECT COALESCE(AVG((bd.price * bd.quantity) * (bd.bill.discountRate.discount / 100)),0) " +
+	@Query("SELECT COALESCE(SUM( (bd.product.price * bd.quantity) * "
+			+ "( SELECT COALESCE(vd.voucher.sale, 0)/100  FROM bd.bill.voucherDetails vd WHERE vd.voucher.typeVoucher.id=2)),0)"
+			+
+			"FROM BillDetail bd " +
+			"WHERE bd.product.account.id = :accountId " +
+			"AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd) ")
+	Double calculateVoucherByShop_San(@Param("accountId") Integer accountId,
+			@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd);
+
+	@Query("SELECT COALESCE(SUM(bd.product.price * (COALESCE(bd.flashSaleDetail.sale,0)/100)), 0) " +
+			"FROM BillDetail bd " +
+			"WHERE bd.product.account.id = :accountId " +
+			"AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd) ")
+	Double calculateFlashSaleByShop_San(@Param("accountId") Integer accountId,
+			@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd);
+
+	@Query("SELECT COALESCE(SUM((bd.product.price * bd.quantity) * (COALESCE(bd.bill.discountRate.discount / 100,0))),0) "
+			+
 			"FROM BillDetail bd " +
 			"WHERE bd.product.account.id = :accountId " +
 			"AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd) ")

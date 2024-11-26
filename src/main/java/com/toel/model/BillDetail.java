@@ -27,7 +27,6 @@ public class BillDetail {
 	Integer id;
 	int quantity;
 	double price;
-	double discountPrice;
 	@ManyToOne
 	@JoinColumn(name = "product_id")
 	Product product;
@@ -38,5 +37,9 @@ public class BillDetail {
 
 	@OneToOne(mappedBy = "billDetail")
 	Evalue evalue;
+
+	@ManyToOne
+	@JoinColumn(name = "flashsaledetail_id")
+	FlashSaleDetail flashSaleDetail;
 
 }

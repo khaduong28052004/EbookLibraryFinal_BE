@@ -60,7 +60,11 @@ public class Service_Bill_User {
 	public Map<String, Object> getBills(Request_Bill_User requestBillDTO) {
 		Map<String, Object> response = new HashMap<String, Object>();
 		try {
+			System.out.println("productsInBill ");
+
 			List<Object[]> productsInBill = getBillsByOrderStatus(requestBillDTO);
+			System.out.println("productsInBill " + productsInBill.size());
+
 			List<Response_Bill_User> shopListInBill = createBillsWithProductsInBillDetail(productsInBill);
 			response.put("data", shopListInBill);
 			response.put("status", "successfully");
@@ -82,20 +86,20 @@ public class Service_Bill_User {
 		System.out.println("userId " + userId);
 
 		switch (orderStatus) {
-			case "CHODUYET":
-				return billRepository.getBillsByUserIdNOrderStatusOrderByCreateAt(userId, 1);
-			case "DANGXULY":
-				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 2);
-			case "DANGGIAO":
-				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 3);
-			case "DAGIAO":
-				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 4);
-			case "HOANTHANH":
-				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 5);
-			case "DAHUY":
-				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 6);
-			default:
-				return billRepository.getBillsByUserIdAll(userId);
+		case "CHODUYET":
+			return billRepository.getBillsByUserIdNOrderStatusOrderByCreateAt(userId, 1);
+		case "DANGXULY":
+			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 2);
+		case "DANGGIAO":
+			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 3);
+		case "DAGIAO":
+			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 4);
+		case "HOANTHANH":
+			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 5);
+		case "DAHUY":
+			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 6);
+		default:
+			return billRepository.getBillsByUserIdAll(userId);
 
 		}
 	}
@@ -114,7 +118,6 @@ public class Service_Bill_User {
 			String billAddress = product[6].toString();
 			Integer orderStatusID = Integer.parseInt(product[7].toString());
 			Date createdDatetime = (Date) product[8];
-			Date updatedDatetime = (Date) product[9];
 			Double billDiscountRate = Double.parseDouble(product[10].toString());
 			Integer productID = Integer.parseInt(product[11].toString());
 			String productName = product[12].toString();
@@ -131,6 +134,11 @@ public class Service_Bill_User {
 			String orderStatus = orderStatusRepository.findById(orderStatusID).get().getName();
 			String billPaymentMethod = paymentMethodRepository.findById(billPaymentMethodId).get().getName();
 
+			String updatedDatetime;
+			if ((Date) product[9] == null) {
+				updatedDatetime = "";
+			}
+
 			Response_Bill_User billData = billMap.get(billID);
 			if (billData == null) {
 				billData = new Response_Bill_User();
@@ -145,11 +153,11 @@ public class Service_Bill_User {
 				billData.setBillOrderStatus(orderStatus);
 				billData.setBillPaymentMethod(billPaymentMethod);
 				billData.setCreatedDatetime(formatDate(createdDatetime.toString()));
-				billData.setUpdatedDatetime(formatDate(updatedDatetime.toString()));
 				billData.setBillDiscountRate(billDiscountRate);
 				billData.setShopId(shopId);
 				billData.setShopName(shopName);
 				billData.setShopAvatar(shopAvatar);
+
 				billData.setProducts(new ArrayList<>());
 				billMap.put(billID, billData); // Thêm bill mới vào Map
 			}
@@ -172,9 +180,10 @@ public class Service_Bill_User {
 			productData.setIsEvaluate(isEvalued == 1);
 			billData.getProducts().add(productData);
 		}
+
 		bills.addAll(billMap.values());
 		bills.sort((bill1, bill2) -> bill2.getCreatedDatetime().compareTo(bill1.getCreatedDatetime())); // Sắp xếp giảm
-																										// dần
+
 		return bills;
 	}
 
@@ -193,6 +202,7 @@ public class Service_Bill_User {
 
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
+		bill.setFinishAt(new Date());
 		bill.setOrderStatus(orderStatusRepository.findById(5).get());
 
 		billRepository.saveAndFlush(bill);

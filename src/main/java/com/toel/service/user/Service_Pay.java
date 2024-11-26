@@ -76,25 +76,33 @@ public class Service_Pay {
 			bil.setPaymentMethod(paymentMethod);
 			bil.setOrderStatus(orderStatus);
 			bil = billRepository.save(bil);
-			if (sellerItem.getVoucher() != null) {
-				VoucherDetail voucherSeller = new VoucherDetail();
-				Voucher voucher = voucherRepository.findById(sellerItem.getVoucher().getId()).get();
-				voucherSeller.setBill(bil);
-				voucherSeller.setAccount(user);
-				voucherSeller.setVoucher(voucher);
-				voucherSeller = voucherDetailRepository.save(voucherSeller);
-				voucher.setQuantity(voucher.getQuantity() - 1);
-				voucherRepository.save(voucher);
+			try {
+				if (sellerItem.getVoucher() != null) {
+					VoucherDetail voucherSeller = new VoucherDetail();
+					Voucher voucher = voucherRepository.findById(sellerItem.getVoucher().getId()).get();
+					voucherSeller.setBill(bil);
+					voucherSeller.setAccount(user);
+					voucherSeller.setVoucher(voucher);
+					voucherSeller = voucherDetailRepository.save(voucherSeller);
+					voucher.setQuantity(voucher.getQuantity() - 1);
+					voucherRepository.save(voucher);
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
 			}
-			if (sellerItem.getVoucherAdmin() != null) {
-				VoucherDetail voucherAdmin = new VoucherDetail();
-				Voucher voucher = voucherRepository.findById(sellerItem.getVoucherAdmin().getId()).get();
-				voucherAdmin.setBill(bil);
-				voucherAdmin.setAccount(user);
-				voucherAdmin.setVoucher(voucher);
-				voucherAdmin = voucherDetailRepository.save(voucherAdmin);
-				voucher.setQuantity(voucher.getQuantity() - 1);
-				voucherRepository.save(voucher);
+			try {
+				if (sellerItem.getVoucherAdmin() != null) {
+					VoucherDetail voucherAdmin = new VoucherDetail();
+					Voucher voucher = voucherRepository.findById(sellerItem.getVoucherAdmin().getId()).get();
+					voucherAdmin.setBill(bil);
+					voucherAdmin.setAccount(user);
+					voucherAdmin.setVoucher(voucher);
+					voucherAdmin = voucherDetailRepository.save(voucherAdmin);
+					voucher.setQuantity(voucher.getQuantity() - 1);
+					voucherRepository.save(voucher);
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
 			}
 			for (Request_Cart cartItem : sellerItem.getCart()) {
 				Product product = productRepository.findById(cartItem.getProduct().getId()).get();

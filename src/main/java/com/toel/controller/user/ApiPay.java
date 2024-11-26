@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.user.resquest.pay.Request_Pay;
-import com.toel.dto.user.resquest.pay.Request_SellerOrder;
 import com.toel.service.user.Service_Pay;
 
 

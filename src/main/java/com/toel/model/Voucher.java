@@ -43,7 +43,7 @@ public class Voucher {
 
 	double totalPriceOrder;
 
-	double sale;
+	int sale;
 
 	int quantity;
 

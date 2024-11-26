@@ -12,11 +12,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.admin.request.FlashSale.Request_FlashSaleCreate;
 import com.toel.dto.admin.request.FlashSale.Request_FlashSaleUpdate;
 import com.toel.dto.admin.response.Response_FlashSale;
+import com.toel.exception.AppException;
+import com.toel.exception.ErrorCode;
+import com.toel.model.FlashSale;
+import com.toel.repository.FlashSaleRepository;
 import com.toel.service.admin.Service_FlashSale;
 
 import jakarta.validation.Valid;
@@ -27,6 +33,8 @@ import jakarta.validation.Valid;
 public class ApiFlashSale {
     @Autowired
     Service_FlashSale service_FlashSale;
+    @Autowired
+    FlashSaleRepository flashSaleRepository;
 
     @GetMapping
     public ApiResponse<PageImpl<Response_FlashSale>> getAll(
@@ -48,6 +56,7 @@ public class ApiFlashSale {
 
     @PostMapping
     public ApiResponse<Response_FlashSale> post(@RequestBody @Valid Request_FlashSaleCreate entity) {
+        check(entity.getDateStart(), null);
         return ApiResponse.<Response_FlashSale>build()
                 .message("Thêm flash sale thành công")
                 .result(service_FlashSale.create(entity));
@@ -55,6 +64,7 @@ public class ApiFlashSale {
 
     @PutMapping
     public ApiResponse<Response_FlashSale> put(@RequestBody @Valid Request_FlashSaleUpdate entity) {
+        check(entity.getDateStart(), entity.getId());
         return ApiResponse.<Response_FlashSale>build()
                 .message("Cập nhật flash sale thành công")
                 .result(service_FlashSale.update(entity));
@@ -66,5 +76,18 @@ public class ApiFlashSale {
         service_FlashSale.delete(id);
         return ApiResponse.<Response_FlashSale>build()
                 .message("Xóa flashsale thành công");
+    }
+
+    private void check(LocalDateTime dateStart, Integer id) {
+        List<FlashSale> list = flashSaleRepository.findByIsDelete(false);
+        for (FlashSale entity : list) {
+            boolean isDateInRange = dateStart.isAfter(entity.getDateStart()) && dateStart.isBefore(entity.getDateEnd());
+            boolean isIdMatching = id == null || entity.getId().equals(id);
+
+            // Kiểm tra nếu ngày nằm trong khoảng và id không khớp
+            if (isDateInRange && !isIdMatching) {
+                throw new AppException(ErrorCode.TIME_ERROR);
+            }
+        }
     }
 }

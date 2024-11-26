@@ -29,5 +29,5 @@ public class Response_ProductListFlashSale {
     Response_Account account;
     Category category;
     List<ImageProduct> imageProducts;
-    List<FlashSaleDetail> flashSaleDetails;
+    List<Response_FlashSaleDetail> flashSaleDetails;
 }

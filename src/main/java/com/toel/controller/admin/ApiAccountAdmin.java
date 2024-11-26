@@ -77,6 +77,17 @@ public class ApiAccountAdmin {
                 .message("Thêm nhân viên thành công");
     }
 
+    @PutMapping("adminv1")
+    public ApiResponse<Response_Account> put(@RequestBody @Valid Request_AccountCreate entity) {
+        String message = checkName(entity.getUsername(), entity.getPhone(), entity.getEmail());
+        if (message != null) {
+            throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, message);
+        }
+        return ApiResponse.<Response_Account>build()
+                .result(service_Account.create("ADMINV1", entity))
+                .message("Thêm nhân viên thành công");
+    }
+
     @PutMapping
     public ApiResponse<Response_Account> putStatus(@RequestParam(value = "id", required = false) Integer id) {
         Response_Account entity = service_Account.updateStatus(id, null);
