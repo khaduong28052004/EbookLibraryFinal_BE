@@ -92,6 +92,7 @@ public class Service_DiscountRate {
                     entity.setAccount(accountRepository.findById(1)
                             .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
                                     "Account")));
+                    entity.setDateInsert(LocalDateTime.now());
                     return entity;
                 })
                 .filter(this::check)
