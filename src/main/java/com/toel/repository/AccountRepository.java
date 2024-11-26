@@ -113,4 +113,6 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
         @Query(value = "SELECT * FROM accounts a WHERE a.role_id = 4 AND a.numberId IS NOT NULL AND a.createAtSeller < NOW() - INTERVAL 7 DAY", nativeQuery = true)
         List<Account> listAccountBeforeSevenDays();
+
+        List<Account> findAllByStatusAndRole(boolean status, Role role);
 }

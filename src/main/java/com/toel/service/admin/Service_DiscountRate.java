@@ -1,8 +1,12 @@
 package com.toel.service.admin;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +25,14 @@ import com.toel.dto.admin.response.Response_DiscountRate;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.DiscountRateMapper;
+import com.toel.model.Account;
 import com.toel.model.DiscountRate;
+import com.toel.model.Role;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.DiscountRateRepository;
+import com.toel.repository.RoleRepository;
+import com.toel.service.Email.EmailService;
+import com.toel.service.Email.EmailTemplateType;
 
 @Service
 public class Service_DiscountRate {
@@ -33,6 +42,10 @@ public class Service_DiscountRate {
     DiscountRateMapper discountRateMapper;
     @Autowired
     AccountRepository accountRepository;
+    @Autowired
+    EmailService emailService;
+    @Autowired
+    RoleRepository roleRepository;
 
     public PageImpl<Response_DiscountRate> getAll(int page, int size, LocalDateTime search, boolean sortBy,
             String sortColumn) {
@@ -83,6 +96,27 @@ public class Service_DiscountRate {
                 })
                 .filter(this::check)
                 .map(discountRateRepository::saveAndFlush)
+                .map(entity -> {
+                    Role role = roleRepository.findById(3)
+                            .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Role"));
+                    // Lấy danh sách email và tạo bản đồ email -> tên
+                    Map<String, String> emailToNameMap = new HashMap<>();
+                    List<String> listmail = new ArrayList<>();
+                    accountRepository.findAllByStatusAndRole(true, role).forEach(account -> {
+                        emailToNameMap.put(account.getEmail(), account.getFullname());
+                        listmail.add(account.getEmail());
+                    });
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                    String formattedDate = entity.getDateStart().format(formatter);
+                    emailService.pushList(
+                            "TOEL - Thông Báo Cập Nhật Chiết Khấu",
+                            listmail, // Gửi email cho từng người
+                            EmailTemplateType.THEMCHIETKHAU,
+                            emailToNameMap,
+                            formattedDate,
+                            entity.getDiscount().toString() + " %");
+                    return entity;
+                })
                 .map(discountRateMapper::tochChietKhauResponse)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Ngày áp dụng đã tồn tại"));
 
