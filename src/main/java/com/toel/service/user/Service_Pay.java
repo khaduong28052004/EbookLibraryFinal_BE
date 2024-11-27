@@ -14,6 +14,7 @@ import com.toel.model.Address;
 import com.toel.model.Bill;
 import com.toel.model.BillDetail;
 import com.toel.model.DiscountRate;
+import com.toel.model.FlashSaleDetail;
 import com.toel.model.OrderStatus;
 import com.toel.model.PaymentMethod;
 import com.toel.model.Product;
@@ -24,6 +25,7 @@ import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
 import com.toel.repository.CartRepository;
 import com.toel.repository.DiscountRateRepository;
+import com.toel.repository.FlashSaleDetailRepository;
 import com.toel.repository.OrderStatusRepository;
 import com.toel.repository.PaymentMethodRepository;
 import com.toel.repository.ProductRepository;
@@ -52,6 +54,8 @@ public class Service_Pay {
 	PaymentMethodRepository paymentMethodRepository;
 	@Autowired
 	OrderStatusRepository orderStatusRepository;
+	@Autowired
+	FlashSaleDetailRepository flashSaleDetailRepository;
 
 	public void createOrder(Request_Pay pay, Integer id_user, Integer paymentMethod_id) {
 		OrderStatus orderStatus = orderStatusRepository.findById(1).get();
@@ -81,8 +85,6 @@ public class Service_Pay {
 					voucherSeller.setAccount(user);
 					voucherSeller.setVoucher(voucher);
 					voucherSeller = voucherDetailRepository.save(voucherSeller);
-					voucher.setQuantity(voucher.getQuantity() - 1);
-					voucherRepository.save(voucher);
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
@@ -95,8 +97,6 @@ public class Service_Pay {
 					voucherAdmin.setAccount(user);
 					voucherAdmin.setVoucher(voucher);
 					voucherAdmin = voucherDetailRepository.save(voucherAdmin);
-					voucher.setQuantity(voucher.getQuantity() - 1);
-					voucherRepository.save(voucher);
 				}
 			} catch (Exception e) {
 				// TODO: handle exception
@@ -109,10 +109,10 @@ public class Service_Pay {
 				billDetail.setQuantity(cartItem.getQuantity());
 				billDetail.setProduct(product);
 				billDetail = billDetailRepository.save(billDetail);
-				product.setQuantity(product.getQuantity() - cartItem.getQuantity());
-				product = productRepository.save(product);
 				try {
 					if (cartItem.getProduct().getFlashSaleDetail().getId() > 0) {
+						FlashSaleDetail flashSaleDetail = flashSaleDetailRepository
+								.findById(cartItem.getProduct().getFlashSaleDetail().getId()).get();
 						billDetail.setFlashSaleDetail(cartItem.getProduct().getFlashSaleDetail());
 					}
 				} catch (Exception e) {
@@ -123,7 +123,5 @@ public class Service_Pay {
 				bil = billRepository.save(bil);
 			}
 		}
-
 	}
-
 }
