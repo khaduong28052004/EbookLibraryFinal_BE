@@ -13,6 +13,9 @@ import com.toel.model.AccountReport;
 import java.util.List;
 
 public interface AccountReportRepository extends JpaRepository<AccountReport, Integer> {
+        //Report
+        List<AccountReport> findByAccountId(int accountId);
+
         Page<AccountReport> findAllByStatus(boolean status, Pageable pageable);
 
         Page<AccountReport> findAllByTitleContainingOrContentContainingAndStatus(String title, String content,

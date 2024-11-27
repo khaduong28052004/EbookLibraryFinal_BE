@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,12 @@ public class Service_Account {
         AccountReportRepository accountReportRepository;
         // @Autowired
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+//Report
+        public Optional<Account> getAccountById(int id) {
+                return accountRepository.findById(id);
+        }
 
+        
         public PageImpl<Response_Account> getAll(String rolename,
                         String search, Boolean gender, Integer page, Integer size, Boolean sortBy, String sortColumn) {
                 Pageable pageable = PageRequest.of(page, size,
