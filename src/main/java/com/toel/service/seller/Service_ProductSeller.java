@@ -81,7 +81,8 @@ public class Service_ProductSeller {
                         Integer product_id,
                         List<MultipartFile> images) throws IOException {
                 return service_ImageProductSeller.createProductImages(
-                                productRepository.findById(product_id).get(),
+                                productRepository.findById(product_id).orElseThrow(
+                                                () -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Product")),
                                 images);
         }
 
@@ -89,13 +90,15 @@ public class Service_ProductSeller {
                         Integer product_id,
                         List<MultipartFile> images) throws IOException {
                 return service_ImageProductSeller.updateProductImages(
-                                productRepository.findById(product_id).get(),
+                                productRepository.findById(product_id).orElseThrow(
+                                                () -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Product")),
                                 images);
         }
 
         public Response_Product edit(
                         Integer product_id) {
-                return productMapper.response_Product(productRepository.findById(product_id).get());
+                return productMapper.response_Product(productRepository.findById(product_id)
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Product")));
         }
 
         public void delete(

@@ -128,7 +128,7 @@ public class Service_Cart {
 	}
 
 	public Map<String, Object> getVoucherAdmin() {
-		TypeVoucher typeVoucher = typeVoucherRepository.findById(1).get();
+		TypeVoucher typeVoucher = typeVoucherRepository.findById(2).get();
 		List<Voucher> listVouchers = voucherRepository.findAllByTypeVoucher(typeVoucher, new Date());
 		Map<String, Object> response = new HashMap<String, Object>();
 		response.put("datas", listVouchers);

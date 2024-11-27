@@ -23,16 +23,15 @@ public interface DiscountRateRepository extends JpaRepository<DiscountRate, Inte
 
 	List<DiscountRate> findAllBydateDeleteIsNull();
 
-	@Query("SELECT dr.discount FROM DiscountRate dr ORDER BY dr.id DESC")
-	Integer getChietKhau();
+	@Query("SELECT dr FROM DiscountRate dr WHERE dr.dateStart  <= CURRENT_DATE AND dr.dateDelete IS NULL")
+	Optional<DiscountRate> getChietKhau();
 
-	@Query("SELECT r FROM DiscountRate r WHERE r.dateDelete is null")
+	@Query("SELECT r FROM DiscountRate r WHERE r.dateDelete is null AND r.dateStart <= ?1")
 	DiscountRate find(LocalDateTime now);
 
 	Optional<DiscountRate> findTopByOrderByIdDesc();
-	
+
 	@Query("SELECT r FROM DiscountRate r WHERE r.dateDelete IS NULL and r.dateStart < CURRENT_TIMESTAMP  ORDER BY r.id DESC")
 	List<DiscountRate> findLatestDiscountRate();
-	
 
 }
