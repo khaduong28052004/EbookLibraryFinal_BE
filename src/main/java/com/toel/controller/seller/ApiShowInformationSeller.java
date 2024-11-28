@@ -2,8 +2,12 @@ package com.toel.controller.seller;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,13 +21,16 @@ import com.toel.model.Account;
 import com.toel.model.Address;
 import com.toel.model.Bill;
 import com.toel.model.BillDetail;
+import com.toel.model.Evalue;
 import com.toel.model.Product;
 import com.toel.model.TypeVoucher;
 import com.toel.model.Voucher;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
+import com.toel.repository.EvalueRepository;
 import com.toel.repository.ProductRepository;
+import com.toel.repository.VoucherRepository;
 
 import lombok.Data;
 
@@ -43,16 +50,11 @@ public class ApiShowInformationSeller {
     @Autowired
     private BillDetailRepository billDetailRepository;
 
-    @GetMapping("/api/v1/informationSeller1/{idSeller}")
-    public String getMethodNam1e(@PathVariable Integer idSeller) {
-        Account account = accountRepository.findById(idSeller)
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
-                        "ID:[" + idSeller + "] không tìm thấy người bán"));
-        List<Product> product = productRepository.findAllByAccount(account);
+    @Autowired
+    private EvalueRepository evalueRepository;
 
-        // List<BillDetail> listBillDetail = billDetailRepository.findByPord
-        return new String();
-    }
+    @Autowired
+    private VoucherRepository voucherRepository;
 
     /**
      * homeShowSeller
@@ -76,10 +78,8 @@ public class ApiShowInformationSeller {
             inforSeller.setNumberOfProducts(account.getProducts().size());
             inforSeller.setNumberOfFollowers(account.getFollowers().size());
             inforSeller.setTrackingNumber(idSeller);
-            // inforSeller.setAverageStarRating(idSeller);
-
+            // inforSeller.setAverageStarRating(averageStars(account));
             // inforSeller.setAverageStarRating();
-
             inforSeller.setShopCancellationRate(idSeller);
             inforSeller.setAvatar(account.getAvatar());
             inforSeller.setBackground(account.getBackground());
@@ -87,18 +87,20 @@ public class ApiShowInformationSeller {
             Optional<Address> defaultAddress = account.getAddresses().stream()
                     .filter(Address::isStatus) // Kiểm tra địa chỉ có `status` là true
                     .findFirst();
-
             if (defaultAddress.isPresent()) {
                 Address address = defaultAddress.get();
                 inforSeller.setDistrict(address.getFullNameAddress());
             } else {
-                throw new AppException(ErrorCode.OBJECT_NOT_FOUND,
-                        "Không tìm thấy địa chỉ mặc định cho người dùng ID: [" + account.getId() + "]");
+                inforSeller.setDistrict("chưa cập nhật!");
             }
-
+            inforSeller.setCreateAtSeller(account.getCreateAtSeller());
+            inforSeller.setParticipationTime(inforSeller.calculateActiveDays());
             inforSeller.setShopName(account.getShopName());
-            inforSeller.setParticipationTime(account.getCreateAtSeller());
-            return ApiResponse.<Response_InforSeller>build().code(100).message("null").result(inforSeller);
+            Map<String, Object> map = new HashMap<>();
+            map.put("shopDataEX", inforSeller);
+            map.put("rating", ValueAverageStars(account));
+
+            return ApiResponse.<Map>build().code(100).message("null").result(map);
         } catch (Exception e) {
             // TODO: handle exception
             return ApiResponse.<Response_InforSeller>build().code(100).message(e.getMessage()).result(null);
@@ -106,28 +108,72 @@ public class ApiShowInformationSeller {
 
     }
 
+    // @GetMapping("/api/user/voucherall/{idSeller}")
+    // public ApiResponse<?> voucherAll(@PathVariable Integer idSeller) {
+    // Account account = accountRepository.findById(idSeller)
+    // .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
+    // "ID:[" + idSeller + "] không tìm thấy người bán"));
+    // List<Voucher> listVoucher = voucherRepository.findAllByAccount(account);
+    // List<Voucher> listVoucher1 = voucherRepository.findAll();
+    // Map<String, Object> hash = new HashMap<>();
+    // hash.put("Voucher", listVoucher);
+    // return ApiResponse.<Map>build().code(0).message(null).result(hash);
+    // }
+
     @GetMapping("/api/user/voucherall/{idSeller}")
     public ApiResponse<?> voucherAll(@PathVariable Integer idSeller) {
         Account account = accountRepository.findById(idSeller)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
                         "ID:[" + idSeller + "] không tìm thấy người bán"));
-        // List<Product> Product = account.getProducts().stream((a) => a).toList();
-        List<BillDetail> listBillDetail = billDetailRepository.findByProductIn(account.getProducts());
-    
-        // List<Voucher> listVoucher = account.getVouchers();
+        List<Voucher> listVoucher = voucherRepository.findAllByAccount(account);
 
-        // List<TypeVoucher> typeVoucher =
-        // Optional<TypeVoucher> typeVoucher = listVoucher.get
+        // Sắp xếp bằng Collections.sort
+        Collections.sort(listVoucher, (v1, v2) -> {
+            if (v1.getId() == null && v2.getId() == null)
+                return 0;
+            if (v1.getId() == null)
+                return 1;
+            if (v2.getId() == null)
+                return -1;
+            return v2.getId().compareTo(v1.getId()); // Giảm dần
+        });
 
-        // Optional<Voucher> defaultAddress = account.getVouchers().stream()
-        // .filter(Voucher::isDelete) // Kiểm tra địa chỉ có `status` là true
-        // .findFirst();
-
-        return ApiResponse.<List<BillDetail>>build().code(0).message("null").result(listBillDetail);
-
-
-        // return ApiResponse.<String>build().code(0).message("null").result("defaultAddress");
+        Map<String, Object> hash = new HashMap<>();
+        hash.put("Voucher", listVoucher);
+        return ApiResponse.<Map>build().code(0).message(null).result(hash);
     }
+
+    public Map<String, Object> ValueAverageStars(Account account) {
+        List<Product> products = account.getProducts();
+        List<BillDetail> listBillDetail = billDetailRepository.findByProductIn(products);
+        List<Evalue> listEvalue = evalueRepository.findByBillDetailIn(listBillDetail);
+        int totalStars = listEvalue.stream()
+                .mapToInt(Evalue::getStar) // Lấy số sao từ mỗi Evalue
+                .sum();
+        double averageStars = listEvalue.isEmpty() ? 0 : (double) totalStars / listEvalue.size();
+        Map<String, Object> result = new HashMap<>();
+        result.put("averageStars", averageStars); // Trung bình sao
+        result.put("totalReviews", listEvalue.size()); // Tổng số đánh giá
+        result.put("totalStars", totalStars); // Tổng số sao (không bắt buộc)
+        return result;
+    }
+
+    // public double averageStars(Account account) {
+    // // Lấy danh sách các sản phẩm của người bán
+    // List<Product> products = account.getProducts();
+    // List<BillDetail> listBillDetail =
+    // billDetailRepository.findByProductIn(products);// all billdetail relate to
+    // // seller
+    // List<Evalue> listEvalue =
+    // evalueRepository.findByBillDetailIn(listBillDetail);// all evalue relate to
+    // seller
+    // int totalStars = listEvalue.stream()
+    // .mapToInt(Evalue::getStar) // total star from evalue
+    // .sum();
+    // double averageStars = listEvalue.isEmpty() ? 0 : (double) totalStars /
+    // listEvalue.size();
+    // return averageStars; // average star precaution
+    // }
 
     // Integer idSeller; x
     // String avatar; x
