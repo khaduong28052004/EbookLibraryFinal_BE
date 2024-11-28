@@ -25,9 +25,9 @@ import com.toel.service.auth.UserService;
 // import com.kot.auth.service.userService;
 // .service.UserService;
 
-@Configuration
-@EnableWebSecurity
-public class SecurityConfig {
+// @Configuration
+// @EnableWebSecurity
+public class SecurityConfig1 {
     @Autowired
     JwtAuthFilter jwtAuthFilter;
 
@@ -50,9 +50,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         // Public access for login, home, and some user routes
 
-                        .requestMatchers("/api/v1/login", "/api/v1/**", "/api/v2/**", "/api/user/**", "/api/v1/otp/**",
-                                "/user/loginGoogle")
-                        .permitAll()
+                        .requestMatchers("/api/v1/login", "/api/v1/**", "/api/v2/**","/api/user/**","/api/v1/otp/**","/user/loginGoogle").permitAll()
 
                         // Product permissions
                         .requestMatchers("/api/v1/product/create").hasRole("CREATE_PRODUCT")
@@ -102,8 +100,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/evaluate/read").hasRole("READ_EVALUATE")
                         .requestMatchers("/api/v1/evaluate/delete").hasRole("DELETE_EVALUATE")
                         
-                        .requestMatchers("/api/v1/seller/thongKe/**").hasRole("SELLER")
-                        .requestMatchers("/api/v1/admin/orderstatistacal/**").hasAnyRole("ADMIN")
+                        
 
                         // Cart and other endpoints for both admin and user roles
                         .requestMatchers("/api/v1/cart/**").hasAnyRole("ADMIN", "USER"))
