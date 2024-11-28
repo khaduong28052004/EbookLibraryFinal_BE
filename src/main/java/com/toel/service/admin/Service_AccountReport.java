@@ -23,7 +23,14 @@ public class Service_AccountReport {
     AccountReportRepository accountReportRepository;
     @Autowired
     AccountReportMapper accountReportMapper;
+// Report
+    public List<AccountReport> getReportsByAccountId(int accountId) {
+        return accountReportRepository.findByAccountId(accountId);
+    }
 
+    public AccountReport saveReport(AccountReport report) {
+        return accountReportRepository.save(report);
+    }
     public PageImpl<Response_AccountReport> getAll(int page, int size, Boolean sortBy, String column, String key) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));
         Page<AccountReport> pageProductReport;

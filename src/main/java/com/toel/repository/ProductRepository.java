@@ -107,4 +107,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
         @Query(value = "SELECT * FROM products p WHERE p.isDelete=false and p.isActive=false and p.createAt < NOW() - INTERVAL 7 DAY", nativeQuery = true)
         List<Product> findAllCreatedBeforeSevenDays();
 
+
+        @Query("SELECT COUNT(f) FROM Product f WHERE f.account.id = :accountId")
+        Integer countProductByAccountId(@Param("accountId") Integer accountId);
 }
