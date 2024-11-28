@@ -25,6 +25,8 @@ public class TemplateBuilder {
                 return huyDuyet(dynamicData);
             case THEMCHIETKHAU:
                 return themChietKhau(dynamicData);
+            case PHANHOIREPORT:
+                return phanHoiReport(dynamicData);
             default:
                 throw new IllegalArgumentException("Invalid template type");
         }
@@ -1039,4 +1041,124 @@ public class TemplateBuilder {
                 "</html>\r\n";
         return content;
     }
+
+    private static String phanHoiReport(String... data) {
+        String fullname = data.length > 0 ? data[0] : "";
+        String contents = data.length > 0 ? data[1].toString() : "";
+        String ngayTao = data.length > 0 ? data[2].toString() : "";
+        String tieude = data.length > 0 ? data[3].toString() : "";
+        String noiDung = data.length > 0 ? data[4].toString() : "";
+        String content = "<!DOCTYPE html>\r\n" + //
+                "<html lang=\"en\">\r\n" + //
+                "<head>\r\n" + //
+                "    <meta charset=\"UTF-8\">\r\n" + //
+                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n" + //
+                "    <title>Thông Báo Hủy Đơn Hàng</title>\r\n" + //
+                "    <style>\r\n" + //
+                "        body {\r\n" + //
+                "            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\r\n" + //
+                "            background-color: #f0f9ff; /* Tailwind sky-50 */\r\n" + //
+                "            margin: 0;\r\n" + //
+                "            padding: 0;\r\n" + //
+                "            color: #333;\r\n" + //
+                "        }\r\n" + //
+                "        .email-container {\r\n" + //
+                "            max-width: 600px;\r\n" + //
+                "            margin: 30px auto;\r\n" + //
+                "            background-color: #ffffff;\r\n" + //
+                "            border-radius: 10px;\r\n" + //
+                "            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);\r\n" + //
+                "            overflow: hidden;\r\n" + //
+                "            border: 1px solid #bae6fd; /* Tailwind sky-200 */\r\n" + //
+                "        }\r\n" + //
+                "        .email-header {\r\n" + //
+                "            background-color: #2fbaf6; /* Tailwind sky-400 */\r\n" + //
+                "            color: #ffffff;\r\n" + //
+                "            padding: 25px;\r\n" + //
+                "            text-align: center;\r\n" + //
+                "        }\r\n" + //
+                "        .email-header h1 {\r\n" + //
+                "            margin: 0;\r\n" + //
+                "            font-size: 22px;\r\n" + //
+                "            font-weight: bold;\r\n" + //
+                "        }\r\n" + //
+                "        .email-body {\r\n" + //
+                "            padding: 20px 30px;\r\n" + //
+                "        }\r\n" + //
+                "        .email-body h2 {\r\n" + //
+                "            font-size: 18px;\r\n" + //
+                "            color: #0ea5e9; /* Tailwind sky-500 */\r\n" + //
+                "            margin-bottom: 15px;\r\n" + //
+                "        }\r\n" + //
+                "        .email-body p {\r\n" + //
+                "            font-size: 14px;\r\n" + //
+                "            line-height: 1.8;\r\n" + //
+                "            margin: 10px 0;\r\n" + //
+                "        }\r\n" + //
+                "        .email-body strong {\r\n" + //
+                "            color: #0284c7; /* Tailwind sky-600 */\r\n" + //
+                "        }\r\n" + //
+                "        .email-footer {\r\n" + //
+                "            background-color: #f0f9ff; /* Tailwind sky-50 */\r\n" + //
+                "            padding: 15px;\r\n" + //
+                "            font-size: 12px;\r\n" + //
+                "            color: #64748b; /* Tailwind slate-500 */\r\n" + //
+                "            text-align: center;\r\n" + //
+                "            border-top: 1px solid #bae6fd; /* Tailwind sky-200 */\r\n" + //
+                "        }\r\n" + //
+                "        .button {\r\n" + //
+                "            display: inline-block;\r\n" + //
+                "            background-color: #0ea5e9; /* Tailwind sky-500 */\r\n" + //
+                "            color: #ffffff;\r\n" + //
+                "            text-decoration: none;\r\n" + //
+                "            padding: 10px 20px;\r\n" + //
+                "            border-radius: 6px;\r\n" + //
+                "            margin-top: 15px;\r\n" + //
+                "            font-size: 14px;\r\n" + //
+                "            font-weight: 600;\r\n" + //
+                "            transition: background-color 0.3s ease, transform 0.2s ease;\r\n" + //
+                "        }\r\n" + //
+                "        .button:hover {\r\n" + //
+                "            background-color: #0284c7; /* Tailwind sky-600 */\r\n" + //
+                "            transform: scale(1.05);\r\n" + //
+                "        }\r\n" + //
+                "        @media screen and (max-width: 600px) {\r\n" + //
+                "            .email-body {\r\n" + //
+                "                padding: 15px 20px;\r\n" + //
+                "            }\r\n" + //
+                "            .email-footer {\r\n" + //
+                "                font-size: 10px;\r\n" + //
+                "                padding: 10px;\r\n" + //
+                "            }\r\n" + //
+                "        }\r\n" + //
+                "    </style>\r\n" + //
+                "</head>\r\n" + //
+                "<body>\r\n" + //
+                "    <div class=\"email-container\">\r\n" + //
+                "        <div class=\"email-header\">\r\n" + //
+                "            <h1>TOEL - Thông Báo Phản Hồi Báo Cáo</h1>" + //
+                "        </div>\r\n" + //
+                "        <div class=\"email-body\">\r\n" + //
+                "            <h2>Kính gửi: " + fullname + ",</h2>\r\n" + //
+                "            <p>Cảm ơn bạn đã dành thời gian gửi báo cáo đến hệ thống của chúng tôi vào ngày " + ngayTao
+                + " đã được đội ngũ của chúng tôi xử lý thành công.</p>\r\n"
+                + //
+                "            <p>**Chi tiết nội dung báo cáo của bạn**:  </p>\r\n" + //
+                "            <p>" + tieude + " </p>\r\n" + //
+                "            <p>" + noiDung + " </p>\r\n" + //
+                "            <p>**Cách giải quyết của chúng tôi**:  </p>\r\n" + //
+                "            <p>" + contents + " </p>\r\n" + //
+                "            <p>Nếu bạn có bất kỳ thắc mắc nào hoặc cần thêm thông tin, vui lòng liên hệ với đội ngũ chăm sóc khách hàng của chúng tôi qua email dưới đây.</p>\r\n"
+                + //
+                "            <a href=\"mailto:khaduong28052004@gmail.com\" class=\"button\">Liên hệ hỗ trợ</a>\r\n" + //
+                "        </div>\r\n" + //
+                "        <div class=\"email-footer\">\r\n" + //
+                "            © 2024 TOEL. Tất cả các quyền được bảo lưu.  \r\n" + //
+                "        </div>\r\n" + //
+                "    </div>\r\n" + //
+                "</body>\r\n" + //
+                "</html>\r\n";
+        return content;
+    }
+
 }

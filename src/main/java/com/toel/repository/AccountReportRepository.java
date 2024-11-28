@@ -18,8 +18,8 @@ public interface AccountReportRepository extends JpaRepository<AccountReport, In
 
         Page<AccountReport> findAllByStatus(boolean status, Pageable pageable);
 
-        Page<AccountReport> findAllByTitleContainingOrContentContainingAndStatus(String title, String content,
-                        boolean status, Pageable pageable);
+        Page<AccountReport> findAllByStatusAndTitleContainingOrContentContaining(boolean status, String title,
+                        String content, Pageable pageable);
 
         Page<AccountReport> findAllByTitleContainingOrContentContaining(String title, String content,
                         Pageable pageable);

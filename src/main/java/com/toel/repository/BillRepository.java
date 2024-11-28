@@ -120,8 +120,11 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	// Thong Ke Seller
 
-	@Query("SELECT SUM(bd.quantity * bd.price) FROM Bill b JOIN b.billDetails bd " +
-			"WHERE bd.product.account.id = :accountId AND b.orderStatus.id = 5 AND DATE(b.createAt)  BETWEEN COALESCE(:startDate, CURRENT_DATE) AND COALESCE(:endDate, CURRENT_DATE)")
+	@Query("SELECT COALESCE(SUM((bd.quantity * bd.price) - (bd.price * bd.quantity * " +
+			"COALESCE(( SELECT COALESCE(vd.voucher.sale, 0)/ 100  FROM bd.bill.voucherDetails vd WHERE vd.bill = bd.bill and vd.voucher.typeVoucher.id=1),0))), 0) "
+			+
+			"FROM BillDetail bd " +
+			"WHERE bd.product.account.id = :accountId AND bd.bill.orderStatus.id = 5 AND DATE(bd.bill.createAt)  BETWEEN COALESCE(:startDate, CURRENT_DATE) AND COALESCE(:endDate, CURRENT_DATE)")
 	Double getTongDoanhSo(
 			@Param("accountId") Integer accountId,
 			@Param("startDate") Date dateStart,

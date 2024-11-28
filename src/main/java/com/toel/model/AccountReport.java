@@ -1,5 +1,6 @@
 package com.toel.model;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import org.hibernate.annotations.Nationalized;
