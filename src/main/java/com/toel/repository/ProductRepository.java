@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -97,9 +98,13 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			@Param("gender") Boolean gender, @Param("username") String username, @Param("fullname") String fullname,
 			@Param("email") String email, @Param("phone") String phone);
 
-	@Query("SELECT p FROM Product p WHERE p.id NOT IN :idProducts AND p.account.id != :idShop")
+	@Query("SELECT p FROM Product p WHERE p.id NOT IN :idProducts AND p.account.id != :idShop AND p.isActive = true AND p.isDelete=false AND p.account.status = true")
 	List<Product> findAllIdNotIn(@Param("idProducts") List<Integer> idProducts, @Param("idShop") Integer idShop);
+
+	@Query("SELECT p FROM Product p WHERE p.isActive = true AND p.isDelete = false AND p.account.status = true")
+	List<Product> findAllProduct(Sort sort);
 
         @Query(value = "SELECT * FROM products p WHERE p.isDelete=false and p.isActive=false and p.createAt < NOW() - INTERVAL 7 DAY", nativeQuery = true)
         List<Product> findAllCreatedBeforeSevenDays();
+
 }

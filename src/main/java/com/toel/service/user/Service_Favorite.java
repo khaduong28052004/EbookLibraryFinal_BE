@@ -34,6 +34,9 @@ public class Service_Favorite {
 	@Autowired
 	ProductMaperUser productMaperUser;
 
+	@Autowired
+	FlashSaleService flashSaleService;
+
 	public boolean addFavorite(Integer id_user, Integer id_product) {
 		Account user = accountRepo.findById(id_user).get();
 		Product product = productRepo.findById(id_product).get();
@@ -77,6 +80,8 @@ public class Service_Favorite {
 		for (Like like : listLikes) {
 			Response_Favorite response_Favorite = favoriteMapper.response_FavoriteToLike(like);
 			response_Favorite.setProduct(productMaperUser.productToResponse_Product(like.getProduct()));
+			response_Favorite.getProduct().setFlashSaleDetail(
+					flashSaleService.getFlashSaleDetailForProduct(response_Favorite.getProduct().getId()));
 			list_Response_Favorites.add(response_Favorite);
 		}
 		Map<String, Object> response = new HashMap<String, Object>();
