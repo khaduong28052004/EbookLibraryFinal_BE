@@ -248,6 +248,10 @@ public class Service_Account {
         public Response_Account create(String rolename, Request_AccountCreate entity) {
                 Account account = accountMapper.toAccountCreate(entity);
                 account.setRole(roleRepository.findByNameIgnoreCase(rolename));
+                if (rolename.equalsIgnoreCase("adminv1")) {
+                        account.setAvatar(
+                                        "https://firebasestorage.googleapis.com/v0/b/ebookstore-4fbb3.appspot.com/o/1_W35QUSvGpcLuxPo3SRTH4w.png?alt=media");
+                }
                 account.setStatus(true);
                 account.setCreateAt(new Date());
                 // Mã hóa mật khẩu mới

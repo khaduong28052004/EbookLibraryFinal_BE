@@ -4,9 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -71,6 +73,18 @@ public class EmailService {
     }
 
     public void push(MailSenderDTO mail) {
+        // JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        // mailSender.setHost("smtp.gmail.com");
+        // mailSender.setPort(587);
+        // mailSender.setUsername(email);
+        // mailSender.setPassword(password);
+
+        // Properties props = mailSender.getJavaMailProperties();
+        // props.put("mail.transport.protocol", "smtp");
+        // props.put("mail.smtp.auth", "true");
+        // props.put("mail.smtp.starttls.enable", "true");
+        // props.put("mail.debug", "true");
+
         MimeMessage mime = sender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mime, true, "utf-8");
