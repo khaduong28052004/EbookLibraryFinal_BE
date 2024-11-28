@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -56,7 +58,7 @@ public class ApiFlashSale {
 
     @PostMapping
     public ApiResponse<Response_FlashSale> post(@RequestBody @Valid Request_FlashSaleCreate entity) {
-        check(entity.getDateStart(), null);
+        check(entity.getDateStart(), entity.getDateEnd(), null);
         return ApiResponse.<Response_FlashSale>build()
                 .message("Thêm flash sale thành công")
                 .result(service_FlashSale.create(entity));
@@ -64,7 +66,7 @@ public class ApiFlashSale {
 
     @PutMapping
     public ApiResponse<Response_FlashSale> put(@RequestBody @Valid Request_FlashSaleUpdate entity) {
-        check(entity.getDateStart(), entity.getId());
+        check(entity.getDateStart(), entity.getDateEnd(), entity.getId());
         return ApiResponse.<Response_FlashSale>build()
                 .message("Cập nhật flash sale thành công")
                 .result(service_FlashSale.update(entity));
@@ -78,16 +80,18 @@ public class ApiFlashSale {
                 .message("Xóa flashsale thành công");
     }
 
-    private void check(LocalDateTime dateStart, Integer id) {
+    private void check(LocalDateTime dateStart, LocalDateTime dateEnd, Integer id) {
         List<FlashSale> list = flashSaleRepository.findByIsDelete(false);
         for (FlashSale entity : list) {
             boolean isDateInRange = dateStart.isAfter(entity.getDateStart()) && dateStart.isBefore(entity.getDateEnd());
             boolean isIdMatching = id == null || entity.getId().equals(id);
-
-            // Kiểm tra nếu ngày nằm trong khoảng và id không khớp
             if (isDateInRange && !isIdMatching) {
-                throw new AppException(ErrorCode.TIME_ERROR);
+                throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Khung thời gian");
             }
+        }
+        long hours = Duration.between(dateStart, dateEnd).toHours();
+        if (hours > 24) {
+            throw new AppException(ErrorCode.TIME_ERROR);
         }
     }
 }

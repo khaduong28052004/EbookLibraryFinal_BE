@@ -18,6 +18,8 @@ import com.toel.exception.ErrorCode;
 import com.toel.mapper.ProductMapper;
 import com.toel.model.Product;
 import com.toel.repository.ProductRepository;
+import com.toel.service.Email.EmailService;
+import com.toel.service.Email.EmailTemplateType;
 
 @Service
 public class Service_Product {
@@ -25,6 +27,8 @@ public class Service_Product {
     ProductRepository productRepository;
     @Autowired
     ProductMapper productMapper;
+    @Autowired
+    EmailService emailService;
 
     public PageImpl<Response_ProductListFlashSale> getAll(int page, int size, Boolean sortBy, String column,
             String key, String option) {
@@ -93,19 +97,34 @@ public class Service_Product {
     // return productMapper.tProductListFlashSale(Product);
     // }
 
-    public Response_ProductListFlashSale updateStatus(int id) {
+    public Response_ProductListFlashSale updateStatus(int id, String contents) {
         Product entity = productRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Product"));
+        if (!entity.isDelete()) {
+            emailService.push(entity.getAccount().getEmail(), "TOEL - Thông Báo Khóa Sản Phẩm",
+                    EmailTemplateType.KHOATAIKHOAN, entity.getAccount().getFullname(), contents, "Sản phẩm");
+        } else {
+            emailService.push(entity.getAccount().getEmail(), "TOEL - Thông Báo Mở Sản Phẩm",
+                    EmailTemplateType.MOTAIKHOAN, entity.getAccount().getFullname(), contents, "Sản phẩm");
+        }
         entity.setDelete(!entity.isDelete());
         return productMapper.tProductListFlashSale(productRepository.save(entity));
     }
 
-    public Response_ProductListFlashSale updateActive(int id, Boolean status) {
+    public Response_ProductListFlashSale updateActive(int id, Boolean status, String contents) {
         Product entity = productRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Product"));
         if (status) {
+            emailService.push(entity.getAccount().getEmail(), "TOEL - Thông Báo Duyệt Sản Phẩm",
+                    EmailTemplateType.DUYET, entity.getAccount().getFullname(),
+                    (contents == null || contents.isEmpty()) ? "Sản phẩm thỏa mãn các tiêu chí của sàn. " : contents,
+                    "Sản phẩm", entity.getId().toString(), entity.getName(), entity.getCategory().getName());
             entity.setActive(true);
         } else {
+            emailService.push(entity.getAccount().getEmail(), "TOEL - Thông Báo Hủy Sản Phẩm",
+                    EmailTemplateType.HUYDUYET, entity.getAccount().getFullname(),
+                    (contents == null || contents.isEmpty()) ? "Sản phẩm vi phạm chính sách sàn" : contents,
+                    "Sản phẩm", entity.getId().toString(), entity.getName(), entity.getCategory().getName());
             entity.setActive(false);
             entity.setDelete(true);
         }

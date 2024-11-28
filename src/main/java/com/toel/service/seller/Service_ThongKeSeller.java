@@ -32,7 +32,7 @@ public class Service_ThongKeSeller {
     BillMapper billMapper;
 
     public Integer getChietKhau() {
-        return discountRateRepository.findTopByOrderByIdDesc()
+        return discountRateRepository.getChietKhau()
                 .map(DiscountRate::getDiscount)
                 .orElse(0);
     }

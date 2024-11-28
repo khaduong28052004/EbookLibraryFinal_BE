@@ -31,6 +31,8 @@ import com.toel.repository.EvalueRepository;
 import com.toel.repository.FollowerRepository;
 import com.toel.repository.ProductRepository;
 import com.toel.repository.RoleRepository;
+import com.toel.service.Email.EmailService;
+import com.toel.service.Email.EmailTemplateType;
 
 @Service
 public class Service_Account {
@@ -52,6 +54,8 @@ public class Service_Account {
         AccountReportRepository accountReportRepository;
         // @Autowired
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        @Autowired
+        EmailService emailService;
 
         public PageImpl<Response_Account> getAll(String rolename,
                         String search, Boolean gender, Integer page, Integer size, Boolean sortBy, String sortColumn) {
@@ -199,25 +203,43 @@ public class Service_Account {
                 return new PageImpl<>(list, pageable, pageAccount.getTotalElements());
         }
 
-        public Response_Account updateStatus(int id, Boolean status) {
+        public Response_Account updateStatus(int id, String contents) {
                 Account entity = accountRepository.findById(id)
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
-                if (status != null && !status) {
+                if (entity.isStatus()) {
+                        emailService.push(entity.getEmail(), "TOEL - Thông Báo Khóa Tài Khoản",
+                                        EmailTemplateType.KHOATAIKHOAN, entity.getFullname(), contents, "Tài khoản");
                         entity.setStatus(false);
                 } else {
-                        entity.setStatus(!entity.isStatus());
+                        emailService.push(entity.getEmail(), "TOEL - Thông Báo Mở Tài Khoản",
+                                        EmailTemplateType.MOTAIKHOAN, entity.getFullname(), contents, "Tài khoản");
+                        entity.setStatus(true);
                 }
                 return accountMapper.toAccount(accountRepository.saveAndFlush(entity));
         }
 
-        public Response_Account updateActive(int id, Boolean status) {
+        public Response_Account updateActive(int id, Boolean status, String contents) {
                 Account entity = accountRepository.findById(id)
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
                 Role role = roleRepository.findByNameIgnoreCase("Seller");
                 if (status) {
+                        emailService.push(entity.getEmail(), "TOEL - Thông Báo Duyệt Shop",
+                                        EmailTemplateType.DUYET, entity.getFullname(),
+                                        (contents == null || contents.isEmpty())
+                                                        ? "Xác nhận thông tin của bạn phù hợp, tài khoản của bạn đã được cấp quyền bán hàng. "
+                                                        : contents,
+                                        "Shop", entity.getId().toString(), entity.getUsername(),
+                                        "Bán hàng");
                         entity.setRole(role);
                         entity.setCreateAtSeller(new Date());
                 } else {
+                        emailService.push(entity.getEmail(), "TOEL - Thông Báo Hủy Duyệt Shop",
+                                        EmailTemplateType.DUYET, entity.getFullname(),
+                                        (contents == null || contents.isEmpty())
+                                                        ? "Xác nhận thông tin của bạn không chính xác, tài khoản của bạn không thể đăng ký bán hàng. "
+                                                        : contents,
+                                        "Shop", entity.getId().toString(), entity.getUsername(),
+                                        "Bán hàng");
                         entity.setNumberId(null);
                 }
                 return accountMapper.toAccount(accountRepository.saveAndFlush(entity));
