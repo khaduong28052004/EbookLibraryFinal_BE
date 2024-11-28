@@ -13,9 +13,10 @@ import com.toel.model.FlashSaleDetail;
 public interface FlashSaleDetailRepository extends JpaRepository<FlashSaleDetail, Integer> {
 	Page<FlashSaleDetail> findAllByFlashSale(FlashSale flashSale, Pageable pageable);
 
-	@Query("SELECT f FROM FlashSaleDetail f WHERE f.flashSale = ?1 AND f.product.isDelete = false AND f.product.isActive = true AND f.product.account.id !=?2")
+	@Query("SELECT f FROM FlashSaleDetail f WHERE f.flashSale = ?1 AND f.product.isDelete = false AND f.product.isActive = true AND f.product.account.id != ?2 AND f.product.account.status = true")
 	Page<FlashSaleDetail> findAllByFlashSale(FlashSale flashSale, Integer idShop, Pageable pageable);
 
-	@Query("SELECT f FROM FlashSaleDetail f WHERE f.flashSale = ?1")
+	@Query("SELECT f FROM FlashSaleDetail f WHERE f.flashSale = ?1 AND f.quantity>0 AND f.flashSale.isDelete = false AND f.product.isActive = true AND f.product.isDelete = false AND f.product.account.status = true")
 	List<FlashSaleDetail> findAllByFlashSale(FlashSale flashSale);
+
 }

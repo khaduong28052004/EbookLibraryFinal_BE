@@ -30,11 +30,23 @@ public class Service_AccountReport {
     AccountReportRepository accountReportRepository;
     @Autowired
     AccountReportMapper accountReportMapper;
+// <<<<<<< HEAD
+
+// Report
+    public List<AccountReport> getReportsByAccountId(int accountId) {
+        return accountReportRepository.findByAccountId(accountId);
+    }
+
+    public AccountReport saveReport(AccountReport report) {
+        return accountReportRepository.save(report);
+    }
+ 
     @Autowired
     EmailService emailService;
 
     public PageImpl<Response_AccountReport> getAll(String option, int page, int size, Boolean sortBy, String column,
             String key) {
+
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));
         Page<AccountReport> pageProductReport;
         boolean status = (option.equalsIgnoreCase("macdinh") || option.equalsIgnoreCase("chuaphanhoi")) ? false : true;

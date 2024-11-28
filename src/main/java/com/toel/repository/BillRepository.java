@@ -82,57 +82,67 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	// Home Seller
 
-	@Query("SELECT COUNT(b.id) FROM Bill b JOIN b.billDetails bd WHERE b.orderStatus.id = 1 AND bd.product.account.id = ?1 GROUP By b.id")
+	@Query("SELECT COUNT(bd.bill.id) FROM BillDetail bd  WHERE bd.bill.orderStatus.id = 1 AND bd.product.account.id = ?1")
 	Integer getDonChoDuyet(Integer account_id);
 
-	@Query("SELECT SUM(b.totalPrice) FROM Bill b JOIN b.billDetails bd WHERE b.finishAt = CURRENT_DATE AND bd.product.account.id = ?1 ")
+	@Query("SELECT SUM(bd.quantity * bd.price) FROM BillDetail bd WHERE DATE(bd.bill.finishAt) = CURRENT_DATE AND bd.product.account.id = ?1 ")
 	Double getDoanhSo(Integer account_id);
 
-	@Query("SELECT SUM(b.totalPrice * (1 - (b.discountRate.discount / 100.0))) FROM Bill b JOIN b.billDetails bd WHERE b.finishAt = CURRENT_DATE AND bd.product.account.id = ?1 ")
+	@Query("SELECT  COALESCE(SUM((bd.price * bd.quantity) * (1 - (bd.bill.discountRate.discount / 100.0)) - (bd.price * bd.quantity * "
+			+ "COALESCE(( SELECT COALESCE(vd.voucher.sale, 0)/ 100  FROM bd.bill.voucherDetails vd WHERE vd.bill = bd.bill and vd.voucher.typeVoucher.id=1),0))), 0) "
+			+ " FROM BillDetail bd WHERE DATE(bd.bill.finishAt) = CURRENT_DATE AND bd.product.account.id = ?1 ")
 	Double getDoanhThu(Integer account_id);
 
-	@Query("SELECT MONTH(b.finishAt), SUM(b.totalPrice) " +
-			"FROM Bill b JOIN b.billDetails bd " +
-			"WHERE YEAR(b.finishAt) = ?1 AND bd.product.account.id = ?2 " +
-			"GROUP BY MONTH(b.finishAt) " +
-			"ORDER BY MONTH(b.finishAt)")
+	@Query("SELECT MONTH(bd.bill.finishAt), SUM(bd.quantity * bd.price) " +
+			"FROM BillDetail bd " +
+			"WHERE YEAR(bd.bill.finishAt) = ?1 AND bd.product.account.id = ?2 " +
+			"GROUP BY MONTH(bd.bill.finishAt)" +
+			"ORDER BY MONTH(bd.bill.finishAt)")
 	List<Object[]> getListDoanhSo(Integer year, Integer account_id);
 
-	@Query("SELECT MONTH(b.finishAt), SUM(b.totalPrice * (1 - (b.discountRate.discount / 100.0))) " +
-			"FROM Bill b JOIN b.billDetails bd " +
-			"WHERE YEAR(b.finishAt) = ?1 AND bd.product.account.id = ?2 " +
-			"GROUP BY MONTH(b.finishAt) " +
-			"ORDER BY MONTH(b.finishAt)")
+	@Query("SELECT MONTH(bd.bill.finishAt), COALESCE(SUM((bd.price * bd.quantity) * (1 - (bd.bill.discountRate.discount / 100.0)) - (bd.price * bd.quantity * "
+			+ "COALESCE(( SELECT COALESCE(vd.voucher.sale, 0)/ 100  FROM bd.bill.voucherDetails vd WHERE vd.bill = bd.bill and vd.voucher.typeVoucher.id=1),0))), 0) "
+			+
+			"FROM BillDetail bd " +
+			"WHERE YEAR(bd.bill.finishAt) = ?1 AND bd.product.account.id = ?2 " +
+			"GROUP BY MONTH(bd.bill.finishAt) " +
+			"ORDER BY MONTH(bd.bill.finishAt)")
 	List<Object[]> getListDoanhThu(Integer year, Integer account_id);
 
-	// @Query("SELECT COALESCE(SUM(b.discountPrice),0) FROM BillDetail bd WHERE bd.account.id =?1 AND ( ?2 IS NULL OR bd.bill.finishAt >= ?2) AND ( ?3 IS NULL OR bd.bill.finishAt <= ?3 )")
-	// Double calculateVoucherByShop_San(Integer account, Date dateStart, Date dateEnd);
-
-	// @Query("SELECT b FROM Bill b WHERE b.account.id =?1 AND ( ?2 IS NULL OR
-	// b.finishAt >= ?2) AND ( ?3 IS NULL OR b.finishAt <= ?3 )")
-	// Page<Bill> selectBill(Integer account, LocalDate dateStart, LocalDate
+	// @Query("SELECT COALESCE(SUM(b.discountPrice),0) FROM BillDetail bd WHERE
+	// bd.account.id =?1 AND ( ?2 IS NULL OR bd.bill.finishAt >= ?2) AND ( ?3 IS
+	// NULL OR bd.bill.finishAt <= ?3 )")
+	// Double calculateVoucherByShop_San(Integer account, Date dateStart, Date
 	// dateEnd);
+
 	@Query("SELECT DISTINCT YEAR(b.finishAt) FROM Bill b JOIN b.billDetails bd WHERE b.finishAt IS NOT NULL AND bd.product.account.id = ?1 ORDER BY YEAR(b.finishAt) DESC")
 	List<Integer> getDistinctYears(Integer account_id);
 
 	// Thong Ke Seller
 
-	@Query("SELECT SUM(b.totalPrice) FROM Bill b JOIN b.billDetails bd " +
-			"WHERE bd.product.account.id = :accountId AND b.orderStatus.id = 5 AND b.createAt BETWEEN COALESCE(:startDate, CURRENT_DATE) AND COALESCE(:endDate, CURRENT_DATE)")
+	@Query("SELECT COALESCE(SUM((bd.quantity * bd.price) - (bd.price * bd.quantity * " +
+			"COALESCE(( SELECT COALESCE(vd.voucher.sale, 0)/ 100  FROM bd.bill.voucherDetails vd WHERE vd.bill = bd.bill and vd.voucher.typeVoucher.id=1),0))), 0) "
+			+
+			"FROM BillDetail bd " +
+			"WHERE bd.product.account.id = :accountId AND bd.bill.orderStatus.id = 5 AND DATE(bd.bill.createAt)  BETWEEN COALESCE(:startDate, CURRENT_DATE) AND COALESCE(:endDate, CURRENT_DATE)")
 	Double getTongDoanhSo(
 			@Param("accountId") Integer accountId,
 			@Param("startDate") Date dateStart,
 			@Param("endDate") Date dateEnd);
 
-	@Query("SELECT SUM(b.totalPrice * (1 - (b.discountRate.discount / 100.0))) FROM Bill b JOIN b.billDetails bd " +
-			"WHERE bd.product.account.id = :accountId AND b.orderStatus.id = 5 AND b.createAt BETWEEN COALESCE(:startDate, CURRENT_DATE) AND COALESCE(:endDate, CURRENT_DATE)")
+	@Query("SELECT COALESCE(SUM((bd.price * bd.quantity) * (1 - (bd.bill.discountRate.discount / 100.0)) - (bd.price * bd.quantity * "
+			+ "COALESCE(( SELECT COALESCE(vd.voucher.sale, 0)/ 100  FROM bd.bill.voucherDetails vd WHERE vd.bill = bd.bill and vd.voucher.typeVoucher.id=1),0))), 0) "
+			+
+			"FROM BillDetail bd " +
+			"WHERE bd.product.account.id = :accountId AND bd.bill.orderStatus.id = 5 " +
+			"AND DATE(bd.bill.createAt) BETWEEN COALESCE(:startDate, CURRENT_DATE) AND COALESCE(:endDate, CURRENT_DATE)")
 	Double getTongDoanhThu(
 			@Param("accountId") Integer accountId,
 			@Param("startDate") Date dateStart,
 			@Param("endDate") Date dateEnd);
 
 	@Query("SELECT b FROM Bill b JOIN b.billDetails bd WHERE bd.product.account.id = :accountId " +
-			"AND b.createAt BETWEEN COALESCE(:startDate, CURRENT_DATE) AND COALESCE(:endDate, CURRENT_DATE) GROUP BY b.id, b.account.fullname, b.createAt, b.totalQuantity, b.totalPrice, b.orderStatus.id")
+			"AND DATE(bd.bill.createAt) BETWEEN COALESCE(:startDate, CURRENT_DATE) AND COALESCE(:endDate, CURRENT_DATE) GROUP BY b.id, b.account.fullname, b.createAt, b.totalQuantity, b.totalPrice, b.orderStatus.id")
 	Page<Bill> getListThongKeBill(
 			@Param("accountId") Integer accountId,
 			@Param("startDate") Date dateStart,
@@ -151,7 +161,8 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			"AND (:search IS NULL OR b.account.fullname LIKE CONCAT('%', :search, '%'))")
 	Integer tongSoSP(@Param("accountId") Integer accountId, @Param("search") String search);
 
-	@Query("SELECT COUNT(e) FROM Bill b JOIN b.billDetails bd JOIN bd.evalue e " +
+	@Query("SELECT COUNT(e) FROM Bill b JOIN b.billDetails bd JOIN bd.evalue e "
+			+
 			"WHERE bd.product.account.id = :accountId " +
 			"AND (:search IS NULL OR b.account.fullname LIKE CONCAT('%', :search, '%'))")
 	Integer tongSoLuotDanhGia(@Param("accountId") Integer accountId, @Param("search") String search);
@@ -162,40 +173,68 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			"AND (:search IS NULL OR b.account.fullname LIKE CONCAT('%', :search, '%'))")
 	Double tongSotTien(@Param("accountId") Integer accountId, @Param("search") String search);
 
-	@Query("SELECT b.account.fullname AS khachHang, " +
-			"SUM(bd.quantity) AS soSanPham , COUNT(b) AS luotMua, COUNT(e) AS luotDanhGia, SUM(b.totalPrice) AS soTien "
-			+
-			"FROM Bill b JOIN b.billDetails bd " +
-			"JOIN bd.evalue e " +
-			"WHERE bd.product.account.id = :accountId  " +
+	@Query("SELECT " +
+			"a.fullname AS khachHang, " +
+			"SUM(bd.quantity) AS soSanPham, " +
+			"COUNT(DISTINCT b) AS luotMua, " +
+			"COUNT(DISTINCT e) AS luotDanhGia, " +
+			"SUM(b.totalPrice) AS soTien " +
+			"FROM Account a " +
+			"INNER JOIN a.bills b " +
+			"INNER JOIN b.billDetails bd " +
+			"LEFT JOIN bd.evalue e " +
+			"WHERE bd.product.account.id = :accountId " +
 			"AND b.finishAt IS NOT NULL " +
-			"AND (:search IS NULL OR b.account.fullname LIKE %:search%) " +
-			"GROUP BY b.account.fullname")
+			"AND (:search IS NULL OR a.fullname LIKE %:search%) " +
+			"GROUP BY a.fullname, a.id")
 	Page<Object[]> getListThongKeKhachHang(
 			@Param("accountId") Integer accountId,
 			@Param("search") String search,
 			Pageable pageable);
 
-	@Query("SELECT SUM(b.totalQuantity) FROM Bill b JOIN b.billDetails bd JOIN bd.product p WHERE p.account.id = :accountId AND (:search IS NULL OR p.name LIKE %:search%) ")
+	@Query("SELECT SUM(bd.quantity) " +
+			"FROM Product p " +
+			"JOIN p.billDetails bd " +
+			"WHERE p.account.id = :accountId " +
+			"AND (:search IS NULL OR p.name LIKE %:search%)")
 	Integer tongLuotBanSanPham(@Param("accountId") Integer account_id, @Param("search") String search);
 
-	@Query("SELECT COUNT(bd.evalue.id) FROM Bill b JOIN b.billDetails bd JOIN bd.product p WHERE bd.product.account.id = :accountId AND (:search IS NULL OR p.name LIKE %:search%)")
+	@Query("SELECT COUNT(e.id) " +
+			"FROM Product p " +
+			"JOIN p.billDetails bd " +
+			"JOIN bd.evalue e " +
+			"WHERE p.account.id = :accountId " +
+			"AND (:search IS NULL OR p.name LIKE %:search%)")
 	Integer tongLuotDanhGia(@Param("accountId") Integer account_id, @Param("search") String search);
 
-	@Query("SELECT SUM(SIZE(bd.product.likes)) FROM Bill b JOIN b.billDetails bd JOIN bd.product p WHERE bd.product.account.id = :accountId AND (:search IS NULL OR p.name LIKE %:search%)")
+	@Query("SELECT COUNT(l.id) " +
+			"FROM Product p " +
+			"JOIN p.likes l " +
+			"WHERE p.account.id = :accountId " +
+			"AND (:search IS NULL OR p.name LIKE %:search%)")
 	Integer tongLuotYeuThich(@Param("accountId") Integer account_id, @Param("search") String search);
 
-	@Query("SELECT AVG(bd.evalue.star) FROM Bill b JOIN b.billDetails bd JOIN bd.product p WHERE bd.product.account.id = :accountId AND (:search IS NULL OR p.name LIKE %:search%) ")
+	@Query("SELECT AVG(e.star) " +
+			"FROM Product p " +
+			"JOIN p.billDetails bd " +
+			"JOIN bd.evalue e " +
+			"WHERE p.account.id = :accountId " +
+			"AND (:search IS NULL OR p.name LIKE %:search%)")
 	Double tongTrungBinhLuotDanhGia(@Param("accountId") Integer account_id, @Param("search") String search);
 
-	@Query("SELECT p.name AS nameSP , c.name AS theLoai, SUM(b.totalQuantity) AS luotBan, COUNT(e.id) AS luotDanhGia, AVG(e.star) AS trungBinhDanhGia, COUNT(l.id) AS luotYeuThich "
-			+
-			"FROM Bill b JOIN b.billDetails bd " +
-			"LEFT JOIN bd.evalue e LEFT JOIN bd.product.likes l " +
-			"JOIN bd.product p JOIN p.category c " +
+	@Query("SELECT p.name AS nameSP, c.name AS theLoai, " +
+			"(SELECT SUM(bd.quantity) FROM BillDetail bd WHERE bd.product.id = p.id) AS luotBan, " +
+			"COUNT(DISTINCT e.id) AS luotDanhGia, " +
+			"AVG(e.star) AS trungBinhDanhGia, " +
+			"COUNT(DISTINCT l.id) AS luotYeuThich " +
+			"FROM Product p " +
+			"JOIN p.category c " +
+			"LEFT JOIN p.billDetails bd " +
+			"LEFT JOIN bd.evalue e " +
+			"LEFT JOIN p.likes l " +
 			"WHERE p.account.id = :accountId " +
 			"AND (:search IS NULL OR p.name LIKE %:search%) " +
-			"GROUP BY p.name, c.name")
+			"GROUP BY p.id, p.name")
 	Page<Object[]> getListThongKeSanPham(@Param("accountId") Integer account_id, @Param("search") String search,
 			Pageable pageable);
 
