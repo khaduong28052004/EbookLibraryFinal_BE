@@ -6,8 +6,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,15 +62,19 @@ public class Service_BillDetail_User {
 		Map<Integer, Response_BillDetail_User> billMap = new HashMap<>();
 		List<Object[]> billDetail = billDetailRepository.findBillDetailById(billId);
 		List<Response_BillDetail_User> productDetail = new ArrayList<>();
-		
+		Set<Integer> idProduct = new HashSet<>();
 		for (Object[] product : billDetail) {
 			Integer billID = Integer.parseInt(product[1].toString());
-			
+
 			Response_BillDetail_User billData = billMap.getOrDefault(billID, createBillDetailUser(product));
 			Response_Bill_Product_User productData = createBillProductUser(product);
-			
-			billData.getProducts().add(productData);
-			billMap.put(billID, billData);
+
+			if (!idProduct.contains(productData.getProductId())) {
+				billData.getProducts().add(productData);
+				billMap.put(billID, billData);
+			}
+			idProduct.add(productData.getProductId());
+
 		}
 		productDetail.addAll(billMap.values());
 		return productDetail;
@@ -137,15 +143,13 @@ public class Service_BillDetail_User {
 		productData.setProductDiscountPrice(productDiscountPrice);
 		productData.setProductImageURL(productImageURL);
 
-
-		Integer billDetailId = billDetailRepository.findBillDetailByProductIdAndAccountId(userID, productID,	billID);
+		Integer billDetailId = billDetailRepository.findBillDetailByProductIdAndAccountId(userID, productID, billID);
 		productData.setBillDetailId(billDetailId);
-		
-		System.out.println("billDetailId "+billDetailId);
+
+		System.out.println("billDetailId " + billDetailId);
 		Integer isEvalued = evaluateRepository.isEvaluate(billDetailId, productID, userID);
 		productData.setIsEvaluate(isEvalued == 1);
-		
-		
+
 		return productData;
 	}
 
