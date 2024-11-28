@@ -24,19 +24,9 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/v1/seller/shop")
 public class ApiShopSeller {
 
-
-        @Autowired
-        Service_ShopSeller service_Shop;
+	
         @Autowired
         Service_Product productService;
-
-        @PostMapping("/save")
-        public ApiResponse<Response_Account> save(
-                        @RequestBody @Valid Request_Account request_Account) {
-                return ApiResponse.<Response_Account>build()
-                                .message("Cập nhật thông tin Shop thành công")
-                                .result(service_Shop.save(request_Account));
-        }
 
         @GetMapping("/followers/count")
         public ApiResponse<Integer> countFollowers(

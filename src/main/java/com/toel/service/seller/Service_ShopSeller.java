@@ -57,7 +57,7 @@ public class Service_ShopSeller {
 
 
     
-}
+
 
     public boolean saveImage(Integer account_id, MultipartFile avatar, MultipartFile backgroud) {
         try {
