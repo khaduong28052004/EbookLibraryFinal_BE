@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.request.Request_Account;
 import com.toel.dto.seller.response.Response_Account;
+import com.toel.service.admin.Service_Product;
 import com.toel.service.seller.Service_ShopSeller;
 
 import jakarta.validation.Valid;
@@ -22,6 +23,30 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/seller/shop")
 public class ApiShopSeller {
+
+	
+        @Autowired
+        Service_Product productService;
+
+        @GetMapping("/followers/count")
+        public ApiResponse<Integer> countFollowers(
+                        @RequestParam(value = "shop_id", required = true) Integer shopId) {
+                return ApiResponse.<Integer>build()
+                                .result(service_Shop.countFollowersByShopId(shopId));
+        }
+        @GetMapping("/following/count")
+        public ApiResponse<Integer> countFollowing(
+                        @RequestParam(value = "account_id", required = true) Integer accountId) {
+                return ApiResponse.<Integer>build()
+                                .result(service_Shop.countFollowingByAccountId(accountId));
+        }
+
+        @GetMapping("/posts/count")
+        public ApiResponse<Integer> countPosts(
+                        @RequestParam(value = "account_id", required = true) Integer accountId) {
+                return ApiResponse.<Integer>build()
+                                .result(productService.getCountProductByAccountId(accountId));
+        }
 
     @Autowired
     Service_ShopSeller service_Shop;
@@ -50,4 +75,5 @@ public class ApiShopSeller {
                 .message(service_Shop.saveImage(account_id, avatar, background) ? "Cập nhật ảnh thành công"
                         : "Cập nhật ảnh thất bại");
     }
+
 }
