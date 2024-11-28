@@ -38,7 +38,6 @@ public class FlashSaleService {
 
 		for (FlashSaleDetail item : flashSale.getFlashSaleDetails()) {
 			if (item.getProduct() != null && item.getProduct().getId().equals(productId)) {
-
 				return item;
 
 			}

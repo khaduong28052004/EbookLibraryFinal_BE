@@ -33,12 +33,59 @@ public class Service_Search {
 
 	public Map<String, Object> getProductByName(String name, Integer size, String sort) {
 		Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, sort));
-		Page<Product> pageProducts = productRepo.findAllByNameContainingAndIsActiveTrueAndIsDeleteFalse(name, pageable);
-		listProducts = pageProducts.getContent();
+//		Page<Product> pageProducts = productRepo.findAllByNameContainingAndIsActiveTrueAndIsDeleteFalse(name, pageable);
+		listProducts = productRepo.findAllProduct(Sort.by(Sort.Direction.DESC, "price"));
+//		listProducts = listProducts.stream().filter(product -> {
+//			String[] names = name.split(" ");
+//			for (String word : names) {
+//				if (product.getName().contains(word)) {
+//					return false;
+//				}
+//			}
+//			return true;
+//
+//		}).collect(Collectors.toList());
+
+		String[] names = name.trim().split("\\s*,\\s*|\\s+");
+		System.out.println("max " + names.length);
+//		System.out.println("totalIndex " + index);
+//		System.out.println("currentProportion " + currentProportion);
+		if (names.length > 0) {
+			List<Integer> listIdProduct = new ArrayList<>();
+			float totalIndex = 0;
+			float maxProportion = 0;
+			for (Product product : listProducts) {
+				String productName = product.getName().toLowerCase();
+				int totalWords = productName.split("\\s*,\\s*|\\s+").length;
+				float index = 0;
+
+				for (String word : names) {
+					if (productName.contains(word.toLowerCase())) {
+						index++;
+					}
+				}
+
+				float currentProportion = index / totalWords;
+				if (index > totalIndex) {
+					maxProportion = currentProportion;
+					totalIndex = index;
+					listIdProduct.clear();
+					listIdProduct.add(product.getId());
+				} else if (index >= totalIndex) {
+					maxProportion = currentProportion;
+					totalIndex = index;
+					listIdProduct.add(product.getId());
+				}
+			}
+
+			listProducts = listProducts.stream().filter(product -> listIdProduct.contains(product.getId()))
+					.collect(Collectors.toList());
+		}
+
 		List<Response_Product> listResponse_Products = new ArrayList<Response_Product>();
 		Map<String, Object> response = new HashMap<String, Object>();
 		Map<Integer, Category> categoryMap = new HashMap<Integer, Category>();
-		for (Product product : pageProducts) {
+		for (Product product : listProducts) {
 			listResponse_Products.add(productMaperUser.productToResponse_Product(product));
 			categoryMap.computeIfAbsent(product.getCategory().getId(), id -> product.getCategory());
 		}
@@ -86,7 +133,5 @@ public class Service_Search {
 		response.put("datas", listResponse_Products);
 		return response;
 	}
-	
-	
 
 }
