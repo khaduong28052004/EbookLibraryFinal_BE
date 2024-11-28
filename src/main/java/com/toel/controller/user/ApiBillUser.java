@@ -2,6 +2,7 @@ package com.toel.controller.user;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.user.resquest.Request_Bill_User;
-
-
-
+import com.toel.model.Bill;
+import com.toel.repository.BillRepository;
+import com.toel.service.Email.EmailService;
 import com.toel.service.user.Service_Bill_User;
 
 @CrossOrigin("*")
@@ -32,13 +33,13 @@ public class ApiBillUser {
 	@GetMapping("/read")
 
 	public ResponseEntity<Map<String, Object>> getAllOrdersByOrderStatus(
-			@RequestParam String orderStatusFind, 
-	        @RequestParam int userId) {
-		
-		   Request_Bill_User requestBillDTO = new Request_Bill_User();
-		    requestBillDTO.setOrderStatusFind(orderStatusFind);
-		    requestBillDTO.setUserID(userId);
-		    
+			@RequestParam String orderStatusFind,
+			@RequestParam int userId) {
+
+		Request_Bill_User requestBillDTO = new Request_Bill_User();
+		requestBillDTO.setOrderStatusFind(orderStatusFind);
+		requestBillDTO.setUserID(userId);
+
 		Map<String, Object> response = service_Bill_User.getBills(requestBillDTO);
 
 		return ResponseEntity.ok(response);
@@ -94,9 +95,36 @@ public class ApiBillUser {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 
-
 	}
-	
 
+	@Autowired
+	BillRepository billRepository;
+	@Autowired
+	EmailService emailService;
+
+	@PostMapping("/send")
+	public ResponseEntity<String> sendNotification(@RequestParam Integer billId) {
+		Optional<Bill> optionalBill = billRepository.findById(billId);
+		if (optionalBill.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+					.body("Bill with ID " + billId + " not found.");
+		}
+
+		Bill bill = optionalBill.get();
+
+		// Call the sendNotification method
+		String email = bill.getAccount().getEmail();
+		String username = bill.getAccount().getUsername();
+
+		String subject = "TOEL - Thông báo cập nhật trạng thái xác nhận đơn hàng";
+		String content = String.format(
+				"Dear %s,\n\nĐơn hàng của bạn sẽ được tự động cập nhật trạng thái sau 2 ngày. "
+						+ "Vui lòng xác nhận trạng thái đã nhận hàng.\n\nXin cảm ơn vì đã mua hàng trên TOEL.",
+				username);
+
+		emailService.push(email, subject, content);
+
+		return ResponseEntity.ok("Notification sent to " + email);
+	}
 
 }
