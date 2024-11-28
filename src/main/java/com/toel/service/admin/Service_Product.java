@@ -119,4 +119,8 @@ public class Service_Product {
             return null;
         }
     }
+
+    public Integer getCountProductByAccountId(Integer accountId) {
+        return productRepository.countProductByAccountId(accountId);
+    }
 }

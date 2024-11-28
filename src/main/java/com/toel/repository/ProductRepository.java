@@ -110,4 +110,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
         @Query("SELECT p FROM Product p WHERE p.id NOT IN :idProducts")
         Page<Product> findAllIdNotIn(@Param("idProducts") List<Integer> idProducts, Pageable pageable);
 
+
+        @Query("SELECT COUNT(f) FROM Product f WHERE f.account.id = :accountId")
+        Integer countProductByAccountId(@Param("accountId") Integer accountId);
 }
