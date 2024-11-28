@@ -42,36 +42,46 @@ public class Service_CategorySeller {
 
         public PageImpl<Response_Category> getAll(
                         Integer page, Integer size, boolean sortBy, String sortColumn, String search) {
-                Pageable pageable = PageRequest.of(page, size,
-                                Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
-                Page<Category> pageCategory = categoryRepository.findALlBySearch(search, pageable);
-                List<Response_Category> list = pageCategory.stream()
-                                .map(category -> categoryMapper.response_Category(category))
-                                .collect(Collectors.toList());
-                return new PageImpl<>(list, pageable, pageCategory.getTotalElements());
+                try {
+                        Pageable pageable = PageRequest.of(page, size,
+                                        Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
+                        Page<Category> pageCategory = categoryRepository.findALlBySearch(search, pageable);
+                        return new PageImpl<>(pageCategory.stream()
+                                        .map(category -> categoryMapper.response_Category(category))
+                                        .collect(Collectors.toList()), pageable, pageCategory.getTotalElements());
+                } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION, "System");
+                }
+
         }
 
-        public PageImpl<Response_CategorySeller> getAllSeller(Integer page, Integer size, boolean sortBy,
-                        String sortColum,
-                        String search, Integer account_id) {
-                Pageable pageable = PageRequest.of(page, size,
-                                Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColum));
-                Page<Object[]> pageCategory = categoryRepository.findCategoriesWithParentName(search, account_id,
-                                pageable);
+        public PageImpl<Response_CategorySeller> getAllSeller(
+                        Integer page, Integer size, boolean sortBy, String sortColum, String search,
+                        Integer account_id) {
+                try {
+                        Pageable pageable = PageRequest.of(page, size,
+                                        Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColum));
+                        Page<Object[]> pageCategory = categoryRepository.findCategoriesWithParentName(search,
+                                        account_id,
+                                        pageable);
+                        return new PageImpl<>(pageCategory.stream()
+                                        .map(objects -> {
+                                                Integer id = (Integer) objects[0];
+                                                String name = (String) objects[1];
+                                                Integer idParent = (Integer) objects[2];
+                                                String parentName = (String) objects[3];
+                                                Boolean hasProducts = (Boolean) objects[4];
+                                                return new Response_CategorySeller(id, name, idParent,
+                                                                parentName != null ? parentName : "Không Có Danh Mục",
+                                                                hasProducts);
+                                        })
+                                        .collect(Collectors.toList()), pageable, pageCategory.getTotalElements());
+                } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION, "System");
+                }
 
-                List<Response_CategorySeller> list = pageCategory.stream()
-                                .map(objects -> {
-                                        Integer id = (Integer) objects[0];
-                                        String name = (String) objects[1];
-                                        Integer idParent = (Integer) objects[2];
-                                        String parentName = (String) objects[3];
-                                        Boolean hasProducts = (Boolean) objects[4]; // hasProducts
-                                        return new Response_CategorySeller(id, name, idParent,
-                                                        parentName != null ? parentName : "No Parent", hasProducts);
-                                })
-                                .collect(Collectors.toList());
-
-                return new PageImpl<>(list, pageable, pageCategory.getTotalElements());
         }
 
         public List<Response_Category> getAllList() {
@@ -86,6 +96,7 @@ public class Service_CategorySeller {
                                 .map(category -> categoryMapper.response_Category(category))
                                 .collect(Collectors.toList());
         }
+
         public List<Response_Category> getIdParent(
                         Integer idParent) {
                 return categoryRepository.findALlByIdParent(idParent).stream()
@@ -128,10 +139,9 @@ public class Service_CategorySeller {
         public void delete(
                         Integer id_category) {
                 categoryRepository.findById(id_category)
-                                .ifPresent(
-                                                category -> {
-                                                        categoryRepository.delete(category);
-                                                });
+                                .ifPresentOrElse(category -> categoryRepository.delete(category), () -> {
+                                        throw new AppException(ErrorCode.OBJECT_NOT_FOUND, "Category");
+                                });
         }
 
         public Response_Category edit(
@@ -140,7 +150,8 @@ public class Service_CategorySeller {
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Thể Loại")));
         }
 
-        public boolean checkCategory(Category category) {
+        public boolean checkCategory(
+                        Category category) {
                 return categoryRepository.findALlByIdAccount(category.getAccount().getId()).stream()
                                 .noneMatch(categoryCheck -> category.getName()
                                                 .equals(categoryCheck.getName())

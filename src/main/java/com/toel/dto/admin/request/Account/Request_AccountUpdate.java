@@ -17,14 +17,12 @@ public class Request_AccountUpdate {
     @NotBlank(message = "FIELD_REQUIRED")
     String background;
     @NotBlank(message = "FIELD_REQUIRED")
-    String username;
-    @NotBlank(message = "FIELD_REQUIRED")
     String fullname;
     @NotNull(message = "FIELD_REQUIRED")
     Boolean gender;
     @NotBlank(message = "FIELD_REQUIRED")
     String email;
-    // @NotBlank(message = "FIELD_REQUIRED")
+    @NotBlank(message = "FIELD_REQUIRED")
     Date birthday;
     @NotBlank(message = "FIELD_REQUIRED")
     String phone;

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,18 +64,21 @@ public class ApiHome {
 			@RequestParam(name = "size", defaultValue = "8") Integer size,
 			@RequestParam(name = "sort", defaultValue = "price") String sort) {
 		List<FlashSaleDetail> flashSaleDetails = new ArrayList<FlashSaleDetail>();
+		LocalDateTime localDateTime = LocalDateTime.now();
+		FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime);
 		try {
-			LocalDateTime localDateTime = LocalDateTime.now();
-			FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime);
+
 			flashSaleDetails = flashSaleDetailRepo.findAllByFlashSale(flashSale);
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
 
 		Map<String, Object> response = serviceSellectAll.selectAll(flashSaleDetails, id_Shop, 0, size, sort);
+		response.put("flashSalene", flashSale);
 		if (response.get("error") != null) {
 			return ApiResponse.<Map<String, Object>>build().message("not fault").code(1002);
 		}
+
 		return ApiResponse.<Map<String, Object>>build().message("success").result(response);
 	}
 

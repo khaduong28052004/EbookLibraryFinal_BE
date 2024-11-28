@@ -1,5 +1,6 @@
 package com.toel.service.seller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,10 +22,20 @@ import com.toel.exception.ErrorCode;
 import com.toel.mapper.BillMapper;
 import com.toel.model.Account;
 import com.toel.model.Bill;
+import com.toel.model.FlashSaleDetail;
 import com.toel.model.OrderStatus;
+import com.toel.model.Product;
+import com.toel.model.Voucher;
+import com.toel.model.VoucherDetail;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.BillRepository;
+import com.toel.repository.FlashSaleDetailRepository;
 import com.toel.repository.OrderStatusRepository;
+import com.toel.repository.ProductRepository;
+import com.toel.repository.VoucherDetailRepository;
+import com.toel.repository.VoucherRepository;
+import com.toel.service.Email.EmailService;
+import com.toel.service.Email.EmailTemplateType;
 
 @Service
 public class Service_BillSeller {
@@ -36,8 +47,19 @@ public class Service_BillSeller {
     OrderStatusRepository orderStatusRepository;
     @Autowired
     AccountRepository accountRepository;
+    @Autowired
+    ProductRepository productRepository;
+    @Autowired
+    VoucherDetailRepository voucherDetailRepository;
+    @Autowired
+    FlashSaleDetailRepository flashSaleDetailRepository;
+    @Autowired
+    VoucherRepository voucherRepository;
+    @Autowired
+    EmailService emailService;
 
-    public PageImpl<Response_Bill> getAll(Integer page, Integer size, boolean sortBy, String sortColumn,
+    public PageImpl<Response_Bill> getAll(
+            Integer page, Integer size, boolean sortBy, String sortColumn,
             Integer account_id, String search) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
         Page<Bill> pageBill = billRepository.findAllByShopId(account_id, search, pageable);
@@ -47,7 +69,8 @@ public class Service_BillSeller {
         return new PageImpl<>(list, pageable, pageBill.getTotalElements());
     }
 
-    public Response_Bill updateOrderStatus(Request_Bill request_Bill) {
+    public Response_Bill updateOrderStatus(
+            Request_Bill request_Bill) {
         Bill bill = billRepository.findById(request_Bill.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Bill"));
         bill.setOrderStatus(orderStatusRepository.findById(request_Bill.getOrderStatus() + 1)
@@ -56,13 +79,66 @@ public class Service_BillSeller {
         return billMapper.response_Bill(billRepository.saveAndFlush(bill));
     }
 
-    public Response_Bill huy(Request_Bill request_Bill) {
+    public Response_Bill huy(
+            String content,
+            Request_Bill request_Bill) {
         Bill bill = billRepository.findById(request_Bill.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Bill"));
         bill.setOrderStatus(orderStatusRepository.findById(6)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "OrderStatus")));
         bill.setUpdateAt(new Date());
+        returnStatus(bill);
+        emailService.push(bill.getAccount().getEmail(), "TOEL - Thông Báo Hủy Đơn Hàng", EmailTemplateType.HUYDON,
+                bill.getAccount().getFullname(),
+                String.valueOf(bill.getId()), content);
         return billMapper.response_Bill(billRepository.saveAndFlush(bill));
+    }
+
+    public void returnStatus(Bill bill) {
+        try {
+            List<Product> updatedProducts = new ArrayList<>();
+            List<FlashSaleDetail> updatedFlashSaleDetails = new ArrayList<>();
+            List<VoucherDetail> voucherDetailsToDelete = new ArrayList<>();
+            List<Voucher> updatedVouchers = new ArrayList<>();
+
+            bill.getBillDetails().forEach(billDetail -> {
+                Product product = billDetail.getProduct();
+                product.setQuantity(product.getQuantity() + billDetail.getQuantity());
+                updatedProducts.add(product);
+
+                if (billDetail.getFlashSaleDetail() != null) {
+                    FlashSaleDetail flashSaleDetail = billDetail.getFlashSaleDetail();
+                    flashSaleDetail.setQuantity(flashSaleDetail.getQuantity() + billDetail.getQuantity());
+                    updatedFlashSaleDetails.add(flashSaleDetail);
+                }
+            });
+
+            if (bill.getVoucherDetails() != null) {
+                bill.getVoucherDetails().forEach(voucherDetails -> {
+                    Voucher voucher = voucherDetails.getVoucher();
+                    voucher.setQuantity(voucher.getQuantity() + 1);
+                    updatedVouchers.add(voucher);
+                    voucherDetailsToDelete.add(voucherDetails);
+                });
+            }
+            if (!updatedProducts.isEmpty()) {
+                productRepository.saveAll(updatedProducts);
+            }
+            if (!updatedFlashSaleDetails.isEmpty()) {
+                flashSaleDetailRepository.saveAll(updatedFlashSaleDetails);
+            }
+            if (!updatedVouchers.isEmpty()) {
+                voucherRepository.saveAll(updatedVouchers);
+
+            }
+            if (!voucherDetailsToDelete.isEmpty()) {
+                voucherDetailRepository.deleteAll(voucherDetailsToDelete);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION, "System");
+        }
     }
 
     public String QuantityBillStatus(Integer idOrder, Integer idAccount) {

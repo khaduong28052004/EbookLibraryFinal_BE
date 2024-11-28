@@ -17,7 +17,6 @@ public enum ErrorCode {
     OBJECT_ACTIVE(2003, "%s đang hoạt động", HttpStatus.BAD_REQUEST),
     OBJECT_SETUP(2004, "%s", HttpStatus.BAD_REQUEST),
 
-
     FIELD_REQUIRED(3001, "{key} không được bỏ trống!", HttpStatus.BAD_REQUEST),
     FIELD_INVALID_FUTURE_DATE(3002, "{key} phải là thời gian trong tương lai!", HttpStatus.BAD_REQUEST),
     FIELD_MIN_VALUE(3003, "{key} phải lớn hơn hoặc bằng {min}!", HttpStatus.BAD_REQUEST),
@@ -28,8 +27,8 @@ public enum ErrorCode {
     TIME_RANGE_ERROR(4001, "Thời gian bắt đầu phải trước thời gian kết thúc", HttpStatus.BAD_REQUEST),
     EMAIL_FORMAT_ERROR(4002, "Email không hợp lệ!", HttpStatus.BAD_REQUEST),
 
+    TIME_ERROR(5001, "Khoảng cách giữa ngày bắt đầu và kết thúc không được vượt quá 24 giờ", HttpStatus.BAD_REQUEST);
 
-    TIME_ERROR(5001, "Khung thời gian đã tồn tại", HttpStatus.BAD_REQUEST);
     private final int code;
     private final String message;
     private final HttpStatus httpStatus;

@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.toel.model.Account;
+import com.toel.model.BillDetail;
 import com.toel.model.Evalue;
 import com.toel.model.Product;
 
@@ -42,4 +43,8 @@ public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
 
 	@Query("SELECT COALESCE(AVG(e.star),0) FROM Evalue e WHERE e.account = :account")
 	Double calculateAverageStarByKhachHang(@Param("account") Account account);
+
+	List<Evalue> findByBillDetail(BillDetail billDetail);
+
+	List<Evalue> findByBillDetailIn(List<BillDetail> billDetail);
 }

@@ -1,7 +1,9 @@
 package com.toel.repository;
 
+import java.lang.foreign.Linker.Option;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,8 +13,8 @@ import com.toel.model.BillDetail;
 import com.toel.model.Product;
 
 public interface BillDetailRepository extends JpaRepository<BillDetail, Integer> {
-	@Query("SELECT COALESCE(SUM( (bd.price * bd.quantity) - (bd.price * bd.quantity * "
-			+ "( SELECT COALESCE(vd.voucher.sale, 0)/ 100  FROM bd.bill.voucherDetails vd WHERE vd.bill = bd.bill and vd.voucher.typeVoucher.id=1))), 0)"
+	@Query("SELECT COALESCE(SUM( (bd.price * bd.quantity) * (1 - (bd.bill.discountRate.discount / 100.0)) - (bd.price * bd.quantity * "
+			+ "COALESCE((SELECT COALESCE(vd.voucher.sale, 0)/ 100  FROM bd.bill.voucherDetails vd WHERE vd.bill = bd.bill and vd.voucher.typeVoucher.id=1),0))), 0)"
 			+
 			"FROM BillDetail bd " +
 			"WHERE bd.product.account.id = :accountId " +
@@ -105,4 +107,14 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 	Integer findBillDetailByProductIdAndAccountId(@Param("accountId") Integer accountId,
 			@Param("productId") Integer productId,
 			@Param("billId") Integer billId);
+
+	List<BillDetail> findByProduct(Product product);
+
+	List<BillDetail> findByProductIn(List<Product> product);
+    
+	// @Override
+	// default List<BillDetail> findAllById(Iterable<Integer> ids) {
+	// 	// TODO Auto-generated method stub
+	// 	throw new UnsupportedOperationException("Unimplemented method 'findAllById'");
+	// } 
 }

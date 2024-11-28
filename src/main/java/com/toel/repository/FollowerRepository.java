@@ -3,6 +3,7 @@ package com.toel.repository;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.toel.model.Account;
 import com.toel.model.Follower;
 
 import io.lettuce.core.dynamic.annotation.Param;
@@ -10,7 +11,9 @@ import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
 
 public interface FollowerRepository extends JpaRepository<Follower, Integer> {
-    List<Follower> findAllByShopId(int shopId);
+	List<Follower> findAllByShopId(int shopId);
+
+	Follower findByAccountAndShopId(Account user, Integer id_shop);
 
     @Query("SELECT COUNT(f) FROM Follower f WHERE f.shopId.id = :shopId")
     Integer countFollowersByShopId(@Param("shopId") Integer shopId);
