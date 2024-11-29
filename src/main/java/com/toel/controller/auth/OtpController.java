@@ -31,13 +31,13 @@ public class OtpController {
 
     @PostMapping("/api/v1/otp/generate")
     public ResponseEntity<String> generateOtp(@RequestBody Account entity) {
-        System.out.println("email"+entity.getEmail());
+        System.out.println("email" + entity.getEmail());
         boolean isvalid = accountRepository.existsByEmail(entity.getEmail());
         // boolean isvalid = true;
         if (isvalid) {
             String otp = otpService.generateOtp(entity.getEmail());
             String hashOTP = serviceToel.hashPassword(otp);
-            System.out.println("otp nè: "+otp +" hashOTP "+hashOTP + " , mail "+ entity.getEmail() + isvalid);
+            System.out.println("otp nè: " + otp + " hashOTP " + hashOTP + " , mail " + entity.getEmail() + isvalid);
 
             emailService.push(entity.getEmail(), "Mã otp của bạn", EmailTemplateType.OTP, otp,
                     "http://localhost:5173/change-password?otp=" + otp);
@@ -47,14 +47,10 @@ public class OtpController {
             return ResponseEntity.ok("emal không tồn tại ! ");
 
         }
-
-        // String otp = otpService.generateOtp(email);
-        // return ResponseEntity.ok("OTP generated: " + otp);
     }
 
     @PostMapping("api/v1/otp/lo")
     public String postMethodName(@RequestParam String email) {
-        // TODO: process POST request
         String o = otpService.find(email);
         return o;
     }
@@ -72,7 +68,8 @@ public class OtpController {
             if (isValid) {
                 account.setPassword(encryptedPassword);
                 accountRepository.save(account);
-                emailService.push(account.getEmail(), "ĐỔI MẬT KHẨU THÀNH CÔNG !", EmailTemplateType.PASSWORD_SUSSECC,account.getFullname());
+                emailService.push(account.getEmail(), "ĐỔI MẬT KHẨU THÀNH CÔNG !", EmailTemplateType.PASSWORD_SUSSECC,
+                        account.getFullname());
                 return ResponseEntity.ok("OTP verified successfully");
             } else {
                 return ResponseEntity.badRequest().body("Invalid OTP !");
@@ -86,33 +83,34 @@ public class OtpController {
 
     }
 
-    // @PostMapping("/api/v1/otp/verify")
-    // public ResponseEntity<String> verifyOtp(@RequestParam String email,
-    // @RequestParam String otp,@RequestParam String pass) {
-    // boolean isValid = otpService.verifyOtp(email, otp);
-    // boolean accountCheck = accountRepository.existsByEmail(email);
-    // Account account = accountRepository.findByEmail(email);
-    // String encryptedPassword = passwordEncoder.encode(pass);
-    // if (isValid) {
-    // account.setPassword(encryptedPassword);
-    // accountRepository.save(account);
-    // return ResponseEntity.ok("OTP verified successfully");
-    // } else {
-    // return ResponseEntity.badRequest().body("Invalid OTP");
-    // }
-    // }
+    // register v2
+    @PostMapping("/api/v2/user/register/generateOTP")
+    public ResponseEntity<String> registerOTPV2(@RequestBody Account entity,
+            @RequestParam(defaultValue = "false") Boolean style) {
+        if (!style) {
+            System.out.println("email" + entity.getEmail());
+            boolean isvalid = accountRepository.existsByEmail(entity.getEmail());
+            // boolean isvalid = true;
+            if (!isvalid) {
+                String otp = otpService.generateOtp(entity.getEmail());
+                String hashOTP = serviceToel.hashPassword(otp);
+                System.out.println("otp nè: " + otp + " hashOTP " + hashOTP + " , mail " + entity.getEmail() + isvalid);
 
-    // @PostMapping("/api/v1/user/verify/{otp}")
-    // public ResponseEntity<String> verifyOtp1(@PathVariable String Otp,
-    // @RequestParam String email,
-    // @RequestParam String otp) {
-    // boolean isValid = otpService.verifyOtp(email, otp);
-    // if (isValid) {
-    // return ResponseEntity.ok("OTP verified successfully");
-    // } else {
-    // return ResponseEntity.badRequest().body("Invalid OTP");
-    // }
-    // }
+                emailService.push(entity.getEmail(), "Mã otp của bạn", EmailTemplateType.DANGKYTAIKHOAN, otp,
+                        "http://localhost:5173/singup2?otp=" + otp + "&email=" + entity.getEmail());
+                return ResponseEntity.ok("OTP generated: " + otp);
+
+            } else {
+                return ResponseEntity.ok("Email đã tồn tại ! ");    
+
+            }
+        } else {
+            return ResponseEntity.ok("Số điện thoại không tồn tại ! ");
+        }
+
+        // String otp = otpService.generateOtp(email);
+        // return ResponseEntity.ok("OTP generated: " + otp);
+    }
 
     @Autowired
     private EmailService emailService;

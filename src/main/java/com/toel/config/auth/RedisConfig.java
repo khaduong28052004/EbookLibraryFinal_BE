@@ -14,8 +14,8 @@ public class RedisConfig {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         config.setHostName("redis-17827.c56.east-us.azure.redns.redis-cloud.com");
         config.setPort(17827);
-        config.setUsername("default");
-        config.setPassword("dNaF1Jnq9z9XLK4Y8EApk3xUHrffPTOV");
+        config.setUsername("kien" );
+        config.setPassword("Wrrbm@jQd!3h8kk");
         return new JedisConnectionFactory(config);
     }
 
