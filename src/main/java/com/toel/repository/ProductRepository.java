@@ -104,10 +104,19 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	@Query("SELECT p FROM Product p WHERE p.isActive = true AND p.isDelete = false AND p.account.status = true")
 	List<Product> findAllProduct(Sort sort);
 
-        @Query(value = "SELECT * FROM products p WHERE p.isDelete=false and p.isActive=false and p.createAt < NOW() - INTERVAL 7 DAY", nativeQuery = true)
-        List<Product> findAllCreatedBeforeSevenDays();
+	@Query(value = "SELECT * FROM products p WHERE p.isDelete=false and p.isActive=false and p.createAt < NOW() - INTERVAL 7 DAY", nativeQuery = true)
+	List<Product> findAllCreatedBeforeSevenDays();
 
+	@Query("SELECT COUNT(f) FROM Product f WHERE f.account.id = :accountId")
+	Integer countProductByAccountId(@Param("accountId") Integer accountId);
 
-        @Query("SELECT COUNT(f) FROM Product f WHERE f.account.id = :accountId")
-        Integer countProductByAccountId(@Param("accountId") Integer accountId);
+	@Query("SELECT DISTINCT p FROM Product p " +
+			"LEFT JOIN BillDetail bd ON bd.product = p " +
+			"WHERE p.id IN :ids " +
+			"AND p.isActive = true " +
+			"AND p.isDelete = false " +
+			"GROUP BY p.id " +
+			"ORDER BY COALESCE(SUM(bd.quantity), 0) DESC")
+	Page<Product> findProductsByIdsSortedByTotalSales(@Param("ids") List<Integer> ids, Pageable pageable);
+
 }

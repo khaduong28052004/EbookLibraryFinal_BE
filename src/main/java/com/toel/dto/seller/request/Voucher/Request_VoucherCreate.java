@@ -6,6 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -32,8 +33,10 @@ public class Request_VoucherCreate {
     boolean isDelete;
     @DateTimeFormat(pattern = "dd/MM/yyyy")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    @Future(message = "FIELD_INVALID_FUTURE_DATE")
     Date dateStart;
     @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @Future(message = "FIELD_INVALID_FUTURE_DATE")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     Date dateEnd;
     @NotNull(message = "FIELD_REQUIRED")
