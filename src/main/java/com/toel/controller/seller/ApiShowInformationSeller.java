@@ -1,6 +1,6 @@
 package com.toel.controller.seller;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,7 +30,9 @@ import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
 import com.toel.repository.EvalueRepository;
 import com.toel.repository.ProductRepository;
+import com.toel.repository.TypeVoucherRepository;
 import com.toel.repository.VoucherRepository;
+import com.toel.service.user.FollowerService;
 
 import lombok.Data;
 
@@ -55,6 +57,10 @@ public class ApiShowInformationSeller {
 
     @Autowired
     private VoucherRepository voucherRepository;
+    @Autowired
+    private TypeVoucherRepository typeVoucherRepository;
+    @Autowired
+    private FollowerService followerService;
 
     /**
      * homeShowSeller
@@ -67,8 +73,8 @@ public class ApiShowInformationSeller {
      * @param idSeller
      * @return
      */
-    @GetMapping("/api/user/informationSeller/{idSeller}")
-    public ApiResponse<?> getMethodName(@PathVariable Integer idSeller) {
+    @GetMapping("/api/user/informationSeller2/{idSeller}/{idAccount}")
+    public ApiResponse<?> getMethodName(@PathVariable Integer idSeller, @PathVariable Integer idAccount) {
         try {
             Account account = accountRepository.findById(idSeller)
                     .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
@@ -83,6 +89,11 @@ public class ApiShowInformationSeller {
             inforSeller.setShopCancellationRate(idSeller);
             inforSeller.setAvatar(account.getAvatar());
             inforSeller.setBackground(account.getBackground());
+            if (idAccount != null) {
+                // followerService.checkFollower(idSeller, idAccount) ?
+                inforSeller.setIsFollowed(followerService.checkFollower(idSeller, idAccount));
+            }
+
             // Kiểm tra địa chỉ có `status` là true
             Optional<Address> defaultAddress = account.getAddresses().stream()
                     .filter(Address::isStatus) // Kiểm tra địa chỉ có `status` là true
@@ -99,6 +110,50 @@ public class ApiShowInformationSeller {
             Map<String, Object> map = new HashMap<>();
             map.put("shopDataEX", inforSeller);
             map.put("rating", ValueAverageStars(account));
+            // map.put("isf", ValueAverageStars(account));
+
+            return ApiResponse.<Map>build().code(100).message("null").result(map);
+        } catch (Exception e) {
+            // TODO: handle exception
+            return ApiResponse.<Response_InforSeller>build().code(100).message(e.getMessage()).result(null);
+        }
+
+    }
+
+    @GetMapping("/api/user/informationSeller/{idSeller}")
+    public ApiResponse<?> informationSellerPublic(@PathVariable Integer idSeller) {
+        try {
+            Account account = accountRepository.findById(idSeller)
+                    .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
+                            "ID:[" + idSeller + "] không tìm thấy người bán"));
+            Response_InforSeller inforSeller = new Response_InforSeller();
+            inforSeller.setIdSeller(account.getId());
+            inforSeller.setNumberOfProducts(account.getProducts().size());
+            inforSeller.setNumberOfFollowers(account.getFollowers().size());
+            inforSeller.setTrackingNumber(idSeller);
+            // inforSeller.setAverageStarRating(averageStars(account));
+            // inforSeller.setAverageStarRating();
+            inforSeller.setShopCancellationRate(idSeller);
+            inforSeller.setAvatar(account.getAvatar());
+            inforSeller.setBackground(account.getBackground());
+            inforSeller.setIsFollowed(false);
+            // Kiểm tra địa chỉ có `status` là true
+            Optional<Address> defaultAddress = account.getAddresses().stream()
+                    .filter(Address::isStatus) // Kiểm tra địa chỉ có `status` là true
+                    .findFirst();
+            if (defaultAddress.isPresent()) {
+                Address address = defaultAddress.get();
+                inforSeller.setDistrict(address.getFullNameAddress());
+            } else {
+                inforSeller.setDistrict("chưa cập nhật!");
+            }
+            inforSeller.setCreateAtSeller(account.getCreateAtSeller());
+            inforSeller.setParticipationTime(inforSeller.calculateActiveDays());
+            inforSeller.setShopName(account.getShopName());
+            Map<String, Object> map = new HashMap<>();
+            map.put("shopDataEX", inforSeller);
+            map.put("rating", ValueAverageStars(account));
+            // map.put("isf", ValueAverageStars(account));
 
             return ApiResponse.<Map>build().code(100).message("null").result(map);
         } catch (Exception e) {
@@ -187,4 +242,19 @@ public class ApiShowInformationSeller {
     // Data participationTime; // tới gian bán
     // Integer trackingNumber; // số lượng theo dõi
     // Integer shopCancellationRate; // Tỷ lệ Shop hủy đơn(%)
+
+    @GetMapping("/ap1/v1/user/voucherAll")
+    public ApiResponse<?> getVoucherAll() {
+        List<TypeVoucher> typeVoucher = typeVoucherRepository.findAll();
+        Date date = new Date();
+        List<Voucher> listVoucherShop = voucherRepository.findAllByTypeVoucher(typeVoucher.get(0),date );
+        List<Voucher> listVoucherSan = voucherRepository.findAllByTypeVoucher(typeVoucher.get(1),date );
+        Map<String, Object> hash = new HashMap<>();
+        hash.put("san", listVoucherSan);
+        hash.put("shop", listVoucherShop);
+
+        
+        return ApiResponse.<Map>build().code(0).message("").result(hash);
+    }
+    
 }

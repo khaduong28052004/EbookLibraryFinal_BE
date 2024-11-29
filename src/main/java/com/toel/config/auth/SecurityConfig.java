@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         // Public access for login, home, and some user routes
                         .requestMatchers(AUTH_WISH_SWAGGER).permitAll()
-                        .requestMatchers("/api/v1/login", "/api/v1/**", "/api/v2/**", "/api/user/**", "/api/v1/otp/**",
+                        .requestMatchers("/api/v1/login", "/api/v1/**", "/api/v2/**", "/api/user/**", "/api/v1/otp/**","/ap1/v1/user/**",
                                 "/user/loginGoogle")
                         .permitAll()
 

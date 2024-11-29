@@ -31,7 +31,7 @@ public class Response_InforSeller {
     long participationTime; // tới gian bán
     Integer trackingNumber; // số lượng theo dõi
     Integer shopCancellationRate; // Tỷ lệ Shop hủy đơn(%)
-
+    Boolean isFollowed;
     // public void setParticipationTime(Date createAtSeller) {
     //     this.participationTime = calculateActiveDays(); // Tính ngay khi set
     // }
