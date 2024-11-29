@@ -26,11 +26,11 @@ public class Log {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer id;
-
+	
 	boolean status;
-
 	Date timestamps;
-
+	String tableName;
+	Integer id_Object;
 	String action_type;
 
 	@ManyToOne
