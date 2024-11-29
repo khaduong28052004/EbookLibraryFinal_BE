@@ -2,10 +2,6 @@ package com.toel.dto.seller.response;
 
 import java.util.Date;
 
-import org.hibernate.annotations.Nationalized;
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
