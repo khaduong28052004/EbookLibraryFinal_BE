@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.toel.model.Account;
+import com.toel.model.BillDetail;
 import com.toel.model.Category;
 import com.toel.model.Product;
 
@@ -118,5 +119,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			"GROUP BY p.id " +
 			"ORDER BY COALESCE(SUM(bd.quantity), 0) DESC")
 	Page<Product> findProductsByIdsSortedByTotalSales(@Param("ids") List<Integer> ids, Pageable pageable);
+	
+	List<Product> findByBillDetails(List<BillDetail> billDetails);
 
 }

@@ -22,6 +22,7 @@ import com.toel.model.Address;
 import com.toel.model.Bill;
 import com.toel.model.BillDetail;
 import com.toel.model.Evalue;
+import com.toel.model.OrderStatus;
 import com.toel.model.Product;
 import com.toel.model.TypeVoucher;
 import com.toel.model.Voucher;
@@ -29,6 +30,7 @@ import com.toel.repository.AccountRepository;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
 import com.toel.repository.EvalueRepository;
+import com.toel.repository.OrderStatusRepository;
 import com.toel.repository.ProductRepository;
 import com.toel.repository.TypeVoucherRepository;
 import com.toel.repository.VoucherRepository;
@@ -62,6 +64,9 @@ public class ApiShowInformationSeller {
     @Autowired
     private FollowerService followerService;
 
+    @Autowired
+    private OrderStatusRepository orderStatusRepository;
+
     /**
      * homeShowSeller
      * số lượng sản phẩm
@@ -73,53 +78,6 @@ public class ApiShowInformationSeller {
      * @param idSeller
      * @return
      */
-    @GetMapping("/api/user/informationSeller2/{idSeller}/{idAccount}")
-    public ApiResponse<?> getMethodName(@PathVariable Integer idSeller, @PathVariable Integer idAccount) {
-        try {
-            Account account = accountRepository.findById(idSeller)
-                    .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
-                            "ID:[" + idSeller + "] không tìm thấy người bán"));
-            Response_InforSeller inforSeller = new Response_InforSeller();
-            inforSeller.setIdSeller(account.getId());
-            inforSeller.setNumberOfProducts(account.getProducts().size());
-            inforSeller.setNumberOfFollowers(account.getFollowers().size());
-            inforSeller.setTrackingNumber(idSeller);
-            // inforSeller.setAverageStarRating(averageStars(account));
-            // inforSeller.setAverageStarRating();
-            inforSeller.setShopCancellationRate(idSeller);
-            inforSeller.setAvatar(account.getAvatar());
-            inforSeller.setBackground(account.getBackground());
-            if (idAccount != null) {
-                // followerService.checkFollower(idSeller, idAccount) ?
-                inforSeller.setIsFollowed(followerService.checkFollower(idSeller, idAccount));
-            }
-
-            // Kiểm tra địa chỉ có `status` là true
-            Optional<Address> defaultAddress = account.getAddresses().stream()
-                    .filter(Address::isStatus) // Kiểm tra địa chỉ có `status` là true
-                    .findFirst();
-            if (defaultAddress.isPresent()) {
-                Address address = defaultAddress.get();
-                inforSeller.setDistrict(address.getFullNameAddress());
-            } else {
-                inforSeller.setDistrict("chưa cập nhật!");
-            }
-            inforSeller.setCreateAtSeller(account.getCreateAtSeller());
-            inforSeller.setParticipationTime(inforSeller.calculateActiveDays());
-            inforSeller.setShopName(account.getShopName());
-            Map<String, Object> map = new HashMap<>();
-            map.put("shopDataEX", inforSeller);
-            map.put("rating", ValueAverageStars(account));
-            // map.put("isf", ValueAverageStars(account));
-
-            return ApiResponse.<Map>build().code(100).message("null").result(map);
-        } catch (Exception e) {
-            // TODO: handle exception
-            return ApiResponse.<Response_InforSeller>build().code(100).message(e.getMessage()).result(null);
-        }
-
-    }
-
     @GetMapping("/api/user/informationSeller/{idSeller}")
     public ApiResponse<?> informationSellerPublic(@PathVariable Integer idSeller) {
         try {
@@ -213,6 +171,64 @@ public class ApiShowInformationSeller {
         return result;
     }
 
+
+    @GetMapping("/api/v1/user/voucherAll")
+    public ApiResponse<?> getVoucherAll() {
+        List<TypeVoucher> typeVoucher = typeVoucherRepository.findAll();
+        Date date = new Date();
+        List<Voucher> listVoucherShop = voucherRepository.findAllByTypeVoucher(typeVoucher.get(0), date);
+        List<Voucher> listVoucherSan = voucherRepository.findAllByTypeVoucher(typeVoucher.get(1), date);
+        Map<String, Object> hash = new HashMap<>();
+        hash.put("san", listVoucherSan);
+        hash.put("shop", listVoucherShop);
+
+        return ApiResponse.<Map>build().code(0).message("").result(hash);
+    }
+
+    @GetMapping("/api/v1/user/topProducts")
+    public ApiResponse<?> topProducts() {
+        OrderStatus orderStatus = orderStatusRepository.findById(1).orElse(null);
+        if (orderStatus == null) {
+            return ApiResponse.<String>build().code(1).message("Đơn hoàn thành bằng 0").result(null);
+        }
+        List<Bill> listBill = billRepository.findByOrderStatus(orderStatus);
+        if (listBill == null || listBill.isEmpty()) {
+            // ne
+            return ApiResponse.<String>build().code(1).message("không có hóa đơn nào!").result(null);
+        }
+        List<BillDetail> listBillDetails = billDetailRepository.findAllByBillIn(listBill);
+        // Thống kê số lượng sản phẩm đã bán
+        Map<Product, Long> productCountMap = listBillDetails.stream()
+                .collect(
+                        Collectors.groupingBy(BillDetail::getProduct, Collectors.summingLong(BillDetail::getQuantity)));
+
+        // List<BillDetail> listBillDetails1 = billDetailRepository.
+        List<Product> listProduct = productRepository.findByBillDetails(listBillDetails);
+        Map<String, Object> hash = new HashMap<>();
+        hash.put("list", listBillDetails);
+        // Sắp xếp danh sách sản phẩm theo số lượng bán giảm dần và giới hạn top 10 sản
+        // phẩm
+        List<Map.Entry<Product, Long>> topProducts = productCountMap.entrySet().stream()
+                .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue()))
+                .limit(10)
+                .collect(Collectors.toList());
+
+        // Chuẩn bị kết quả trả về
+        List<Map<String, Object>> result = topProducts.stream()
+                .map(entry -> {
+                    Map<String, Object> productData = new HashMap<>();
+                    productData.put("product", entry.getKey());
+                    productData.put("quantity", entry.getValue());
+                    return productData;
+                })
+                .collect(Collectors.toList());
+
+        return ApiResponse.<List<Map<String, Object>>>build()
+                .code(0)
+                .message("Top sold products fetched successfully")
+                .result(result);
+    }
+
     // public double averageStars(Account account) {
     // // Lấy danh sách các sản phẩm của người bán
     // List<Product> products = account.getProducts();
@@ -242,19 +258,4 @@ public class ApiShowInformationSeller {
     // Data participationTime; // tới gian bán
     // Integer trackingNumber; // số lượng theo dõi
     // Integer shopCancellationRate; // Tỷ lệ Shop hủy đơn(%)
-
-    @GetMapping("/ap1/v1/user/voucherAll")
-    public ApiResponse<?> getVoucherAll() {
-        List<TypeVoucher> typeVoucher = typeVoucherRepository.findAll();
-        Date date = new Date();
-        List<Voucher> listVoucherShop = voucherRepository.findAllByTypeVoucher(typeVoucher.get(0),date );
-        List<Voucher> listVoucherSan = voucherRepository.findAllByTypeVoucher(typeVoucher.get(1),date );
-        Map<String, Object> hash = new HashMap<>();
-        hash.put("san", listVoucherSan);
-        hash.put("shop", listVoucherShop);
-
-        
-        return ApiResponse.<Map>build().code(0).message("").result(hash);
-    }
-    
 }
