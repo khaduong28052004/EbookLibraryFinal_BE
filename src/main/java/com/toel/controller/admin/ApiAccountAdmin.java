@@ -54,6 +54,18 @@ public class ApiAccountAdmin {
                 .result(pageImpl);
     }
 
+    @GetMapping("adminv")
+    public ApiResponse<PageImpl<?>> getAllAdminV(
+            @RequestParam(value = "search", required = false) String search,
+            @RequestParam(value = "gender", required = false) Boolean gender,
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "5") Integer size,
+            @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
+            @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
+        return ApiResponse.<PageImpl<?>>build()
+                .result(service_Account.getAllNhanVien(search, gender, page, size, sortBy, sortColumn));
+    }
+
     @GetMapping("seller/notbrowse")
     public ApiResponse<PageImpl<Response_Account>> getAllSellerBrowse(
             @RequestParam(value = "search", required = false) String search,
@@ -73,7 +85,7 @@ public class ApiAccountAdmin {
             throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, message);
         }
         return ApiResponse.<Response_Account>build()
-                .result(service_Account.create("ADMINV1", entity))
+                .result(service_Account.create(entity))
                 .message("Thêm nhân viên thành công");
     }
 
@@ -104,7 +116,7 @@ public class ApiAccountAdmin {
             @RequestParam(value = "id", required = false) Integer id,
             @RequestParam(value = "status", required = false) Boolean status,
             @RequestParam(value = "contents", required = false) String contents) {
-        Response_Account entity = service_Account.updateActive(id, status,contents);
+        Response_Account entity = service_Account.updateActive(id, status, contents);
         return ApiResponse.<Response_Account>build()
                 .message(entity.isStatus() ? "Duyệt thành công" : "Hủy thành công")
                 .result(entity);

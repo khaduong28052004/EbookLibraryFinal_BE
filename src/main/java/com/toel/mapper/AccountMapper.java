@@ -1,6 +1,8 @@
 package com.toel.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import com.toel.dto.admin.request.Account.Request_AccountCreate;
 import com.toel.dto.admin.request.Account.Request_AccountUpdate;
@@ -14,6 +16,7 @@ import com.toel.model.Account;
 public interface AccountMapper {
     Response_Account toAccount(Account account);
 
+    @Mapping(target = "role", ignore = true)
     Account toAccountCreate(Request_AccountCreate accountCreate);
 
     Account toAccountUpdate(Request_AccountUpdate accountUpdate);
