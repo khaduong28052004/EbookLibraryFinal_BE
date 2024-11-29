@@ -18,52 +18,83 @@ import org.springframework.stereotype.Service;
 import com.toel.dto.user.response.Response_Bill_User;
 import com.toel.dto.user.response.Response_Bill_Product_User;
 import com.toel.dto.user.resquest.Request_Bill_User;
-
+import com.toel.exception.AppException;
+import com.toel.exception.ErrorCode;
+import com.toel.mapper.BillMapper;
 import com.toel.model.Account;
 import com.toel.model.Bill;
 import com.toel.model.Cart;
+import com.toel.model.FlashSaleDetail;
 import com.toel.model.OrderStatus;
 import com.toel.model.Product;
+import com.toel.model.Voucher;
+import com.toel.model.VoucherDetail;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.AddressRepository;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
 import com.toel.repository.CartRepository;
 import com.toel.repository.EvalueRepository;
+import com.toel.repository.FlashSaleDetailRepository;
 import com.toel.repository.OrderStatusRepository;
 import com.toel.repository.PaymentMethodRepository;
+import com.toel.repository.ProductRepository;
+import com.toel.repository.VoucherDetailRepository;
+import com.toel.repository.VoucherRepository;
 import com.toel.service.Email.EmailService;
+import com.toel.service.Email.EmailTemplateType;
 
 @Service("userServiceBill")
 public class Service_Bill_User {
 	@Autowired
 	BillRepository billRepository;
+
 	@Autowired
 	BillDetailRepository billDetailRepository;
+
 	@Autowired
 	OrderStatusRepository orderStatusRepository;
+
 	@Autowired
 	PaymentMethodRepository paymentMethodRepository;
+
 	@Autowired
 	AccountRepository accountRepository;
+
 	@Autowired
 	EvalueRepository evaluateRepository;
+
 	@Autowired
 	CartRepository cartRepository;
+
 	@Autowired
 	AddressRepository addressRepository;
+
 	@Autowired
 	OrderStatusRepository oderStatusRepository;
+
 	@Autowired
 	EmailService emailService;
+
+	@Autowired
+	BillMapper billMapper;
+
+	@Autowired
+	ProductRepository productRepository;
+
+	@Autowired
+	VoucherDetailRepository voucherDetailRepository;
+
+	@Autowired
+	FlashSaleDetailRepository flashSaleDetailRepository;
+
+	@Autowired
+	VoucherRepository voucherRepository;
 
 	public Map<String, Object> getBills(Request_Bill_User requestBillDTO) {
 		Map<String, Object> response = new HashMap<String, Object>();
 		try {
-			System.out.println("productsInBill ");
-
 			List<Object[]> productsInBill = getBillsByOrderStatus(requestBillDTO);
-			System.out.println("productsInBill " + productsInBill.size());
 
 			List<Response_Bill_User> shopListInBill = createBillsWithProductsInBillDetail(productsInBill);
 			response.put("data", shopListInBill);
@@ -82,24 +113,21 @@ public class Service_Bill_User {
 		String orderStatus = BillShopRequestDTO.getOrderStatusFind() == null ? ""
 				: BillShopRequestDTO.getOrderStatusFind();
 
-		System.out.println("orderstatusL " + orderStatus);
-		System.out.println("userId " + userId);
-
 		switch (orderStatus) {
-		case "CHODUYET":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByCreateAt(userId, 1);
-		case "DANGXULY":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 2);
-		case "DANGGIAO":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 3);
-		case "DAGIAO":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 4);
-		case "HOANTHANH":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 5);
-		case "DAHUY":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 6);
-		default:
-			return billRepository.getBillsByUserIdAll(userId);
+			case "CHODUYET":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByCreateAt(userId, 1);
+			case "DANGXULY":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 2);
+			case "DANGGIAO":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 3);
+			case "DAGIAO":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 4);
+			case "HOANTHANH":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 5);
+			case "DAHUY":
+				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 6);
+			default:
+				return billRepository.getBillsByUserIdAll(userId);
 
 		}
 	}
@@ -189,11 +217,58 @@ public class Service_Bill_User {
 
 	public void cancelBill(Integer billId) {
 		checkBillStatus(billId, 1);
-
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
-		bill.setOrderStatus(orderStatusRepository.findById(6).get());
+		returnStatus(bill);
+
 		billRepository.saveAndFlush(bill);
+	}
+
+	public void returnStatus(Bill bill) {
+		try {
+			List<Product> updatedProducts = new ArrayList<>();
+			List<FlashSaleDetail> updatedFlashSaleDetails = new ArrayList<>();
+			List<VoucherDetail> voucherDetailsToDelete = new ArrayList<>();
+			List<Voucher> updatedVouchers = new ArrayList<>();
+
+			bill.getBillDetails().forEach(billDetail -> {
+				Product product = billDetail.getProduct();
+				product.setQuantity(product.getQuantity() + billDetail.getQuantity());
+				updatedProducts.add(product);
+
+				if (billDetail.getFlashSaleDetail() != null) {
+					FlashSaleDetail flashSaleDetail = billDetail.getFlashSaleDetail();
+					flashSaleDetail.setQuantity(flashSaleDetail.getQuantity() + billDetail.getQuantity());
+					updatedFlashSaleDetails.add(flashSaleDetail);
+				}
+			});
+
+			if (bill.getVoucherDetails() != null) {
+				bill.getVoucherDetails().forEach(voucherDetails -> {
+					Voucher voucher = voucherDetails.getVoucher();
+					voucher.setQuantity(voucher.getQuantity() + 1);
+					updatedVouchers.add(voucher);
+					voucherDetailsToDelete.add(voucherDetails);
+				});
+			}
+			if (!updatedProducts.isEmpty()) {
+				productRepository.saveAll(updatedProducts);
+			}
+			if (!updatedFlashSaleDetails.isEmpty()) {
+				flashSaleDetailRepository.saveAll(updatedFlashSaleDetails);
+			}
+			if (!updatedVouchers.isEmpty()) {
+				voucherRepository.saveAll(updatedVouchers);
+
+			}
+			if (!voucherDetailsToDelete.isEmpty()) {
+				voucherDetailRepository.deleteAll(voucherDetailsToDelete);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION, "System");
+		}
 	}
 
 	public void confirmBill(Integer billId) {
@@ -207,6 +282,42 @@ public class Service_Bill_User {
 
 		billRepository.saveAndFlush(bill);
 
+	}
+
+	@Scheduled(cron = "0 0 0 * * ?")
+	public void updateOrdersAutomatically() {
+		List<Bill> bills = billRepository.findByOrderStatusId(4);
+		LocalDateTime now = LocalDateTime.now();
+		for (Bill bill : bills) {
+			LocalDateTime lastUpdate = bill.getUpdateAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+			if (ChronoUnit.DAYS.between(lastUpdate, now) >= 5 && ChronoUnit.DAYS.between(lastUpdate, now) < 7) {
+				sendNotification(bill);
+			} else if (ChronoUnit.DAYS.between(lastUpdate, now) >= 7) {
+				OrderStatus updateOrderStatus = oderStatusRepository.findById(5).orElse(null);
+
+				sendNotification(bill);
+				if (updateOrderStatus != null) {
+					bill.setOrderStatus(updateOrderStatus);
+					bill.setUpdateAt(new Date());
+					billRepository.saveAndFlush(bill);
+				}
+
+			}
+		}
+	}
+
+	private void sendNotification(Bill bill) {
+		String email = bill.getAccount().getEmail();
+		String username = bill.getAccount().getUsername();
+
+		String subject = "TOEL - Thông báo cập nhật trạng thái xác nhận đơn hàng ";
+		String content = "Dear " + username
+				+ ", \n\nĐơn hàng của bạn sẽ được tự động cập nhật trạng thái sau 2 ngày. Vui lòng xác nhận trạng thái đã nhận hàng \n\n Xin cảm ơn vì đã mua hàng trên TOEL.";
+		emailService.push(email, subject, content);
+
+		emailService.push(bill.getAccount().getEmail(), subject, EmailTemplateType.HUYDON,
+				bill.getAccount().getFullname(),
+				String.valueOf(bill.getId()), content);
 	}
 
 	public void reOrder(Integer billId) {
@@ -255,39 +366,6 @@ public class Service_Bill_User {
 		}
 	}
 
-	@Scheduled(cron = "0 0 0 * * ?")
-	public void updateOrdersAutomatically() {
-		List<Bill> bills = billRepository.findByOrderStatusId(4);
-		LocalDateTime now = LocalDateTime.now();
-		for (Bill bill : bills) {
-			LocalDateTime lastUpdate = bill.getUpdateAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-			if (ChronoUnit.DAYS.between(lastUpdate, now) >= 5 && ChronoUnit.DAYS.between(lastUpdate, now) < 7) {
-				sendNotification(bill);
-			} else if (ChronoUnit.DAYS.between(lastUpdate, now) >= 7) {
-				OrderStatus updateOrderStatus = oderStatusRepository.findById(5).orElse(null);
-
-				sendNotification(bill);
-				if (updateOrderStatus != null) {
-					System.out.println("GỬI MEO NÈ");
-					bill.setOrderStatus(updateOrderStatus);
-					bill.setUpdateAt(new Date());
-					billRepository.saveAndFlush(bill);
-				}
-
-			}
-		}
-	}
-
-	private void sendNotification(Bill bill) {
-		String email = bill.getAccount().getEmail();
-		String username = bill.getAccount().getUsername();
-
-		String subject = "[TOEL] Thông báo cập nhật trạng thái xác nhận đơn hàng ";
-		String content = "Dear " + username
-				+ ", \n\nĐơn hàng của bạn sẽ được tự động cập nhật trạng thái sau 2 ngày. Vui lòng xác nhận trạng thái đã nhận hàng \n\n Xin cảm ơn vì đã mua hàng trên TOEL.";
-		emailService.push(email, subject, content);
-	}
-
 	public static String formatDate(String inputDate) {
 		// Định dạng đầu vào
 		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
@@ -304,4 +382,5 @@ public class Service_Bill_User {
 			return null; // Hoặc xử lý lỗi theo cách khác
 		}
 	}
+
 }

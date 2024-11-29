@@ -13,8 +13,13 @@ import com.toel.exception.ErrorCode;
 import com.toel.mapper.ShopMapper;
 import com.toel.model.Account;
 import com.toel.repository.AccountRepository;
+
+import com.toel.repository.FollowerRepository;
+import com.toel.repository.ProductRepository;
+
 import com.toel.service.firebase.DeleteImage;
 import com.toel.service.firebase.UploadImage;
+
 
 @Service
 public class Service_ShopSeller {
@@ -27,6 +32,12 @@ public class Service_ShopSeller {
     @Autowired
     UploadImage uploadImage;
 
+    @Autowired
+    FollowerRepository followerRepository ;
+
+    @Autowired
+    ProductRepository productRepository ;
+
     public Response_Account get(Integer idAccount) {
         return accountMapper.response_Account(accountRepository.findById(idAccount)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
@@ -35,6 +46,18 @@ public class Service_ShopSeller {
     public Response_Account save(Request_Account request_Account) {
         return accountMapper.response_Account(accountRepository.saveAndFlush(accountMapper.account(request_Account)));
     }
+
+
+    public Integer countFollowersByShopId(Integer shopId) {
+        return followerRepository.countFollowersByShopId(shopId);
+    }
+    public Integer countFollowingByAccountId(Integer accountId) {
+        return followerRepository.countFollowingByAccountId(accountId);
+    }
+
+
+    
+
 
     public boolean saveImage(Integer account_id, MultipartFile avatar, MultipartFile backgroud) {
         try {
@@ -51,3 +74,4 @@ public class Service_ShopSeller {
         }
     }
 }
+
