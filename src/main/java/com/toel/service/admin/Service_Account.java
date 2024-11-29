@@ -85,6 +85,30 @@ public class Service_Account {
                 return new PageImpl<>(list, pageable, pageAccount.getTotalElements());
         }
 
+        public PageImpl<Response_Account> getAllNhanVien(
+                        String search, Boolean gender, Integer page, Integer size,
+                        Boolean sortBy, String sortColumn) {
+
+                Pageable pageable = PageRequest.of(page, size,
+                                Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
+
+                List<Role> listRole = roleRepository.selectRoleNhanVien();
+                Page<Account> pageAccount;
+                if (search == null || search.isBlank()) {
+                        pageAccount = (gender == null)
+                                        ? accountRepository.findAllByRolesIn(listRole, pageable)
+                                        : accountRepository.findAllByRolesInAndGender(listRole, gender, pageable);
+                } else {
+                        pageAccount = accountRepository.findAllByRolesInAndSearch(
+                                        listRole, gender, search, pageable);
+                }
+                List<Response_Account> list = pageAccount.stream()
+                                .map(accountMapper::toAccount)
+                                .collect(Collectors.toList());
+
+                return new PageImpl<>(list, pageable, pageAccount.getTotalElements());
+        }
+
         public PageImpl<Response_TK_Seller> getAllSeller(String rolename,
                         String search, Boolean gender, Integer page, Integer size, Boolean sortBy, String sortColumn) {
                 Role role = roleRepository.findByNameIgnoreCase(rolename);
@@ -245,13 +269,15 @@ public class Service_Account {
                 return accountMapper.toAccount(accountRepository.saveAndFlush(entity));
         }
 
-        public Response_Account create(String rolename, Request_AccountCreate entity) {
+        public Response_Account create(Request_AccountCreate entity) {
                 Account account = accountMapper.toAccountCreate(entity);
-                account.setRole(roleRepository.findByNameIgnoreCase(rolename));
-                if (rolename.equalsIgnoreCase("adminv1")) {
-                        account.setAvatar(
-                                        "https://firebasestorage.googleapis.com/v0/b/ebookstore-4fbb3.appspot.com/o/1_W35QUSvGpcLuxPo3SRTH4w.png?alt=media");
+                if (!isValidPhoneNumber(entity.getPhone())) {
+                        throw new AppException(ErrorCode.OBJECT_SETUP, "Số điện thoại không hợp lệ");
                 }
+                account.setRole(roleRepository.findById(entity.getRole())
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Quyền")));
+                account.setAvatar(
+                                "https://firebasestorage.googleapis.com/v0/b/ebookstore-4fbb3.appspot.com/o/1_W35QUSvGpcLuxPo3SRTH4w.png?alt=media");
                 account.setStatus(true);
                 account.setCreateAt(new Date());
                 // Mã hóa mật khẩu mới
@@ -260,4 +286,7 @@ public class Service_Account {
                 return accountMapper.toAccount(accountRepository.saveAndFlush(account));
         }
 
+        private boolean isValidPhoneNumber(String phoneNumber) {
+                return phoneNumber != null && phoneNumber.matches("^\\d{10,11}$");
+        }
 }

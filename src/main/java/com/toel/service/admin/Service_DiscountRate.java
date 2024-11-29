@@ -71,6 +71,10 @@ public class Service_DiscountRate {
     public Response_DiscountRate update(Request_DiscountRateUpdate discountRateUpdate) {
         DiscountRate discountRate = discountRateRepository.findById(discountRateUpdate.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Chiết khấu"));
+        DiscountRate discountRateNow = discountRateRepository.findLatestDiscountRate().get(0);
+        if (discountRateNow.getDiscount() == discountRateUpdate.getDiscount()) {
+            throw new AppException(ErrorCode.OBJECT_ACTIVE, "Mức chiết khấu");
+        }
         return Optional.of(discountRate)
                 .map(entity -> {
                     entity.setDateStart(entity.getDateStart());
