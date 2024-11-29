@@ -49,7 +49,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         // Public access for login, home, and some user routes
-
+                        .requestMatchers(AUTH_WISH_SWAGGER).permitAll()
                         .requestMatchers("/api/v1/login", "/api/v1/**", "/api/v2/**", "/api/user/**", "/api/v1/otp/**",
                                 "/user/loginGoogle")
                         .permitAll()
@@ -101,7 +101,7 @@ public class SecurityConfig {
                         // Evaluate permissions
                         .requestMatchers("/api/v1/evaluate/read").hasRole("READ_EVALUATE")
                         .requestMatchers("/api/v1/evaluate/delete").hasRole("DELETE_EVALUATE")
-                        
+
                         .requestMatchers("/api/v1/seller/thongKe/**").hasRole("SELLER")
                         .requestMatchers("/api/v1/admin/orderstatistacal/**").hasAnyRole("ADMIN")
 
@@ -134,6 +134,13 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
+    private static final String[] AUTH_WISH_SWAGGER = {
+            "/api/v1/auth/**",
+            "/v3/api-docs/**",
+            "/v3/api-docs.yaml",
+            "/swagger-ui/**",
+            "/swagger-ui.html"
+    };
     // @Bean
     // public CorsConfigurationSource corsConfigurationSource() {
     // CorsConfiguration configuration = new CorsConfiguration();
