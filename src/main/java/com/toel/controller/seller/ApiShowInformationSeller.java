@@ -206,22 +206,25 @@ public class ApiShowInformationSeller {
                 .result(null);
             }
             // Thống kê số lượng sản phẩm đã bán
-            // Map<Product, Long> productCountMap = listBillDetails.stream()
-            //         .collect(
-            //                 Collectors.groupingBy(BillDetail::getProduct, Collectors.summingLong(BillDetail::getQuantity)));
+            Map<Product, Long> productCountMap = listBillDetails.stream()
+                    .collect(
+                            Collectors.groupingBy(BillDetail::getProduct, Collectors.summingLong(BillDetail::getQuantity)));
             // List<BillDetail> listBillDetails1 = billDetailRepository.
             Map<String, Object> hash = new HashMap<>();
             List<Product> listProduct = productRepository.findByBillDetails(listBillDetails);
-            if (!listProduct.isEmpty()) {
-                hash.put("listProduct", listProduct.stream()
-                        .sorted((e1, e2) -> Long.compare(e2.getId(), e1.getId()))
-                        .limit(10)
-                        .collect(Collectors.toList())); // sản 
-            } else {
-                List<Product> listProductO = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream().limit(10)
+            List<Product> listProductO = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream().limit(10)
                         .collect(Collectors.toList()); 
                 hash.put("listProduct", listProductO);
-            }
+            // if (!listProduct.isEmpty()) {
+            //     hash.put("listProduct", listProduct.stream()
+            //             .sorted((e1, e2) -> Long.compare(e2.getId(), e1.getId()))
+            //             .limit(10)
+            //             .collect(Collectors.toList())); // sản 
+            // } else {
+            //     List<Product> listProductO = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream().limit(10)
+            //             .collect(Collectors.toList()); 
+            //     hash.put("listProduct", listProductO);
+            // }
             return ApiResponse.<Map>build()
                     .code(0)
                     .message("Top sold products fetched successfully")
