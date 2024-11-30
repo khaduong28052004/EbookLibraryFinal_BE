@@ -2,6 +2,7 @@ package com.toel.controller.auth;
 
 // import java.lang.foreign.Linker.Option;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +89,8 @@ public class ApiController {
     ServiceToel serviceToel;
     @Autowired
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    public static String avatarURL = "https://firebasestorage.googleapis.com/v0/b/ebookstore-4fbb3.appspot.com/o/1_W35QUSvGpcLuxPo3SRTH4w.png?alt=media";
 
     public static Map<String, String> map = new HashMap<>();
 
@@ -314,7 +317,9 @@ public class ApiController {
             account.setFullname(entity.getFullname());
             account.setPhone(entity.getPhone());
             account.setEmail(entity.getEmail());
-            account.setAvatar("noImage.png");
+            account.setCreateAt(new Date());
+            account.setStatus(true);
+            account.setAvatar(avatarURL);
             String encryptedPassword = passwordEncoder.encode(entity.getPassword());
             account.setPassword(encryptedPassword);
             accountRepository.save(account);
@@ -353,7 +358,9 @@ public class ApiController {
                 account.setFullname(entity.getFullname());
                 account.setPhone(entity.getPhone());
                 account.setEmail(entity.getEmail());
-                account.setAvatar("noImage.png");
+                account.setCreateAt(new Date());
+                account.setStatus(true);
+                account.setAvatar(avatarURL);
                 String encryptedPassword = passwordEncoder.encode(entity.getPassword());
                 account.setPassword(encryptedPassword);
                 accountRepository.save(account);
