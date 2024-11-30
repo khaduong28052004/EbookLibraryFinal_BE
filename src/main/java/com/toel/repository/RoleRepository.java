@@ -27,7 +27,7 @@ public interface RoleRepository extends JpaRepository<Role, Integer> {
           SELECT v
           FROM Role v
           LEFT JOIN v.accounts a
-          WHERE v.name NOT IN ('ADMIN', 'SELLER', 'USER')
+          WHERE v.name NOT IN ('ADMIN', 'SELLER', 'USER','ADMINV1')
             AND (:key IS NULL
                  OR :key LIKE CONCAT('%', v.name, '%')
                  OR :key LIKE CONCAT('%', v.description, '%')
@@ -35,7 +35,7 @@ public interface RoleRepository extends JpaRepository<Role, Integer> {
       """)
   Page<Role> selectRoleNhanVien(@Param("key") String key, Pageable pageable);
 
-  @Query("SELECT v FROM Role v WHERE v.name NOT IN ('ADMIN', 'SELLER', 'USER') and SIZE(v.accounts) = 0")
+  @Query("SELECT v FROM Role v WHERE v.name NOT IN ('ADMIN', 'SELLER', 'USER','ADMINV1') and SIZE(v.accounts) = 0")
   List<Role> selectRoleNotNhanVien();
 
 }
