@@ -86,7 +86,6 @@ public class Service_BillDetail_User {
 		Double billTotalPrice = Double.parseDouble(product[2].toString());
 		Double billDiscountPrice = Double.parseDouble(product[3].toString());
 		Double billTotalShippingPrice = Double.parseDouble(product[4].toString());
-		Double billTempPrice = billTotalPrice + billTotalShippingPrice - billDiscountPrice;
 		Integer billTotalQuantity = Integer.parseInt(product[5].toString());
 		Integer billAddressId = Integer.parseInt(product[6].toString());
 		Integer orderStatusID = Integer.parseInt(product[7].toString());
@@ -100,6 +99,7 @@ public class Service_BillDetail_User {
 		String userPhone = product[22].toString();
 		String orderStatus = orderStatusRepository.findById(orderStatusID).get().getName();
 		String address = addressRepository.findById(billAddressId).get().getFullNameAddress();
+		Double billTempPrice = billTotalPrice + billDiscountPrice - billTotalShippingPrice;
 
 		Response_BillDetail_User billData = new Response_BillDetail_User();
 		billData.setBillID(billID);
@@ -157,15 +157,16 @@ public class Service_BillDetail_User {
 		checkBillDetailStatus(billId, 1);
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
+		bill.setFinishAt(new Date());
 		bill.setOrderStatus(orderStatusRepository.findById(6).get());
 		billRepository.saveAndFlush(bill);
 	}
 
 	public void confirmBill(Integer billId) {
 		checkBillDetailStatus(billId, 4);
-
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
+		bill.setFinishAt(new Date());
 		bill.setOrderStatus(orderStatusRepository.findById(5).get());
 		billRepository.saveAndFlush(bill);
 

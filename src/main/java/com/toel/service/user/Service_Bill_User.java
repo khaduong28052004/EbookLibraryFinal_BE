@@ -215,13 +215,18 @@ public class Service_Bill_User {
 		return bills;
 	}
 
-	public void cancelBill(Integer billId) {
+	public Bill cancelBill(Integer billId) {
 		checkBillStatus(billId, 1);
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
+		bill.setFinishAt(new Date());
+		bill.setOrderStatus(orderStatusRepository.findById(6).get());
+		billRepository.saveAndFlush(bill);
 		returnStatus(bill);
 
-		billRepository.saveAndFlush(bill);
+		sendNotification(bill);
+
+		return billRepository.saveAndFlush(bill);
 	}
 
 	public void returnStatus(Bill bill) {
@@ -284,39 +289,13 @@ public class Service_Bill_User {
 
 	}
 
-	@Scheduled(cron = "0 0 0 * * ?")
-	public void updateOrdersAutomatically() {
-		List<Bill> bills = billRepository.findByOrderStatusId(4);
-		LocalDateTime now = LocalDateTime.now();
-		for (Bill bill : bills) {
-			LocalDateTime lastUpdate = bill.getUpdateAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-			if (ChronoUnit.DAYS.between(lastUpdate, now) >= 5 && ChronoUnit.DAYS.between(lastUpdate, now) < 7) {
-				sendNotification(bill);
-			} else if (ChronoUnit.DAYS.between(lastUpdate, now) >= 7) {
-				OrderStatus updateOrderStatus = oderStatusRepository.findById(5).orElse(null);
-
-				sendNotification(bill);
-				if (updateOrderStatus != null) {
-					bill.setOrderStatus(updateOrderStatus);
-					bill.setUpdateAt(new Date());
-					billRepository.saveAndFlush(bill);
-				}
-
-			}
-		}
-	}
-
 	private void sendNotification(Bill bill) {
-		String email = bill.getAccount().getEmail();
-		String username = bill.getAccount().getUsername();
-
-		String subject = "TOEL - Thông báo cập nhật trạng thái xác nhận đơn hàng ";
-		String content = "Dear " + username
-				+ ", \n\nĐơn hàng của bạn sẽ được tự động cập nhật trạng thái sau 2 ngày. Vui lòng xác nhận trạng thái đã nhận hàng \n\n Xin cảm ơn vì đã mua hàng trên TOEL.";
-		emailService.push(email, subject, content);
-
-		emailService.push(bill.getAccount().getEmail(), subject, EmailTemplateType.HUYDON,
-				bill.getAccount().getFullname(),
+		String email = billDetailRepository.findByBill(bill).getBill().getAccount().getEmail();
+		System.out.println("email " + email);
+		String subject = "TOEL - Thông báo cập nhật trạng thái hủy đơn hàng ";
+		String content = "Khách hàng đã hủy đơn của shop\n\n Xin cảm ơn vì sử dụng bán hàng trên TOEL.";
+		emailService.push(email, subject, EmailTemplateType.HUYDON,
+				bill.getAccount().getShopName(),
 				String.valueOf(bill.getId()), content);
 	}
 
