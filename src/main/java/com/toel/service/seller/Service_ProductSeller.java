@@ -74,6 +74,7 @@ public class Service_ProductSeller {
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
                 product.setCategory(categoryRepository.findById(request_Product.getCategory())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Category")));
+                product.setCreateAt(product.getCreateAt());
                 return productMapper.response_Product(productRepository.saveAndFlush(product));
         }
 
