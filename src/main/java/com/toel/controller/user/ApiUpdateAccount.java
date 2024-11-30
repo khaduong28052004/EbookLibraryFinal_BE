@@ -79,7 +79,7 @@ public ResponseEntity<Map<String, Object>> updateAccount(
     
     // Cập nhật các trường thông tin từ entity vào tài khoản
     // account.setShopName(entity.getShopName());
-    account.setUsername(entity.getUsername());
+    // account.setUsername(entity.getUsername());
     account.setFullname(entity.getFullname());
     account.setEmail(entity.getEmail());
     account.setBirthday(entity.getBirthday());
