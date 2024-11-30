@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,6 +41,7 @@ import lombok.Data;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @CrossOrigin("*")
 @RestController
@@ -186,47 +188,93 @@ public class ApiShowInformationSeller {
 
     @GetMapping("/api/v1/user/topProducts")
     public ApiResponse<?> topProducts() {
-        OrderStatus orderStatus = orderStatusRepository.findById(1).orElse(null);
-        if (orderStatus == null) {
-            return ApiResponse.<String>build().code(1).message("Đơn hoàn thành bằng 0").result(null);
-        }
-        List<Bill> listBill = billRepository.findByOrderStatus(orderStatus);
-        if (listBill == null || listBill.isEmpty()) {
-            // ne
-            return ApiResponse.<String>build().code(1).message("không có hóa đơn nào!").result(null);
-        }
-        List<BillDetail> listBillDetails = billDetailRepository.findAllByBillIn(listBill);
-        // Thống kê số lượng sản phẩm đã bán
-        Map<Product, Long> productCountMap = listBillDetails.stream()
-                .collect(
-                        Collectors.groupingBy(BillDetail::getProduct, Collectors.summingLong(BillDetail::getQuantity)));
-
-        // List<BillDetail> listBillDetails1 = billDetailRepository.
-        List<Product> listProduct = productRepository.findByBillDetails(listBillDetails);
-        Map<String, Object> hash = new HashMap<>();
-        hash.put("list", listBillDetails);
-        // Sắp xếp danh sách sản phẩm theo số lượng bán giảm dần và giới hạn top 10 sản
-        // phẩm
-        List<Map.Entry<Product, Long>> topProducts = productCountMap.entrySet().stream()
-                .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue()))
-                .limit(10)
-                .collect(Collectors.toList());
-
-        // Chuẩn bị kết quả trả về
-        List<Map<String, Object>> result = topProducts.stream()
-                .map(entry -> {
-                    Map<String, Object> productData = new HashMap<>();
-                    productData.put("product", entry.getKey());
-                    productData.put("quantity", entry.getValue());
-                    return productData;
-                })
-                .collect(Collectors.toList());
-
-        return ApiResponse.<List<Map<String, Object>>>build()
+        try {
+            OrderStatus orderStatus = orderStatusRepository.findById(1).orElse(null);
+            if (orderStatus == null) {
+                return ApiResponse.<String>build().code(1).message("Đơn hoàn thành bằng 0").result(null);
+            }
+            List<Bill> listBill = billRepository.findByOrderStatus(orderStatus);
+            if (listBill == null || listBill.isEmpty()) {
+                // ne
+                return ApiResponse.<String>build().code(1).message("không có hóa đơn nào!").result(null);
+            }
+            List<BillDetail> listBillDetails = billDetailRepository.findAllByBillIn(listBill);
+            if(listBillDetails.isEmpty()){
+                return ApiResponse.<Map>build()
                 .code(0)
-                .message("Top sold products fetched successfully")
-                .result(result);
+                .message("không có hóa đơn detail nào!")
+                .result(null);
+            }
+            // Thống kê số lượng sản phẩm đã bán
+            // Map<Product, Long> productCountMap = listBillDetails.stream()
+            //         .collect(
+            //                 Collectors.groupingBy(BillDetail::getProduct, Collectors.summingLong(BillDetail::getQuantity)));
+            // List<BillDetail> listBillDetails1 = billDetailRepository.
+            Map<String, Object> hash = new HashMap<>();
+            List<Product> listProduct = productRepository.findByBillDetails(listBillDetails);
+            if (!listProduct.isEmpty()) {
+                hash.put("listProduct", listProduct.stream()
+                        .sorted((e1, e2) -> Long.compare(e2.getId(), e1.getId()))
+                        .limit(10)
+                        .collect(Collectors.toList())); // sản 
+            } else {
+                List<Product> listProductO = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream().limit(10)
+                        .collect(Collectors.toList()); 
+                hash.put("listProduct", listProductO);
+            }
+            return ApiResponse.<Map>build()
+                    .code(0)
+                    .message("Top sold products fetched successfully")
+                    .result(hash);
+        } catch (Exception e) {
+            return ApiResponse.<Map>build()
+            .code(0)
+            .message(e.getMessage())
+            .result(null);
+        }
+      
     }
+
+
+    // @GetMapping("/api/v1/user/topProducts")
+    // public ApiResponse<?> topProducts() {
+    //     try {
+    //         OrderStatus orderStatus = orderStatusRepository.findById(1).orElse(null);
+    //         if (orderStatus == null) {
+    //             return ApiResponse.<String>build().code(1).message("Đơn hoàn thành bằng 0").result(null);
+    //         }
+    //         List<Bill> listBill = billRepository.findByOrderStatus(orderStatus);
+    //         if (listBill == null || listBill.isEmpty()) {
+    //             // ne
+    //             return ApiResponse.<String>build().code(1).message("không có hóa đơn nào!").result(null);
+    //         }
+    //         List<BillDetail> listBillDetails = billDetailRepository.findAllByBillIn(listBill);
+    //         // Thống kê số lượng sản phẩm đã bán
+    //         if(listBillDetails.isEmpty()){
+    //             return ApiResponse.<String>build().code(1).message("không có hóa đơn nào!").result(null);
+    //         }
+    //         Map<Product, Long> productCountMap = listBillDetails.stream()
+    //                 .collect(
+    //                         Collectors.groupingBy(BillDetail::getProduct, Collectors.summingLong(BillDetail::getQuantity)));
+    
+    //         // List<BillDetail> listBillDetails1 = billDetailRepository.
+    //         List<Product> listProduct = productRepository.findByBillDetails(listBillDetails);
+    //         Map<String, Object> hash = new HashMap<>();
+    //         hash.put("list", listBillDetails);
+
+    //         return ApiResponse.<Map>build()
+    //                 .code(0)
+    //                 .message("Top sold products fetched successfully")
+    //                 .result(hash);
+    //     } catch (Exception e) {
+    //         // TODO: handle exception
+    //         return ApiResponse.<Map>build()
+    //         .code(0)
+    //         .message(e.getMessage())
+    //         .result(null);
+    //     }
+       
+    // }
 
     // public double averageStars(Account account) {
     // // Lấy danh sách các sản phẩm của người bán
