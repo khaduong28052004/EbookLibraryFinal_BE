@@ -31,7 +31,6 @@ public class ApiBillUser {
 
 	/* Lấy thông tin order */
 	@GetMapping("/read")
-
 	public ResponseEntity<Map<String, Object>> getAllOrdersByOrderStatus(
 			@RequestParam String orderStatusFind,
 			@RequestParam int userId) {
@@ -39,9 +38,7 @@ public class ApiBillUser {
 		Request_Bill_User requestBillDTO = new Request_Bill_User();
 		requestBillDTO.setOrderStatusFind(orderStatusFind);
 		requestBillDTO.setUserID(userId);
-
 		Map<String, Object> response = service_Bill_User.getBills(requestBillDTO);
-
 		return ResponseEntity.ok(response);
 	}
 

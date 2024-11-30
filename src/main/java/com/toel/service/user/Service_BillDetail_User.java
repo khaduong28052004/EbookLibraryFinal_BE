@@ -6,10 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,19 +60,15 @@ public class Service_BillDetail_User {
 		Map<Integer, Response_BillDetail_User> billMap = new HashMap<>();
 		List<Object[]> billDetail = billDetailRepository.findBillDetailById(billId);
 		List<Response_BillDetail_User> productDetail = new ArrayList<>();
-		Set<Integer> idProduct = new HashSet<>();
+
 		for (Object[] product : billDetail) {
 			Integer billID = Integer.parseInt(product[1].toString());
 
 			Response_BillDetail_User billData = billMap.getOrDefault(billID, createBillDetailUser(product));
 			Response_Bill_Product_User productData = createBillProductUser(product);
 
-			if (!idProduct.contains(productData.getProductId())) {
-				billData.getProducts().add(productData);
-				billMap.put(billID, billData);
-			}
-			idProduct.add(productData.getProductId());
-
+			billData.getProducts().add(productData);
+			billMap.put(billID, billData);
 		}
 		productDetail.addAll(billMap.values());
 		return productDetail;
@@ -157,15 +151,16 @@ public class Service_BillDetail_User {
 		checkBillDetailStatus(billId, 1);
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
+		bill.setFinishAt(new Date());
 		bill.setOrderStatus(orderStatusRepository.findById(6).get());
 		billRepository.saveAndFlush(bill);
 	}
 
 	public void confirmBill(Integer billId) {
 		checkBillDetailStatus(billId, 4);
-
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
+		bill.setFinishAt(new Date());
 		bill.setOrderStatus(orderStatusRepository.findById(5).get());
 		billRepository.saveAndFlush(bill);
 
