@@ -76,6 +76,7 @@ public class Service_Pay {
 			bil.setTotalPrice(sellerItem.getTotal());
 			bil.setPaymentMethod(paymentMethod);
 			bil.setOrderStatus(orderStatus);
+			bil.setUpdateAt(new Date());
 			bil = billRepository.save(bil);
 			try {
 				if (sellerItem.getVoucher() != null) {

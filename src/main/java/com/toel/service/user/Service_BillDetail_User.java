@@ -6,8 +6,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,15 +62,19 @@ public class Service_BillDetail_User {
 		Map<Integer, Response_BillDetail_User> billMap = new HashMap<>();
 		List<Object[]> billDetail = billDetailRepository.findBillDetailById(billId);
 		List<Response_BillDetail_User> productDetail = new ArrayList<>();
-
+		Set<Integer> idProduct = new HashSet<>();
 		for (Object[] product : billDetail) {
 			Integer billID = Integer.parseInt(product[1].toString());
 
 			Response_BillDetail_User billData = billMap.getOrDefault(billID, createBillDetailUser(product));
 			Response_Bill_Product_User productData = createBillProductUser(product);
 
-			billData.getProducts().add(productData);
-			billMap.put(billID, billData);
+			if (!idProduct.contains(productData.getProductId())) {
+				billData.getProducts().add(productData);
+				billMap.put(billID, billData);
+			}
+			idProduct.add(productData.getProductId());
+
 		}
 		productDetail.addAll(billMap.values());
 		return productDetail;
@@ -80,7 +86,6 @@ public class Service_BillDetail_User {
 		Double billTotalPrice = Double.parseDouble(product[2].toString());
 		Double billDiscountPrice = Double.parseDouble(product[3].toString());
 		Double billTotalShippingPrice = Double.parseDouble(product[4].toString());
-		Double billTempPrice = billTotalPrice + billTotalShippingPrice - billDiscountPrice;
 		Integer billTotalQuantity = Integer.parseInt(product[5].toString());
 		Integer billAddressId = Integer.parseInt(product[6].toString());
 		Integer orderStatusID = Integer.parseInt(product[7].toString());
@@ -94,6 +99,7 @@ public class Service_BillDetail_User {
 		String userPhone = product[22].toString();
 		String orderStatus = orderStatusRepository.findById(orderStatusID).get().getName();
 		String address = addressRepository.findById(billAddressId).get().getFullNameAddress();
+		Double billTempPrice = billTotalPrice + billDiscountPrice - billTotalShippingPrice;
 
 		Response_BillDetail_User billData = new Response_BillDetail_User();
 		billData.setBillID(billID);
