@@ -24,14 +24,12 @@ public interface RoleRepository extends JpaRepository<Role, Integer> {
   List<Role> selectRoleNhanVien();
 
   @Query("""
-          SELECT v
-          FROM Role v
-          LEFT JOIN v.accounts a
-          WHERE v.name NOT IN ('ADMIN', 'SELLER', 'USER','ADMINV1')
-            AND (:key IS NULL
-                 OR :key LIKE CONCAT('%', v.name, '%')
-                 OR :key LIKE CONCAT('%', v.description, '%')
-                 OR :key LIKE CONCAT('%', a.fullname, '%'))
+      SELECT v
+      FROM Role v
+      WHERE v.name NOT IN ('ADMIN', 'SELLER', 'USER','ADMINV1')
+      AND (:key IS NULL
+      OR LOWER(v.name) LIKE LOWER(CONCAT('%', :key, '%'))
+      OR LOWER(v.description) LIKE LOWER(CONCAT('%', :key, '%')))
       """)
   Page<Role> selectRoleNhanVien(@Param("key") String key, Pageable pageable);
 

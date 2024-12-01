@@ -94,7 +94,6 @@ public class Service_Favorite {
 			likeRepo.deleteById(id);
 			return true;
 		} catch (Exception e) {
-			// TODO: handle exception
 		}
 		return false;
 	}

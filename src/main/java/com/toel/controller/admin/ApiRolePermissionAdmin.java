@@ -1,5 +1,7 @@
 package com.toel.controller.admin;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,15 +26,15 @@ public class ApiRolePermissionAdmin {
     Service_RolePermission service_RolePermission;
 
     @PostMapping
-    public ApiResponse<Response_RolePermission> create(@RequestBody @Valid Request_RolePermissionCreate entity) {
-        return ApiResponse.<Response_RolePermission>build()
+    public ApiResponse<List<Response_RolePermission>> create(@RequestBody @Valid Request_RolePermissionCreate entity) {
+        return ApiResponse.<List<Response_RolePermission>>build()
                 .message("Thêm quyền thành công")
                 .result(service_RolePermission.create(entity));
     }
 
     @DeleteMapping
     public ApiResponse<Response_RolePermission> delete(
-        @RequestParam(value = "id", required = false) Integer id) {
+            @RequestParam(value = "id", required = false) Integer id) {
         service_RolePermission.delete(id);
         return ApiResponse.<Response_RolePermission>build()
                 .message("Xóa quyền thành công");

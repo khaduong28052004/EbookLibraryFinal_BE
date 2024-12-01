@@ -63,8 +63,13 @@ public class ApiRoleAdmin {
     @DeleteMapping
     public ApiResponse<Response_Role> delete(
             @RequestParam(value = "id", required = false) Integer id) {
-        service_Role.delete(id);
-        return ApiResponse.<Response_Role>build()
-                .message("Xóa quyền thành công");
+        try {
+            service_Role.delete(id);
+            return ApiResponse.<Response_Role>build()
+                    .message("Xóa quyền thành công");
+        } catch (Exception e) {
+            return ApiResponse.<Response_Role>build()
+                    .message(e.getMessage());
+        }
     }
 }

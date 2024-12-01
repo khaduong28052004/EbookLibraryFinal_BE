@@ -1,10 +1,7 @@
 package com.toel.repository;
 
-import java.lang.foreign.Linker.Option;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -125,7 +122,6 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 
 	// @Override
 	// default List<BillDetail> findAllById(Iterable<Integer> ids) {
-	// // TODO Auto-generated method stub
 	// throw new UnsupportedOperationException("Unimplemented method
 	// 'findAllById'");
 	// }
