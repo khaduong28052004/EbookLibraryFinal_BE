@@ -1,6 +1,5 @@
 package com.toel.service.admin;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,10 +18,10 @@ import com.toel.dto.admin.response.Response_Role;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.RoleMapper;
-import com.toel.model.FlashSale;
-import com.toel.model.Permission;
 import com.toel.model.Role;
+import com.toel.model.RolePermission;
 import com.toel.repository.PermissionRepository;
+import com.toel.repository.RolePermissionRepository;
 import com.toel.repository.RoleRepository;
 
 @Service
@@ -33,6 +32,8 @@ public class Service_Role {
         PermissionRepository permissionRepository;
         @Autowired
         RoleMapper roleMapper;
+        @Autowired
+        RolePermissionRepository rolePermissionRepository;
 
         public PageImpl<Response_Role> getRoleNhanVien(String search, Integer page, Integer size,
                         Boolean sortBy,
@@ -48,6 +49,7 @@ public class Service_Role {
                                 .collect(Collectors.toList());
                 return new PageImpl<>(list, pageable, pageRole.getTotalElements());
         }
+
         public List<Response_Role> getlistRoleNotNhanVien() {
                 List<Response_Role> list = roleRepository.selectRoleNotNhanVien().stream()
                                 .map(role -> roleMapper.tResponse_Role(role))
@@ -77,9 +79,11 @@ public class Service_Role {
         public void delete(Integer id) {
                 Role entity = roleRepository.findById(id)
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Quyền"));
-                if (entity.getAccounts().size() > 0) {
+                if (!entity.getAccounts().isEmpty()) {
                         throw new AppException(ErrorCode.OBJECT_ACTIVE, "Quyền");
                 } else {
+                        List<RolePermission> list = rolePermissionRepository.findAllByRole(entity);
+                        list.forEach(rlp -> rolePermissionRepository.delete(rlp));
                         roleRepository.delete(entity);
                 }
         }
