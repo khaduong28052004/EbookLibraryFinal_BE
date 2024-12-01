@@ -16,7 +16,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException, ServletException {
-       // TODO Auto-generated method stub
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		response.setContentType("application/json");
 		response.getWriter().write("{\"error\":\"UnAuthorzed\",\"message\":  \""+"ban can dang nhap !! " + authException.getMessage() + "\"}");

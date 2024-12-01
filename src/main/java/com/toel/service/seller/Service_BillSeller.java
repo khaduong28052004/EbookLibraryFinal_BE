@@ -101,19 +101,21 @@ public class Service_BillSeller {
             List<VoucherDetail> voucherDetailsToDelete = new ArrayList<>();
             List<Voucher> updatedVouchers = new ArrayList<>();
 
-            bill.getBillDetails().forEach(billDetail -> {
-                Product product = billDetail.getProduct();
-                product.setQuantity(product.getQuantity() + billDetail.getQuantity());
-                updatedProducts.add(product);
+            if (bill.getBillDetails() != null & !bill.getBillDetails().isEmpty()) {
+                bill.getBillDetails().forEach(billDetail -> {
+                    Product product = billDetail.getProduct();
+                    product.setQuantity(product.getQuantity() + billDetail.getQuantity());
+                    updatedProducts.add(product);
 
-                if (billDetail.getFlashSaleDetail() != null) {
-                    FlashSaleDetail flashSaleDetail = billDetail.getFlashSaleDetail();
-                    flashSaleDetail.setQuantity(flashSaleDetail.getQuantity() + billDetail.getQuantity());
-                    updatedFlashSaleDetails.add(flashSaleDetail);
-                }
-            });
+                    if (billDetail.getFlashSaleDetail() != null) {
+                        FlashSaleDetail flashSaleDetail = billDetail.getFlashSaleDetail();
+                        flashSaleDetail.setQuantity(flashSaleDetail.getQuantity() + billDetail.getQuantity());
+                        updatedFlashSaleDetails.add(flashSaleDetail);
+                    }
+                });
+            }
 
-            if (bill.getVoucherDetails() != null) {
+            if (bill.getVoucherDetails() != null && !bill.getVoucherDetails().isEmpty()) {
                 bill.getVoucherDetails().forEach(voucherDetails -> {
                     Voucher voucher = voucherDetails.getVoucher();
                     voucher.setQuantity(voucher.getQuantity() + 1);

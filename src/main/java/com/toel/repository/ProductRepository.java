@@ -32,21 +32,21 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
 	@Query("SELECT p FROM Product p WHERE p.isActive = false and p.isDelete=false "
 			+ "AND (:price IS NULL OR p.price = :price OR p.sale = :price )"
-			+ "AND (:key iS NULL OR p.name LIKE %:key% OR p.introduce LIKE %:key% "
+			+ "AND (:key iS NULL OR p.name LIKE %:key%  "
 			+ "OR p.writerName LIKE %:key% OR p.publishingCompany LIKE %:key%)")
 	Page<Product> selectAllByActiveAndDeleteAndMatchingAttributes(@Param("key") String key,
 			@Param("price") Double price, Pageable pageable);
 
 	@Query("SELECT p FROM Product p WHERE p.isActive = true "
 			+ "AND (:price IS NULL OR p.price = :price OR p.sale = :price )"
-			+ "AND (:key iS NULL OR p.name LIKE %:key% OR p.introduce LIKE %:key% "
+			+ "AND (:key iS NULL OR p.name LIKE %:key%  "
 			+ "OR p.writerName LIKE %:key% OR p.publishingCompany LIKE %:key%)")
 	Page<Product> selectAllByActiveAndMatchingKey(@Param("key") String key, @Param("price") Double price,
 			Pageable pageable);
 
 	@Query("SELECT p FROM Product p WHERE p.isActive != false And p.isDelete != true "
 			+ "AND (:price IS NULL OR p.price = :price OR p.sale = :price )"
-			+ "AND (:key iS NULL OR p.name LIKE %:key% OR p.introduce LIKE %:key% "
+			+ "AND (:key iS NULL OR p.name LIKE %:key%  "
 			+ "OR p.writerName LIKE %:key% OR p.publishingCompany LIKE %:key%)")
 	Page<Product> selectAllMatchingKey(@Param("key") String key, @Param("price") Double price, Pageable pageable);
 
@@ -77,7 +77,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
 	@Query("SELECT p FROM Product p WHERE p.isActive = true and p.isDelete=false "
 			+ "AND (p.createAt BETWEEN :dateStart AND :dateEnd) "
-			+ "AND (:key iS NULL OR p.name LIKE %:key% OR p.introduce LIKE %:key% "
+			+ "AND (:key iS NULL OR p.name LIKE %:key%  "
 			+ "OR p.writerName LIKE %:key% OR p.publishingCompany LIKE %:key%)")
 	List<Product> selectAllMatchingAttributesByDateStartAndDateEnd(@Param("key") String key,
 			@Param("dateStart") Date dateStart, @Param("dateEnd") Date dateEnd);
