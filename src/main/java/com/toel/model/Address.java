@@ -36,6 +36,8 @@ public class Address {
 
 	String phone;
 
+	String street;
+
 	@Nationalized
 	String fullNameAddress;
 
