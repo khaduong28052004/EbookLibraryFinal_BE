@@ -35,7 +35,8 @@ public class Address {
 	boolean status;
 
 	String phone;
-	
+
+	@Nationalized
 	String street;
 
 	@Nationalized
