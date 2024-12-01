@@ -2,6 +2,7 @@ package com.toel.service.user;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import com.toel.model.Product;
 import com.toel.model.Voucher;
 import com.toel.model.VoucherDetail;
 import com.toel.repository.AccountRepository;
+import com.toel.repository.AddressRepository;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
 import com.toel.repository.CartRepository;
@@ -56,14 +58,15 @@ public class Service_Pay {
 	OrderStatusRepository orderStatusRepository;
 	@Autowired
 	FlashSaleDetailRepository flashSaleDetailRepository;
+	@Autowired
+	AddressRepository addressRepository;
 
-	public void createOrder(Request_Pay pay, Integer id_user, Integer paymentMethod_id) {
+	public void createOrder(Request_Pay pay, Integer id_user, Integer paymentMethod_id, Integer id_address) {
 		OrderStatus orderStatus = orderStatusRepository.findById(1).get();
 		PaymentMethod paymentMethod = paymentMethodRepository.findById(paymentMethod_id).get();
 		DiscountRate discountRate = discountRateRepository.find(LocalDateTime.now());
 		Account user = accountRepository.findById(id_user).get();
-		Address toAddress = user.getAddresses().stream().filter(address -> address.isStatus() == true).findFirst()
-				.orElse(null);
+		Address toAddress = addressRepository.findById(id_address).get();
 		for (Request_SellerOrder sellerItem : pay.getDatas()) {
 			Bill bil = new Bill();
 			bil.setAccount(user);
@@ -124,5 +127,11 @@ public class Service_Pay {
 				bil = billRepository.save(bil);
 			}
 		}
+	}
+
+	public List<Address> getAllAdressByUser(Integer id_user) {
+		Account user = accountRepository.findById(id_user).get();
+		List<Address> listAddresses = addressRepository.findAllByAccount(user);
+		return listAddresses;
 	}
 }
