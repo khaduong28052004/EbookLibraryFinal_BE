@@ -82,7 +82,7 @@ public class Service_Cart {
 					flashSaleService.getFlashSaleDetailForProduct(response_Cart.getProduct().getId()));
 			responseSeller.getCart().add(response_Cart);
 
-			List<Voucher> listVoucher = voucherRepository.findAllByAccount(item.getProduct().getAccount());
+			List<Voucher> listVoucher = voucherRepository.findAllByAccount(item.getProduct().getAccount(), new Date());
 			responseSeller.setVouchers(new ArrayList<Voucher>());
 			for (Voucher voucher : listVoucher) {
 				responseSeller.getVouchers().add(voucher);

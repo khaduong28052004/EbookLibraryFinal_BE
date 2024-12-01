@@ -2,10 +2,6 @@ package com.toel.dto.seller.response;
 
 import java.util.Date;
 
-import org.hibernate.annotations.Nationalized;
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,7 +27,7 @@ public class Response_InforSeller {
     long participationTime; // tới gian bán
     Integer trackingNumber; // số lượng theo dõi
     Integer shopCancellationRate; // Tỷ lệ Shop hủy đơn(%)
-
+    Boolean isFollowed;
     // public void setParticipationTime(Date createAtSeller) {
     //     this.participationTime = calculateActiveDays(); // Tính ngay khi set
     // }

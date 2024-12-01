@@ -1,5 +1,6 @@
 package com.toel.repository;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -33,7 +34,12 @@ public interface VoucherRepository extends JpaRepository<Voucher, Integer> {
 
 	List<Voucher> findAllByAccount(Account account);
 
+	@Query("SELECT v FROM Voucher v WHERE v.account =?1 and v.dateStart < ?2 AND ?2< v.dateEnd AND v.isDelete = false")
+	List<Voucher> findAllByAccount(Account account, Date now);
+
 	@Query("SELECT v FROM Voucher v WHERE (v.typeVoucher = ?1) AND (?2 BETWEEN v.dateStart AND v.dateEnd) AND (isDelete = false)")
 	List<Voucher> findAllByTypeVoucher(TypeVoucher typeVoucher, Date now);
+	
+
 
 }

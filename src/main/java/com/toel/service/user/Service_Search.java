@@ -2,15 +2,18 @@ package com.toel.service.user;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_Product;
@@ -33,23 +36,25 @@ public class Service_Search {
 
 	public Map<String, Object> getProductByName(String name, Integer size, String sort) {
 		Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, sort));
-//		Page<Product> pageProducts = productRepo.findAllByNameContainingAndIsActiveTrueAndIsDeleteFalse(name, pageable);
+		// Page<Product> pageProducts =
+		// productRepo.findAllByNameContainingAndIsActiveTrueAndIsDeleteFalse(name,
+		// pageable);
 		listProducts = productRepo.findAllProduct(Sort.by(Sort.Direction.DESC, "price"));
-//		listProducts = listProducts.stream().filter(product -> {
-//			String[] names = name.split(" ");
-//			for (String word : names) {
-//				if (product.getName().contains(word)) {
-//					return false;
-//				}
-//			}
-//			return true;
-//
-//		}).collect(Collectors.toList());
+		// listProducts = listProducts.stream().filter(product -> {
+		// String[] names = name.split(" ");
+		// for (String word : names) {
+		// if (product.getName().contains(word)) {
+		// return false;
+		// }
+		// }
+		// return true;
+		//
+		// }).collect(Collectors.toList());
 
 		String[] names = name.trim().split("\\s*,\\s*|\\s+");
 		System.out.println("max " + names.length);
-//		System.out.println("totalIndex " + index);
-//		System.out.println("currentProportion " + currentProportion);
+		// System.out.println("totalIndex " + index);
+		// System.out.println("currentProportion " + currentProportion);
 		if (names.length > 0) {
 			List<Integer> listIdProduct = new ArrayList<>();
 			float totalIndex = 0;
@@ -134,4 +139,19 @@ public class Service_Search {
 		return response;
 	}
 
+	public PageImpl<Response_Product> searchImage(List<Integer> idProducts, Integer page, Integer size) {
+		List<Integer> uniqueIdList = idProducts.stream()
+				.distinct()
+				.collect(Collectors.toList());
+		Pageable pageable = PageRequest.of(page, size);
+
+		Page<Product> pageProduct = productRepo.findProductsByIdsSortedByTotalSales(uniqueIdList, pageable);
+
+		List<Response_Product> list = pageProduct.stream()
+				.map(product -> productMaperUser.productToResponse_Product(product))
+				.collect(Collectors.toList());
+
+		return new PageImpl<>(list, pageable, pageProduct.getTotalElements());
+
+	}
 }

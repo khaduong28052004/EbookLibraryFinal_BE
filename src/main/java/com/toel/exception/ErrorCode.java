@@ -28,7 +28,8 @@ public enum ErrorCode {
     EMAIL_FORMAT_ERROR(4002, "Email không hợp lệ!", HttpStatus.BAD_REQUEST),
 
     TIME_ERROR(5001, "Khoảng cách giữa ngày bắt đầu và kết thúc không được vượt quá 24 giờ", HttpStatus.BAD_REQUEST);
-
+    
+    
     private final int code;
     private final String message;
     private final HttpStatus httpStatus;
