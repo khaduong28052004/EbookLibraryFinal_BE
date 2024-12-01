@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.toel.dto.Api.ApiResponse;
+import com.toel.dto.admin.response.Response_ProductListFlashSale;
 import com.toel.dto.seller.request.Product.Request_ProductCreate;
 import com.toel.dto.seller.request.Product.Request_ProductUpdate;
 import com.toel.dto.seller.response.Response_Product;
@@ -33,38 +34,38 @@ public class ApiProductSeller {
         Service_ProductSeller service_ProductSeller;
 
         @GetMapping("/getAll")
-        public ApiResponse<PageImpl<Response_Product>> getAll(
+        public ApiResponse<PageImpl<Response_ProductListFlashSale>> getAll(
                         @RequestParam(value = "account_id", defaultValue = "1") Integer account_id,
                         @RequestParam(value = "page", defaultValue = "0") Integer page,
                         @RequestParam(value = "size", defaultValue = "5") Integer size,
                         @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
                         @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn,
                         @RequestParam(value = "search", required = false) String search) {
-                return ApiResponse.<PageImpl<Response_Product>>build()
+                return ApiResponse.<PageImpl<Response_ProductListFlashSale>>build()
                                 .result(service_ProductSeller.getAll(page, size, sortBy, sortColumn, account_id,
                                                 search));
         }
 
         @GetMapping("/edit")
-        public ApiResponse<Response_Product> edit(
+        public ApiResponse<Response_ProductListFlashSale> edit(
                         @RequestParam(value = "product_id", defaultValue = "0") Integer product_id) {
-                return ApiResponse.<Response_Product>build()
+                return ApiResponse.<Response_ProductListFlashSale>build()
                                 .result(service_ProductSeller.edit(product_id));
         }
 
         @PostMapping("/create")
-        public ApiResponse<Response_Product> create(
+        public ApiResponse<Response_ProductListFlashSale> create(
                         @RequestBody @Valid Request_ProductCreate request_Product) throws IOException {
-                return ApiResponse.<Response_Product>build()
+                return ApiResponse.<Response_ProductListFlashSale>build()
                                 .message("Thêm sản phẩm thành công")
                                 .result(service_ProductSeller
                                                 .create(service_ProductSeller.checkCreate(request_Product)));
         }
 
         @PostMapping("/update")
-        public ApiResponse<Response_Product> update(
+        public ApiResponse<Response_ProductListFlashSale> update(
                         @RequestBody @Valid Request_ProductUpdate request_Product) throws IOException {
-                return ApiResponse.<Response_Product>build()
+                return ApiResponse.<Response_ProductListFlashSale>build()
                                 .message("Cập nhật sản phẩm thành công")
                                 .result(service_ProductSeller
                                                 .update(service_ProductSeller.checkUpdate(request_Product)));
