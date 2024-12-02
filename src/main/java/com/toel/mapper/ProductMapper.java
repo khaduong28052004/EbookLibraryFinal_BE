@@ -12,6 +12,7 @@ import com.toel.dto.admin.response.Response_SearchAudio;
 import com.toel.dto.admin.response.ThongKe.Response_TK_Product;
 
 import com.toel.dto.seller.response.Response_Product;
+import com.toel.dto.seller.response.Response_ProductInfo;
 import com.toel.model.Product;
 
 @Mapper(componentModel = "spring")
@@ -39,5 +40,9 @@ public interface ProductMapper {
 
     List<Response_Product> listResponse_Products(List<Product> products);
     List<Response_ProductListFlashSale> tProductListFlashSale(List<Product> product);
+
+
+    List<Response_ProductInfo> Response_ProductInfo(List<Product> product);
+
 
 }

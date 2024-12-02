@@ -18,6 +18,7 @@ import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.admin.response.Response_ProductListFlashSale;
 import com.toel.dto.seller.response.Response_InforSeller;
 import com.toel.dto.seller.response.Response_Product;
+import com.toel.dto.seller.response.Response_ProductInfo;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.ProductMapper;
@@ -258,10 +259,8 @@ public class ApiShowInformationSeller {
             .limit(10) // Giới hạn kết quả
             .collect(Collectors.toList());
     
-         
-
-            List<Response_ProductListFlashSale> listResponse_Products = productMapper
-                    .tProductListFlashSale(listProductO);
+            List<Response_ProductInfo> listResponse_Products = productMapper
+                    .Response_ProductInfo(listProductO);
             hash.put("listProduct", listResponse_Products);
             return ApiResponse.<Map>build()
                     .code(0)
