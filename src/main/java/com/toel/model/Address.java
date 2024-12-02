@@ -47,6 +47,7 @@ public class Address {
 
 	String wardCode;
 
+	String street;
 	@ManyToOne
 	@JoinColumn(name = "account_id ")
 	Account account;
