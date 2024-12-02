@@ -31,11 +31,13 @@ public interface ProductMapper {
 
     Response_ProductListFlashSale tProductListFlashSale(Product product);
 
+
     Response_TK_Product toResponse_TK_Product(Product product);
 
     Response_SearchAudio toResponse_TK_ProductSearchAudio(Product product);
 
 
     List<Response_Product> listResponse_Products(List<Product> products);
+    List<Response_ProductListFlashSale> tProductListFlashSale(List<Product> product);
 
 }
