@@ -11,8 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.toel.dto.user.response.Response_BillDetail_User;
-import com.toel.dto.user.response.Response_Bill_User;
 import com.toel.model.Account;
 import com.toel.model.Bill;
 

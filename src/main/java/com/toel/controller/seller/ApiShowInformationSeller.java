@@ -41,11 +41,8 @@ import com.toel.repository.TypeVoucherRepository;
 import com.toel.repository.VoucherRepository;
 import com.toel.service.user.FollowerService;
 
-import lombok.Data;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @CrossOrigin("*")
 @RestController
@@ -122,7 +119,6 @@ public class ApiShowInformationSeller {
 
             return ApiResponse.<Map>build().code(100).message("null").result(map);
         } catch (Exception e) {
-            // TODO: handle exception
             return ApiResponse.<Response_InforSeller>build().code(100).message(e.getMessage()).result(null);
         }
 
@@ -191,7 +187,6 @@ public class ApiShowInformationSeller {
 
             return ApiResponse.<Map>build().code(0).message("").result(hash);
         } catch (Exception e) {
-            // TODO: handle exception
             return ApiResponse.<String>build().code(0).message("").result(null);
         }
 
@@ -299,7 +294,6 @@ public class ApiShowInformationSeller {
     // .message("Top sold products fetched successfully")
     // .result(hash);
     // } catch (Exception e) {
-    // // TODO: handle exception
     // return ApiResponse.<Map>build()
     // .code(0)
     // .message(e.getMessage())

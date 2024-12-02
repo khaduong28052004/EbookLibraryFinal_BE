@@ -1,10 +1,6 @@
 package com.toel.dto.user.response;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
-import com.toel.dto.ProductDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

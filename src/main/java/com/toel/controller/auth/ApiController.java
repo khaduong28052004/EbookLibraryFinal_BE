@@ -40,7 +40,6 @@ import com.toel.service.auth.JwtService;
 import com.toel.service.auth.OtpService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.toel.dto.AuthRequestDTO;
-import com.toel.dto.ChangePassOtp;
 import com.toel.dto.JwtResponseDTO;
 import com.toel.dto.PermissionDTO;
 import com.toel.dto.Api.ApiResponse;
@@ -370,7 +369,6 @@ public class ApiController {
             }
             // return ApiResponse.<String>build().code(200).message("!").result("ok");
         } catch (Exception e) {
-            // TODO: handle exception
             return ApiResponse.<String>build().code(200).message(e.getMessage()).result("ok");
         }
         return ApiResponse.<String>build().code(200).message("o").result("ok");
@@ -383,7 +381,6 @@ public class ApiController {
             @RequestParam("phone") String phone,
             @RequestParam("fullname") String fullname,
             @RequestParam("password") String password) {
-        // TODO: process POST request
         try {
             boolean isValid = otpService.verifyOtp(email, otp);
             if (isValid) {
@@ -403,7 +400,6 @@ public class ApiController {
             }
         } catch (Exception e) {
 
-            // TODO: handle exception
             e.printStackTrace();
             return ResponseEntity.ok().body(e);
         }

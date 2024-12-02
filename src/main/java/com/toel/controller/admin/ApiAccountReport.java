@@ -28,8 +28,13 @@ public class ApiAccountReport {
             @RequestParam(value = "size", defaultValue = "5") Integer size,
             @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
             @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
-        return ApiResponse.<PageImpl<Response_AccountReport>>build()
-                .result(service_AccountReport.getAll(option, page, size, sortBy, sortColumn, search));
+        try {
+            return ApiResponse.<PageImpl<Response_AccountReport>>build()
+                    .result(service_AccountReport.getAll(option, page, size, sortBy, sortColumn, search));
+        } catch (Exception e) {
+            return ApiResponse.<PageImpl<Response_AccountReport>>build()
+                    .message(e.getMessage());
+        }
     }
 
     @GetMapping("id")

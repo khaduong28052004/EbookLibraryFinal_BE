@@ -20,7 +20,6 @@ import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.admin.response.Response_ProductListFlashSale;
 import com.toel.dto.seller.request.Product.Request_ProductCreate;
 import com.toel.dto.seller.request.Product.Request_ProductUpdate;
-import com.toel.dto.seller.response.Response_Product;
 import com.toel.service.seller.Service_ProductSeller;
 
 import jakarta.validation.Valid;

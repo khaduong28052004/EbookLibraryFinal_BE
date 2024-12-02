@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import com.toel.model.BillDetail;
 import com.toel.model.FlashSaleDetail;
 import com.toel.model.Product;
-import com.toel.model.Account;
 import com.toel.model.Bill;
 
 public interface BillDetailRepository extends JpaRepository<BillDetail, Integer> {

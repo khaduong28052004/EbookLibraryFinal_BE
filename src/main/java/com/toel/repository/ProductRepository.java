@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.toel.dto.user.response.Response_InfoShop_Billdetail_DTO;
 import com.toel.model.Account;
 import com.toel.model.BillDetail;
 import com.toel.model.Category;
