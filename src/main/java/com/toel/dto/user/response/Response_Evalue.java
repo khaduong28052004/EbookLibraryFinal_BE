@@ -24,7 +24,7 @@ public class Response_Evalue {
 
 	String content;
 
-	List<ImageEvalue> imageEvalues;
+	List<Response_ImageEvalue> imageEvalues;
 
 	Account account;
 
