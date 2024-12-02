@@ -219,7 +219,7 @@ public class TemplateBuilder {
     private static String buildOtpTemplate(String... data) {
         String otp = data[0];
         String link = data[1];
-        String username = data.length > 1 ? data[1] : "User"; // Optional data handling
+        String username = data.length > 1 ? data[2] : "User"; // Optional data handling
         // HTML for OTP email template
         String content = "<!DOCTYPE html>\r\n" + //
                 "<html lang=\"en\">\r\n" + //
@@ -311,7 +311,7 @@ public class TemplateBuilder {
                "<body>\r\n" + //
         " <div class=\"email-container\">\r\n" + //
         " <div class=\"email-header\">\r\n" + //
-        " <h1>TOEL - Đăng ký</h1>\r\n" + //
+        " <h1>TOEL - cập nhật mật khẩu</h1>\r\n" + //
         " </div>\r\n" + //
         " <div class=\"email-body\">\r\n" + //
         " <div class=\"container\">\r\n" +

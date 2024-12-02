@@ -40,11 +40,11 @@ public class OtpController {
             System.out.println("otp nè: " + otp + " hashOTP " + hashOTP + " , mail " + entity.getEmail() + isvalid);
 
             emailService.push(entity.getEmail(), "Quên mật khẩu ", EmailTemplateType.OTP, otp,
-                    "http://localhost:5173/change-password?otp=" + otp);
+                    "http://localhost:5173/change-password?otp=" + otp,entity.getFullname());
             return ResponseEntity.ok("OTP generated: " + otp);
 
         } else {
-            return ResponseEntity.ok("emal không tồn tại ! ");
+            return ResponseEntity.badRequest().body("emal không tồn tại ! ");
 
         }
     }
