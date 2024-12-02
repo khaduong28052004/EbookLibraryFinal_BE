@@ -39,7 +39,7 @@ public class OtpController {
             String hashOTP = serviceToel.hashPassword(otp);
             System.out.println("otp nè: " + otp + " hashOTP " + hashOTP + " , mail " + entity.getEmail() + isvalid);
 
-            emailService.push(entity.getEmail(), "Mã otp của bạn", EmailTemplateType.OTP, otp,
+            emailService.push(entity.getEmail(), "Quên mật khẩu ", EmailTemplateType.OTP, otp,
                     "http://localhost:5173/change-password?otp=" + otp);
             return ResponseEntity.ok("OTP generated: " + otp);
 
@@ -95,7 +95,7 @@ public class OtpController {
                 String hashOTP = serviceToel.hashPassword(otp);
                 System.out.println("otp nè: " + otp + " hashOTP " + hashOTP + " , mail " + entity.getEmail() + isvalid);
 
-                emailService.push(entity.getEmail(), "Mã otp của bạn", EmailTemplateType.DANGKYTAIKHOAN, otp,
+                emailService.push(entity.getEmail(), "Đăng ký tài khoản", EmailTemplateType.DANGKYTAIKHOAN, otp,
                         "http://localhost:5173/singup2?otp=" + otp + "&email=" + entity.getEmail());
                 return ResponseEntity.ok("OTP generated: " + otp);
 

@@ -226,7 +226,7 @@ public class TemplateBuilder {
                 "<head>\r\n" + //
                 "    <meta charset=\"UTF-8\">\r\n" + //
                 "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n" + //
-                "    <title>Thông Báo Hủy Đơn Hàng</title>\r\n" + //
+                "    <title>Quên mật khẩu</title>\r\n" + //
                 "    <style>\r\n" + //
                 "        body {\r\n" + //
                 "            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\r\n" + //
@@ -351,7 +351,7 @@ public class TemplateBuilder {
                 "<head>\r\n" + //
                 "    <meta charset=\"UTF-8\">\r\n" + //
                 "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n" + //
-                "    <title>Thông Báo Hủy Đơn Hàng</title>\r\n" + //
+                "    <title>Đăng ký tài khoản</title>\r\n" + //
                 "    <style>\r\n" + //
                 "        body {\r\n" + //
                 "            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\r\n" + //
