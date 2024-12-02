@@ -47,6 +47,7 @@ import lombok.Data;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -237,7 +238,8 @@ public class ApiShowInformationSeller {
 
     @Autowired
     ProductMapper productMapper;
-    @GetMapping("/api/v1/user/topProducts")
+
+    @PostMapping("/api/v1/user/topProducts")
     public ApiResponse<?> topProducts(@RequestBody Map<String, String> body) {
         String sellerID = body.get("sellerID");
         // String userID = body.get("userID");
@@ -254,11 +256,20 @@ public class ApiShowInformationSeller {
             List<BillDetail> listBillDetails = billDetailRepository.findAllByBillIn(listBill);
             Map<String, Object> hash = new HashMap<>();
             // List<Product> listProductO = new ArrayList<>();
-            List<Product> listProductO = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream()
-            .filter(product -> !product.getAccount().getId().equals(Integer.parseInt(sellerID))) // Lọc bỏ sellerID
-            .limit(10) // Giới hạn kết quả
-            .collect(Collectors.toList());
-    
+            List<Product> listProductO = new ArrayList<>();
+            if (isNumeric(sellerID)) {
+                listProductO = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream()
+                        .filter(product -> !product.getAccount().getId().equals(Integer.parseInt(sellerID))) // Lọc bỏ
+                        .limit(10) // Giới hạn kết quả
+                        .collect(Collectors.toList());
+            } else {
+                listProductO = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream()
+                        // .filter(product ->
+                        // !product.getAccount().getId().equals(Integer.parseInt(sellerID))) // Lọc bỏ
+                        // sellerID
+                        .limit(10) // Giới hạn kết quả
+                        .collect(Collectors.toList());
+            }
             List<Response_ProductInfo> listResponse_Products = productMapper
                     .Response_ProductInfo(listProductO);
             hash.put("listProduct", listResponse_Products);

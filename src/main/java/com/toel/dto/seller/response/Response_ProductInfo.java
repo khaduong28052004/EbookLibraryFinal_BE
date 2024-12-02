@@ -26,7 +26,7 @@ public class Response_ProductInfo {
     String introduce;
 
     String writerName;
-
+    
     String publishingCompany;
 
     Date createAt;
@@ -36,7 +36,7 @@ public class Response_ProductInfo {
     Integer quantity;
     Response_Account account;
     boolean isActive;
-    Response_Category category;
+    // Response_Category category;
     List<Response_ImageProduct> imageProducts;
 }
 
