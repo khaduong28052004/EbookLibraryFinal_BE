@@ -16,13 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.response.Response_InforSeller;
+import com.toel.dto.seller.response.Response_Product;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
+import com.toel.mapper.ProductMapper;
 import com.toel.model.Account;
 import com.toel.model.Address;
 import com.toel.model.Bill;
 import com.toel.model.BillDetail;
 import com.toel.model.Evalue;
+import com.toel.model.ImageProduct;
 import com.toel.model.OrderStatus;
 import com.toel.model.Product;
 import com.toel.model.TypeVoucher;
@@ -31,6 +34,7 @@ import com.toel.repository.AccountRepository;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
 import com.toel.repository.EvalueRepository;
+import com.toel.repository.ImageProductRepository;
 import com.toel.repository.OrderStatusRepository;
 import com.toel.repository.ProductRepository;
 import com.toel.repository.TypeVoucherRepository;
@@ -67,6 +71,8 @@ public class ApiShowInformationSeller {
 
     @Autowired
     private OrderStatusRepository orderStatusRepository;
+    @Autowired
+    private ImageProductRepository imageProductRepository;
 
     /**
      * homeShowSeller
@@ -79,7 +85,7 @@ public class ApiShowInformationSeller {
      * @param idSeller
      * @return
      */
-    @GetMapping("/api/user/informationSeller/{idSeller}")
+    @GetMapping("/api/v1/user/informationSeller/{idSeller}")
     public ApiResponse<?> informationSellerPublic(@PathVariable Integer idSeller) {
         try {
             Account account = accountRepository.findById(idSeller)
@@ -134,7 +140,7 @@ public class ApiShowInformationSeller {
     // return ApiResponse.<Map>build().code(0).message(null).result(hash);
     // }
 
-    @GetMapping("/api/user/voucherall/{idSeller}")
+    @GetMapping("/api/v1/user/voucherAll/{idSeller}")
     public ApiResponse<?> voucherAll(@PathVariable Integer idSeller) {
         Account account = accountRepository.findById(idSeller)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
@@ -172,19 +178,27 @@ public class ApiShowInformationSeller {
         return result;
     }
 
-
     @GetMapping("/api/v1/user/voucherAll")
     public ApiResponse<?> getVoucherAll() {
-        List<TypeVoucher> typeVoucher = typeVoucherRepository.findAll();
-        Date date = new Date();
-        List<Voucher> listVoucherShop = voucherRepository.findAllByTypeVoucher(typeVoucher.get(0), date);
-        List<Voucher> listVoucherSan = voucherRepository.findAllByTypeVoucher(typeVoucher.get(1), date);
-        Map<String, Object> hash = new HashMap<>();
-        hash.put("san", listVoucherSan);
-        hash.put("shop", listVoucherShop);
+        try {
+            List<TypeVoucher> typeVoucher = typeVoucherRepository.findAll();
+            Date date = new Date();
+            List<Voucher> listVoucherShop = voucherRepository.findAllByTypeVoucher(typeVoucher.get(0), date);
+            List<Voucher> listVoucherSan = voucherRepository.findAllByTypeVoucher(typeVoucher.get(1), date);
+            Map<String, Object> hash = new HashMap<>();
+            hash.put("san", listVoucherSan);
+            hash.put("shop", listVoucherShop);
 
-        return ApiResponse.<Map>build().code(0).message("").result(hash);
+            return ApiResponse.<Map>build().code(0).message("").result(hash);
+        } catch (Exception e) {
+            // TODO: handle exception
+            return ApiResponse.<String>build().code(0).message("").result(null);
+        }
+
     }
+
+    @Autowired
+    ProductMapper productMapper;
 
     @GetMapping("/api/v1/user/topProducts")
     public ApiResponse<?> topProducts() {
@@ -199,31 +213,40 @@ public class ApiShowInformationSeller {
                 return ApiResponse.<String>build().code(1).message("không có hóa đơn nào!").result(null);
             }
             List<BillDetail> listBillDetails = billDetailRepository.findAllByBillIn(listBill);
-            if(listBillDetails.isEmpty()){
-                return ApiResponse.<Map>build()
-                .code(0)
-                .message("không có hóa đơn detail nào!")
-                .result(null);
-            }
+            // if(listBillDetails.isEmpty()){
+            // return ApiResponse.<Map>build()
+            // .code(0)
+            // .message("không có hóa đơn detail nào!")
+            // .result(null);
+            // }
             // Thống kê số lượng sản phẩm đã bán
-            Map<Product, Long> productCountMap = listBillDetails.stream()
-                    .collect(
-                            Collectors.groupingBy(BillDetail::getProduct, Collectors.summingLong(BillDetail::getQuantity)));
+            // Map<Product, Long> productCountMap = listBillDetails.stream()
+            // .collect(
+            // Collectors.groupingBy(BillDetail::getProduct,
+            // Collectors.summingLong(BillDetail::getQuantity)));
             // List<BillDetail> listBillDetails1 = billDetailRepository.
             Map<String, Object> hash = new HashMap<>();
-            List<Product> listProduct = productRepository.findByBillDetails(listBillDetails);
-            List<Product> listProductO = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream().limit(10)
-                        .collect(Collectors.toList()); 
-                hash.put("listProduct", listProductO);
+            // List<Product> listProduct =
+            // productRepository.findByBillDetails(listBillDetails);
+            List<Product> listProductO = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream()
+                    .limit(10)
+                    .collect(Collectors.toList());
+            List<ImageProduct> imageProducts = new ArrayList<>();
+            // imageProducts = imageProductRepository.findByProductIn(listProductO);
+            List<Response_Product> listResponse_Products = productMapper.listResponse_Products(listProductO);
+
+            hash.put("listProduct", listResponse_Products);
             // if (!listProduct.isEmpty()) {
-            //     hash.put("listProduct", listProduct.stream()
-            //             .sorted((e1, e2) -> Long.compare(e2.getId(), e1.getId()))
-            //             .limit(10)
-            //             .collect(Collectors.toList())); // sản 
+            // hash.put("listProduct", listProduct.stream()
+            // .sorted((e1, e2) -> Long.compare(e2.getId(), e1.getId()))
+            // .limit(10)
+            // .collect(Collectors.toList())); // sản
             // } else {
-            //     List<Product> listProductO = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream().limit(10)
-            //             .collect(Collectors.toList()); 
-            //     hash.put("listProduct", listProductO);
+            // List<Product> listProductO =
+            // productRepository.findAll(Sort.by(Sort.Direction.DESC,
+            // "id")).stream().limit(10)
+            // .collect(Collectors.toList());
+            // hash.put("listProduct", listProductO);
             // }
             return ApiResponse.<Map>build()
                     .code(0)
@@ -231,55 +254,62 @@ public class ApiShowInformationSeller {
                     .result(hash);
         } catch (Exception e) {
             return ApiResponse.<Map>build()
-            .code(0)
-            .message(e.getMessage())
-            .result(null);
+                    .code(0)
+                    .message(e.getMessage())
+                    .result(null);
         }
-      
-    }
 
+    }
 
     // @GetMapping("/api/v1/user/topProducts")
     // public ApiResponse<?> topProducts() {
-    //     try {
-    //         OrderStatus orderStatus = orderStatusRepository.findById(1).orElse(null);
-    //         if (orderStatus == null) {
-    //             return ApiResponse.<String>build().code(1).message("Đơn hoàn thành bằng 0").result(null);
-    //         }
-    //         List<Bill> listBill = billRepository.findByOrderStatus(orderStatus);
-    //         if (listBill == null || listBill.isEmpty()) {
-    //             // ne
-    //             return ApiResponse.<String>build().code(1).message("không có hóa đơn nào!").result(null);
-    //         }
-    //         List<BillDetail> listBillDetails = billDetailRepository.findAllByBillIn(listBill);
-    //         // Thống kê số lượng sản phẩm đã bán
-    //         if(listBillDetails.isEmpty()){
-    //             return ApiResponse.<String>build().code(1).message("không có hóa đơn nào!").result(null);
-    //         }
-    //         Map<Product, Long> productCountMap = listBillDetails.stream()
-    //                 .collect(
-    //                         Collectors.groupingBy(BillDetail::getProduct, Collectors.summingLong(BillDetail::getQuantity)));
-    
-    //         // List<BillDetail> listBillDetails1 = billDetailRepository.
-    //         List<Product> listProduct = productRepository.findByBillDetails(listBillDetails);
-    //         Map<String, Object> hash = new HashMap<>();
-    //         hash.put("list", listBillDetails);
+    // try {
+    // OrderStatus orderStatus = orderStatusRepository.findById(1).orElse(null);
+    // if (orderStatus == null) {
+    // return ApiResponse.<String>build().code(1).message("Đơn hoàn thành bằng
+    // 0").result(null);
+    // }
+    // List<Bill> listBill = billRepository.findByOrderStatus(orderStatus);
+    // if (listBill == null || listBill.isEmpty()) {
+    // // ne
+    // return ApiResponse.<String>build().code(1).message("không có hóa đơn
+    // nào!").result(null);
+    // }
+    // List<BillDetail> listBillDetails =
+    // billDetailRepository.findAllByBillIn(listBill);
+    // // Thống kê số lượng sản phẩm đã bán
+    // if (listBillDetails.isEmpty()) {
+    // return ApiResponse.<String>build().code(1).message("không có hóa đơn
+    // nào!").result(null);
+    // }
+    // Map<Product, Long> productCountMap = listBillDetails.stream()
+    // .collect(
+    // Collectors.groupingBy(BillDetail::getProduct,
+    // Collectors.summingLong(BillDetail::getQuantity)));
 
-    //         return ApiResponse.<Map>build()
-    //                 .code(0)
-    //                 .message("Top sold products fetched successfully")
-    //                 .result(hash);
-    //     } catch (Exception e) {
-    //         // TODO: handle exception
-    //         return ApiResponse.<Map>build()
-    //         .code(0)
-    //         .message(e.getMessage())
-    //         .result(null);
-    //     }
-       
+    // // List<BillDetail> listBillDetails1 = billDetailRepository.
+
+    // // // hash.put("listProduct", listProductO);
+
+    // Map<String, Object> hash = new HashMap<>();
+    // hash.put("list", listBillDetails);
+
+    // return ApiResponse.<Map>build()
+    // .code(0)
+    // .message("Top sold products fetched successfully")
+    // .result(hash);
+    // } catch (Exception e) {
+    // // TODO: handle exception
+    // return ApiResponse.<Map>build()
+    // .code(0)
+    // .message(e.getMessage())
+    // .result(null);
+    // }
+
     // }
 
     // public double averageStars(Account account) {
+
     // // Lấy danh sách các sản phẩm của người bán
     // List<Product> products = account.getProducts();
     // List<BillDetail> listBillDetail =

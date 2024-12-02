@@ -11,9 +11,10 @@ import com.toel.service.Service_Session;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,30 +54,39 @@ public class ApiAddress {
     }
 
     @PostMapping("/rest/address/create/{id}")
-    public Map<String, Object> createAddress(@PathVariable("id") Integer id, @RequestBody Address address) {
-        // Account account = sessionService.getAttribute("account");
-        Account account = accountRepositoty.findById(id).get();
-        Map<String, Object> map = new HashMap<String, Object>();
-
-        if (account == null) {
-            map.put("message", "Account is null");
-            map.put("status", "error");
-            return map;
-        }
-        if (address.isStatus()) {
-            List<Address> listAddresses = addressRepository.findByAccount(account);
-            for (Address addressEnty : listAddresses) {
-                addressEnty.setStatus(false);
-                addressRepository.save(addressEnty);
-            }
-        }
-        address.setAccount(account);
-        addressRepository.save(address);
-        map.put("data", address);
-        map.put("message", "Address create successfully");
-        map.put("status", "success");
+public Map<String, Object> createAddress(@PathVariable("id") Integer id, @RequestBody Address address) {
+    Map<String, Object> map = new HashMap<>();
+    
+    // Lấy tài khoản theo ID
+    Optional<Account> optionalAccount = accountRepositoty.findById(id);
+    if (optionalAccount.isEmpty()) {
+        map.put("message", "Account not found");
+        map.put("status", "error");
         return map;
     }
+    
+    Account account = optionalAccount.get();
+    
+    // Đặt tất cả các địa chỉ của tài khoản thành không mặc định
+    List<Address> listAddresses = addressRepository.findByAccount(account);
+    for (Address addressEnty : listAddresses) {
+        if (addressEnty.isStatus()) {
+            addressEnty.setStatus(false);
+            addressRepository.save(addressEnty);
+        }
+    }
+
+    // Thiết lập địa chỉ mới là mặc định
+    address.setStatus(true);
+    address.setAccount(account);
+    addressRepository.save(address);
+    
+    map.put("data", address);
+    map.put("message", "Address created successfully and set as default");
+    map.put("status", "success");
+    return map;
+}
+
 
     @GetMapping("/rest/address/getOne/{id}")
     public Map<String, Object> getByIdAddress(@PathVariable("id") Integer id) {
@@ -112,7 +122,32 @@ public class ApiAddress {
         map.put("status", "success");
         return map;
     }
-
+    @PutMapping("/rest/address/updateStatus/{id}")
+    public ResponseEntity<?> updateAddress(@PathVariable("id") Integer id) {
+        Optional<Address> optionalAddress = addressRepository.findById(id);
+        if (optionalAddress.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Address not found");
+        }
+    
+        Address address = optionalAddress.get();
+        Account account = address.getAccount();
+    
+        // Đặt tất cả các địa chỉ khác của tài khoản thành không mặc định
+        List<Address> addresses = addressRepository.findByAccount(account);
+        for (Address addr : addresses) {
+            if (addr.isStatus()) {
+                addr.setStatus(false);
+                addressRepository.save(addr);
+            }
+        }
+    
+        // Đặt địa chỉ hiện tại làm mặc định
+        address.setStatus(true);
+        addressRepository.save(address);
+    
+        return ResponseEntity.ok("Default address updated successfully");
+    }
+    
     @DeleteMapping("/rest/address/delete/{id}")
     public Map<String, Object> deleteAddress(@PathVariable("id") Integer id) {
         Address address = addressRepository.findById(id).get();
