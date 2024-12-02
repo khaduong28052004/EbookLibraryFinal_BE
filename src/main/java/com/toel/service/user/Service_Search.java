@@ -21,9 +21,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import com.toel.dto.admin.response.Response_ProductListFlashSale;
-import com.toel.dto.admin.response.Response_SearchAudio;
-import com.toel.dto.admin.response.ThongKe.Page_TK_Product;
 import com.toel.dto.user.response.Response_Product;
 import com.toel.mapper.user.ProductMaperUser;
 import com.toel.model.Category;
@@ -236,19 +233,19 @@ public class Service_Search {
 			}
 
 			// Xử lý điều kiện sắp xếp
-			if (normalizedSearch.contains("moi nhat")) {
+			if (normalizedSearch.contains("moi")) {
 				option = "moi nhat";
 				sortKey = "createat";
-			} else if (normalizedSearch.contains("luot ban") ||
-					normalizedSearch.contains("hoa don") ||
-					normalizedSearch.contains("bill") ||
-					normalizedSearch.contains("bills")) {
+			} else if (normalizedSearch.contains("luot ban") || normalizedSearch.contains("hoa don") ||
+					normalizedSearch.contains("bill") || normalizedSearch.contains("bills") ||
+					normalizedSearch.contains("ban chay")) {
 				option = "bill";
 				sortKey = "sumbill";
-			} else if (normalizedSearch.contains("danh gia")) {
+			} else if (normalizedSearch.contains("danh gia") || normalizedSearch.contains("phan hoi")) {
 				option = "danhgia";
 				sortKey = "sumevalue";
-			} else if (normalizedSearch.contains("like") || normalizedSearch.contains("yeu thich")) {
+			} else if (normalizedSearch.contains("like") || normalizedSearch.contains("yeu thich")
+					|| normalizedSearch.contains("duoc quan tam")) {
 				option = "yeuthich";
 				sortKey = "sumlike";
 			}
