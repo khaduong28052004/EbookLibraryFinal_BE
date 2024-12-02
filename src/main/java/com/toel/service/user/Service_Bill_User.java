@@ -16,6 +16,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_Bill_User;
+import com.toel.dto.BillDTO;
+import com.toel.dto.ProductDTO;
+import com.toel.dto.user.response.Response_BillDetail_User;
 import com.toel.dto.user.response.Response_Bill_Product_User;
 import com.toel.dto.user.resquest.Request_Bill_User;
 import com.toel.exception.AppException;
@@ -92,11 +95,12 @@ public class Service_Bill_User {
 	VoucherRepository voucherRepository;
 
 	public Map<String, Object> getBills(Request_Bill_User requestBillDTO) {
-		Map<String, Object> response = new HashMap<String, Object>();
+		Map<String, Object> response = new HashMap<>();
 		try {
 			List<Object[]> productsInBill = getBillsByOrderStatus(requestBillDTO);
+			List<Response_Bill_User> listConver = convertToResponseBillUser(productsInBill);
+			List<BillDTO> shopListInBill = createBillsWithProductsInBillDetail(listConver);
 
-			List<Response_Bill_User> shopListInBill = createBillsWithProductsInBillDetail(productsInBill);
 			response.put("data", shopListInBill);
 			response.put("status", "successfully");
 			response.put("message", "Retrieve data successfully");
@@ -115,104 +119,68 @@ public class Service_Bill_User {
 
 		switch (orderStatus) {
 			case "CHODUYET":
-				return billRepository.getBillsByUserIdNOrderStatusOrderByCreateAt(userId, 1);
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 1, "create"); // Status
 			case "DANGXULY":
-				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 2);
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 2, "update"); // Status
 			case "DANGGIAO":
-				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 3);
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 3, "update"); // Status
 			case "DAGIAO":
-				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 4);
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 4, "update"); // Status
 			case "HOANTHANH":
-				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 5);
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 5, "update"); // Status
 			case "DAHUY":
-				return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 6);
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 6, "update"); // Status
 			default:
-				return billRepository.getBillsByUserIdAll(userId);
-
+				return billRepository.findBillsByUserId(userId); // Default: No filter on order status
 		}
 	}
 
-	public List<Response_Bill_User> createBillsWithProductsInBillDetail(List<Object[]> productsInBill) {
-		Map<Integer, Response_Bill_User> billMap = new HashMap<>(); // Map để lưu các bill với key là billID
-		List<Response_Bill_User> bills = new ArrayList<>(); // Danh sách để trả về cuối cùng
-
-		for (Object[] product : productsInBill) {
-			Integer billID = Integer.parseInt(product[1].toString());
-			Integer userID = Integer.parseInt(product[0].toString());
-			Double billTotalPrice = Double.parseDouble(product[2].toString());
-			Double billDiscountPrice = Double.parseDouble(product[3].toString());
-			Double billTotalShippingPrice = Double.parseDouble(product[4].toString());
-			Integer billTotalQuantity = Integer.parseInt(product[5].toString());
-			String billAddress = product[6].toString();
-			Integer orderStatusID = Integer.parseInt(product[7].toString());
-			Date createdDatetime = (Date) product[8];
-			Double billDiscountRate = Double.parseDouble(product[10].toString());
-			Integer productID = Integer.parseInt(product[11].toString());
-			String productName = product[12].toString();
-			String productIntroduce = product[13].toString();
-			Integer productQuantity = Integer.parseInt(product[14].toString());
-			Double productPrice = Double.parseDouble(product[15].toString());
-			Double productDiscountPrice = Double.parseDouble(product[16].toString());
-			String productImageURL = product[17].toString();
-			Integer shopId = Integer.parseInt(product[18].toString());
-			String shopName = product[19].toString();
-			String shopAvatar = product[20].toString();
-			Integer billPaymentMethodId = Integer.parseInt(product[21].toString());
-
-			String orderStatus = orderStatusRepository.findById(orderStatusID).get().getName();
-			String billPaymentMethod = paymentMethodRepository.findById(billPaymentMethodId).get().getName();
-
-			String updatedDatetime;
-			if ((Date) product[9] == null) {
-				updatedDatetime = "";
-			}
-
-			Response_Bill_User billData = billMap.get(billID);
-			if (billData == null) {
-				billData = new Response_Bill_User();
-				billData.setBillID(billID);
-				billData.setUserID(userID);
-				billData.setBillTotalPrice(billTotalPrice);
-				billData.setBillDiscountPrice(billDiscountPrice);
-				billData.setBillTotalShippingPrice(billTotalShippingPrice);
-				billData.setBillTotalQuantity(billTotalQuantity);
-				billData.setBillAddress(billAddress);
-				billData.setBillOrderStatusId(orderStatusID);
-				billData.setBillOrderStatus(orderStatus);
-				billData.setBillPaymentMethod(billPaymentMethod);
-				billData.setCreatedDatetime(formatDate(createdDatetime.toString()));
-				billData.setBillDiscountRate(billDiscountRate);
-				billData.setShopId(shopId);
-				billData.setShopName(shopName);
-				billData.setShopAvatar(shopAvatar);
-
-				billData.setProducts(new ArrayList<>());
-				billMap.put(billID, billData); // Thêm bill mới vào Map
-			}
-
-			Response_Bill_Product_User productData = new Response_Bill_Product_User();
-			productData.setProductId(productID);
-			productData.setProductName(productName);
-			productData.setProductIntroduce(productIntroduce);
-			productData.setProductQuantity(productQuantity);
-			productData.setProductPrice(productPrice);
-			productData.setProductDiscountPrice(productDiscountPrice);
-			productData.setProductImageURL(productImageURL);
-
-			Integer billDetailId = billDetailRepository.findBillDetailByProductIdAndAccountId(userID, productID,
-					billID);
-			productData.setBillDetailId(billDetailId);
-
-			System.out.println("billDetailId " + billDetailId);
-			Integer isEvalued = evaluateRepository.isEvaluate(billDetailId, productID, userID);
-			productData.setIsEvaluate(isEvalued == 1);
-			billData.getProducts().add(productData);
+	public List<Response_Bill_User> convertToResponseBillUser(List<Object[]> result) {
+		List<Response_Bill_User> bills = new ArrayList<>();
+		for (Object[] row : result) {
+			Response_Bill_User bill = new Response_Bill_User();
+			bill.setBillId((Integer) row[0]);
+			bill.setUserId((Integer) row[1]);
+			bill.setTotalPriceBill((Double) row[2]);
+			bill.setPriceShippingBill((Double) row[3]);
+			bill.setTotalQuantityBill((Integer) row[4]);
+			bill.setOrderStatus((String) row[5]);
+			bill.setCreatedDatetime((Date) row[6]);
+			bill.setUpdatedDatetime((Date) row[7]);
+			bill.setPaymentMethod((String) row[8]);
+			bills.add(bill);
 		}
-
-		bills.addAll(billMap.values());
-		bills.sort((bill1, bill2) -> bill2.getCreatedDatetime().compareTo(bill1.getCreatedDatetime())); // Sắp xếp giảm
-
 		return bills;
+	}
+
+	public List<BillDTO> createBillsWithProductsInBillDetail(List<Response_Bill_User> productsInBill) {
+		List<BillDTO> billList = new ArrayList<>();
+
+		for (Response_Bill_User bill : productsInBill) {
+			BillDTO newBill = new BillDTO();
+			Integer billId = bill.getBillId();
+			Integer userId = bill.getUserId();
+			Double totalPriceBill = bill.getTotalPriceBill();
+			Double priceShippingBill = bill.getPriceShippingBill();
+			Integer totalBillQuantity = bill.getTotalQuantityBill();
+			String orderStatus = bill.getOrderStatus();
+			Date createAt = bill.getCreatedDatetime();
+			Date updateAt = bill.getUpdatedDatetime();
+			String paymentMethod = bill.getPaymentMethod().toUpperCase();
+
+			newBill.setBillId(billId);
+			newBill.setUserId(userId);
+			newBill.setTotalPriceBill(totalPriceBill);
+			newBill.setPriceShippingBill(priceShippingBill);
+			newBill.setOrderStatus(orderStatus);
+			newBill.setCreatedDatetime(createAt);
+			newBill.setUpdatedDatetime(updateAt);
+			newBill.setTotalQuantityBill(totalBillQuantity);
+			newBill.setPaymentMethod(paymentMethod);
+
+			billList.add(newBill);
+		}
+		return billList;
 	}
 
 	public Bill cancelBill(Integer billId) {
@@ -277,26 +245,24 @@ public class Service_Bill_User {
 	}
 
 	public void confirmBill(Integer billId) {
-
 		checkBillStatus(billId, 4);
-
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
 		bill.setFinishAt(new Date());
 		bill.setOrderStatus(orderStatusRepository.findById(5).get());
-
 		billRepository.saveAndFlush(bill);
 
 	}
 
 	private void sendNotification(Bill bill) {
-		String email = billDetailRepository.findByBill(bill).getBill().getAccount().getEmail();
+		String email = bill.getAccount().getEmail();
 		System.out.println("email " + email);
 		String subject = "TOEL - Thông báo cập nhật trạng thái hủy đơn hàng ";
-		String content = "Khách hàng đã hủy đơn của shop\n\n Xin cảm ơn vì sử dụng bán hàng trên TOEL.";
+		String content = " Khách hàng đã hủy đơn của shop. Xin cảm ơn vì sử dụng bán hàng trên TOEL.";
 		emailService.push(email, subject, EmailTemplateType.HUYDON,
-				bill.getAccount().getShopName(),
+				bill.getBillDetails().get(0).getProduct().getAccount().getShopName(),
 				String.valueOf(bill.getId()), content);
+
 	}
 
 	public void reOrder(Integer billId) {

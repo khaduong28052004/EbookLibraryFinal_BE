@@ -1,6 +1,9 @@
 package com.toel.dto.user.response;
 
+import java.sql.Date;
 import java.util.List;
+
+import com.toel.model.Product;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,29 +15,20 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Response_BillDetail_User {
-	Integer userID;
-	Integer billID;
-	Double billTotalPrice;
-	Double billDiscountPrice;
-	Double billTotalShippingPrice;
-	Double billTempPrice;
-	Integer billTotalQuantity;
-	String billAddress;
-	Integer billOrderStatusId;
-	String billOrderStatus;
-
-	String billPaymentMethod;
-
-	String createdDatetime;
-	String updatedDatetime;
-	Double billDiscountRate;
-	Integer shopId;
-	String shopName;
-	String shopAvatar;
-	String userPhone;
-	String userFullname;
-
-	
-	List<Response_Bill_Product_User> products; 
-
+	private Integer billId;
+	private Integer userId;
+	private Double billTotalPrice;
+	private Double billDiscountPrice;
+	private Double billPriceShipping;
+	private Integer billTotalQuantity;
+	private String orderStatus;
+	private Integer orderStatusId;
+	private String createdDatetime;
+	private String updatedDatetime;
+	private Double billDiscountRate;
+	private Double productTempPrice;
+	private Double billShippingPrice;
+	private String userPhone;
+	private String userFullname;
+	private String userAddress;
 }

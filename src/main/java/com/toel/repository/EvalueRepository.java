@@ -20,7 +20,7 @@ public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
 	Page<Evalue> findByAccountId(Integer account_id, String search, Pageable pageable);
 
 	@Query(value = "SELECT CASE WHEN EXISTS (SELECT 1 FROM evalues WHERE evalues.billDetail_id = :billDetailId AND evalues.product_id = :productId AND evalues.account_id = :accountId) THEN 1 ELSE 0 END AS isEvaluated ", nativeQuery = true)
-	Integer isEvaluate(@Param("billDetailId") Integer billDetailId, @Param("productId") Integer product_id,
+	Integer isEvaluated(@Param("billDetailId") Integer billDetailId, @Param("productId") Integer product_id,
 			@Param("accountId") Integer account_id);
 
 	@Query("SELECT COALESCE(AVG(e.star),0) FROM Evalue e WHERE e.product.account.id = :accountId")
@@ -47,4 +47,5 @@ public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
 	List<Evalue> findByBillDetail(BillDetail billDetail);
 
 	List<Evalue> findByBillDetailIn(List<BillDetail> billDetail);
+
 }
