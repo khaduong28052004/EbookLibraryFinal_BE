@@ -49,9 +49,9 @@ public class Service_FlashSaleDetail {
                     // flashSaleRepository.findById(idFlashSale)
                     .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Flash sale"));
         }
-        if (Boolean.TRUE.equals(status)) {
+        if (status) {
             pageItems = flashSaleDetailRepository.findAllByFlashSale(flashSale, pageable);
-        } else if (Boolean.FALSE.equals(status)) {
+        } else if (status==false) {
             pageItems = productRepository.selectAllProductNotInFlashSale(idFlashSale, pageable);
             // pageItems = productRepository.selectAllProductInFlashSale(idFlashSale,
             // pageable);

@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 import com.toel.dto.seller.request.Product.Request_ProductCreate;
 import com.toel.dto.seller.request.Product.Request_ProductUpdate;
 import com.toel.dto.admin.response.Response_ProductListFlashSale;
+import com.toel.dto.admin.response.Response_SearchAudio;
 import com.toel.dto.admin.response.ThongKe.Response_TK_Product;
 
 import com.toel.dto.seller.response.Response_Product;
@@ -31,6 +32,9 @@ public interface ProductMapper {
     Response_ProductListFlashSale tProductListFlashSale(Product product);
 
     Response_TK_Product toResponse_TK_Product(Product product);
+
+    Response_SearchAudio toResponse_TK_ProductSearchAudio(Product product);
+
 
     List<Response_Product> listResponse_Products(List<Product> products);
 

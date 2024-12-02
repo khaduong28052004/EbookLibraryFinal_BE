@@ -26,10 +26,18 @@ public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
 	@Query("SELECT COALESCE(AVG(e.star),0) FROM Evalue e WHERE e.product.account.id = :accountId")
 	Double calculateAverageStarByAccountId(@Param("accountId") Integer accountId);
 
+	@Query("SELECT COALESCE(AVG(e.star),0) FROM Evalue e WHERE e.product.id = :productId and e.createAt BETWEEN :dateStart AND :dateEnd")
+	Double calculateAverageStarByProduct(@Param("productId") Integer productId, @Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd);
+
 	@Query("SELECT COALESCE(AVG(e.star),0) FROM Evalue e WHERE e.product.id = :productId")
 	Double calculateAverageStarByProduct(@Param("productId") Integer productId);
 
 	List<Evalue> findAllByProduct(Product product);
+
+	@Query("SELECT e FROM Evalue e WHERE e.product = :product AND e.createAt BETWEEN :dateStart AND :dateEnd")
+	List<Evalue> findAllByProductAndCreateAt(@Param("product") Product product, @Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd);
 
 	Integer countByProduct(Product product);
 

@@ -75,7 +75,6 @@ public class OtpController {
                 return ResponseEntity.badRequest().body("Invalid OTP !");
             }
         } catch (Exception e) {
-            // TODO: handle exception
             System.out.println(e);
             e.printStackTrace();
             return ResponseEntity.badRequest().body("error");
@@ -142,7 +141,6 @@ public class OtpController {
             accountRepository.save(accountRe);
             return ResponseEntity.ok("Cập nhật mật khẩu thành công!");
         } catch (Exception e) {
-            // TODO: handle exception
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cập nhật mật khẩu không thành công!");
         }
 

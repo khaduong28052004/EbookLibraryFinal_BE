@@ -68,7 +68,6 @@ public class ApiHome {
 
 			flashSaleDetails = flashSaleDetailRepo.findAllByFlashSale(flashSale);
 		} catch (Exception e) {
-			// TODO: handle exception
 		}
 
 		Map<String, Object> response = serviceSellectAll.selectAll(flashSaleDetails, id_Shop, 0, size, sort);

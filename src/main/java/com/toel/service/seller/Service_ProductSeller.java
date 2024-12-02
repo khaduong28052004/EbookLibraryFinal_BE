@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.toel.dto.admin.response.Response_ProductListFlashSale;
 import com.toel.dto.seller.request.Product.Request_ProductCreate;
 import com.toel.dto.seller.request.Product.Request_ProductUpdate;
 import com.toel.dto.seller.response.Response_Product;
@@ -40,21 +41,21 @@ public class Service_ProductSeller {
         @Autowired
         CategoryRepository categoryRepository;
 
-        public PageImpl<Response_Product> getAll(
+        public PageImpl<Response_ProductListFlashSale> getAll(
                         Integer page, Integer size, boolean sortBy, String sortColum, Integer account_id,
                         String search) {
                 Pageable pageable = PageRequest.of(page, size,
                                 Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColum));
                 Page<Product> pageProduct = productRepository.findByAccountId(account_id, search, pageable);
-                List<Response_Product> list = pageProduct.hasContent()
+                List<Response_ProductListFlashSale> list = pageProduct.hasContent()
                                 ? pageProduct.stream()
-                                                .map(product -> productMapper.response_Product(product))
+                                                .map(product -> productMapper.tProductListFlashSale(product))
                                                 .collect(Collectors.toList())
                                 : new ArrayList<>();
                 return new PageImpl<>(list, pageable, pageProduct.getTotalElements());
         }
 
-        public Response_Product create(
+        public Response_ProductListFlashSale create(
                         Request_ProductCreate request_Product) throws IOException {
                 Product product = productMapper.productCreate(request_Product);
                 product.setAccount(accountRepository.findById(request_Product.getAccount())
@@ -64,17 +65,18 @@ public class Service_ProductSeller {
                                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
                                                                 "Category")));
                 product.setCreateAt(new Date());
-                return productMapper.response_Product(productRepository.saveAndFlush(product));
+                return productMapper.tProductListFlashSale(productRepository.saveAndFlush(product));
         }
 
-        public Response_Product update(
+        public Response_ProductListFlashSale update(
                         Request_ProductUpdate request_Product) throws IOException {
                 Product product = productMapper.productUpdate(request_Product);
                 product.setAccount(accountRepository.findById(request_Product.getAccount())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
                 product.setCategory(categoryRepository.findById(request_Product.getCategory())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Category")));
-                return productMapper.response_Product(productRepository.saveAndFlush(product));
+                product.setCreateAt(productRepository.findById(request_Product.getId()).get().getCreateAt());
+                return productMapper.tProductListFlashSale(productRepository.saveAndFlush(product));
         }
 
         public boolean saveImgCreate(
@@ -95,9 +97,9 @@ public class Service_ProductSeller {
                                 images);
         }
 
-        public Response_Product edit(
+        public Response_ProductListFlashSale edit(
                         Integer product_id) {
-                return productMapper.response_Product(productRepository.findById(product_id)
+                return productMapper.tProductListFlashSale(productRepository.findById(product_id)
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Product")));
         }
 

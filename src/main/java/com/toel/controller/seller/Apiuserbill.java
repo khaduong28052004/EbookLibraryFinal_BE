@@ -28,7 +28,7 @@ public class Apiuserbill {
                         return ResponseEntity.ok().body(map);
                 } catch (Exception e) {
                         map.put("quantity", service_Bill.QuantityBillStatus(idOrder, idAccount));
-                        return ResponseEntity.badRequest().body(map);// TODO: handle exception
+                        return ResponseEntity.badRequest().body(map);
                 }
         }
 
