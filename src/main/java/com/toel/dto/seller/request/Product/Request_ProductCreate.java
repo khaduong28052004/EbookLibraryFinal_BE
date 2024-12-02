@@ -15,7 +15,7 @@ public class Request_ProductCreate {
     @NotNull(message = "FIELD_REQUIRED")
     double sale;
     @NotNull(message = "FIELD_REQUIRED")
-    double weight;  
+    double weight;
     @NotBlank(message = "FIELD_REQUIRED")
     String name;
     @NotBlank(message = "FIELD_REQUIRED")

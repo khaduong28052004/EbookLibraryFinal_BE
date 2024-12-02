@@ -37,7 +37,7 @@ public class FlashSaleService {
 		}
 
 		for (FlashSaleDetail item : flashSale.getFlashSaleDetails()) {
-			if (item.getProduct() != null && item.getProduct().getId().equals(productId)) {
+			if (item.getProduct() != null && item.getProduct().getId().equals(productId) && item.getQuantity() > 0) {
 				return item;
 
 			}

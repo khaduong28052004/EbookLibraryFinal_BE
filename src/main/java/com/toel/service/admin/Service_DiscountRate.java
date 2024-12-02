@@ -25,7 +25,6 @@ import com.toel.dto.admin.response.Response_DiscountRate;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.DiscountRateMapper;
-import com.toel.model.Account;
 import com.toel.model.DiscountRate;
 import com.toel.model.Role;
 import com.toel.repository.AccountRepository;
@@ -72,6 +71,10 @@ public class Service_DiscountRate {
     public Response_DiscountRate update(Request_DiscountRateUpdate discountRateUpdate) {
         DiscountRate discountRate = discountRateRepository.findById(discountRateUpdate.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Chiết khấu"));
+        DiscountRate discountRateNow = discountRateRepository.findLatestDiscountRate().get(0);
+        if (discountRateNow.getDiscount() == discountRateUpdate.getDiscount()) {
+            throw new AppException(ErrorCode.OBJECT_ACTIVE, "Mức chiết khấu");
+        }
         return Optional.of(discountRate)
                 .map(entity -> {
                     entity.setDateStart(entity.getDateStart());
@@ -85,42 +88,40 @@ public class Service_DiscountRate {
 
     }
 
-    public Response_DiscountRate create(Request_DiscountRateCreate discountRate) {
-        return Optional.of(discountRate)
-                .map(discountRateMapper::toDiscountRateCreate)
-                .map(entity -> {
-                    entity.setAccount(accountRepository.findById(1)
-                            .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
-                                    "Account")));
-                    entity.setDateInsert(LocalDateTime.now());
-                    return entity;
-                })
-                .filter(this::check)
-                .map(discountRateRepository::saveAndFlush)
-                .map(entity -> {
-                    Role role = roleRepository.findById(3)
-                            .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Role"));
-                    // Lấy danh sách email và tạo bản đồ email -> tên
-                    Map<String, String> emailToNameMap = new HashMap<>();
-                    List<String> listmail = new ArrayList<>();
-                    accountRepository.findAllByStatusAndRole(true, role).forEach(account -> {
-                        emailToNameMap.put(account.getEmail(), account.getFullname());
-                        listmail.add(account.getEmail());
-                    });
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                    String formattedDate = entity.getDateStart().format(formatter);
-                    emailService.pushList(
-                            "TOEL - Thông Báo Cập Nhật Chiết Khấu",
-                            listmail, // Gửi email cho từng người
-                            EmailTemplateType.THEMCHIETKHAU,
-                            emailToNameMap,
-                            formattedDate,
-                            entity.getDiscount().toString() + " %");
-                    return entity;
-                })
-                .map(discountRateMapper::tochChietKhauResponse)
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Ngày áp dụng đã tồn tại"));
-
+    public Response_DiscountRate create(Request_DiscountRateCreate discountRateCreate) {
+        DiscountRate entity = discountRateMapper.toDiscountRateCreate(discountRateCreate);
+        entity.setAccount(accountRepository.findById(1)
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
+                        "Account")));
+        if (check(entity)) {
+            DiscountRate discountRateNow = discountRateRepository.findLatestDiscountRate().get(0);
+            if (discountRateNow.getDiscount() == discountRateCreate.getDiscount()) {
+                throw new AppException(ErrorCode.OBJECT_ACTIVE, "Mức chiết khấu");
+            }
+            entity.setDateInsert(LocalDateTime.now());
+            DiscountRate discountRate = discountRateRepository.save(entity);
+            Role role = roleRepository.findById(3)
+                    .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Role"));
+            // Lấy danh sách email và tạo bản đồ email -> tên
+            Map<String, String> emailToNameMap = new HashMap<>();
+            List<String> listmail = new ArrayList<>();
+            accountRepository.findAllByStatusAndRole(true, role).forEach(account -> {
+                emailToNameMap.put(account.getEmail(), account.getFullname());
+                listmail.add(account.getEmail());
+            });
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String formattedDate = entity.getDateStart().format(formatter);
+            emailService.pushList(
+                    "TOEL - Thông Báo Cập Nhật Chiết Khấu",
+                    listmail, // Gửi email cho từng người
+                    EmailTemplateType.THEMCHIETKHAU,
+                    emailToNameMap,
+                    formattedDate,
+                    entity.getDiscount().toString() + " %");
+            return discountRateMapper.tochChietKhauResponse(discountRate);
+        } else {
+            throw new AppException(ErrorCode.OBJECT_SETUP, "Ngày áp dụng đã tồn tại");
+        }
     }
 
     public void delete(Integer id) {

@@ -19,7 +19,7 @@ public interface FlashSaleRepository extends JpaRepository<FlashSale, Integer> {
 
 	Page<FlashSale> findAllByIsDelete(boolean delete, Pageable pageable);
 
-	@Query("SELECT f FROM FlashSale f WHERE f.dateStart <= :date AND :date <= f.dateEnd")
+	@Query("SELECT f FROM FlashSale f WHERE f.dateStart <= :date AND :date <= f.dateEnd AND f.isDelete = false")
 	FlashSale findFlashSaleNow(@Param("date") LocalDateTime date);
 
 	List<FlashSale> findByIsDelete(boolean delete);

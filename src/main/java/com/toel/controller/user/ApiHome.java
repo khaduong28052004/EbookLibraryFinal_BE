@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -70,7 +68,6 @@ public class ApiHome {
 
 			flashSaleDetails = flashSaleDetailRepo.findAllByFlashSale(flashSale);
 		} catch (Exception e) {
-			// TODO: handle exception
 		}
 
 		Map<String, Object> response = serviceSellectAll.selectAll(flashSaleDetails, id_Shop, 0, size, sort);

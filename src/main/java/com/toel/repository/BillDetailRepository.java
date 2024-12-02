@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.toel.model.BillDetail;
 import com.toel.model.Product;
+import com.toel.model.Bill;
 
 public interface BillDetailRepository extends JpaRepository<BillDetail, Integer> {
 	@Query("SELECT COALESCE(SUM( (bd.price * bd.quantity) * (1 - (bd.bill.discountRate.discount / 100.0)) - (bd.price * bd.quantity * "
@@ -105,4 +106,23 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 	Integer findBillDetailByProductIdAndAccountId(@Param("accountId") Integer accountId,
 			@Param("productId") Integer productId,
 			@Param("billId") Integer billId);
+
+	List<BillDetail> findByProduct(Product product);
+
+	List<BillDetail> findByProductIn(List<Product> product);
+
+	List<BillDetail> findAllByBill(Bill bill);
+
+	// findAllByBillIn
+
+	List<BillDetail> findAllByBillIn(List<Bill> bill);
+	// ByBillIn
+
+	BillDetail findByBill(Bill bill);
+
+	// @Override
+	// default List<BillDetail> findAllById(Iterable<Integer> ids) {
+	// throw new UnsupportedOperationException("Unimplemented method
+	// 'findAllById'");
+	// }
 }

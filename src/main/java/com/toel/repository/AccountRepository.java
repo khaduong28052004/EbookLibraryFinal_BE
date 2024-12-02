@@ -115,4 +115,27 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
         List<Account> listAccountBeforeSevenDays();
 
         List<Account> findAllByStatusAndRole(boolean status, Role role);
+
+        @Query("SELECT a FROM Account a WHERE a.role IN :roles")
+Page<Account> findAllByRolesIn(@Param("roles") List<Role> roles, Pageable pageable);
+
+@Query("SELECT a FROM Account a WHERE a.role IN :roles AND a.gender = :gender")
+Page<Account> findAllByRolesInAndGender(
+        @Param("roles") List<Role> roles, @Param("gender") Boolean gender, Pageable pageable);
+
+@Query("""
+        SELECT a FROM Account a 
+        WHERE a.role IN :roles 
+        AND (a.gender = :gender OR :gender IS NULL) 
+        AND (a.username LIKE %:search% 
+            OR a.fullname LIKE %:search% 
+            OR a.email LIKE %:search% 
+            OR a.phone LIKE %:search%)
+        """)
+Page<Account> findAllByRolesInAndSearch(
+        @Param("roles") List<Role> roles,
+        @Param("gender") Boolean gender,
+        @Param("search") String search,
+        Pageable pageable);
+
 }

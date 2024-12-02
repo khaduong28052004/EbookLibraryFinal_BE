@@ -91,7 +91,6 @@ public class Service_Pay {
 					voucherSeller = voucherDetailRepository.save(voucherSeller);
 				}
 			} catch (Exception e) {
-				// TODO: handle exception
 			}
 			try {
 				if (sellerItem.getVoucherAdmin() != null) {
@@ -103,7 +102,6 @@ public class Service_Pay {
 					voucherAdmin = voucherDetailRepository.save(voucherAdmin);
 				}
 			} catch (Exception e) {
-				// TODO: handle exception
 			}
 			for (Request_Cart cartItem : sellerItem.getCart()) {
 				Product product = productRepository.findById(cartItem.getProduct().getId()).get();
@@ -120,7 +118,6 @@ public class Service_Pay {
 						billDetail.setFlashSaleDetail(cartItem.getProduct().getFlashSaleDetail());
 					}
 				} catch (Exception e) {
-					// TODO: handle exception
 				}
 				cartRepository.deleteById(cartItem.getId());
 				bil.setTotalQuantity(bil.getTotalQuantity() + cartItem.getQuantity());

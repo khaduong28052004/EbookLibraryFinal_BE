@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,9 +55,16 @@ public class Service_Account {
         AccountReportRepository accountReportRepository;
         // @Autowired
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+        public Optional<Account> getAccountById(int id) {
+                return accountRepository.findById(id);
+        }
+
         @Autowired
         EmailService emailService;
 
+
+        
         public PageImpl<Response_Account> getAll(String rolename,
                         String search, Boolean gender, Integer page, Integer size, Boolean sortBy, String sortColumn) {
                 Pageable pageable = PageRequest.of(page, size,
@@ -82,6 +90,30 @@ public class Service_Account {
                 List<Response_Account> list = pageAccount.stream()
                                 .map(account -> accountMapper.toAccount(account))
                                 .collect(Collectors.toList());
+                return new PageImpl<>(list, pageable, pageAccount.getTotalElements());
+        }
+
+        public PageImpl<Response_Account> getAllNhanVien(
+                        String search, Boolean gender, Integer page, Integer size,
+                        Boolean sortBy, String sortColumn) {
+
+                Pageable pageable = PageRequest.of(page, size,
+                                Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
+
+                List<Role> listRole = roleRepository.selectRoleNhanVien();
+                Page<Account> pageAccount;
+                if (search == null || search.isBlank()) {
+                        pageAccount = (gender == null)
+                                        ? accountRepository.findAllByRolesIn(listRole, pageable)
+                                        : accountRepository.findAllByRolesInAndGender(listRole, gender, pageable);
+                } else {
+                        pageAccount = accountRepository.findAllByRolesInAndSearch(
+                                        listRole, gender, search, pageable);
+                }
+                List<Response_Account> list = pageAccount.stream()
+                                .map(accountMapper::toAccount)
+                                .collect(Collectors.toList());
+
                 return new PageImpl<>(list, pageable, pageAccount.getTotalElements());
         }
 
@@ -245,9 +277,15 @@ public class Service_Account {
                 return accountMapper.toAccount(accountRepository.saveAndFlush(entity));
         }
 
-        public Response_Account create(String rolename, Request_AccountCreate entity) {
+        public Response_Account create(Request_AccountCreate entity) {
                 Account account = accountMapper.toAccountCreate(entity);
-                account.setRole(roleRepository.findByNameIgnoreCase(rolename));
+                if (!isValidPhoneNumber(entity.getPhone())) {
+                        throw new AppException(ErrorCode.OBJECT_SETUP, "Số điện thoại không hợp lệ");
+                }
+                account.setRole(roleRepository.findById(entity.getRole())
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Quyền")));
+                account.setAvatar(
+                                "https://firebasestorage.googleapis.com/v0/b/ebookstore-4fbb3.appspot.com/o/1_W35QUSvGpcLuxPo3SRTH4w.png?alt=media");
                 account.setStatus(true);
                 account.setCreateAt(new Date());
                 // Mã hóa mật khẩu mới
@@ -256,4 +294,7 @@ public class Service_Account {
                 return accountMapper.toAccount(accountRepository.saveAndFlush(account));
         }
 
+        private boolean isValidPhoneNumber(String phoneNumber) {
+                return phoneNumber != null && phoneNumber.matches("^\\d{10,11}$");
+        }
 }

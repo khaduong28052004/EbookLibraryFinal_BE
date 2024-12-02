@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 
 import com.toel.model.Account;
 import com.toel.model.Follower;
-import com.toel.repository.AccountReportRepository;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.FollowerRepository;
 

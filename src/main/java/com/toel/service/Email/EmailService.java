@@ -71,6 +71,18 @@ public class EmailService {
     }
 
     public void push(MailSenderDTO mail) {
+        // JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        // mailSender.setHost("smtp.gmail.com");
+        // mailSender.setPort(587);
+        // mailSender.setUsername(email);
+        // mailSender.setPassword(password);
+
+        // Properties props = mailSender.getJavaMailProperties();
+        // props.put("mail.transport.protocol", "smtp");
+        // props.put("mail.smtp.auth", "true");
+        // props.put("mail.smtp.starttls.enable", "true");
+        // props.put("mail.debug", "true");
+
         MimeMessage mime = sender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mime, true, "utf-8");
@@ -89,7 +101,6 @@ public class EmailService {
                     helper.addAttachment(file.getName(), file);
                 }
             } catch (Exception e) {
-                // TODO: handle exception
             }
         } catch (MessagingException e) {
             e.printStackTrace();

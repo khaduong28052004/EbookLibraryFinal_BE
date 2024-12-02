@@ -21,4 +21,5 @@ public interface RolePermissionRepository extends JpaRepository<RolePermission, 
     @Query(value = "SELECT v FROM RolePermission v WHERE v.role = ?1 AND (v.permission.cotSlug LIKE %?2% OR v.permission.description LIKE %?2%)")
     Page<RolePermission> findAllKeyAndByRole(Role role, String key, Pageable pageable);
 
+    List<RolePermission> findAllByRole(Role role);
 }
