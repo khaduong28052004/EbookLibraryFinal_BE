@@ -1,6 +1,11 @@
 package com.toel.service.seller;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,22 +61,86 @@ public class Service_ShopSeller {
     }
 
 
-    
+// public boolean saveImage(Integer account_id, MultipartFile avatar, MultipartFile background) {
+//     try {
+//         // Tìm tài khoản theo ID
+//         Account account = accountRepository.findById(account_id)
+//                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Tài khoản không tồn tại"));
 
+//         boolean isUpdated = false;
 
-    public boolean saveImage(Integer account_id, MultipartFile avatar, MultipartFile backgroud) {
-        try {
-            Account account = accountRepository.findById(account_id)
-                    .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
-            deleteImage.deleteFileByUrl(account.getAvatar());
-            deleteImage.deleteFileByUrl(account.getBackground());
-            account.setAvatar(uploadImage.uploadFile("avatar", avatar));
-            account.setBackground(uploadImage.uploadFile("background", backgroud));
-            accountRepository.saveAndFlush(account);
-            return true;
-        } catch (IOException e) {
-            return false;
+//         // Xử lý avatar
+//         if (avatar != null && !avatar.isEmpty()) {
+//             if (account.getAvatar() != null) {
+//                 deleteImage.deleteFileByUrl(account.getAvatar()); // Xoá ảnh cũ
+//             }
+//             account.setAvatar(uploadImage.uploadFile("avatars/", avatar)); // Lưu ảnh mới
+//             isUpdated = true;
+//         }
+
+//         // Xử lý background
+//         if (background != null && !background.isEmpty()) {
+//             if (account.getBackground() != null) {
+//                 deleteImage.deleteFileByUrl(account.getBackground()); // Xoá ảnh cũ
+//             }
+//             account.setBackground(uploadImage.uploadFile("backgrounds/", background)); // Lưu ảnh mới
+//             isUpdated = true;
+//         }
+
+//         // Nếu ít nhất một ảnh được cập nhật, lưu thay đổi
+//         if (isUpdated) {
+//             // Lưu cập nhật vào database
+//             accountRepository.saveAndFlush(account);
+//             return true;
+//         }
+
+//         // Nếu không có ảnh nào được gửi lên
+//         throw new AppException(ErrorCode.INVALID_REQUEST, "Không có ảnh nào được gửi lên để cập nhật");
+
+//     } catch (IOException e) {
+//         e.printStackTrace();
+//         return false; // Xử lý lỗi trong trường hợp gặp vấn đề
+//     }
+// }
+
+public boolean saveImage(Integer account_id, MultipartFile avatar, MultipartFile background) {
+    try {
+        // Tìm tài khoản theo ID
+        Account account = accountRepository.findById(account_id)
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Tài khoản không tồn tại"));
+
+        boolean isUpdated = false;
+
+        // Xử lý avatar
+        if (avatar != null && !avatar.isEmpty()) {
+            if (account.getAvatar() != null) {
+                deleteImage.deleteFileByUrl(account.getAvatar()); // Xoá ảnh cũ
+            }
+            account.setAvatar(uploadImage.uploadFile("avatars/", avatar)); // Lưu ảnh mới
+            isUpdated = true;
         }
+
+        // Xử lý background
+        if (background != null && !background.isEmpty()) {
+            if (account.getBackground() != null) {
+                deleteImage.deleteFileByUrl(account.getBackground()); // Xoá ảnh cũ
+            }
+            account.setBackground(uploadImage.uploadFile("backgrounds/", background)); // Lưu ảnh mới
+            isUpdated = true;
+        }
+
+        // Lưu thay đổi chỉ khi có cập nhật
+        if (isUpdated) {
+            accountRepository.saveAndFlush(account);
+        }
+
+        return isUpdated;
+
+    } catch (IOException e) {
+        e.printStackTrace();
+        throw new AppException(ErrorCode.OBJECT_SETUP, "Có lỗi xảy ra trong quá trình xử lý ảnh");
     }
+}
+
 }
 

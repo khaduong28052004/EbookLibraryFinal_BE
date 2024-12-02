@@ -258,7 +258,7 @@ public class ApiShowInformationSeller {
                     .limit(10)
                     .collect(Collectors.toList());
             List<ImageProduct> imageProducts = new ArrayList<>();
-            imageProducts = imageProductRepository.findByProductIn(listProductO);
+            // imageProducts = imageProductRepository.findByProductIn(listProductO);
             List<Response_Product> listResponse_Products = productMapper.listResponse_Products(listProductO);
 
             hash.put("listProduct", listResponse_Products);

@@ -12,6 +12,7 @@ public class Response_Address {
     boolean status;
     String phone;
     String fullNameAddress;
+    String street;
     Integer province;
     Integer district;
     String wardCode;
