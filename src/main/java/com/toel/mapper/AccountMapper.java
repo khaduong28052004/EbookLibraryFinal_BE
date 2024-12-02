@@ -2,7 +2,6 @@ package com.toel.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 
 import com.toel.dto.admin.request.Account.Request_AccountCreate;
 import com.toel.dto.admin.request.Account.Request_AccountUpdate;

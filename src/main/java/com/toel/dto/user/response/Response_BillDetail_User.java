@@ -1,10 +1,5 @@
 package com.toel.dto.user.response;
 
-import java.sql.Date;
-import java.util.List;
-
-import com.toel.model.Product;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

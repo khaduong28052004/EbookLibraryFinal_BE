@@ -233,7 +233,7 @@ public class Service_Search {
 			}
 
 			// Xử lý điều kiện sắp xếp
-			if (normalizedSearch.contains("moi")) {
+			if (normalizedSearch.contains("moi nhat")) {
 				option = "moi nhat";
 				sortKey = "createat";
 			} else if (normalizedSearch.contains("luot ban") || normalizedSearch.contains("hoa don") ||
