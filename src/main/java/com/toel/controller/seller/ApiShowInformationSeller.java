@@ -45,6 +45,7 @@ import lombok.Data;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @CrossOrigin("*")
@@ -85,23 +86,36 @@ public class ApiShowInformationSeller {
      * @param idSeller
      * @return
      */
-    @GetMapping("/api/v1/user/informationSeller/{idSeller}")
-    public ApiResponse<?> informationSellerPublic(@PathVariable Integer idSeller) {
+    @GetMapping("/api/v1/user/informationSeller")
+    public ApiResponse<?> informationSellerPublic(@RequestBody Map<String, String> body) {
+        String sellerID = body.get("sellerID");
+        String userID = body.get("userID");
+
+        Integer lo = 1;
         try {
-            Account account = accountRepository.findById(idSeller)
+            Account account = accountRepository.findById(Integer.parseInt(sellerID))
                     .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
-                            "ID:[" + idSeller + "] không tìm thấy người bán"));
+                            "ID:[" + sellerID + "] không tìm thấy người bán"));
             Response_InforSeller inforSeller = new Response_InforSeller();
             inforSeller.setIdSeller(account.getId());
             inforSeller.setNumberOfProducts(account.getProducts().size());
             inforSeller.setNumberOfFollowers(account.getFollowers().size());
-            inforSeller.setTrackingNumber(idSeller);
+            inforSeller.setTrackingNumber(lo);
             // inforSeller.setAverageStarRating(averageStars(account));
             // inforSeller.setAverageStarRating();
-            inforSeller.setShopCancellationRate(idSeller);
+            inforSeller.setShopCancellationRate(lo);
             inforSeller.setAvatar(account.getAvatar());
             inforSeller.setBackground(account.getBackground());
-            inforSeller.setIsFollowed(false);
+            if (isNumeric(userID)) {
+                inforSeller
+                        .setIsFollowed(
+                                followerService.checkFollower(Integer.parseInt(userID), Integer.parseInt(sellerID)));
+                // So sánh giá trị sellerID với một điều kiện
+            } else {
+                System.out.println("Invalid Seller ID: Not a number.");
+            }
+            inforSeller
+                    .setIsFollowed(followerService.checkFollower(Integer.parseInt(userID), Integer.parseInt(sellerID)));
             // Kiểm tra địa chỉ có `status` là true
             Optional<Address> defaultAddress = account.getAddresses().stream()
                     .filter(Address::isStatus) // Kiểm tra địa chỉ có `status` là true
@@ -126,6 +140,18 @@ public class ApiShowInformationSeller {
             return ApiResponse.<Response_InforSeller>build().code(100).message(e.getMessage()).result(null);
         }
 
+    }
+
+    public static boolean isNumeric(String str) {
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+        try {
+            Integer.parseInt(str); // Thử chuyển đổi thành số
+            return true;
+        } catch (NumberFormatException e) {
+            return false; // Bắt lỗi nếu không phải số
+        }
     }
 
     // @GetMapping("/api/user/voucherall/{idSeller}")
@@ -198,7 +224,7 @@ public class ApiShowInformationSeller {
     }
 
     @Autowired
-    ProductMapper productMapper;    
+    ProductMapper productMapper;
 
     @GetMapping("/api/v1/user/topProducts")
     public ApiResponse<?> topProducts() {
