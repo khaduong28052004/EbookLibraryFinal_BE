@@ -89,7 +89,7 @@ public class ApiShowInformationSeller {
      * @param body Dữ liệu chứa sellerID và userID
      * @return Thông tin người bán
      */
-    @GetMapping("/api/v1/user/informationSeller")
+    @PostMapping("/api/v1/user/informationSeller")
     public ApiResponse<?> informationSellerPublic(@RequestBody Map<String, String> body) {
         String sellerID = body.get("sellerID");
         String userID = body.get("userID");
