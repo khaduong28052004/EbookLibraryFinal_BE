@@ -9,6 +9,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.toel.dto.ChangePassOtp;
+import com.toel.exception.AppException;
+import com.toel.exception.ErrorCode;
 import com.toel.model.Account;
 import com.toel.repository.AccountRepository;
 import com.toel.service.ServiceToel;
@@ -33,14 +35,18 @@ public class OtpController {
     public ResponseEntity<String> generateOtp(@RequestBody Account entity) {
         System.out.println("email" + entity.getEmail());
         boolean isvalid = accountRepository.existsByEmail(entity.getEmail());
+
         // boolean isvalid = true;
         if (isvalid) {
+            Account account = accountRepository.findByEmail(entity.getEmail());
+          
+           
             String otp = otpService.generateOtp(entity.getEmail());
             String hashOTP = serviceToel.hashPassword(otp);
             System.out.println("otp nè: " + otp + " hashOTP " + hashOTP + " , mail " + entity.getEmail() + isvalid);
 
             emailService.push(entity.getEmail(), "Quên mật khẩu ", EmailTemplateType.OTP, otp,
-                    "http://localhost:5173/change-password?otp=" + otp,entity.getFullname());
+                    "http://localhost:5173/change-password?otp=" + otp,account.getFullname());
             return ResponseEntity.ok("OTP generated: " + otp);
 
         } else {
