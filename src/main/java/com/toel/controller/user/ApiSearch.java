@@ -46,9 +46,26 @@ public class ApiSearch {
 	public ApiResponse<PageImpl<Response_Product>> searchImage(
 			@RequestParam(value = "idProducts") List<Integer> idProducts,
 			@RequestParam(value = "page", defaultValue = "0") Integer page,
-			@RequestParam(value = "size", defaultValue = "10") Integer size) {
+			@RequestParam(value = "size", defaultValue = "9") Integer size) {
 		return ApiResponse.<PageImpl<Response_Product>>build()
 				.result(service_Search.searchImage(idProducts, page, size));
+	}
+
+	@GetMapping("search/audio")
+	public ApiResponse<PageImpl<?>> searchText(
+			@RequestParam("text") String text,
+			@RequestParam(value = "page", defaultValue = "0") Integer page,
+			@RequestParam(value = "size", defaultValue = "9") Integer size) {
+		try {
+			PageImpl<?> pageSearch = service_Search.searchAudio(text, page, size);
+			return ApiResponse.<PageImpl<?>>build()
+					.message("Tìm thành công")
+					.result(pageSearch);
+		} catch (Exception e) {
+			return ApiResponse.<PageImpl<?>>build()
+					.message(e.getMessage());
+		}
+
 	}
 
 }

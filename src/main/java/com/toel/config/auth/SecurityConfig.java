@@ -104,7 +104,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/v1/seller/thongKe/**").hasRole("SELLER")
                         .requestMatchers("/api/v1/admin/orderstatistacal/**").hasAnyRole("ADMIN")
-
+                         // admin lơns nhat mơi voi được vì vậy có 
                         // Cart and other endpoints for both admin and user roles
                         .requestMatchers("/api/v1/cart/**").hasAnyRole("ADMIN", "USER"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

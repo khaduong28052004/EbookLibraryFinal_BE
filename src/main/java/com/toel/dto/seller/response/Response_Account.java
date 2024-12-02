@@ -14,10 +14,7 @@ public class Response_Account {
     String phone;
     String background;
     String shopName;
-
     String email;
-
-
     Response_Address address;
 
 }
