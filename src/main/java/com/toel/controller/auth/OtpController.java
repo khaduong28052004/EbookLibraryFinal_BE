@@ -100,7 +100,7 @@ public class OtpController {
                 return ResponseEntity.ok("OTP generated: " + otp);
 
             } else {
-                return ResponseEntity.ok("Email đã tồn tại ! ");    
+                return ResponseEntity.badRequest().body("Email đã tồn tại ! ");    
 
             }
         } else {
