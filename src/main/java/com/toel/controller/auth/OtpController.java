@@ -124,7 +124,8 @@ public class OtpController {
 
             }
         } else {
-            return ResponseEntity.ok("Số điện thoại không tồn tại ! ");
+            // return ResponseEntity.ok("Số điện thoại không tồn tại ! ");
+            return ResponseEntity.badRequest().body("Đang cập nhật chức năng! ");
         }
 
         // String otp = otpService.generateOtp(email);

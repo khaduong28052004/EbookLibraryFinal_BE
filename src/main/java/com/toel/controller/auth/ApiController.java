@@ -93,59 +93,59 @@ public class ApiController {
 
     public static Map<String, String> map = new HashMap<>();
 
+    /**
+     * @param authRequestDTO
+     * code 1000: đăng nhập thành công!
+     * code 1001: tài khoản không tồn tại!
+     * code 1002: tài khoản không tồn tại!
+     * code 1003:1004 lỗi đăng ký:
+     * @return
+     */
     @PostMapping("/api/v1/login")
-    public ResponseEntity<?> AuthenticateAndGetToken(@RequestBody AuthRequestDTO authRequestDTO) {
+    public ApiResponse<?> AuthenticateAndGetToken(@RequestBody AuthRequestDTO authRequestDTO) {
         try {
             Account ACCOUNTIgnoreCase = accountRepository.findByUsername(authRequestDTO.getUsername());
-            if (!ACCOUNTIgnoreCase.getUsername().equals(authRequestDTO.getUsername())) {
-                map.put("error", "Incorrect username!");
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
+            if (ACCOUNTIgnoreCase == null) {
+                return ApiResponse.<String>build().code(1001).message("Tài khoản không tồn tại!").result(null);
             }
-            // Authenticate the user using their username and password
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(),
                             authRequestDTO.getPassword()));
             if (authentication.isAuthenticated()) {
                 Account account = accountRepository.findByUsername(authRequestDTO.getUsername());
-
                 Role role = account.getRole();
                 List<RolePermission> permissions = rolesPermissionRepository.findByRole(role); // Ensure this retrieves
-
                 List<PermissionDTO> dtos = permissions.stream()
                         .map(pr -> new PermissionDTO(
                                 pr.getId(),
                                 pr.getPermission().getDescription(),
                                 pr.getPermission().getCotSlug()))
                         .collect(Collectors.toList());
-
                 Map<String, Object> map = new HashMap<>(); // Infor mation to include in the JWT
                 String token = jwtService.GenerateToken(authRequestDTO.getUsername(), map);
                 System.out.println("Generated Token: " + token); // Debugging log
 
                 // Return the JWT response
-                return ResponseEntity.ok(JwtResponseDTO.builder()
-                        .accessToken(token)
-                        .username(account.getUsername())
-                        .id_account(account.getId())
-                        .avatar(null)
-                        .roles(role.getName())
-                        .Permission(dtos)
-                        .fullname(account.getFullname())
-                        .avatar(account.getAvatar())
-                        .build());
+                return ApiResponse.<JwtResponseDTO>build().code(1000).message("Đăng nhập thành công!")
+                        .result(JwtResponseDTO.builder()
+                                .accessToken(token)
+                                .username(account.getUsername())
+                                .id_account(account.getId())
+                                .avatar(null)
+                                .roles(role.getName())
+                                .Permission(dtos)
+                                .fullname(account.getFullname())
+                                .avatar(account.getAvatar())
+                                .build());
             } else {
                 throw new UsernameNotFoundException("Invalid user request..!!");
             }
         } catch (BadCredentialsException e) {
-            // Return error message for wrong username or password
-            map.put("error", "Incorrect password or username 1");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(map);
+            return ApiResponse.<String>build().code(1002).message("Sai mật khẩu!").result(e.getMessage());
         } catch (UsernameNotFoundException e) {
-            map.put("error", "User not found.");// error mk end un
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
+            return ApiResponse.<String>build().code(1003).message("Lỗi đăng nhập!").result(e.getMessage());
         } catch (AuthenticationException e) {
-            map.put("error", "Incorrect password or username 2");// error mk end un
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(map);
+            return ApiResponse.<String>build().code(1004).message("Lỗi đăng nhập!").result(e.getMessage());
         }
     }
 
