@@ -107,7 +107,7 @@ public class ApiAccountAdmin {
             @RequestParam(value = "contents", required = false) String contents) {
         Response_Account entity = service_Account.updateActive(id, status, contents);
         return ApiResponse.<Response_Account>build()
-                .message(entity.isStatus() ? "Duyệt thành công" : "Hủy thành công")
+                .message(status ? "Duyệt thành công" : "Hủy thành công")
                 .result(entity);
     }
 
