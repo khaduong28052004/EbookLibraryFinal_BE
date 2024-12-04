@@ -1,7 +1,5 @@
 package com.toel.service.admin.Thongke;
 
-import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Service;
 import com.toel.dto.admin.response.Response_SearchAudio;
 import com.toel.dto.admin.response.ThongKe.Page_TK_Product;
 import com.toel.dto.admin.response.ThongKe.Response_TK_Product;
-import com.toel.dto.user.response.Response_Product;
 import com.toel.mapper.ProductMapper;
 import com.toel.model.Product;
 import com.toel.repository.BillDetailRepository;

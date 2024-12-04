@@ -1,7 +1,6 @@
 package com.toel.controller.user;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.toel.dto.user.response.Response_BillDetail_User;
 import com.toel.service.user.Service_BillDetail_User;
 
 @CrossOrigin("*")
@@ -31,8 +29,7 @@ public class ApiBillDetailUser {
 	public ResponseEntity<Map<String, Object>> getAllOrdersByOrderStatus(@RequestParam("billId") Integer billId) {
 		Map<String, Object> response = new HashMap<String, Object>();
 		try {
-			List<Response_BillDetail_User> shopListInBill = service_BillDetail_User
-					.createBillsWithProductsInBillDetail(billId);
+			Map<String, Object> shopListInBill = service_BillDetail_User.getBillDetail(billId);
 			response.put("data", shopListInBill);
 			response.put("status", "success");
 			response.put("message", "Retrieve data successfully");
@@ -94,6 +91,5 @@ public class ApiBillDetailUser {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
-	
 
 }

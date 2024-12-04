@@ -119,7 +119,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			"GROUP BY p.id " +
 			"ORDER BY COALESCE(SUM(bd.quantity), 0) DESC")
 	Page<Product> findProductsByIdsSortedByTotalSales(@Param("ids") List<Integer> ids, Pageable pageable);
-	
+
 	List<Product> findByBillDetails(List<BillDetail> billDetails);
+
+	
 
 }

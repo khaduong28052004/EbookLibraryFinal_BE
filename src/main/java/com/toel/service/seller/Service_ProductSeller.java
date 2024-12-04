@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.toel.dto.admin.response.Response_ProductListFlashSale;
 import com.toel.dto.seller.request.Product.Request_ProductCreate;
 import com.toel.dto.seller.request.Product.Request_ProductUpdate;
-import com.toel.dto.seller.response.Response_Product;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.ProductMapper;

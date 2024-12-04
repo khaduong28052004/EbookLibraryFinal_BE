@@ -113,11 +113,12 @@ public class SecurityConfig {
                 .formLogin(form -> form.loginPage("http://localhost:3000/login").permitAll())
                 .logout(logout -> logout.logoutSuccessUrl("http://localhost:3000").deleteCookies("JSESSIONID")
                         .permitAll())
-                .exceptionHandling(exceptions -> exceptions
-                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                        .accessDeniedHandler(new CustomAccessDeniedHandler()))
+                // .exceptionHandling(exceptions -> exceptions
+                //         .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                //         .accessDeniedHandler(new CustomAccessDeniedHandler())
+                //         )
                 .httpBasic(Customizer.withDefaults())
-                .build();
+                .build();       
     }
 
     @Bean

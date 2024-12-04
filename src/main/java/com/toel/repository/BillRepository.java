@@ -2,6 +2,8 @@ package com.toel.repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,63 +18,43 @@ import com.toel.model.OrderStatus;
 
 @Repository
 public interface BillRepository extends JpaRepository<Bill, Integer> {
-	@Query(value = "SELECT user.id as userID, bills.id as billID, "
-			+ "bills.totalPrice as billTotalPrice,COALESCE(bills.discountPrice, 0), bills.priceShipping as billTotalShippingPrice, bills.totalQuantity as billTotalQuantity, "
-			+ "bills.address_id as billAddressId, bills.orderstatus_id as billOrderStatusId, bills.createAt as createdDatetime, bills.updateAt as updatedDatetime, "
-			+ "COALESCE(bills.discountrate_id, 0) as billDiscountRate, "
-			+ "products.id as productId, products.name as productName, products.introduce as productIntroduce, "
-			+ "billdetails.quantity as productQuantity, billdetails.price as productPrice, billdetails.discountPrice as productDiscountPrice, imageproducts.name as productImageURL, "
-			+ "shop.id as shopId, shop.shopName, shop.avatar as shopAvatar, bills.paymentmethod_id\r\n "
-			+ "FROM bills "
-			+ "JOIN accounts user ON bills.account_id = user.id "
-			+ "JOIN billdetails ON billdetails.bill_id = bills.id "
-			+ "JOIN products ON billdetails.product_id = products.id "
-			+ "JOIN accounts shop ON shop.id = products.account_id "
-			+ "LEFT JOIN imageproducts ON imageproducts.product_id = products.id "
-			+ "LEFT JOIN discountrates ON discountrates.id = bills.discountrate_id "
-			+ "WHERE user.id = :userId AND bills.orderstatus_id= :idOrderStatus "
-			+ "ORDER BY bills.createAt DESC", nativeQuery = true)
-	List<Object[]> getBillsByUserIdNOrderStatusOrderByCreateAt(@Param("userId") Integer userId,
-			@Param("idOrderStatus") Integer idOrderStatus);
 
-	@Query(value = "SELECT user.id as userID, bills.id as billID, "
-			+ "bills.totalPrice as billTotalPrice, COALESCE(bills.discountPrice, 0), bills.priceShipping as billTotalShippingPrice, bills.totalQuantity as billTotalQuantity, "
-			+ "bills.address_id as billAddressId, bills.orderstatus_id as billOrderStatusId, bills.createAt as createdDatetime, bills.updateAt as updatedDatetime, "
-			+ "COALESCE(bills.discountrate_id, 0) as billDiscountRate, "
-			+ "products.id as productId, products.name as productName, products.introduce as productIntroduce, "
-			+ "billdetails.quantity as productQuantity, billdetails.price as productPrice, billdetails.discountPrice as productDiscountPrice, imageproducts.name as productImageURL, "
-			+ "shop.id as shopId, shop.shopName, shop.avatar as shopAvatar,  bills.paymentmethod_id \r\n "
-			+ "FROM bills "
-			+ "JOIN accounts user ON bills.account_id = user.id "
-			+ "JOIN billdetails ON billdetails.bill_id = bills.id "
-			+ "JOIN products ON billdetails.product_id = products.id "
-			+ "JOIN accounts shop ON shop.id = products.account_id "
-			+ "LEFT JOIN imageproducts ON imageproducts.product_id = products.id "
-			+ "LEFT JOIN discountrates ON discountrates.id = bills.discountrate_id "
-			+ "WHERE user.id = :userId AND bills.orderstatus_id= :idOrderStatus "
-			+ "ORDER BY bills.updateAt DESC", nativeQuery = true)
-	List<Object[]> getBillsByUserIdNOrderStatusOrderByUpdateAt(@Param("userId") Integer userId,
-			@Param("idOrderStatus") Integer idOrderStatus);
+	@Query("SELECT b.id AS billId, \r\n" +
+			"    a.id AS userId, \r\n" +
+			"    b.totalPrice AS totalBillPrice, \r\n" +
+			"    b.priceShipping AS priceShippingBill, \r\n" +
+			"    b.totalQuantity AS totalBillQuantity, \r\n" +
+			"    os.name AS orderStatus, \r\n" +
+			"    b.createAt AS createdDatetime, \r\n" +
+			"    b.updateAt AS updatedDatetime, \r\n" +
+			"    b.paymentMethod.name AS paymentMethod \r\n" +
+			"	 FROM Bill b JOIN \r\n" +
+			"    b.account a \r\n" +
+			"	 JOIN \r\n" +
+			"    b.orderStatus os  WHERE a.id = :userId  AND os.id = :orderStatus "
+			+ "	 ORDER BY CASE WHEN :orderBy = 'create' THEN b.createAt "
+			+ "              WHEN :orderBy = 'update' THEN b.updateAt "
+			+ "              ELSE b.createAt END DESC")
+	List<Object[]> findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(
+			@Param("userId") Integer userId,
+			@Param("orderStatus") Integer orderStatus,
+			@Param("orderBy") String orderBy);
 
-	@Query(value = "SELECT user.id as userID, bills.id as billID,\r\n"
-			+ "bills.totalPrice as billTotalPrice,COALESCE(bills.discountPrice, 0),   bills.priceShipping as billTotalShippingPrice, bills.totalQuantity as billTotalQuantity,\r\n"
-			+ "bills.address_id as billAddressId, bills.orderstatus_id as billOrderStatusId,  bills.createAt as createdDatetime, bills.updateAt as updatedDatetime,\r\n"
-			+ "COALESCE(bills.discountrate_id, 0) as billDiscountRate,\r\n"
-			+ "products.id as productId, products.name as productName,products.introduce as productIntroduce, \r\n"
-			+ "billdetails.quantity as productQuantity , billdetails.price as productPrice, billdetails.discountPrice as productDiscountPrice, imageproducts.name as productImageURL,\r\n"
-
-			+ "shop.id as shopId,  shop.shopName, shop.avatar as  shopAvatar,  bills.paymentmethod_id\r\n"
-
-			+ "FROM\r\n"
-			+ "bills JOIN accounts user ON bills.account_id = user.id \r\n"
-			+ "JOIN billdetails ON billdetails.bill_id = bills.id\r\n"
-			+ "JOIN products ON billdetails.product_id = products.id\r\n"
-			+ "JOIN accounts shop ON shop.id = products.account_id\r\n"
-			+ "LEFT JOIN imageproducts ON imageproducts.product_id = products.id\r\n"
-			+ "LEFT JOIN discountrates ON discountrates.id =  bills.discountrate_id\r\n"
-			+ "WHERE user.id = :userId \r\n"
-			+ "ORDER BY  createdDatetime DESC ", nativeQuery = true)
-	List<Object[]> getBillsByUserIdAll(@Param("userId") Integer userId);
+	@Query("SELECT \r\n" + //
+			"    b.id AS billId, \r\n" + //
+			"    a.id AS userId, \r\n" + //
+			"    b.totalPrice AS totalBillPrice, \r\n" + //
+			"    b.priceShipping AS priceShippingBill, \r\n" + //
+			"    b.totalQuantity AS totalBillQuantity, \r\n" + //
+			"    os.name AS orderStatus, \r\n" + //
+			"    b.createAt AS createdDatetime, \r\n" + //
+			"    b.updateAt AS updatedDatetime, \r\n" +
+			"    b.paymentMethod.name AS paymentMethod \r\n" + //
+			"FROM Bill b JOIN  b.account a \r\n" + //
+			"JOIN  b.orderStatus os WHERE a.id = :userId \r\n" + //
+			"ORDER BY b.createAt DESC\r\n" + //
+			"")
+	List<Object[]> findBillsByUserId(@Param("userId") Integer userId);
 
 	// Seller (Update Shop)
 
@@ -319,4 +301,16 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			@Param("fullname") String fullname,
 			@Param("email") String email,
 			@Param("phone") String phone);
+
+	List<Bill> findBillsByAccountId(Integer userId);
+
+	@Query("SELECT b.account.id FROM Bill b WHERE b.id = ?1")
+	Optional<Integer> findUserById(Integer billId);
+
+	@Query("SELECT b.orderStatus.name  FROM Bill b JOIN  b.orderStatus os WHERE b.id = ?1")
+	String findOrderStatusByBill(Integer billId);
+
+	@Query("SELECT b.address.fullNameAddress  FROM Bill b JOIN  b.address os WHERE b.id = ?1")
+	String findAddressByBill(Integer id);
+
 }
