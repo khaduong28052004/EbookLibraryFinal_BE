@@ -3,12 +3,16 @@ package com.toel.controller.seller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.response.Response_Account;
+import com.toel.exception.AppException;
 import com.toel.service.admin.Service_Product;
 import com.toel.service.seller.Service_ShopSeller;
 
@@ -49,42 +53,4 @@ public class ApiShopSeller {
                 return ApiResponse.<Response_Account>build()
                                 .result(service_Shop.get(account_id));
         }
-
-        // @PostMapping("/saveImg")
-        // public ApiResponse<Void> saveImg(
-        //                 @RequestParam(value = "account_id", defaultValue = "0") Integer account_id,
-        //                 @RequestPart(value = "avatar", required = false) MultipartFile avatar,
-        //                 @RequestPart(value = "background", required = false) MultipartFile background) {
-
-        //         try {
-        //                 // Kiểm tra nếu không có ảnh nào được gửi lên
-        //                 if ((avatar == null || avatar.isEmpty()) && (background == null || background.isEmpty())) {
-        //                         return ApiResponse.<Void>build()
-        //                                         .message("Không có ảnh nào được gửi lên để cập nhật")
-        //                                         .code(400); // Mã lỗi 400 nếu không có ảnh
-        //                 }
-
-        //                 // Gọi service để lưu ảnh
-        //                 boolean isUpdated = service_Shop.saveImage(account_id, avatar, background);
-
-        //                 // Tạo thông báo dựa trên kết quả cập nhật
-        //                 String message = isUpdated
-        //                                 ? "Cập nhật ảnh thành công"
-        //                                 : "Không có ảnh nào được cập nhật hoặc tài khoản không tồn tại";
-
-        //                 return ApiResponse.<Void>build()
-        //                                 .message(message)
-        //                                 .code(isUpdated ? 200 : 400); // 200: Thành công, 400: Không có gì để cập nhật
-
-        //         } catch (AppException e) {
-        //                 return ApiResponse.<Void>build()
-        //                                 .message(e.getMessage())
-        //                                 .code(e.getErrorCode().getCode()); // Trả mã lỗi phù hợp với AppException
-        //         } catch (Exception e) {
-        //                 return ApiResponse.<Void>build()
-        //                                 .message("Đã xảy ra lỗi khi cập nhật ảnh")
-        //                                 .code(500); // Mã lỗi 500 (Internal Server Error)
-        //         }
-        // }
-
 }
