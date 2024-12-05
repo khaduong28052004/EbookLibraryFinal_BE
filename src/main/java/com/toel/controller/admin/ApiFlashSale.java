@@ -84,8 +84,7 @@ public class ApiFlashSale {
         List<FlashSale> list = flashSaleRepository.findByIsDelete(false);
         for (FlashSale entity : list) {
             boolean isDateInRange = dateStart.isAfter(entity.getDateStart()) && dateStart.isBefore(entity.getDateEnd());
-            boolean isIdMatching = id == null || entity.getId().equals(id);
-            if (isDateInRange && !isIdMatching) {
+            if (isDateInRange && (id == null || entity.getId().equals(id))) {
                 throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Khung thời gian");
             }
         }
