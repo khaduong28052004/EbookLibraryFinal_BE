@@ -9,6 +9,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.toel.dto.ChangePassOtp;
+import com.toel.exception.AppException;
+import com.toel.exception.ErrorCode;
 import com.toel.model.Account;
 import com.toel.repository.AccountRepository;
 import com.toel.service.ServiceToel;
@@ -33,18 +35,21 @@ public class OtpController {
     public ResponseEntity<String> generateOtp(@RequestBody Account entity) {
         System.out.println("email" + entity.getEmail());
         boolean isvalid = accountRepository.existsByEmail(entity.getEmail());
+
         // boolean isvalid = true;
         if (isvalid) {
+            Account account = accountRepository.findByEmail(entity.getEmail());
+
             String otp = otpService.generateOtp(entity.getEmail());
             String hashOTP = serviceToel.hashPassword(otp);
             System.out.println("otp nè: " + otp + " hashOTP " + hashOTP + " , mail " + entity.getEmail() + isvalid);
 
-            emailService.push(entity.getEmail(), "Mã otp của bạn", EmailTemplateType.OTP, otp,
-                    "http://localhost:5173/change-password?otp=" + otp);
+            emailService.push(entity.getEmail(), "Quên mật khẩu ", EmailTemplateType.OTP, otp,
+                    "http://localhost:5173/change-password?otp=" + otp, account.getFullname());
             return ResponseEntity.ok("OTP generated: " + otp);
 
         } else {
-            return ResponseEntity.ok("emal không tồn tại ! ");
+            return ResponseEntity.badRequest().body("emal không tồn tại ! ");
 
         }
     }
@@ -58,28 +63,43 @@ public class OtpController {
     @PostMapping("/api/v1/otp/verify")
     public ResponseEntity<String> verifyOtp(@RequestBody ChangePassOtp entity) {
         try {
-            boolean isValid = otpService.verifyOtp(entity.getEmail(), entity.getOtp());
-            boolean accountCheck = accountRepository.existsByEmail(entity.getEmail());
-            Account account = accountRepository.findByEmail(entity.getEmail());
-            String encryptedPassword = passwordEncoder.encode(entity.getNewpass());
-            if (!accountCheck) {
-                return ResponseEntity.badRequest().body("email không tồn tại!");
+            // Check if the account exists by email
+            boolean accountExists = accountRepository.existsByEmail(entity.getEmail());
+            if (!accountExists) {
+                return ResponseEntity.badRequest().body("Email không tồn tại!");
             }
-            if (isValid) {
-                account.setPassword(encryptedPassword);
-                accountRepository.save(account);
-                emailService.push(account.getEmail(), "ĐỔI MẬT KHẨU THÀNH CÔNG !", EmailTemplateType.PASSWORD_SUSSECC,
-                        account.getFullname());
-                return ResponseEntity.ok("OTP verified successfully");
-            } else {
-                return ResponseEntity.badRequest().body("Invalid OTP !");
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("error");
-        }
 
+            // Verify OTP
+            boolean isValidOtp = otpService.verifyOtp(entity.getEmail(), entity.getOtp());
+            if (!isValidOtp) {
+                return ResponseEntity.badRequest().body("OTP không hợp lệ!");
+            }
+
+            // Retrieve the account and update password
+            Account account = accountRepository.findByEmail(entity.getEmail());
+            if (account == null) {
+                return ResponseEntity.badRequest().body("Không tìm thấy tài khoản với email được cung cấp!");
+            }
+
+            // Encrypt and update the password
+            String encryptedPassword = passwordEncoder.encode(entity.getNewpass());
+            account.setPassword(encryptedPassword);
+            accountRepository.save(account);
+
+            // Send success email
+            emailService.push(
+                    account.getEmail(),
+                    "Đổi mật khẩu thành công!",
+                    EmailTemplateType.PASSWORD_SUSSECC,
+                    account.getFullname());
+
+            return ResponseEntity.ok("OTP xác thực thành công, mật khẩu đã được đổi!");
+        } catch (Exception e) {
+            // Log and return error response
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Đã xảy ra lỗi trong quá trình xác thực OTP: " + e.getMessage());
+        }
     }
 
     // register v2
@@ -95,16 +115,17 @@ public class OtpController {
                 String hashOTP = serviceToel.hashPassword(otp);
                 System.out.println("otp nè: " + otp + " hashOTP " + hashOTP + " , mail " + entity.getEmail() + isvalid);
 
-                emailService.push(entity.getEmail(), "Mã otp của bạn", EmailTemplateType.DANGKYTAIKHOAN, otp,
+                emailService.push(entity.getEmail(), "Đăng ký tài khoản", EmailTemplateType.DANGKYTAIKHOAN, otp,
                         "http://localhost:5173/singup2?otp=" + otp + "&email=" + entity.getEmail());
                 return ResponseEntity.ok("OTP generated: " + otp);
 
             } else {
-                return ResponseEntity.ok("Email đã tồn tại ! ");    
+                return ResponseEntity.badRequest().body("Email đã tồn tại ! ");
 
             }
         } else {
-            return ResponseEntity.ok("Số điện thoại không tồn tại ! ");
+            // return ResponseEntity.ok("Số điện thoại không tồn tại ! ");
+            return ResponseEntity.badRequest().body("Đang cập nhật chức năng! ");
         }
 
         // String otp = otpService.generateOtp(email);
