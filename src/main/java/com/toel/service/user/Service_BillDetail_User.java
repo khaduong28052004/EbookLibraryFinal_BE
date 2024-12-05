@@ -97,12 +97,8 @@ public class Service_BillDetail_User {
 		newBill.put("priceTemp", priceTemp);
 
 		String orderStatus = billRepository.findOrderStatusByBill(billId);
-		String address = billRepository.findAddressByBill(billId) == null ? ""
-				: billRepository.findAddressByBill(billId);
-
 		result.put("bill", newBill);
 		result.put("orderstatus", orderStatus);
-		result.put("address", address);
 
 		return result;
 
@@ -178,9 +174,9 @@ public class Service_BillDetail_User {
 		userInfo.put("userPhone", user.getPhone());
 
 		// Lấy địa chỉ từ billRepository, nếu không có trả về chuỗi rỗng
-		String address = billRepository.findAddressByBill(billId);
-		userInfo.put("userAddress", (address != null) ? address : "");
-
+		String address = addressRepository.findAddressByBill(user.getId());
+		userInfo.put("userAddress", address == null ? "" : address);
+		System.out.println("userAddress: " + address);
 		return userInfo;
 	}
 

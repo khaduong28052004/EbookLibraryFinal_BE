@@ -310,7 +310,6 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	@Query("SELECT b.orderStatus.name  FROM Bill b JOIN  b.orderStatus os WHERE b.id = ?1")
 	String findOrderStatusByBill(Integer billId);
 
-	@Query("SELECT b.address.fullNameAddress  FROM Bill b JOIN  b.address os WHERE b.id = ?1")
-	String findAddressByBill(Integer id);
+	
 
 }
