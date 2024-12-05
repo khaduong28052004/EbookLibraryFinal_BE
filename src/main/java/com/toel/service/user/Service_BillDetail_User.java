@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -174,8 +175,8 @@ public class Service_BillDetail_User {
 		userInfo.put("userPhone", user.getPhone());
 
 		// Lấy địa chỉ từ billRepository, nếu không có trả về chuỗi rỗng
-		String address = addressRepository.findAddressByBill(user.getId());
-		userInfo.put("userAddress", address == null ? "" : address);
+		Optional<String> address = addressRepository.findAddressByBill(user.getId());
+		userInfo.put("userAddress", address == null ? "" : address.get());
 		System.out.println("userAddress: " + address);
 		return userInfo;
 	}

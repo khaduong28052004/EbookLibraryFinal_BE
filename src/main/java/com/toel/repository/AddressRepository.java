@@ -1,6 +1,7 @@
 package com.toel.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,6 +17,7 @@ public interface AddressRepository extends JpaRepository<Address, Integer> {
 
     List<Address> findByStatusAndAccount(Boolean status, Account account);
 
-    @Query("SELECT a.fullNameAddress  FROM Address a  WHERE account.id = ?1")
-    String findAddressByBill(Integer id);
+    @Query("SELECT a.fullNameAddress FROM Address a WHERE a.account.id = ?1 AND a.status = true")
+    Optional<String> findAddressByBill(Integer accountId);
+
 }
