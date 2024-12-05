@@ -57,8 +57,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	@Query("SELECT p FROM Product p where p.account.id = ?1 AND p.isDelete = false ")
 	List<Product> findByAccountId(Integer account_id);
 
-	@Query("SELECT p FROM Product p WHERE p.isDelete=false and p.isActive=true and p.id NOT IN (SELECT fl.product.id FROM FlashSaleDetail fl Where fl.flashSale.id =?1)")
-	Page<Product> selectAllProductNotInFlashSale(Integer flashSaleId, Pageable pageable);
+	@Query("SELECT p FROM Product p WHERE p.isDelete=false and p.isActive=true AND (:search IS NULL OR LOWER(p.name) LIKE CONCAT('%', LOWER(:search), '%')) and p.id NOT IN (SELECT fl.product.id FROM FlashSaleDetail fl Where fl.flashSale.id = :flashSaleId)")
+	Page<Product> selectAllProductNotInFlashSale(@Param("flashSaleId") Integer flashSaleId,
+			@Param("search") String search, Pageable pageable);
 
 	@Query("SELECT p FROM Product p WHERE p.isDelete=false and p.isActive=true and p.id IN (SELECT fl.product.id FROM FlashSaleDetail fl Where fl.flashSale.id =?1)")
 	Page<Product> selectAllProductInFlashSale(Integer flashSaleId, Pageable pageable);
@@ -121,7 +122,5 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	Page<Product> findProductsByIdsSortedByTotalSales(@Param("ids") List<Integer> ids, Pageable pageable);
 
 	List<Product> findByBillDetails(List<BillDetail> billDetails);
-
-	
 
 }

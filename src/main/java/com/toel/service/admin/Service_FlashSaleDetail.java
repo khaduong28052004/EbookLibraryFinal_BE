@@ -39,30 +39,22 @@ public class Service_FlashSaleDetail {
     @Autowired
     ProductMapper productMapper;
 
-    public PageImpl<?> getAll(int page, int size, Boolean sortBy, String column, Boolean status, Integer idFlashSale) {
+    public PageImpl<?> getAll(String search, int page, int size, Boolean sortBy, String column, Boolean status,
+            Integer idFlashSale) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));
-        // Page<Product> pageItems;
         Page<?> pageItems;
         FlashSale flashSale = null;
         if (idFlashSale != null) {
             flashSale = flashSaleRepository.findById(idFlashSale)
-                    // flashSaleRepository.findById(idFlashSale)
                     .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Flash sale"));
         }
         if (status) {
-            pageItems = flashSaleDetailRepository.findAllByFlashSale(flashSale, pageable);
-        } else if (status==false) {
-            pageItems = productRepository.selectAllProductNotInFlashSale(idFlashSale, pageable);
-            // pageItems = productRepository.selectAllProductInFlashSale(idFlashSale,
-            // pageable);
+            pageItems = flashSaleDetailRepository.selectAllByFlashSale(flashSale, search, pageable);
+        } else if (status == false) {
+            pageItems = productRepository.selectAllProductNotInFlashSale(idFlashSale, search, pageable);
         } else {
             pageItems = flashSaleDetailRepository.findAll(pageable);
-            // pageItems = productRepository.selectAllProductNotInFlashSale(idFlashSale,
-            // pageable);
         }
-        // List<Response_Product> list = pageItems.stream()
-        // .map(item -> productMapper.response_Product(item))
-        // .collect(Collectors.toList());
         List<?> list = pageItems.stream()
                 .map(item -> {
                     if (status == true) {

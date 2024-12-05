@@ -88,15 +88,15 @@ public class Service_FlashSale {
                 flashSaleRepository.save(entity);
         }
 
-        @Scheduled(fixedDelay = 100)
-        public void run() {
-                if (flashSaleRepository.findByIsDelete(false).size() >= 1) {
-                        flashSaleRepository.findByIsDelete(false).forEach(flasesale -> {
-                                if (flasesale.getDateEnd().isBefore(LocalDateTime.now())) {
-                                        flasesale.setDelete(true);
-                                        flashSaleRepository.save(flasesale);
-                                }
-                        });
-                }
-        }
+        // @Scheduled(fixedDelay = 100)
+        // public void run() {
+        //         if (flashSaleRepository.findByIsDelete(false).size() >= 1) {
+        //                 flashSaleRepository.findByIsDelete(false).forEach(flasesale -> {
+        //                         if (flasesale.getDateEnd().isBefore(LocalDateTime.now())) {
+        //                                 flasesale.setDelete(true);
+        //                                 flashSaleRepository.save(flasesale);
+        //                         }
+        //                 });
+        //         }
+        // }
 }
