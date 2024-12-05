@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.toel.service.ServiceToel;
 
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -17,6 +18,19 @@ public class OtpService1 {
     private RedisTemplate<String, Object> redisTemplate;
 
     private static final long OTP_EXPIRATION_MINUTES = 5; 
+
+    public String setData(String key,List<String> data){
+        redisTemplate.opsForValue().getAndSet(key, data);
+        return "Thanh cong";
+    }
+
+    public List<String> getData(String key) {
+        Object data = redisTemplate.opsForValue().get(key);
+        if (data != null && data instanceof List<?>) {
+            return (List<String>) data;
+        }
+        return null; // Or handle the case when the data is not found
+    }
 
     public String generateOtp(String email) {
         String otp = String.format("%06d", new Random().nextInt(999999));

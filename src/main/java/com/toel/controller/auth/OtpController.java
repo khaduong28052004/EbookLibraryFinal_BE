@@ -1,5 +1,7 @@
 package com.toel.controller.auth;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,10 @@ import com.toel.service.Email.EmailService;
 import com.toel.service.Email.EmailTemplateType;
 // import com.toel.service.auth.InfobipService;
 import com.toel.service.auth.OtpService;
+import com.toel.service.auth.OtpService1;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @CrossOrigin("*")
 @RestController
@@ -30,7 +36,19 @@ public class OtpController {
     @Autowired
     ServiceToel serviceToel;
     @Autowired
+    OtpService1 otpService1;
+    @Autowired
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    
+    @PostMapping("/api/v1/user/canhanhoa")
+    public String Adddata() {
+        //TODO: process POST request
+        List<String> list = new  ArrayList<>();
+        list.add(0, "chao");
+        otpService1.setData("1", list);
+        return "entity";
+    }
+    
 
     @PostMapping("/api/v1/otp/generate")
     public ResponseEntity<String> generateOtp(@RequestBody Account entity) {
