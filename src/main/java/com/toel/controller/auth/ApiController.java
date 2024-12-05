@@ -401,16 +401,18 @@ public class ApiController {
         }
         // Check if email already exists
         if (accountRepository.existsByEmail(entity.getEmail())) {
-            throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Email ");
+            throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Email");
+        }
+        if (accountRepository.existsByPhoneIgnoreCase(entity.getEmail())) {
+            throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Số điện thoại");
         }
 
         if ("email".equalsIgnoreCase(entity.getMethod())) {
             String otp = otpService.generateOtp1(entity.getEmail());
             String hashOTP = serviceToel.hashPassword(otp);
             System.out.println("otp nè: " + otp + " hashOTP " + hashOTP + " , mail " + entity.getEmail());
-            emailService.push(entity.getEmail(), "Đăng ký tài khoản", EmailTemplateType.DANGKYTAIKHOAN, otp,
-                    "http://localhost:5173/singup2?otp=" + otp + "&email=" + entity.getEmail());
-            return ApiResponse.build().message("OTP đã được gửi qua email.");
+            emailService.push(entity.getEmail(), "Đăng ký tài khoản", EmailTemplateType.DANGKYV3, otp,entity.getFullname());  //DANGKYTAIKHOAN
+            return ApiResponse.<String>build().message("OTP đã được gửi qua email.").result(otp);
         } else if ("phone".equalsIgnoreCase(entity.getMethod())) {
             String otp = otpService.generateOtp1(entity.getPhone());
             try {
@@ -418,9 +420,9 @@ public class ApiController {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return ApiResponse.build().message("OTP đã được gửi qua phone.");
+            return ApiResponse.<String>build().message("OTP đã được gửi qua phone.").result(otp);
         } else {
-            return ApiResponse.build().message("OTP đã được gửi qua g.");
+            return ApiResponse.build().message("methor không xác định vui lòng kiểm tra lại!.");
         }
     }
 
