@@ -6,13 +6,11 @@ import org.springframework.stereotype.Service;
 
 import com.toel.service.ServiceToel;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
-public class OtpService {
+public class OtpService1 {
  @Autowired
  ServiceToel servicetoel;
     @Autowired
@@ -22,16 +20,7 @@ public class OtpService {
 
     public String generateOtp(String email) {
         String otp = String.format("%06d", new Random().nextInt(999999));
-        String hashOtp = servicetoel.hashPassword(otp);
-        String key = "OTP:" + email;
-        redisTemplate.opsForValue().set(key, hashOtp, OTP_EXPIRATION_MINUTES, TimeUnit.MINUTES);
-        System.out.println(otp + " hash " + hashOtp);
-        return hashOtp;
-        // return "oke";
-    }
 
-    public String generateOtp1(String email) {
-        String otp = String.format("%06d", new Random().nextInt(999999));
         String key = "OTP:" + email;
         redisTemplate.opsForValue().set(key, otp, OTP_EXPIRATION_MINUTES, TimeUnit.MINUTES);
         System.out.println(otp + " h");
@@ -62,16 +51,5 @@ public class OtpService {
     public long getOtpExpirationTime(String email) {
         String key = "OTP:" + email;
         return redisTemplate.getExpire(key, TimeUnit.SECONDS);
-    }
-
-    
-    public String generateMapdata(String email) {
-        String otp = String.format("%06d", new Random().nextInt(999999));
-        String key = "OTP:" + email;
-        Map<String,Object> map = new HashMap<>();
-        redisTemplate.opsForValue().set(key, map, OTP_EXPIRATION_MINUTES, TimeUnit.MINUTES);
-        System.out.println(otp + " h");
-        return otp;
-        // return "oke";
     }
 }

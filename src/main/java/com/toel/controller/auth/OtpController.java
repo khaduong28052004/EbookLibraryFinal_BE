@@ -16,6 +16,7 @@ import com.toel.repository.AccountRepository;
 import com.toel.service.ServiceToel;
 import com.toel.service.Email.EmailService;
 import com.toel.service.Email.EmailTemplateType;
+// import com.toel.service.auth.InfobipService;
 import com.toel.service.auth.OtpService;
 
 @CrossOrigin("*")
@@ -134,6 +135,8 @@ public class OtpController {
 
     @Autowired
     private EmailService emailService;
+
+ 
 
     @GetMapping("/api/v1/otp/send-email")
     public String sendEmail() {

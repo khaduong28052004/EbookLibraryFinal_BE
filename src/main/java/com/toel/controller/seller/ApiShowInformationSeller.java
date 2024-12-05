@@ -11,10 +11,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
+import com.toel.dto.admin.request.Account.Request_AccountCreateOTP;
 import com.toel.dto.admin.response.Response_ProductListFlashSale;
 import com.toel.dto.seller.response.Response_InforSeller;
 import com.toel.dto.seller.response.Response_Product;
@@ -42,6 +44,8 @@ import com.toel.repository.ProductRepository;
 import com.toel.repository.TypeVoucherRepository;
 import com.toel.repository.VoucherRepository;
 import com.toel.service.user.FollowerService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -242,15 +246,18 @@ public class ApiShowInformationSeller {
         // String userID = body.get("userID");
         System.out.println("ly lor" + sellerID);
         try {
-            OrderStatus orderStatus = orderStatusRepository.findById(1).orElse(null);
-            if (orderStatus == null) {
-                return ApiResponse.<String>build().code(1).message("Đơn hoàn thành bằng 0").result(null);
-            }
-            List<Bill> listBill = billRepository.findByOrderStatus(orderStatus);
-            if (listBill == null || listBill.isEmpty()) {
-                return ApiResponse.<String>build().code(1).message("không có hóa đơn nào!").result(null);
-            }
-            List<BillDetail> listBillDetails = billDetailRepository.findAllByBillIn(listBill);
+            // OrderStatus orderStatus = orderStatusRepository.findById(1).orElse(null);
+            // if (orderStatus == null) {
+            // return ApiResponse.<String>build().code(1).message("Đơn hoàn thành bằng
+            // 0").result(null);
+            // }
+            // List<Bill> listBill = billRepository.findByOrderStatus(orderStatus);
+            // if (listBill == null || listBill.isEmpty()) {
+            // return ApiResponse.<String>build().code(1).message("không có hóa đơn
+            // nào!").result(null);
+            // }
+            // List<BillDetail> listBillDetails =
+            // billDetailRepository.findAllByBillIn(listBill);
             Map<String, Object> hash = new HashMap<>();
             // List<Product> listProductO = new ArrayList<>();
             List<Product> listProductO = new ArrayList<>();
@@ -361,6 +368,30 @@ public class ApiShowInformationSeller {
 
     }
 
+    // @PostMapping("/api/v1/user/send-otpe")
+    // public ApiResponse<?> sendOtp(@RequestBody @Valid Request_AccountCreateOTP body) {
+     
+    //     // String otp = otpService.generateOtp(identifier); // Tạo OTP
+    //     // otpService.saveOtp(identifier, otp); // Lưu OTP và thời gian hết hạn
+    //     if (accountRepository.existsByUsername(body.getUsername())) {
+    //         throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Tên tài khoản");
+    //     }
+
+    //     // Check if email already exists
+    //     if (accountRepository.existsByEmail(body.getEmail())) {
+    //         throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Email ");
+    //     }
+
+    //     if ("email".equalsIgnoreCase(body.getMethod())) {
+    //         // emailService.sendOtpEmail(identifier, otp);
+    //         return ApiResponse.build().message("OTP đã được gửi qua email.");
+    //     } else if ("phone".equalsIgnoreCase(body.getMethod())) {
+    //         // smsService.sendOtpSms(identifier, otp);
+    //         return ApiResponse.build().message("OTP đã được gửi qua phone.");
+    //     } else {
+    //         return ApiResponse.build().message("OTP đã được gửi qua g.");
+    //     }
+    // }
     // @GetMapping("/api/v1/user/topProducts")
     // public ApiResponse<?> topProducts() {
     // try {
@@ -437,4 +468,5 @@ public class ApiShowInformationSeller {
     // Data participationTime; // tới gian bán
     // Integer trackingNumber; // số lượng theo dõi
     // Integer shopCancellationRate; // Tỷ lệ Shop hủy đơn(%)
+
 }
