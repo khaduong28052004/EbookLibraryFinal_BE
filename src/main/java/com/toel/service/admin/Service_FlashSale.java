@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.request.FlashSale.Request_FlashSaleCreate;
@@ -40,10 +41,9 @@ public class Service_FlashSale {
                                 Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));
                 Page<FlashSale> pageFlashSale;
                 if (dateStart == null || dateEnd == null) {
-                        pageFlashSale = flashSaleRepository.findAllByIsDelete(false, pageable);
+                        pageFlashSale = flashSaleRepository.findAll(pageable);
                 } else {
-                        pageFlashSale = flashSaleRepository.findAllByDateStartOrDateEndAndIsDelete(dateStart, dateEnd,
-                                        false,
+                        pageFlashSale = flashSaleRepository.findAllByDateStartOrDateEnd(dateStart, dateEnd,
                                         pageable);
                 }
                 List<Response_FlashSale> list = pageFlashSale.stream()
@@ -87,4 +87,16 @@ public class Service_FlashSale {
                 entity.setDelete(true);
                 flashSaleRepository.save(entity);
         }
+
+        // @Scheduled(fixedDelay = 100)
+        // public void run() {
+        //         if (flashSaleRepository.findByIsDelete(false).size() >= 1) {
+        //                 flashSaleRepository.findByIsDelete(false).forEach(flasesale -> {
+        //                         if (flasesale.getDateEnd().isBefore(LocalDateTime.now())) {
+        //                                 flasesale.setDelete(true);
+        //                                 flashSaleRepository.save(flasesale);
+        //                         }
+        //                 });
+        //         }
+        // }
 }
