@@ -142,8 +142,9 @@ public class TemplateBuilder {
                 + //
                 "                    <div class=\"otp-box\" style=\"font-size: 18px; font-weight: bold; color: #333; background: #f4f4f4; padding: 10px; text-align: center; border-radius: 5px;\">\n"
                 + //
-                "                        mã OTP đăng ký: <span style=\"color: #007bff;\">[123456]</span>\n" + //
+                "                        mã OTP đăng ký: <span style=\"color: #007bff;\">["+otp+"]</span>\n" + //
                 "                    </div>\n" + //
+                
                 "                    <p>Xin vui lòng nhập mã này vào trang đăng ký để tiếp tục quá trình đăng ký.</p>\n"
                 + //
                 "                    <p style=\"color: #555; font-size: 14px;\">Lưu ý rằng mã OTP sẽ hết hạn sau <strong>5 phút</strong> kể từ lúc nhận được email.</p>\n"
