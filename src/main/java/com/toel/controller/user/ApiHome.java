@@ -60,6 +60,7 @@ public class ApiHome {
 	public ApiResponse<Map<String, Object>> selectAll(
 			@RequestParam(name = "id_Shop", defaultValue = "0") Integer id_Shop,
 			@RequestParam(name = "size", defaultValue = "8") Integer size,
+			@RequestParam(name = "page", defaultValue = "0") Integer page,
 			@RequestParam(name = "sort", defaultValue = "price") String sort) {
 		List<FlashSaleDetail> flashSaleDetails = new ArrayList<FlashSaleDetail>();
 		LocalDateTime localDateTime = LocalDateTime.now();
@@ -70,7 +71,7 @@ public class ApiHome {
 		} catch (Exception e) {
 		}
 
-		Map<String, Object> response = serviceSellectAll.selectAll(flashSaleDetails, id_Shop, 0, size, sort);
+		Map<String, Object> response = serviceSellectAll.selectAll(flashSaleDetails, id_Shop, page, size, sort);
 		response.put("flashSalene", flashSale);
 		if (response.get("error") != null) {
 			return ApiResponse.<Map<String, Object>>build().message("not fault").code(1002);

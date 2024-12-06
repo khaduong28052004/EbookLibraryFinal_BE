@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -33,7 +34,7 @@ public class Service_SelectAllProductHome {
 
 		List<Integer> idProducts = list.stream().map(p -> p.getProduct().getId()).collect(Collectors.toList());
 		Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
-		List<Product> pageProducts = productRepo.findAllIdNotIn(idProducts, idShop);
+		Page<Product> pageProducts = productRepo.findAllIdNotIn(idProducts, idShop,pageable);
 		List<Response_Product> response_Products = new ArrayList<Response_Product>();
 		for (Product product : pageProducts) {
 			if (product.getAccount().getId() != idShop) {
@@ -43,7 +44,7 @@ public class Service_SelectAllProductHome {
 		Map<String, Object> response = new HashMap<String, Object>();
 		if (response_Products.size() > 0) {
 			response.put("datas", response_Products);
-//			response.put("totalPages", pageProducts.getTotalPages() * response_Products.size());
+			response.put("totalPages", pageProducts.getTotalPages());
 		} else {
 			response.put("error", 1002);
 		}

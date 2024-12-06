@@ -100,7 +100,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			@Param("email") String email, @Param("phone") String phone);
 
 	@Query("SELECT p FROM Product p WHERE p.id NOT IN :idProducts AND p.account.id != :idShop AND p.isActive = true AND p.isDelete=false AND p.account.status = true")
-	List<Product> findAllIdNotIn(@Param("idProducts") List<Integer> idProducts, @Param("idShop") Integer idShop);
+	Page<Product> findAllIdNotIn(@Param("idProducts") List<Integer> idProducts, @Param("idShop") Integer idShop,Pageable pageable);
 
 	@Query("SELECT p FROM Product p WHERE p.isActive = true AND p.isDelete = false AND p.account.status = true")
 	List<Product> findAllProduct(Sort sort);
