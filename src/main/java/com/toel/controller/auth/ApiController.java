@@ -335,7 +335,7 @@ public class ApiController {
         }
     }
 
-    @PostMapping("/api/v2/user/register")// nhập otp  //them moth phân biệt là phone hay email
+    @PostMapping("/api/v2/user/register") // nhập otp //them moth phân biệt là phone hay email
     public ApiResponse<?> registerAccountV2(@RequestBody Account entity, @RequestParam String otp) {
         try {
             // Check if username already exists
@@ -406,15 +406,19 @@ public class ApiController {
         if (accountRepository.existsByPhoneIgnoreCase(entity.getEmail())) {
             throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Số điện thoại");
         }
+        // if (accountRepository.existsBySh(entity.getEmail())) {
+        //     throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Số điện thoại");
+        // }
 
         if ("email".equalsIgnoreCase(entity.getMethod())) {
             String otp = otpService.generateOtp1(entity.getEmail());
             String hashOTP = serviceToel.hashPassword(otp);
             System.out.println("otp nè: " + otp + " hashOTP " + hashOTP + " , mail " + entity.getEmail());
-            emailService.push(entity.getEmail(), "Đăng ký tài khoản", EmailTemplateType.DANGKYV3, otp,entity.getFullname());  //DANGKYTAIKHOAN
+            emailService.push(entity.getEmail(), "Đăng ký tài khoản", EmailTemplateType.DANGKYV3, otp,
+                    entity.getFullname()); // DANGKYTAIKHOAN
             return ApiResponse.<String>build().message("OTP đã được gửi qua email.").result(otp);
         } else if ("phone".equalsIgnoreCase(entity.getMethod())) {
-            String otp = otpService.generateOtp1(entity.getPhone());
+            String otp = otpService.generateOtp1(convertPhoneNumber(entity.getPhone()));
             try {
                 infobipService.sendSMS(entity.getPhone(), otp);
             } catch (Exception e) {
@@ -424,6 +428,16 @@ public class ApiController {
         } else {
             return ApiResponse.build().message("methor không xác định vui lòng kiểm tra lại!.");
         }
+    }
+
+    public static String convertPhoneNumber(String phoneNumber) {
+        // Kiểm tra nếu số điện thoại bắt đầu với '0'
+        if (phoneNumber != null && phoneNumber.startsWith("0")) {
+            // Cắt '0' đầu tiên và thay thế bằng +84
+            return "+84" + phoneNumber.substring(1);
+        }
+        // Nếu số điện thoại không bắt đầu bằng '0', trả về chính nó
+        return phoneNumber;
     }
 
     @PostMapping("/api/v2/user/register_1/{otp}")
