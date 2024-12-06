@@ -250,7 +250,7 @@ public class Service_Bill_User {
 		String email = bill.getAccount().getEmail();
 		System.out.println("email " + email);
 		String subject = "TOEL - Thông báo cập nhật trạng thái hủy đơn hàng ";
-		String content = " Khách hàng đã hủy đơn của shop. Xin cảm ơn vì sử dụng bán hàng trên TOEL.";
+		String content = " Khách hàng đã hủy đơn của shop. Xin cảm ơn vì sử dụng dịch vụ bán hàng trên TOEL.";
 		emailService.push(email, subject, EmailTemplateType.HUYDON,
 				bill.getBillDetails().get(0).getProduct().getAccount().getShopName(),
 				String.valueOf(bill.getId()), content);

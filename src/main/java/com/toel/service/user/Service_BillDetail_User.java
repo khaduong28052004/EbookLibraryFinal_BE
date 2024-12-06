@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.toel.mapper.user.ProductMaperUser;
 //import com.toel.exception.CustomException;
 import com.toel.model.Account;
+import com.toel.model.Address;
 import com.toel.model.Bill;
 import com.toel.model.BillDetail;
 import com.toel.model.Cart;
@@ -170,15 +171,21 @@ public class Service_BillDetail_User {
 		Account user = accountRepository.findById(accountId)
 				.orElseThrow(() -> new NoSuchElementException("User không tồn tại với accountId: " + accountId));
 
-		// Thêm thông tin người dùng vào Map
-		userInfo.put("userFullname", user.getFullname());
-		userInfo.put("userPhone", user.getPhone());
-
 		// Lấy địa chỉ từ billRepository, nếu không có trả về chuỗi rỗng
-		Optional<String> address = addressRepository.findAddressByBill(user.getId());
-		userInfo.put("userAddress", address == null ? "" : address.get());
-		System.out.println("userAddress: " + address);
+
+		// Thêm thông tin vào userInfo
+		userInfo.put("userFullname", user.getFullname());
+		Optional<Address> address = billRepository.findAddressByBill(billId);
+		if (address.isPresent()) {
+			userInfo.put("userAddress", address.get().getFullNameAddress());
+			userInfo.put("userPhone", address.get().getPhone());
+		} else {
+			userInfo.put("userAddress", "");
+			userInfo.put("userPhone", "");
+		}
+
 		return userInfo;
+
 	}
 
 	// public List<Response_BillDetail_User>

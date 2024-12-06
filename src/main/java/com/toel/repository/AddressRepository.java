@@ -17,7 +17,5 @@ public interface AddressRepository extends JpaRepository<Address, Integer> {
 
     List<Address> findByStatusAndAccount(Boolean status, Account account);
 
-    @Query("SELECT a.fullNameAddress FROM Address a WHERE a.account.id = ?1 AND a.status = true")
-    Optional<String> findAddressByBill(Integer accountId);
 
 }
