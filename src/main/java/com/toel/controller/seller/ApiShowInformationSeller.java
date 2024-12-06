@@ -36,6 +36,7 @@ import com.toel.repository.AccountRepository;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
 import com.toel.repository.EvalueRepository;
+import com.toel.repository.FollowerRepository;
 import com.toel.repository.ImageProductRepository;
 import com.toel.repository.OrderStatusRepository;
 import com.toel.repository.ProductRepository;
@@ -75,6 +76,8 @@ public class ApiShowInformationSeller {
     private OrderStatusRepository orderStatusRepository;
     @Autowired
     private ImageProductRepository imageProductRepository;
+    @Autowired
+    private FollowerRepository followRepository;
 
     /**
      * homeShowSeller
@@ -108,14 +111,17 @@ public class ApiShowInformationSeller {
             Account account = accountRepository.findById(Integer.parseInt(sellerID))
                     .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
                             "ID:[" + sellerID + "] không tìm thấy người bán"));
+
             Response_InforSeller inforSeller = new Response_InforSeller();
             inforSeller.setIdSeller(account.getId());
             inforSeller.setNumberOfProducts(account.getProducts().size());
-            inforSeller.setNumberOfFollowers(account.getFollowers().size());
             inforSeller.setTrackingNumber(defaultValue); // nguoi ban da dax theo gioi casi gi
             inforSeller.setShopCancellationRate(defaultValue);
             inforSeller.setAvatar(account.getAvatar());
             inforSeller.setBackground(account.getBackground());
+
+            Integer follower = followRepository.countFollowersByShopId(account.getId());
+            inforSeller.setNumberOfFollowers(follower);
             // Kiểm tra userID và set trạng thái theo dõi
             if (isNumeric(userID) || !sellerID.equals(userID)) {
                 inforSeller.setIsFollowed(
