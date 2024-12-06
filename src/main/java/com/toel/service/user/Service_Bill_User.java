@@ -93,7 +93,23 @@ public class Service_Bill_User {
 			List<Response_Bill_User> listConver = convertToResponseBillUser(productsInBill);
 			List<BillDTO> shopListInBill = createBillsWithProductsInBillDetail(listConver);
 
-			response.put("data", shopListInBill);
+			int page = requestBillDTO.getPage();
+			int size = requestBillDTO.getSize();
+			int totalItems = shopListInBill.size();
+			int totalPages = (int) Math.ceil((double) totalItems / size);
+
+			// Lấy dữ liệu cho trang hiện tại
+			int start = Math.min(page * size, totalItems);
+			int end = Math.min(start + size, totalItems);
+			List<BillDTO> paginatedList = shopListInBill.subList(start, end);
+
+			response.put("data", paginatedList); // Dữ liệu cho trang hiện tại
+			response.put("currentPage", page);
+			response.put("totalItems", totalItems);
+			response.put("totalPages", totalPages);
+			response.put("pageSize", size);
+
+			// response.put("data", shopListInBill);
 			response.put("status", "successfully");
 			response.put("message", "Retrieve data successfully");
 		} catch (Exception e) {
