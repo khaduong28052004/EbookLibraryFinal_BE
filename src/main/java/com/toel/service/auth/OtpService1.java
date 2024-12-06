@@ -1,25 +1,67 @@
 package com.toel.service.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.toel.service.ServiceToel;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class OtpService1 {
- @Autowired
- ServiceToel servicetoel;
+    @Autowired
+    ServiceToel servicetoel;
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
-    private static final long OTP_EXPIRATION_MINUTES = 5; 
+    private static final long OTP_EXPIRATION_MINUTES = 5;
+    private HashOperations<String, String, Object> hashOperations;
 
-    public String setData(String key,List<String> data){
+    @Autowired
+    public OtpService1(RedisTemplate<String, Object> redisTemplate) {
+        this.hashOperations = redisTemplate.opsForHash();
+    }
+
+    // ... (keep all existing methods)
+     
+    // public Map<String,Map<String, Object>> getAllData() {
+    //     String key = "USER:" + userId;
+    //     return hashOperations.;
+    // }
+
+    // New method to save user data
+    public void saveUserData(String userId, Map<String, Object> userData) {
+        String key = "USER:" + userId;
+        hashOperations.putAll(key, userData);
+    }
+
+    // New method to get user data
+    public Map<String, Object> getUserData(String userId) {
+        String key = "USER:" + userId;
+        return hashOperations.entries(key);
+    }
+
+    // New method to update specific fields of user data
+    public void updateUserData(String userId, Map<String, Object> updatedFields) {
+        String key = "USER:" + userId;
+        hashOperations.putAll(key, updatedFields);
+    }
+
+    // New method to delete user data
+    public void deleteUserData(String userId) {
+        String key = "USER:" + userId;
+        redisTemplate.delete(key);
+    }
+
+
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    public String setData(String key, List<String> data) {
         redisTemplate.opsForValue().getAndSet(key, data);
         return "Thanh cong";
     }
@@ -51,7 +93,8 @@ public class OtpService1 {
         }
         return false;
     }
-    public String find(String email  ){
+
+    public String find(String email) {
         String key = "OTP:" + email;
         String storedOtp = (String) redisTemplate.opsForValue().get(key);
         return storedOtp;

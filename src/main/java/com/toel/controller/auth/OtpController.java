@@ -1,7 +1,9 @@
 package com.toel.controller.auth;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +23,7 @@ import com.toel.service.Email.EmailTemplateType;
 // import com.toel.service.auth.InfobipService;
 import com.toel.service.auth.OtpService;
 import com.toel.service.auth.OtpService1;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 @CrossOrigin("*")
@@ -39,6 +40,28 @@ public class OtpController {
     OtpService1 otpService1;
     @Autowired
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+   @GetMapping("/api/v1/user/getlist")
+   public  Map<String, Object> getMethodName(@RequestParam String param) {
+    // user123
+       Map<String, Object> retrievedData = otpService1.getUserData(param);
+    //    retrievedData.
+       return retrievedData;
+   }
+   
+    @PostMapping("/api/v1/user/saveList")
+    public String postMethodNamea(@RequestBody String entity) {
+        String userId = "user123";
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("interestList", List.of("item_1", "item_2", "item_3"));
+        // userData.put("name", "John Doe");
+        // userData.put("email", "john@example.com");
+
+        otpService1.saveUserData(userId, userData);
+        System.out.println("User data saved successfully");
+
+        return entity;
+    }
+    
     
     @PostMapping("/api/v1/user/canhanhoa")
     public String Adddata() {
