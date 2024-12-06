@@ -117,7 +117,7 @@ public class Service_CategorySeller {
                                 .filter(this::checkCategory)
                                 .map(categoryRepository::saveAndFlush)
                                 .map(categoryMapper::response_Category)
-                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Tên thể loại đã tồn tại"));
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Tên danh mục đã tồn tại"));
         }
 
         public Response_Category update(
@@ -133,7 +133,7 @@ public class Service_CategorySeller {
                                 .filter(this::checkCategory)
                                 .map(categoryRepository::saveAndFlush)
                                 .map(categoryMapper::response_Category)
-                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Tên thể loại đã tồn tại"));
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Tên danh mục đã tồn tại"));
         }
 
         public void delete(
@@ -147,7 +147,7 @@ public class Service_CategorySeller {
         public Response_Category edit(
                         Integer id) {
                 return categoryMapper.response_Category(categoryRepository.findById(id)
-                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Thể Loại")));
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Danh mục")));
         }
 
         public boolean checkCategory(
