@@ -102,6 +102,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	@Query("SELECT p FROM Product p WHERE p.id NOT IN :idProducts AND p.account.id != :idShop AND p.isActive = true AND p.isDelete=false AND p.account.status = true")
 	List<Product> findAllIdNotIn(@Param("idProducts") List<Integer> idProducts, @Param("idShop") Integer idShop);
 
+	@Query("SELECT p FROM Product p WHERE p.account.id = :idShop AND p.isActive = true AND p.isDelete=false AND p.account.status = true")
+	List<Product> findAllIdIn(@Param("idShop") Integer idShop);
+
 	@Query("SELECT p FROM Product p WHERE p.isActive = true AND p.isDelete = false AND p.account.status = true")
 	List<Product> findAllProduct(Sort sort);
 
@@ -121,7 +124,5 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	Page<Product> findProductsByIdsSortedByTotalSales(@Param("ids") List<Integer> ids, Pageable pageable);
 
 	List<Product> findByBillDetails(List<BillDetail> billDetails);
-
-	
 
 }
