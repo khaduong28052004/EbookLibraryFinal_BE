@@ -13,8 +13,8 @@ import com.toel.model.FlashSale;
 import java.util.List;
 
 public interface FlashSaleRepository extends JpaRepository<FlashSale, Integer> {
-	@Query("SELECT f FROM FlashSale f WHERE (CAST(f.dateStart AS date) BETWEEN :dateStart AND :dateEnd OR CAST(f.dateEnd AS date) BETWEEN :dateStart AND :dateEnd) AND f.isDelete = :delete")
-	Page<FlashSale> findAllByDateStartOrDateEndAndIsDelete(LocalDate dateStart, LocalDate dateEnd, boolean delete,
+	@Query("SELECT f FROM FlashSale f WHERE (CAST(f.dateStart AS date) BETWEEN :dateStart AND :dateEnd OR CAST(f.dateEnd AS date) BETWEEN :dateStart AND :dateEnd)")
+	Page<FlashSale> findAllByDateStartOrDateEnd(LocalDate dateStart, LocalDate dateEnd,
 			Pageable pageable);
 
 	Page<FlashSale> findAllByIsDelete(boolean delete, Pageable pageable);
