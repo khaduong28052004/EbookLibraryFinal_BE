@@ -19,53 +19,53 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @RequestMapping("/api/v1/admin/permission")
 public class ApiPermissionAdmin {
-    @Autowired
-    Service_Premisson service_Premisson;
+        @Autowired
+        Service_Premisson service_Premisson;
 
-    @GetMapping
-    public ApiResponse<PageImpl<?>> getAllNhanVApiResponse(
-            @RequestParam(value = "search", required = false) String search,
-            @RequestParam(value = "role", required = false) String role,
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "5") Integer size,
-            @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
-            @RequestParam(value = "sortColumn", defaultValue = "v.permission.id") String sortColumn) {
-        return ApiResponse.<PageImpl<?>>build()
-                .result(service_Premisson.getAll(search, role, page, size, sortBy, sortColumn));
-    }
+        @GetMapping
+        public ApiResponse<PageImpl<?>> getAllNhanVApiResponse(
+                        @RequestParam(value = "search", required = false) String search,
+                        @RequestParam(value = "role", required = false) String role,
+                        @RequestParam(value = "page", defaultValue = "0") Integer page,
+                        @RequestParam(value = "size", defaultValue = "5") Integer size,
+                        @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
+                        @RequestParam(value = "sortColumn", defaultValue = "v.permission.id") String sortColumn) {
+                return ApiResponse.<PageImpl<?>>build()
+                                .result(service_Premisson.getAll(search, role, page, size, sortBy, sortColumn));
+        }
 
-    @GetMapping("notrole")
-    public ApiResponse<PageImpl<Response_Permission>> getAllNotRole(
-            @RequestParam(value = "search", required = false) String search,
-            @RequestParam(value = "role", required = false) String role,
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "5") Integer size,
-            @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
-            @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
-        return ApiResponse.<PageImpl<Response_Permission>>build()
-                .result(service_Premisson.getAllNotRole(search, role, page, size, sortBy, sortColumn));
-    }
+        @GetMapping("notrole")
+        public ApiResponse<PageImpl<Response_Permission>> getAllNotRole(
+                        @RequestParam(value = "search", required = false) String search,
+                        @RequestParam(value = "role", required = false) String role,
+                        @RequestParam(value = "page", defaultValue = "0") Integer page,
+                        @RequestParam(value = "size", defaultValue = "5") Integer size,
+                        @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
+                        @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
+                return ApiResponse.<PageImpl<Response_Permission>>build()
+                                .result(service_Premisson.getAllNotRole(search, role, page, size, sortBy, sortColumn));
+        }
 
-    @GetMapping("id")
-    public ApiResponse<Response_Permission_Role> getById(@RequestParam(value = "id", required = false) Integer id) {
-        return ApiResponse.<Response_Permission_Role>build()
-                .result(service_Premisson.getByID(id));
-    }
+        @GetMapping("id")
+        public ApiResponse<Response_Permission_Role> getById(@RequestParam(value = "id", required = false) Integer id) {
+                return ApiResponse.<Response_Permission_Role>build()
+                                .result(service_Premisson.getByID(id));
+        }
 
-    //
-    // @PostMapping
-    // public ApiResponse<Response_Permission> post(@RequestBody @Valid
-    // Request_PermissionCreate entity) {
-    // return ApiResponse.<Response_Permission>build()
-    // .result(service_Premisson.create(entity));
-    // }
-    //
-    @DeleteMapping
-    public ApiResponse<Response_Permission> delete(
-            @RequestParam(value = "id", required = false) Integer id) {
-        service_Premisson.delete(id);
-        return ApiResponse.<Response_Permission>build()
-                .message("Xóa permission thành công");
-    }
+        //
+        // @PostMapping
+        // public ApiResponse<Response_Permission> post(@RequestBody @Valid
+        // Request_PermissionCreate entity) {
+        // return ApiResponse.<Response_Permission>build()
+        // .result(service_Premisson.create(entity));
+        // }
+        //
+        @DeleteMapping
+        public ApiResponse<Response_Permission> delete(
+                        @RequestParam(value = "id", required = false) Integer id) {
+                service_Premisson.delete(id);
+                return ApiResponse.<Response_Permission>build()
+                                .message("Xóa permission thành công");
+        }
 
 }

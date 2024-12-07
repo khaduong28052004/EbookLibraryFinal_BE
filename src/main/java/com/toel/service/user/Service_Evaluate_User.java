@@ -92,7 +92,7 @@ public class Service_Evaluate_User {
 		if (billDetailRepository.billDetailIsExisted(billDetailId, productId, accountId) == 0) {
 			throw new AppException(ErrorCode.OBJECT_SETUP, "Kiểm tra lại thông tin cần đánh giá");
 		}
-		if (evaluateRepository.isEvaluate(billDetailId, productId, accountId) == 1) {
+		if (evaluateRepository.isEvaluated(billDetailId, productId, accountId) == 1) {
 			throw new AppException(ErrorCode.OBJECT_SETUP, "Sản phẩm đã đánh giá");
 		}
 

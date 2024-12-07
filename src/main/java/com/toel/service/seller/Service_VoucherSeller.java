@@ -119,39 +119,24 @@ public class Service_VoucherSeller {
 
         public Request_VoucherCreate checkVoucherCreate(
                         Request_VoucherCreate request_VoucherCreate) {
-                boolean nameExists = voucherRepository.findAllListByIdAccount(request_VoucherCreate.getAccount())
-                                .stream()
-                                .anyMatch(voucherCheck -> request_VoucherCreate.getName()
-                                                .equalsIgnoreCase(voucherCheck.getName()));
-                if (nameExists) {
-                        throw new AppException(ErrorCode.OBJECT_SETUP, "Tên voucher đã tồn tại");
-                }
                 if (request_VoucherCreate.getSale() < 1 || request_VoucherCreate.getSale() > 100) {
                         throw new AppException(ErrorCode.OBJECT_SETUP, "Sale phải từ 1 - 100");
                 }
-                if (request_VoucherCreate.getDateStart().after(request_VoucherCreate.getDateEnd())) {
-                        throw new AppException(ErrorCode.OBJECT_SETUP, "Ngày bắt đầu không thể lớn hơn ngày kết thúc");
+                if (request_VoucherCreate.getDateStart().after(request_VoucherCreate.getDateEnd())
+                                || request_VoucherCreate.getDateStart().equals(request_VoucherCreate.getDateEnd())) {
+                        throw new AppException(ErrorCode.OBJECT_SETUP, "Ngày bắt đầu phải nhỏ hơn ngày kết thúc");
                 }
                 return request_VoucherCreate;
         }
 
         public Request_VoucherUpdate checkVoucherUpdate(
                         Request_VoucherUpdate request_VoucherUpdate) {
-                boolean nameExists = voucherRepository.findAllListByIdAccount(request_VoucherUpdate.getAccount())
-                                .stream()
-                                .anyMatch(voucherCheck -> request_VoucherUpdate.getName()
-                                                .equalsIgnoreCase(voucherCheck.getName())
-                                                && !request_VoucherUpdate
-                                                                .getId().equals(voucherCheck.getId()));
-                if (nameExists) {
-                        throw new AppException(ErrorCode.OBJECT_SETUP, "Tên voucher đã tồn tại");
-                }
-
                 if (request_VoucherUpdate.getSale() < 1 || request_VoucherUpdate.getSale() > 100) {
                         throw new AppException(ErrorCode.OBJECT_SETUP, "Sale phải từ 1 - 100");
                 }
-                if (request_VoucherUpdate.getDateStart().after(request_VoucherUpdate.getDateEnd())) {
-                        throw new AppException(ErrorCode.OBJECT_SETUP, "Ngày bắt đầu không thể lớn hơn ngày kết thúc");
+                if (request_VoucherUpdate.getDateStart().after(request_VoucherUpdate.getDateEnd())
+                                || request_VoucherUpdate.getDateStart().equals(request_VoucherUpdate.getDateEnd())) {
+                        throw new AppException(ErrorCode.OBJECT_SETUP, "Ngày bắt đầu phải nhỏ hơn ngày kết thúc");
                 }
                 return request_VoucherUpdate;
         }
