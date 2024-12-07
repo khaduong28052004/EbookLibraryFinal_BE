@@ -4,9 +4,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.api.Http;
 import com.toel.dto.user.resquest.Request_ReportShop_DTO;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
@@ -30,13 +32,13 @@ public class Service_ShowInfoSeller {
             validateEntitiesExist(reportDTO);
             createReport(reportDTO);
             response.put("message", "Báo cáo đã được gửi");
-            response.put("status", "successfully");
+            response.put("status", HttpStatus.SC_OK);
         } catch (IllegalArgumentException e) {
             response.put("message", e.getMessage());
-            response.put("status", "fail");
+            response.put("status", HttpStatus.SC_BAD_REQUEST);
         } catch (Exception e) {
             response.put("message", e.getMessage());
-            response.put("status", "error");
+            response.put("status", HttpStatus.SC_BAD_REQUEST);
             e.printStackTrace();
         }
         return response;
@@ -48,6 +50,12 @@ public class Service_ShowInfoSeller {
         String content = reportDTO.getContent() == null ? "" : reportDTO.getContent();
         Date createAt = reportDTO.getCreateAt() == null ? null : reportDTO.getCreateAt();
         String title = reportDTO.getTitle() == null ? "" : reportDTO.getTitle();
+
+        System.out.println("accountIdval " + accountId);
+        System.out.println("shopIdval " + shopId);
+        System.out.println("contentval " + content);
+        System.out.println("createAtval " + createAt);
+        System.out.println("titleval " + title);
 
         if (!accountRepository.existsById(accountId) || accountId == null) {
             throw new AppException(ErrorCode.OBJECT_SETUP, "Tài khoản đang sử dụng không tồn tại");
@@ -66,7 +74,7 @@ public class Service_ShowInfoSeller {
             throw new AppException(ErrorCode.OBJECT_SETUP, "Thiếu trường title");
         }
         if (reportRepository.waitAfterReport(accountId, shopId) == 1) {
-            throw new AppException(ErrorCode.OBJECT_SETUP, "Bạn đã báo cáo shop. Đang trong quá trình xử lý");
+            throw new AppException(ErrorCode.OBJECT_SETUP, "Bạn đã báo cáo. Đang trong quá trình xử lý");
         }
     }
 

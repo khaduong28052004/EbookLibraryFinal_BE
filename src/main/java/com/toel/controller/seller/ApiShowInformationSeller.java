@@ -410,7 +410,7 @@ public class ApiShowInformationSeller {
     }
 
     @PostMapping("api/v1/user/shop/createReport")
-    public ResponseEntity<Map<String, Object>> createReportShop(@Valid @ModelAttribute Request_ReportShop_DTO reportDTO,
+    public ResponseEntity<Map<String, Object>> createReportShop(@Valid @RequestBody Request_ReportShop_DTO reportDTO,
             BindingResult bindingResult) {
         Map<String, Object> response = serviceShowInfoSeller.createReportShop(reportDTO);
         return ResponseEntity.ok(response);
@@ -475,7 +475,7 @@ public class ApiShowInformationSeller {
     // seller
     // int totalStars = listEvalue.stream()
     // .mapToInt(Evalue::getStar) // total star from evalue
-    // .sum();	
+    // .sum();
     // double averageStars = listEvalue.isEmpty() ? 0 : (double) totalStars /
     // listEvalue.size();
     // return averageStars; // average star precaution
