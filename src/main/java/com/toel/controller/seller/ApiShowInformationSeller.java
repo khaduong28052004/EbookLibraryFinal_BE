@@ -1,6 +1,7 @@
 package com.toel.controller.seller;
 
 import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,6 +12,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +22,8 @@ import com.toel.dto.admin.response.Response_ProductListFlashSale;
 import com.toel.dto.seller.response.Response_InforSeller;
 import com.toel.dto.seller.response.Response_Product;
 import com.toel.dto.seller.response.Response_ProductInfo;
+import com.toel.dto.user.resquest.Request_Evaluate_User;
+import com.toel.dto.user.resquest.Request_ReportShop_DTO;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.ProductMapper;
@@ -27,6 +32,8 @@ import com.toel.model.Address;
 import com.toel.model.Bill;
 import com.toel.model.BillDetail;
 import com.toel.model.Evalue;
+import com.toel.model.FlashSale;
+import com.toel.model.FlashSaleDetail;
 import com.toel.model.ImageProduct;
 import com.toel.model.OrderStatus;
 import com.toel.model.Product;
@@ -36,6 +43,8 @@ import com.toel.repository.AccountRepository;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
 import com.toel.repository.EvalueRepository;
+import com.toel.repository.FlashSaleDetailRepository;
+import com.toel.repository.FlashSaleRepository;
 import com.toel.repository.FollowerRepository;
 import com.toel.repository.ImageProductRepository;
 import com.toel.repository.OrderStatusRepository;
@@ -43,11 +52,17 @@ import com.toel.repository.ProductRepository;
 import com.toel.repository.TypeVoucherRepository;
 import com.toel.repository.VoucherRepository;
 import com.toel.service.user.FollowerService;
+import com.toel.service.user.Service_SelectAllProductHome;
+import com.toel.service.user.Service_ShowInfoSeller;
+
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @CrossOrigin("*")
@@ -61,23 +76,30 @@ public class ApiShowInformationSeller {
     private BillRepository billRepository;
     @Autowired
     private BillDetailRepository billDetailRepository;
-
     @Autowired
     private EvalueRepository evalueRepository;
-
     @Autowired
     private VoucherRepository voucherRepository;
     @Autowired
     private TypeVoucherRepository typeVoucherRepository;
     @Autowired
     private FollowerService followerService;
-
     @Autowired
     private OrderStatusRepository orderStatusRepository;
     @Autowired
     private ImageProductRepository imageProductRepository;
     @Autowired
     private FollowerRepository followRepository;
+    @Autowired
+    ProductMapper productMapper;
+    @Autowired
+    private Service_ShowInfoSeller serviceShowInfoSeller;
+    @Autowired
+    FlashSaleRepository flashSaleRepo;
+    @Autowired
+    Service_SelectAllProductHome serviceSellectAll;
+    @Autowired
+    FlashSaleDetailRepository flashSaleDetailRepo;
 
     /**
      * homeShowSeller
@@ -239,9 +261,6 @@ public class ApiShowInformationSeller {
 
     }
 
-    @Autowired
-    ProductMapper productMapper;
-
     @PostMapping("/api/v1/user/topProducts")
     public ApiResponse<?> topProducts(@RequestBody Map<String, String> body) {
         String sellerID = body.get("sellerID");
@@ -367,6 +386,37 @@ public class ApiShowInformationSeller {
 
     }
 
+    @RequestMapping("api/v1/user/shop/selectall")
+    public ApiResponse<Map<String, Object>> selectAll(
+            @RequestParam(name = "id_Shop", defaultValue = "0") Integer id_Shop,
+            @RequestParam(name = "size", defaultValue = "8") Integer size,
+            @RequestParam(name = "sort", defaultValue = "price") String sort) {
+        List<FlashSaleDetail> flashSaleDetails = new ArrayList<FlashSaleDetail>();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime);
+        try {
+
+            flashSaleDetails = flashSaleDetailRepo.findAllByFlashSale(flashSale);
+        } catch (Exception e) {
+        }
+
+        Map<String, Object> response = serviceSellectAll.selectAllHomeShop(flashSaleDetails, id_Shop, 0, size, sort);
+        response.put("flashSale", flashSale);
+        if (response.get("error") != null) {
+            return ApiResponse.<Map<String, Object>>build().message("not fault").code(1002);
+        }
+
+        return ApiResponse.<Map<String, Object>>build().message("success").result(response);
+    }
+
+    @PostMapping("api/v1/user/shop/createReport")
+    public ResponseEntity<Map<String, Object>> createReportShop(@Valid @ModelAttribute Request_ReportShop_DTO reportDTO,
+            BindingResult bindingResult) {
+        Map<String, Object> response = serviceShowInfoSeller.createReportShop(reportDTO);
+        return ResponseEntity.ok(response);
+
+    }
+
     // @GetMapping("/api/v1/user/topProducts")
     // public ApiResponse<?> topProducts() {
     // try {
@@ -425,7 +475,7 @@ public class ApiShowInformationSeller {
     // seller
     // int totalStars = listEvalue.stream()
     // .mapToInt(Evalue::getStar) // total star from evalue
-    // .sum();
+    // .sum();	
     // double averageStars = listEvalue.isEmpty() ? 0 : (double) totalStars /
     // listEvalue.size();
     // return averageStars; // average star precaution
