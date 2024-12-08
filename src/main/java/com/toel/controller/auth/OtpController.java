@@ -1,5 +1,9 @@
 package com.toel.controller.auth;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +20,11 @@ import com.toel.repository.AccountRepository;
 import com.toel.service.ServiceToel;
 import com.toel.service.Email.EmailService;
 import com.toel.service.Email.EmailTemplateType;
+// import com.toel.service.auth.InfobipService;
 import com.toel.service.auth.OtpService;
+import com.toel.service.auth.OtpService1;
+
+
 
 @CrossOrigin("*")
 @RestController
@@ -29,7 +37,41 @@ public class OtpController {
     @Autowired
     ServiceToel serviceToel;
     @Autowired
+    OtpService1 otpService1;
+    @Autowired
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+   @GetMapping("/api/v1/user/getlist")
+   public  Map<String, Object> getMethodName(@RequestParam String param) {
+    // user123
+       Map<String, Object> retrievedData = otpService1.getUserData(param);
+    //    retrievedData.
+       return retrievedData;
+   }
+   
+    @PostMapping("/api/v1/user/saveList")
+    public String postMethodNamea(@RequestBody String entity) {
+        String userId = "user123";
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("interestList", List.of("item_1", "item_2", "item_3"));
+        // userData.put("name", "John Doe");
+        // userData.put("email", "john@example.com");
+
+        otpService1.saveUserData(userId, userData);
+        System.out.println("User data saved successfully");
+
+        return entity;
+    }
+    
+    
+    @PostMapping("/api/v1/user/canhanhoa")
+    public String Adddata() {
+        //TODO: process POST request
+        List<String> list = new  ArrayList<>();
+        list.add(0, "chao");
+        otpService1.setData("1", list);
+        return "entity";
+    }
+    
 
     @PostMapping("/api/v1/otp/generate")
     public ResponseEntity<String> generateOtp(@RequestBody Account entity) {
@@ -134,6 +176,8 @@ public class OtpController {
 
     @Autowired
     private EmailService emailService;
+
+ 
 
     @GetMapping("/api/v1/otp/send-email")
     public String sendEmail() {

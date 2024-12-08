@@ -36,13 +36,18 @@ import com.toel.service.ServiceToel;
 import com.toel.service.Email.EmailService;
 import com.toel.service.Email.EmailTemplateType;
 import com.toel.service.auth.GoogleTokenVerifier;
+import com.toel.service.InfobipService;
 import com.toel.service.auth.JwtService;
 import com.toel.service.auth.OtpService;
+
+import jakarta.validation.Valid;
+
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.toel.dto.AuthRequestDTO;
 import com.toel.dto.JwtResponseDTO;
 import com.toel.dto.PermissionDTO;
 import com.toel.dto.Api.ApiResponse;
+import com.toel.dto.admin.request.Account.Request_AccountCreateOTP;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.model.Account;
@@ -81,6 +86,8 @@ public class ApiController {
     RolePermissionRepository rolesPermissionRepository;
     @Autowired
     EmailService emailService;
+    @Autowired
+    InfobipService infobipService;
 
     @Autowired
     private OtpService otpService;
@@ -95,10 +102,10 @@ public class ApiController {
 
     /**
      * @param authRequestDTO
-     * code 1000: đăng nhập thành công!
-     * code 1001: tài khoản không tồn tại!
-     * code 1002: tài khoản không tồn tại!
-     * code 1003:1004 lỗi đăng ký:
+     *                       code 1000: đăng nhập thành công!
+     *                       code 1001: tài khoản không tồn tại!
+     *                       code 1002: tài khoản không tồn tại!
+     *                       code 1003:1004 lỗi đăng ký:
      * @return
      */
     @PostMapping("/api/v1/login")
@@ -328,29 +335,25 @@ public class ApiController {
         }
     }
 
-    @PostMapping("/api/v2/user/register")
+    @PostMapping("/api/v2/user/register") // nhập otp //them moth phân biệt là phone hay email
     public ApiResponse<?> registerAccountV2(@RequestBody Account entity, @RequestParam String otp) {
         try {
             // Check if username already exists
             if (accountRepository.existsByUsername(entity.getUsername())) {
                 throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Username ");
             }
-
             // Check if email already exists
             if (accountRepository.existsByEmail(entity.getEmail())) {
                 throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Email ");
             }
-
             // Verify OTP
             boolean isValidOtp = otpService.verifyOtp(entity.getEmail(), otp);
             if (!isValidOtp) {
                 throw new AppException(ErrorCode.OBJECT_NOT_FOUND, "Invalid OTP");
             }
-
             // Fetch default role for the user
             Role role = roleRepository.findById(4)
                     .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Role not found"));
-
             // Create and save new account
             Account account = new Account();
             account.setRole(role);
@@ -362,16 +365,13 @@ public class ApiController {
             account.setStatus(true);
             account.setAvatar(avatarURL);
             account.setPassword(passwordEncoder.encode(entity.getPassword()));
-
             accountRepository.save(account);
-
             // Send welcome email
             emailService.push(
                     entity.getEmail(),
                     "Welcome to Toel Shop!",
                     EmailTemplateType.WELCOME,
                     entity.getFullname());
-
             // Return success response
             return ApiResponse.<String>build()
                     .code(200)
@@ -390,6 +390,54 @@ public class ApiController {
                     .message("An unexpected error occurred: " + e.getMessage())
                     .result("error");
         }
+    }
+
+    @PostMapping("/api/v1/user/send-otpe")
+    public ApiResponse<?> sendOtp(@RequestBody @Valid Request_AccountCreateOTP entity) {
+        // String otp = otpService.generateOtp(identifier); // Tạo OTP
+        // otpService.saveOtp(identifier, otp); // Lưu OTP và thời gian hết hạn
+        if (accountRepository.existsByUsername(entity.getUsername())) {
+            throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Tên tài khoản");
+        }
+        // Check if email already exists
+        if (accountRepository.existsByEmail(entity.getEmail())) {
+            throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Email");
+        }
+        if (accountRepository.existsByPhoneIgnoreCase(entity.getEmail())) {
+            throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Số điện thoại");
+        }
+        // if (accountRepository.existsBySh(entity.getEmail())) {
+        //     throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Số điện thoại");
+        // }
+
+        if ("email".equalsIgnoreCase(entity.getMethod())) {
+            String otp = otpService.generateOtp1(entity.getEmail());
+            String hashOTP = serviceToel.hashPassword(otp);
+            System.out.println("otp nè: " + otp + " hashOTP " + hashOTP + " , mail " + entity.getEmail());
+            emailService.push(entity.getEmail(), "Đăng ký tài khoản", EmailTemplateType.DANGKYV3, otp,
+                    entity.getFullname()); // DANGKYTAIKHOAN
+            return ApiResponse.<String>build().message("OTP đã được gửi qua email.").result(otp);
+        } else if ("phone".equalsIgnoreCase(entity.getMethod())) {
+            String otp = otpService.generateOtp1(convertPhoneNumber(entity.getPhone()));
+            try {
+                infobipService.sendSMS(entity.getPhone(), otp);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return ApiResponse.<String>build().message("OTP đã được gửi qua phone.").result(otp);
+        } else {
+            return ApiResponse.build().message("methor không xác định vui lòng kiểm tra lại!.");
+        }
+    }
+
+    public static String convertPhoneNumber(String phoneNumber) {
+        // Kiểm tra nếu số điện thoại bắt đầu với '0'
+        if (phoneNumber != null && phoneNumber.startsWith("0")) {
+            // Cắt '0' đầu tiên và thay thế bằng +84
+            return "+84" + phoneNumber.substring(1);
+        }
+        // Nếu số điện thoại không bắt đầu bằng '0', trả về chính nó
+        return phoneNumber;
     }
 
     @PostMapping("/api/v2/user/register_1/{otp}")
