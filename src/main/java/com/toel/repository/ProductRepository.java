@@ -123,7 +123,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
 	List<Product> findByBillDetails(List<BillDetail> billDetails);
 
-	@Query("SELECT p " +
+	@Query("SELECT DISTINCT p " +
 			"FROM Product p " +
 			"JOIN BillDetail bd ON p.id = bd.product.id " +
 			"JOIN Bill b ON bd.bill.id = b.id " +
@@ -132,4 +132,16 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			"ORDER BY SUM(bd.quantity) DESC")
 	List<Product> findTop10ByBillDetails(@Param("bills") List<Bill> bills);
 
+	@Query(value = "SELECT DISTINCT p FROM Product p " +
+			"LEFT JOIN BillDetail bd ON p.id = bd.product.id " +
+			"LEFT JOIN Evalue e ON e.product.id = p.id " +
+			"LEFT JOIN Like l ON l.product.id = p.id " +
+			"WHERE p.isDelete = false AND p.isActive = true " +
+			"ORDER BY CASE " +
+			"           WHEN :keySearch = 'moi' THEN p.id " +
+			"           WHEN :keySearch = 'danh gia' THEN COUNT(e.id) " +
+			"           WHEN :keySearch = 'luot ban' THEN SUM(bd.quantity) " +
+			"           WHEN :keySearch = 'yeu thich' THEN COUNT(l.id) " +
+			"         END ASC", nativeQuery = true)
+	List<Product> findChatBot(@Param("keySearch") String keySearch);
 }

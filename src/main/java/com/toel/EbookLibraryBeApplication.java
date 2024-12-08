@@ -16,7 +16,6 @@ import redis.clients.jedis.UnifiedJedis;
 @EnableScheduling
 public class EbookLibraryBeApplication {
 
-
 	public static void main(String[] args) {
 		SpringApplication.run(EbookLibraryBeApplication.class, args);
 
@@ -26,7 +25,7 @@ public class EbookLibraryBeApplication {
 
 		String res2 = jedis.get("bike:1");
 		System.out.println(res2); // Deimos
-		
+
 	}
 
 }

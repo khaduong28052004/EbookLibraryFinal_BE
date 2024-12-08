@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
+import com.toel.dto.admin.response.Response_ProductListFlashSale;
 import com.toel.dto.user.response.Response_Product;
+import com.toel.service.seller.Service_ChatBot;
 import com.toel.service.user.Service_Search;
 
 @RestController
@@ -22,6 +24,8 @@ public class ApiSearch {
 
 	@Autowired
 	Service_Search service_Search;
+	@Autowired
+	Service_ChatBot service_ChatBot;
 
 	@GetMapping("search")
 	public ApiResponse<Map<String, Object>> search(@RequestParam("text") String text) {
@@ -66,6 +70,13 @@ public class ApiSearch {
 					.message(e.getMessage());
 		}
 
+	}
+
+	@GetMapping("/chatBot")
+	public ApiResponse<List<Response_ProductListFlashSale>> chatBot(
+			@RequestParam("text") String key) {
+		return ApiResponse.<List<Response_ProductListFlashSale>>build()
+				.result(service_ChatBot.searchChatBot(key));
 	}
 
 }
