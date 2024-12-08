@@ -88,7 +88,7 @@ public class Service_FlashSale {
                 flashSaleRepository.save(entity);
         }
 
-        @Scheduled(fixedDelay = 100)
+        @Scheduled(fixedDelay = 100000)
         public void run() {
                 if (flashSaleRepository.findByIsDelete(false).size() >= 1) {
                         flashSaleRepository.findByIsDelete(false).forEach(flasesale -> {

@@ -19,17 +19,20 @@ import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.admin.request.Account.Request_AccountCreateOTP;
 import com.toel.dto.admin.response.Response_ProductListFlashSale;
 import com.toel.dto.seller.response.Response_InforSeller;
+import com.toel.dto.seller.response.Response_Like;
 import com.toel.dto.seller.response.Response_Product;
 import com.toel.dto.seller.response.Response_ProductInfo;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.ProductMapper;
+import com.toel.mapper.user.LikeMapper;
 import com.toel.model.Account;
 import com.toel.model.Address;
 import com.toel.model.Bill;
 import com.toel.model.BillDetail;
 import com.toel.model.Evalue;
 import com.toel.model.ImageProduct;
+import com.toel.model.Like;
 import com.toel.model.OrderStatus;
 import com.toel.model.Product;
 import com.toel.model.TypeVoucher;
@@ -39,6 +42,7 @@ import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
 import com.toel.repository.EvalueRepository;
 import com.toel.repository.ImageProductRepository;
+import com.toel.repository.LikeRepository;
 import com.toel.repository.OrderStatusRepository;
 import com.toel.repository.ProductRepository;
 import com.toel.repository.TypeVoucherRepository;
@@ -168,18 +172,6 @@ public class ApiShowInformationSeller {
             return false;
         }
     }
-
-    // @GetMapping("/api/user/voucherall/{idSeller}")
-    // public ApiResponse<?> voucherAll(@PathVariable Integer idSeller) {
-    // Account account = accountRepository.findById(idSeller)
-    // .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
-    // "ID:[" + idSeller + "] không tìm thấy người bán"));
-    // List<Voucher> listVoucher = voucherRepository.findAllByAccount(account);
-    // List<Voucher> listVoucher1 = voucherRepository.findAll();
-    // Map<String, Object> hash = new HashMap<>();
-    // hash.put("Voucher", listVoucher);
-    // return ApiResponse.<Map>build().code(0).message(null).result(hash);
-    // }
 
     @GetMapping("/api/v1/user/voucherAll/{idSeller}")
     public ApiResponse<?> voucherAll(@PathVariable Integer idSeller) {
@@ -312,8 +304,64 @@ public class ApiShowInformationSeller {
     // }
 
     // }
+    @Autowired
+    LikeRepository likeRepository;
+    @Autowired
+    LikeMapper likeMapper;
 
-    @PostMapping("/api/v1/user/topProducts")
+    @PostMapping("/api/v1/user/topLikeProducts1")
+    public ApiResponse<?> thichNhieu(@RequestBody Map<String, String> body) {
+        // TODO: process POST request
+        List<Like> listLike = likeRepository.findAll();
+        List<Response_Like> responeLike = likeMapper.mapToResponseLikeList(listLike);
+        List<Integer> idproduct = new ArrayList<>();
+        // idproduct = listLike.
+        for (Response_Like response_Like : responeLike) {
+            idproduct.add(response_Like.getProduct());
+        }
+
+        List<Product> lisProducts = productRepository.findAllById(idproduct);
+        Map<String, Object> response = new HashMap<>();
+        response.put("response", responeLike);
+        return ApiResponse.<Map>build().message("getMethodName()").result(response);
+    }
+
+    @PostMapping("/api/v1/user/topLikeProducts")//đang dùng
+    public ApiResponse<?> thichNhieu1(@RequestBody Map<String, String> body) {
+        // Lấy danh sách sản phẩm theo lượt like
+        List<Map<String, Object>> topLikedProducts = likeRepository.findTopLikedProducts();
+        // Lấy danh sách id sản phẩm từ kết quả truy vấn
+        List<Integer> productIds = topLikedProducts.stream()
+                .map(item -> (Integer) item.get("productId"))
+                .collect(Collectors.toList());
+        // Lấy chi tiết sản phẩm từ danh sách id
+        List<Product> products = productRepository.findAllById(productIds);
+        List<Response_ProductInfo> listResponse_Products = productMapper.Response_ProductInfo(products);
+        // Chuẩn bị dữ liệu phản hồi
+        List<Map<String, Object>> responseList = topLikedProducts.stream()
+                .map(item -> {
+                    Integer productId = (Integer) item.get("productId");
+                    Long likeCount = (Long) item.get("likeCount");
+                    // Tìm chi tiết sản phẩm tương ứng
+                    Response_ProductInfo product = listResponse_Products.stream()
+                            .filter(p -> p.getId().equals(productId))
+                            .findFirst()
+                            .orElse(null);
+                    // Trả về dữ liệu sản phẩm với số lượt like
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("product", product);
+                    response.put("likeCount", likeCount);
+                    return response;
+                })
+                .collect(Collectors.toList());
+
+        // Đóng gói phản hồi API
+        Map<String, Object> response = new HashMap<>();
+        response.put("topLikedProducts", responseList);
+        return ApiResponse.<Map>build().message("Top liked products retrieved successfully").result(response);
+    }
+
+    @PostMapping("/api/v1/user/topProducts")//đang dùng
     public ApiResponse<?> topProducts(@RequestBody Map<String, String> body) {
         String sellerID = body.get("sellerID");
         System.out.println("Seller ID: " + sellerID);
@@ -358,6 +406,8 @@ public class ApiShowInformationSeller {
 
     }
 
+
+    
     // @PostMapping("/api/v1/user/send-otpe")
     // public ApiResponse<?> sendOtp(@RequestBody @Valid Request_AccountCreateOTP
     // body) {
