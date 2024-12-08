@@ -4,7 +4,13 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+
+// import org.apache.logging.log4j.LogManager;
+// import org.apache.logging.log4j.Logger;
+// import org.apache.logging.log4j.ThreadContext;
+import org.slf4j.MDC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,16 +61,11 @@ public class Service_Account {
         AccountReportRepository accountReportRepository;
         // @Autowired
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-        public Optional<Account> getAccountById(int id) {
-                return accountRepository.findById(id);
-        }
-
         @Autowired
         EmailService emailService;
 
+        private static final Logger logger = LoggerFactory.getLogger("Account");
 
-        
         public PageImpl<Response_Account> getAll(String rolename,
                         String search, Boolean gender, Integer page, Integer size, Boolean sortBy, String sortColumn) {
                 Pageable pageable = PageRequest.of(page, size,
@@ -238,15 +239,30 @@ public class Service_Account {
         public Response_Account updateStatus(int id, String contents) {
                 Account entity = accountRepository.findById(id)
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
+                 MDC.put("affected_id", String.valueOf(id)); // Dùng ID của tài khoản làm "affected_id"
+                 MDC.put("account_id", "1"); // Cập nhật ID tài khoản nếu cần
+
                 if (entity.isStatus()) {
                         emailService.push(entity.getEmail(), "TOEL - Thông Báo Khóa Tài Khoản",
-                                        EmailTemplateType.KHOATAIKHOAN, entity.getFullname(), contents, "Tài khoản");
+                        EmailTemplateType.KHOATAIKHOAN, entity.getFullname(), contents, "Tài khoản");
                         entity.setStatus(false);
+                        logger.info("Tài khoản {} đã bị khóa. Lý do: {}");
+                        logger.info("Tài khoản {} đã bị khóa. Lý do: {}");
+                        logger.info("Tài khoản {} đã bị khóa. Lý do: {}");
+                        logger.info("Tài khoản {} đã bị khóa. Lý do: {}");
+                        logger.info("Tài khoản {} đã bị khóa. Lý do: {}");
                 } else {
                         emailService.push(entity.getEmail(), "TOEL - Thông Báo Mở Tài Khoản",
-                                        EmailTemplateType.MOTAIKHOAN, entity.getFullname(), contents, "Tài khoản");
+                        EmailTemplateType.MOTAIKHOAN, entity.getFullname(), contents, "Tài khoản");
                         entity.setStatus(true);
+                        logger.info("bbbbbbbbbbbbbbbbbbbbbb");
+                        logger.info("bbbbbbbbbbbbbbbbbbbbbb");
+                        logger.info("bbbbbbbbbbbbbbbbbbbbbb");
+                        logger.info("bbbbbbbbbbbbbbbbbbbbbb");
+                        logger.info("bbbbbbbbbbbbbbbbbbbbbb");
                 }
+                MDC.clear();
+
                 return accountMapper.toAccount(accountRepository.saveAndFlush(entity));
         }
 

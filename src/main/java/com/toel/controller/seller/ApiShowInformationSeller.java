@@ -1,25 +1,17 @@
 package com.toel.controller.seller;
 
 import java.util.Date;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
-import com.toel.dto.admin.request.Account.Request_AccountCreateOTP;
-import com.toel.dto.admin.response.Response_ProductListFlashSale;
 import com.toel.dto.seller.response.Response_InforSeller;
-import com.toel.dto.seller.response.Response_Product;
 import com.toel.dto.seller.response.Response_ProductInfo;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
@@ -29,7 +21,6 @@ import com.toel.model.Address;
 import com.toel.model.Bill;
 import com.toel.model.BillDetail;
 import com.toel.model.Evalue;
-import com.toel.model.ImageProduct;
 import com.toel.model.OrderStatus;
 import com.toel.model.Product;
 import com.toel.model.TypeVoucher;
@@ -45,13 +36,10 @@ import com.toel.repository.TypeVoucherRepository;
 import com.toel.repository.VoucherRepository;
 import com.toel.service.user.FollowerService;
 
-import jakarta.validation.Valid;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @CrossOrigin("*")
 @RestController

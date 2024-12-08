@@ -65,7 +65,6 @@ public class OtpController {
     
     @PostMapping("/api/v1/user/canhanhoa")
     public String Adddata() {
-        //TODO: process POST request
         List<String> list = new  ArrayList<>();
         list.add(0, "chao");
         otpService1.setData("1", list);

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+	<!-- Định nghĩa Appender cho console -->
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<charset>
+				UTF-8
+			</charset>
+			<pattern>
+				%d{yyyy-MM-dd HH:mm:ss} %logger{36} %-5level - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<property resource="application.properties" />
+	<springProperty name="driverClass" source="spring.datasource.driver-class-name" />
+	<springProperty name="url" source="spring.datasource.url" />
+	<springProperty name="username" source="spring.datasource.username" />
+	<springProperty name="password" source="spring.datasource.password" />
+	<!-- Appender ghi log vào database -->
+	<appender name="DB" class="ch.qos.logback.classic.db.DBAppender">
+		<connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+			<driverClass>
+				${driverClass}
+			</driverClass>
+			<url>
+				${url}
+			</url>
+			<user>
+				${username}
+			</user>
+			<password>
+				${password}
+			</password>
+		</connectionSource>
+		<sql>
+			<![CDATA[
+			INSERT INTO logs (log_date, level, logger, message, exception, affected_id, account_id)
+			VALUES (CURRENT_TIMESTAMP, '%level', '%logger', '%message', '%ex{short}', '%X{affected_id}', '%X{account_id}')
+			]]>
+		</sql>
+	</appender>
+	<!-- Root logger cấu hình các appender -->
+	<root level="INFO">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="DB" />
+	</root>
+</configuration>
