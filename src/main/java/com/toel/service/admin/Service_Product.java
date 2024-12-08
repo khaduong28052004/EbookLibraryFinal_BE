@@ -16,13 +16,19 @@ import com.toel.dto.admin.response.Response_ProductListFlashSale;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.ProductMapper;
+import com.toel.model.AccountReport;
 import com.toel.model.Product;
+import com.toel.model.ProductReport;
+import com.toel.repository.AccountReportRepository;
+import com.toel.repository.ProductReportRepository;
 import com.toel.repository.ProductRepository;
 import com.toel.service.Email.EmailService;
 import com.toel.service.Email.EmailTemplateType;
 
 @Service
 public class Service_Product {
+      @Autowired
+    ProductReportRepository productReportRepository;
     @Autowired
     ProductRepository productRepository;
     @Autowired
@@ -141,5 +147,10 @@ public class Service_Product {
 
     public Integer getCountProductByAccountId(Integer accountId) {
         return productRepository.countProductByAccountId(accountId);
+    }
+    
+    // show Report sản phẩm
+    public List<ProductReport> getReportsByAccountId(int accountId) {
+        return productReportRepository.findByAccountId(accountId);
     }
 }
