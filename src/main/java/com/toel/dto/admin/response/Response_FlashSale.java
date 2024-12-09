@@ -1,7 +1,6 @@
 package com.toel.dto.admin.response;
 
-import java.util.Date;
-
+import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
@@ -13,10 +12,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Response_FlashSale {
 	Integer id;
+	String title;
 	// @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss", timezone = "UTC")
-	Date dateStart;
+	LocalDateTime dateStart;
 	// @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss", timezone = "UTC")
-	Date dateEnd;
+	LocalDateTime dateEnd;
 	boolean isDelete;
 	Response_Account account;
 }

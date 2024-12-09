@@ -3,6 +3,8 @@ package com.toel.dto.seller.response;
 import java.util.Date;
 import java.util.List;
 
+import com.toel.dto.admin.response.Response_Account;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,5 +41,4 @@ public class Response_Product {
     Response_Category category;
     List<Response_ImageProduct> imageProducts;
     Response_Account account;
-
 }
