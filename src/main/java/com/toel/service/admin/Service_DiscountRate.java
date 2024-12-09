@@ -69,22 +69,50 @@ public class Service_DiscountRate {
     }
 
     public Response_DiscountRate update(Request_DiscountRateUpdate discountRateUpdate) {
-        DiscountRate discountRate = discountRateRepository.findById(discountRateUpdate.getId())
+        DiscountRate entity = discountRateRepository.findById(discountRateUpdate.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Chiết khấu"));
         DiscountRate discountRateNow = discountRateRepository.findLatestDiscountRate().get(0);
         if (discountRateNow.getDiscount() == discountRateUpdate.getDiscount()) {
             throw new AppException(ErrorCode.OBJECT_ACTIVE, "Mức chiết khấu");
         }
-        return Optional.of(discountRate)
-                .map(entity -> {
-                    entity.setDateStart(entity.getDateStart());
-                    entity.setDiscount(entity.getDiscount());
-                    return entity;
-                })
-                .filter(this::check)
-                .map(discountRateRepository::saveAndFlush)
-                .map(discountRateMapper::tochChietKhauResponse)
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Ngày áp dụng đã tồn tại"));
+        entity.setDateStart(entity.getDateStart());
+        entity.setDiscount(entity.getDiscount());
+        if (check(entity)) {
+            Response_DiscountRate dResponse_DiscountRate = discountRateMapper
+                    .tochChietKhauResponse(discountRateRepository.save(entity));
+            Role role = roleRepository.findById(3)
+                    .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Role"));
+            // Lấy danh sách email và tạo bản đồ email -> tên
+            Map<String, String> emailToNameMap = new HashMap<>();
+            List<String> listmail = new ArrayList<>();
+            accountRepository.findAllByStatusAndRole(true, role).forEach(account -> {
+                emailToNameMap.put(account.getEmail(), account.getFullname());
+                listmail.add(account.getEmail());
+            });
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String formattedDate = entity.getDateStart().format(formatter);
+            emailService.pushList(
+                    "TOEL - Thông Báo Cập Nhật Chiết Khấu",
+                    listmail, // Gửi email cho từng người
+                    EmailTemplateType.THEMCHIETKHAU,
+                    emailToNameMap,
+                    formattedDate,
+                    entity.getDiscount().toString() + " %");
+            return dResponse_DiscountRate;
+        } else {
+            throw new AppException(ErrorCode.OBJECT_SETUP, "Ngày áp dụng đã tồn tại");
+        }
+        // return Optional.of(discountRate)
+        // .map(entity -> {
+        // entity.setDateStart(entity.getDateStart());
+        // entity.setDiscount(entity.getDiscount());
+        // return entity;
+        // })
+        // .filter(this::check)
+        // .map(discountRateRepository::saveAndFlush)
+        // .map(discountRateMapper::tochChietKhauResponse)
+        // .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Ngày áp dụng đã
+        // tồn tại"));
 
     }
 

@@ -43,6 +43,6 @@
 	<!-- Root logger cấu hình các appender -->
 	<root level="INFO">
 		<appender-ref ref="CONSOLE" />
-		<appender-ref ref="DB" />
+		<!-- <appender-ref ref="DB" /> -->
 	</root>
 </configuration>
