@@ -33,11 +33,15 @@ public class ApiBillUser {
 	@GetMapping("/read")
 	public ResponseEntity<Map<String, Object>> getAllOrdersByOrderStatus(
 			@RequestParam String orderStatusFind,
-			@RequestParam int userId) {
+			@RequestParam int userId,
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "6") int size) {
 
 		Request_Bill_User requestBillDTO = new Request_Bill_User();
 		requestBillDTO.setOrderStatusFind(orderStatusFind);
 		requestBillDTO.setUserID(userId);
+		requestBillDTO.setPage(page);
+		requestBillDTO.setSize(size);
 		Map<String, Object> response = service_Bill_User.getBills(requestBillDTO);
 		return ResponseEntity.ok(response);
 	}
