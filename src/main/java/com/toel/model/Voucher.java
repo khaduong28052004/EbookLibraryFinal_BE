@@ -28,31 +28,32 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-
 @Entity
 @Table(name = "Vouchers")
 public class Voucher {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer id;
-	
+
 	@Nationalized
 	String name;
-	
+
 	@Nationalized
 	String note;
-	
+
 	double totalPriceOrder;
-	
-	double sale;
-	
+
+	int sale;
+
 	int quantity;
-	
+
 	boolean isDelete;
-	
+
+	double minOrder;
+
 	@Temporal(TemporalType.DATE)
 	Date dateStart;
-	
+
 	@Temporal(TemporalType.DATE)
 	Date dateEnd;
 

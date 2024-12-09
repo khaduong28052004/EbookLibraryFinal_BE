@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.hibernate.annotations.Nationalized;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -35,6 +37,9 @@ public class Address {
 	String phone;
 
 	@Nationalized
+	String street;
+
+	@Nationalized
 	String fullNameAddress;
 
 	Integer province;
@@ -47,6 +52,7 @@ public class Address {
 	@JoinColumn(name = "account_id ")
 	Account account;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "address")
 	List<Bill> bills;
 }

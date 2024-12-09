@@ -39,32 +39,29 @@ public class Service_FlashSaleDetail {
     @Autowired
     ProductMapper productMapper;
 
-    public PageImpl<?> getAll(int page, int size, Boolean sortBy, String column, Boolean status, Integer idFlashSale) {
+    public PageImpl<?> getAll(String search, int page, int size, Boolean sortBy, String column, Boolean status,
+            Integer idFlashSale) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));
         Page<?> pageItems;
         FlashSale flashSale = null;
-
         if (idFlashSale != null) {
             flashSale = flashSaleRepository.findById(idFlashSale)
                     .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Flash sale"));
         }
-        if (Boolean.TRUE.equals(status)) {
-            pageItems = productRepository.selectAllProductInFlashSale(idFlashSale, pageable);
-        } else if (Boolean.FALSE.equals(status)) {
-            pageItems = productRepository.selectAllProductNotInFlashSale(idFlashSale, pageable);
+        if (status) {
+            pageItems = flashSaleDetailRepository.selectAllByFlashSale(flashSale, search, pageable);
+        } else if (status == false) {
+            pageItems = productRepository.selectAllProductNotInFlashSale(idFlashSale, search, pageable);
         } else {
-            pageItems = (idFlashSale != null)
-                    ? flashSaleDetailRepository.findAllByFlashSale(flashSale, pageable)
-                    : flashSaleDetailRepository.findAll(pageable);
+            pageItems = flashSaleDetailRepository.findAll(pageable);
         }
         List<?> list = pageItems.stream()
                 .map(item -> {
-                    if (item instanceof FlashSaleDetail) {
+                    if (status == true) {
                         return flashSaleDetailsMapper.toFlashSaleDetail((FlashSaleDetail) item);
-                    } else if (item instanceof Product) {
+                    } else {
                         return productMapper.response_Product((Product) item);
                     }
-                    return null;
                 })
                 .collect(Collectors.toList());
 

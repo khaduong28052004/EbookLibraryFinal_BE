@@ -36,6 +36,8 @@ public class Product {
 
 	double sale;
 
+	double weight;
+
 	String name;
 
 	String introduce;
@@ -51,18 +53,34 @@ public class Product {
 	Integer quantity;
 
 	boolean isActive;
-// account
+	// account
 	@ManyToOne
 	@JoinColumn(name = "account_id")
 	Account account;
 
-//	category
+	// category
 	@ManyToOne
 	@JoinColumn(name = "category_id")
 	Category category;
-//	flashsale 
+	// flashsale
 	@JsonIgnore
 	@OneToMany(mappedBy = "product")
 	List<FlashSaleDetail> flashSaleDetails;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "product")
+	List<Like> likes;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "product")
+	List<ImageProduct> imageProducts;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "product")
+	List<Evalue> evalues;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "product")
+	List<BillDetail> billDetails;
 
 }

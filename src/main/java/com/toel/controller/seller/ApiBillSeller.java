@@ -2,7 +2,6 @@ package com.toel.controller.seller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,9 +31,10 @@ public class ApiBillSeller {
                         @RequestParam(value = "page", defaultValue = "0") Integer page,
                         @RequestParam(value = "size", defaultValue = "5") Integer size,
                         @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
-                        @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
+                        @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn,
+                        @RequestParam(value = "search", required = false) String search) {
                 return ApiResponse.<PageImpl<Response_Bill>>build()
-                                .result(service_Bill.getAll(page, size, sortBy, sortColumn, account_id));
+                                .result(service_Bill.getAll(page, size, sortBy, sortColumn, account_id, search));
         }
 
         @PostMapping("updateOrderStatus")
@@ -47,10 +47,11 @@ public class ApiBillSeller {
 
         @PostMapping("huy")
         public ApiResponse<Response_Bill> huy(
+                        @RequestParam(value = "content", defaultValue = "") String content,
                         @RequestBody @Valid Request_Bill request_Bill) {
                 return ApiResponse.<Response_Bill>build()
                                 .message("Hủy đơn hàng thành công")
-                                .result(service_Bill.huy(request_Bill));
+                                .result(service_Bill.huy(content, request_Bill));
         }
 
 }

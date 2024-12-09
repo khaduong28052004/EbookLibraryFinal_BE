@@ -10,6 +10,11 @@ import lombok.NoArgsConstructor;
 public class Response_Account {
     Integer id;
     String avatar;
+    String fullname;
+    String phone;
     String background;
     String shopName;
+    String email;
+    Response_Address address;
+
 }

@@ -1,10 +1,9 @@
 package com.toel.dto.admin.response;
 
+import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.List;
 
-import com.toel.dto.admin.request.Account.Request_AccountCreate;
-import com.toel.model.FlashSaleDetail;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,8 +14,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Response_FlashSale {
 	Integer id;
-	Date dateStart;
-	Date dateEnd;
+	String title;
+	// @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss", timezone = "UTC")
+	LocalDateTime dateStart;
+	// @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss", timezone = "UTC")
+	LocalDateTime dateEnd;
 	boolean isDelete;
-	Request_AccountCreate account;
+	Response_Account account;
 }

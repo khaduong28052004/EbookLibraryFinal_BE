@@ -12,5 +12,5 @@ public class Response_Role {
 	String name;
 	String description;
 	// List<Response_RolePermission> rolePermissions;
-	// List<Response_Account> accounts;
+	List<Response_Account> accounts;
 }

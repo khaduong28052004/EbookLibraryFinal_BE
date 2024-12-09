@@ -1,10 +1,5 @@
 package com.toel.dto.user.response;
 
-import java.util.Date;
-import java.util.List;
-
-import org.mapstruct.Mapper;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,22 +10,20 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Response_BillDetail_User {
-	Integer userID;
-	Integer billID;
-	Double billTotalPrice;
-	Double billDiscountPrice;
-	Double billTotalShippingPrice;
-	Integer billTotalQuantity;
-	String billAddress;
-	Integer billOrderStatusId;
-	Date createdDatetime;
-	Date updatedDatetime;
-	Double billDiscountRate;
-	Integer shopId;
-	String shopName;
-	String shopAvatar;
-	String userPhone;
-	String userFullname;
-	List<Response_Bill_Product_User> products; 
-
+	private Integer billId;
+	private Integer userId;
+	private Double billTotalPrice;
+	private Double billDiscountPrice;
+	private Double billPriceShipping;
+	private Integer billTotalQuantity;
+	private String orderStatus;
+	private Integer orderStatusId;
+	private String createdDatetime;
+	private String updatedDatetime;
+	private Double billDiscountRate;
+	private Double productTempPrice;
+	private Double billShippingPrice;
+	private String userPhone;
+	private String userFullname;
+	private String userAddress;
 }

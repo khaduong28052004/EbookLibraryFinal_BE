@@ -31,9 +31,10 @@ public class ApiEvalueSeller {
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "size", defaultValue = "5") Integer size,
             @RequestParam(value = "sortBy", defaultValue = "true") boolean sortBy,
-            @RequestParam(value = "sortColum", defaultValue = "id") String sortColum) {
+            @RequestParam(value = "sortColum", defaultValue = "id") String sortColum,
+            @RequestParam(value = "search", required = false) String search) {
         return ApiResponse.<PageImpl<Response_Evalue>>build()
-                .result(service_Evalue.getAll(page, size, sortBy, sortColum, account_id));
+                .result(service_Evalue.getAll(page, size, sortBy, sortColum, account_id, search));
     }
 
     @PostMapping("/phanHoi")

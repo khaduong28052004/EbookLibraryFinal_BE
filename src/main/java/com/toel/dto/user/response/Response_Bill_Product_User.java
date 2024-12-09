@@ -1,9 +1,6 @@
 package com.toel.dto.user.response;
 
 import java.util.Date;
-import java.util.List;
-
-import org.mapstruct.Mapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,13 +14,12 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Response_Bill_Product_User {
-	Integer productId;
-	String productName;
-	String productIntroduce;
-	Integer productQuantity;
-	Double productPrice;
-	Double productDiscountPrice;
-	String productImageURL;
-	Boolean isEvaluate;
-
+	private Integer billId; // b.id AS billId
+	private Integer userId; // a.id AS userId
+	private Double totalPriceBill; // b.totalPrice AS totalBillPrice
+	private Double priceShippingBill; // b.priceShipping AS priceShippingBill
+	private Integer totalQuantityBill; // b.totalQuantity AS totalBillQuantity
+	private String orderStatus; // os.name AS orderStatus
+	private Date createdDatetime; // b.createAt AS createdDatetime
+	private Date updatedDatetime; // b.updateAt AS updatedDatetime
 }

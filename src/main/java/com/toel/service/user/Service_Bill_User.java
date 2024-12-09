@@ -1,74 +1,121 @@
 package com.toel.service.user;
 
-import java.security.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_Bill_User;
-import com.toel.dto.user.response.Response_Bill_Shop_User;
-import com.toel.dto.user.response.Response_Bill_Product_User;
+import com.toel.dto.BillDTO;
 import com.toel.dto.user.resquest.Request_Bill_User;
+import com.toel.exception.AppException;
+import com.toel.exception.ErrorCode;
+import com.toel.mapper.BillMapper;
 import com.toel.model.Account;
-import com.toel.model.Address;
 import com.toel.model.Bill;
 import com.toel.model.Cart;
-import com.toel.model.Evalue;
-import com.toel.model.OrderStatus;
+import com.toel.model.FlashSaleDetail;
 import com.toel.model.Product;
+import com.toel.model.Voucher;
+import com.toel.model.VoucherDetail;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.AddressRepository;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
 import com.toel.repository.CartRepository;
 import com.toel.repository.EvalueRepository;
+import com.toel.repository.FlashSaleDetailRepository;
 import com.toel.repository.OrderStatusRepository;
-import com.toel.repository.ProductReportRepository;
+import com.toel.repository.PaymentMethodRepository;
+import com.toel.repository.ProductRepository;
+import com.toel.repository.VoucherDetailRepository;
+import com.toel.repository.VoucherRepository;
+import com.toel.service.Email.EmailService;
+import com.toel.service.Email.EmailTemplateType;
 
 @Service("userServiceBill")
 public class Service_Bill_User {
 	@Autowired
 	BillRepository billRepository;
+
 	@Autowired
 	BillDetailRepository billDetailRepository;
+
 	@Autowired
 	OrderStatusRepository orderStatusRepository;
+
+	@Autowired
+	PaymentMethodRepository paymentMethodRepository;
+
 	@Autowired
 	AccountRepository accountRepository;
-	@Autowired
-	ProductReportRepository productRepository;
+
 	@Autowired
 	EvalueRepository evaluateRepository;
+
 	@Autowired
 	CartRepository cartRepository;
+
 	@Autowired
 	AddressRepository addressRepository;
+
 	@Autowired
 	OrderStatusRepository oderStatusRepository;
 
+	@Autowired
+	EmailService emailService;
+
+	@Autowired
+	BillMapper billMapper;
+
+	@Autowired
+	ProductRepository productRepository;
+
+	@Autowired
+	VoucherDetailRepository voucherDetailRepository;
+
+	@Autowired
+	FlashSaleDetailRepository flashSaleDetailRepository;
+
+	@Autowired
+	VoucherRepository voucherRepository;
+
 	public Map<String, Object> getBills(Request_Bill_User requestBillDTO) {
-		Map<String, Object> response = new HashMap<String, Object>();
+		Map<String, Object> response = new HashMap<>();
 		try {
 			List<Object[]> productsInBill = getBillsByOrderStatus(requestBillDTO);
-			List<Response_Bill_User> shopListInBill = createBillsWithProductsInBillDetail(productsInBill);
-			response.put("data", shopListInBill);
-			response.put("status", "success");
+			List<Response_Bill_User> listConver = convertToResponseBillUser(productsInBill);
+			List<BillDTO> shopListInBill = createBillsWithProductsInBillDetail(listConver);
+
+			int page = requestBillDTO.getPage();
+			int size = requestBillDTO.getSize();
+			int totalItems = shopListInBill.size();
+			int totalPages = (int) Math.ceil((double) totalItems / size);
+
+			// Lấy dữ liệu cho trang hiện tại
+			int start = Math.min(page * size, totalItems);
+			int end = Math.min(start + size, totalItems);
+			List<BillDTO> paginatedList = shopListInBill.subList(start, end);
+
+			response.put("data", paginatedList); // Dữ liệu cho trang hiện tại
+			response.put("currentPage", page);
+			response.put("totalItems", totalItems);
+			response.put("totalPages", totalPages);
+			response.put("pageSize", size);
+
+			// response.put("data", shopListInBill);
+			response.put("status", "successfully");
 			response.put("message", "Retrieve data successfully");
 		} catch (Exception e) {
 			response.put("status", "error");
 			response.put("message", "An error occurred while retrieving orders.");
 			response.put("error", e.getMessage());
-			return (Map<String, Object>) ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 		return response;
 	}
@@ -79,204 +126,214 @@ public class Service_Bill_User {
 				: BillShopRequestDTO.getOrderStatusFind();
 
 		switch (orderStatus) {
-		case "CHUANBI":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByCreateAt(userId, 1);
-		case "DANGXULY":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 2);
-		case "DANGGIAO":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 3);
-		case "DAGIAO":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 4);
-		case "HOANTHANH":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 5);
-		case "DAHUY":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 6);
-		default:
-			return billRepository.getBillsByUserIdAll(userId);
+			case "CHODUYET":
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 1, "create"); // Status
+			case "DANGXULY":
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 2, "update"); // Status
+			case "DANGGIAO":
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 3, "update"); // Status
+			case "DAGIAO":
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 4, "update"); // Status
+			case "HOANTHANH":
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 5, "update"); // Status
+			case "DAHUY":
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 6, "update"); // Status
+			default:
+				return billRepository.findBillsByUserId(userId); // Default: No filter on order status
 		}
 	}
 
-	public List<Response_Bill_User> createBillsWithProductsInBillDetail(List<Object[]> productsInBill) {
-		Map<Integer, Response_Bill_User> billMap = new HashMap<>(); // Map để lưu các bill với key là billID
-		List<Response_Bill_User> bills = new ArrayList<>(); // Danh sách để trả về cuối cùng
-
-		for (Object[] product : productsInBill) {
-			Integer billID = Integer.parseInt(product[1].toString());
-			Integer userID = Integer.parseInt(product[0].toString());
-			Double billTotalPrice = Double.parseDouble(product[2].toString());
-			Double billDiscountPrice = Double.parseDouble(product[3].toString());
-			Double billTotalShippingPrice = Double.parseDouble(product[4].toString());
-			Integer billTotalQuantity = Integer.parseInt(product[5].toString());
-			String billAddress = product[6].toString();
-			Integer orderStatusID = Integer.parseInt(product[7].toString());
-			Date createdDatetime = (Date) product[8];
-			Date updatedDatetime = (Date) product[9];
-			Double billDiscountRate = Double.parseDouble(product[10].toString());
-			Integer productID = Integer.parseInt(product[11].toString());
-			String productName = product[12].toString();
-			String productIntroduce = product[13].toString();
-			Integer productQuantity = Integer.parseInt(product[14].toString());
-			Double productPrice = Double.parseDouble(product[15].toString());
-			Double productDiscountPrice = Double.parseDouble(product[16].toString());
-			String productImageURL = product[17].toString();
-			Integer shopId = Integer.parseInt(product[18].toString());
-			String shopName = product[19].toString();
-			String shopAvatar = product[20].toString();
-
-			Response_Bill_User billData = billMap.get(billID);
-			if (billData == null) {
-				billData = new Response_Bill_User();
-				billData.setBillID(billID);
-				billData.setUserID(userID);
-				billData.setBillTotalPrice(billTotalPrice);
-				billData.setBillDiscountPrice(billDiscountPrice);
-				billData.setBillTotalShippingPrice(billTotalShippingPrice);
-				billData.setBillTotalQuantity(billTotalQuantity);
-				billData.setBillAddress(billAddress);
-				billData.setBillOrderStatusId(orderStatusID);
-				billData.setCreatedDatetime(createdDatetime);
-				billData.setUpdatedDatetime(updatedDatetime);
-				billData.setBillDiscountRate(billDiscountRate);
-				billData.setShopId(shopId);
-				billData.setShopName(shopName);
-				billData.setShopAvatar(shopAvatar);
-				billData.setProducts(new ArrayList<>());
-				billMap.put(billID, billData); // Thêm bill mới vào Map
-			}
-
-			Response_Bill_Product_User productData = new Response_Bill_Product_User();
-			productData.setProductId(productID);
-			productData.setProductName(productName);
-			productData.setProductIntroduce(productIntroduce);
-			productData.setProductQuantity(productQuantity);
-			productData.setProductPrice(productPrice);
-			productData.setProductDiscountPrice(productDiscountPrice);
-			productData.setProductImageURL(productImageURL);
-
-			Evalue isEvalued = evaluateRepository.findByProductIdAndAccountId(userID, productID, billID);
-			productData.setIsEvaluate(isEvalued != null);
-			billData.getProducts().add(productData);
+	public List<Response_Bill_User> convertToResponseBillUser(List<Object[]> result) {
+		List<Response_Bill_User> bills = new ArrayList<>();
+		for (Object[] row : result) {
+			Response_Bill_User bill = new Response_Bill_User();
+			bill.setBillId((Integer) row[0]);
+			bill.setUserId((Integer) row[1]);
+			bill.setTotalPriceBill((Double) row[2]);
+			bill.setPriceShippingBill((Double) row[3]);
+			bill.setTotalQuantityBill((Integer) row[4]);
+			bill.setOrderStatus((String) row[5]);
+			bill.setCreatedDatetime((Date) row[6]);
+			bill.setUpdatedDatetime((Date) row[7]);
+			bill.setPaymentMethod((String) row[8]);
+			bills.add(bill);
 		}
-		bills.addAll(billMap.values());
 		return bills;
 	}
 
-	public Map<String, Object> cancelBill(Integer billId) {
-		Map<String, Object> response = new HashMap<String, Object>();
-		Optional<Bill> billOptional = billRepository.findById(billId);
-		Optional<OrderStatus> orderStatusOptional = orderStatusRepository.findById(6);
+	public List<BillDTO> createBillsWithProductsInBillDetail(List<Response_Bill_User> productsInBill) {
+		List<BillDTO> billList = new ArrayList<>();
 
-		if (orderStatusOptional.isEmpty()) {
-			response.put("message", "Trạng thái đơn hàng không tồn tại");
-			response.put("status", "fail");
-			return response;
-		}
+		for (Response_Bill_User bill : productsInBill) {
+			BillDTO newBill = new BillDTO();
+			Integer billId = bill.getBillId();
+			Integer userId = bill.getUserId();
+			Double totalPriceBill = bill.getTotalPriceBill();
+			Double priceShippingBill = bill.getPriceShippingBill();
+			Integer totalBillQuantity = bill.getTotalQuantityBill();
+			String orderStatus = bill.getOrderStatus();
+			Date createAt = bill.getCreatedDatetime();
+			Date updateAt = bill.getUpdatedDatetime();
+			String paymentMethod = bill.getPaymentMethod().toUpperCase();
 
-		if (billOptional.isEmpty()) {
-			response.put("message", "Đơn hàng không tồn tại");
-			response.put("status", "fail");
-		}
+			newBill.setBillId(billId);
+			newBill.setUserId(userId);
+			newBill.setTotalPriceBill(totalPriceBill);
+			newBill.setPriceShippingBill(priceShippingBill);
+			newBill.setOrderStatus(orderStatus);
+			newBill.setCreatedDatetime(createAt);
+			newBill.setUpdatedDatetime(updateAt);
+			newBill.setTotalQuantityBill(totalBillQuantity);
+			newBill.setPaymentMethod(paymentMethod);
 
-		try {
-			Bill bill = billOptional.get();
-			bill.setUpdateAt(new Date());
-			bill.setOrderStatus(orderStatusOptional.get());
-			billRepository.saveAndFlush(bill);
-			response.put("message", "Hủy đơn thành công");
-			response.put("status", "successfully");
-		} catch (Exception e) {
-			response.put("message", "Hủy đơn thất bại");
-			response.put("status", "error");
-			response.put("server-message", e.getMessage());
+			billList.add(newBill);
 		}
-		return response;
+		return billList;
 	}
 
-	public Map<String, Object> confirmBill(Integer billId) {
-		Map<String, Object> response = new HashMap<String, Object>();
+	public Bill cancelBill(Integer billId) {
+		checkBillStatus(billId, 1);
+		Bill bill = billRepository.findById(billId).get();
+		bill.setUpdateAt(new Date());
+		bill.setFinishAt(new Date());
+		bill.setOrderStatus(orderStatusRepository.findById(6).get());
+		billRepository.saveAndFlush(bill);
+		returnStatus(bill);
 
-		Optional<OrderStatus> orderStatusOptional = orderStatusRepository.findById(5);
-		if (orderStatusOptional.isEmpty()) {
-			response.put("message", "Trạng thái đơn hàng không tồn tại");
-			response.put("status", "fail");
-		}
+		sendNotification(bill);
 
-		Optional<Bill> billOptional = billRepository.findById(billId);
-		if (billOptional.isEmpty()) {
-			response.put("message", "Đơn hàng không tồn tại");
-			response.put("status", "fail");
-		}
-
-		try {
-			Bill bill = billOptional.get();
-			bill.setUpdateAt(new Date());
-			bill.setOrderStatus(orderStatusOptional.get());
-			billRepository.saveAndFlush(bill);
-
-			response.put("message", "Đã xác nhận thành công");
-			response.put("status", "successfully");
-		} catch (Exception e) {
-			response.put("message", "Xác nhận thất bại");
-			response.put("status", "error");
-			response.put("server-message", e.getMessage());
-		}
-
-		return response;
+		return billRepository.saveAndFlush(bill);
 	}
 
-	public Map<String, Object> reOrder(Integer billId) {
-		Map<String, Object> response = new HashMap<String, Object>();
-		List<Cart> cart = new ArrayList<Cart>();
-
-		List<Object[]> originBills = billDetailRepository.getOriginBillsByBillId(billId);
-		if (originBills.isEmpty()) {
-			response.put("data", false);
-			response.put("message", "Không có chi tiết hóa đơn nào được tìm thấy.");
-			response.put("status", "fail");
-			return response;
-		}
-
+	public void returnStatus(Bill bill) {
 		try {
-			for (Object[] billDetail : originBills) {
-				Integer quantityToAdd = Integer.parseInt(billDetail[0].toString());
-				Integer accountId = Integer.parseInt(billDetail[1].toString());
-				Integer productId = Integer.parseInt(billDetail[2].toString());
+			List<Product> updatedProducts = new ArrayList<>();
+			List<FlashSaleDetail> updatedFlashSaleDetails = new ArrayList<>();
+			List<VoucherDetail> voucherDetailsToDelete = new ArrayList<>();
+			List<Voucher> updatedVouchers = new ArrayList<>();
 
-				Cart existingCartDetail = cartRepository.findCartByAccountIdAndProductId(productId, accountId);
-				if (existingCartDetail != null) {
-					existingCartDetail.setQuantity(existingCartDetail.getQuantity() + quantityToAdd);
-					cartRepository.saveAndFlush(existingCartDetail);
-				} else {
+			bill.getBillDetails().forEach(billDetail -> {
+				Product product = billDetail.getProduct();
+				product.setQuantity(product.getQuantity() + billDetail.getQuantity());
+				updatedProducts.add(product);
 
-					Account account = new Account();
-					account.setId(accountId);
-
-					Product product = new Product();
-					product.setId(productId);
-
-					Cart newCart = new Cart();
-					newCart.setAccount(account);
-					newCart.setProduct(product);
-					newCart.setQuantity(quantityToAdd);
-					cart.add(newCart);
+				if (billDetail.getFlashSaleDetail() != null) {
+					FlashSaleDetail flashSaleDetail = billDetail.getFlashSaleDetail();
+					flashSaleDetail.setQuantity(flashSaleDetail.getQuantity() + billDetail.getQuantity());
+					updatedFlashSaleDetails.add(flashSaleDetail);
 				}
+			});
+
+			if (bill.getVoucherDetails() != null) {
+				bill.getVoucherDetails().forEach(voucherDetails -> {
+					Voucher voucher = voucherDetails.getVoucher();
+					voucher.setQuantity(voucher.getQuantity() + 1);
+					updatedVouchers.add(voucher);
+					voucherDetailsToDelete.add(voucherDetails);
+				});
+			}
+			if (!updatedProducts.isEmpty()) {
+				productRepository.saveAll(updatedProducts);
+			}
+			if (!updatedFlashSaleDetails.isEmpty()) {
+				flashSaleDetailRepository.saveAll(updatedFlashSaleDetails);
+			}
+			if (!updatedVouchers.isEmpty()) {
+				voucherRepository.saveAll(updatedVouchers);
+
+			}
+			if (!voucherDetailsToDelete.isEmpty()) {
+				voucherDetailRepository.deleteAll(voucherDetailsToDelete);
 			}
 
-			if (!cart.isEmpty()) {
-				cartRepository.saveAll(cart);
-			}
-
-			response.put("data", true);
-			response.put("message", "Đã thêm vào giỏ hàng");
-			response.put("status", "successfully");
 		} catch (Exception e) {
-			response.put("data", false);
-			response.put("message", "Lỗi thêm vào giỏ hàng");
-			response.put("status", "error");
-			response.put("error", e.getMessage());
+			e.printStackTrace();
+			throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION, "System");
+		}
+	}
+
+	public void confirmBill(Integer billId) {
+		checkBillStatus(billId, 4);
+		Bill bill = billRepository.findById(billId).get();
+		bill.setUpdateAt(new Date());
+		bill.setFinishAt(new Date());
+		bill.setOrderStatus(orderStatusRepository.findById(5).get());
+		billRepository.saveAndFlush(bill);
+
+	}
+
+	private void sendNotification(Bill bill) {
+		String email = bill.getAccount().getEmail();
+		System.out.println("email " + email);
+		String subject = "TOEL - Thông báo cập nhật trạng thái hủy đơn hàng ";
+		String content = " Khách hàng đã hủy đơn của shop. Xin cảm ơn vì sử dụng dịch vụ bán hàng trên TOEL.";
+		emailService.push(email, subject, EmailTemplateType.HUYDON,
+				bill.getBillDetails().get(0).getProduct().getAccount().getShopName(),
+				String.valueOf(bill.getId()), content);
+
+	}
+
+	public void reOrder(Integer billId) {
+		checkBillStatus(billId, 6);
+		checkBillStatus(billId, 5);
+
+		List<Cart> cart = new ArrayList<Cart>();
+		List<Object[]> originBills = billDetailRepository.getOriginBillsByBillId(billId);
+
+		for (Object[] billDetail : originBills) {
+			Integer quantityToAdd = Integer.parseInt(billDetail[0].toString());
+			Integer accountId = Integer.parseInt(billDetail[1].toString());
+			Integer productId = Integer.parseInt(billDetail[2].toString());
+
+			Cart existingCartDetail = cartRepository.findCartByAccountIdAndProductId(productId, accountId);
+			if (existingCartDetail != null) {
+				existingCartDetail.setQuantity(existingCartDetail.getQuantity() + quantityToAdd);
+				cartRepository.saveAndFlush(existingCartDetail);
+			} else {
+				Cart newCart = new Cart();
+
+				Account account = new Account();
+				account.setId(accountId);
+
+				Product product = new Product();
+				product.setId(productId);
+
+				newCart.setAccount(account);
+				newCart.setProduct(product);
+				newCart.setQuantity(quantityToAdd);
+				cart.add(newCart);
+			}
 		}
 
-		return response;
+		if (!cart.isEmpty()) {
+			cartRepository.saveAll(cart);
+		}
+	}
+
+	private void checkBillStatus(Integer billId, Integer orderStatusId) {
+		if (billRepository.findById(billId).isEmpty() || billId == null) {
+			// throw new CustomException("Đơn hàng không tồn tại", "error");
+		}
+		if (orderStatusRepository.findById(orderStatusId).isEmpty()) {
+			// throw new CustomException("Trạng thái đơn hàng không tồn tại", "error");
+		}
+	}
+
+	public static String formatDate(String inputDate) {
+		// Định dạng đầu vào
+		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+		// Định dạng đầu ra
+		SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy/MM/dd");
+
+		try {
+			// Phân tích chuỗi đầu vào thành đối tượng Date
+			Date date = inputFormat.parse(inputDate);
+			// Định dạng lại đối tượng Date thành chuỗi đầu ra
+			return outputFormat.format(date);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return null; // Hoặc xử lý lỗi theo cách khác
+		}
 	}
 
 }

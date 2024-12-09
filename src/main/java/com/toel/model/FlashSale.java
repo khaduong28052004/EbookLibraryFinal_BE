@@ -1,7 +1,6 @@
 package com.toel.model;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -36,6 +35,8 @@ public class FlashSale {
 	LocalDateTime dateStart;
 
 	LocalDateTime dateEnd;
+
+	String title;
 
 	boolean isDelete;
 

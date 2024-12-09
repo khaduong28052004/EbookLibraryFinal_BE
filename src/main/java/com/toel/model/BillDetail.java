@@ -1,21 +1,13 @@
 package com.toel.model;
 
-import java.util.Date;
-import java.util.List;
-
-import org.hibernate.annotations.Nationalized;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -35,7 +27,7 @@ public class BillDetail {
 	Integer id;
 	int quantity;
 	double price;
-	double discountPrice;
+	
 	@ManyToOne
 	@JoinColumn(name = "product_id")
 	Product product;
@@ -46,5 +38,9 @@ public class BillDetail {
 
 	@OneToOne(mappedBy = "billDetail")
 	Evalue evalue;
+
+	@ManyToOne
+	@JoinColumn(name = "flashsaledetail_id")
+	FlashSaleDetail flashSaleDetail;
 
 }

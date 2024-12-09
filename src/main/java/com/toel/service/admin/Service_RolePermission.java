@@ -1,5 +1,8 @@
 package com.toel.service.admin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,15 +29,19 @@ public class Service_RolePermission {
     @Autowired
     RolePermissionMapper rolePermissionMapper;
 
-    public Response_RolePermission create(Request_RolePermissionCreate entity) {
-        Permission permission = permissionRepository.findById(entity.getPermission())
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,"Permission"));
-        Role role = roleRepository.findById(entity.getRole())
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Role"));
-        RolePermission rolePermission = new RolePermission();
-        rolePermission.setPermission(permission);
-        rolePermission.setRole(role);
-        return rolePermissionMapper.toRolePermission(rolePermissionRepository.save(rolePermission));
+    public List<Response_RolePermission> create(Request_RolePermissionCreate entity) {
+        Role role = roleRepository.findByNameIgnoreCase(entity.getRole());
+        List<Response_RolePermission> list = new ArrayList<>();
+        entity.getPermission().forEach(permissionId -> {
+            RolePermission rolePermission = new RolePermission();
+            Permission permission = permissionRepository.findById(permissionId)
+                    .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Permission"));
+            rolePermission.setPermission(permission);
+            rolePermission.setRole(role);
+            list.add(rolePermissionMapper.toRolePermission(rolePermissionRepository.save(rolePermission)));
+        });
+
+        return list;
     }
 
     public void delete(Integer id) {

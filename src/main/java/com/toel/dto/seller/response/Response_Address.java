@@ -9,6 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Response_Address {
     Integer id;
-    String fullNameAddress;
+    boolean status;
     String phone;
+    String fullNameAddress;
+    String street;
+    Integer province;
+    Integer district;
+    String wardCode;
 }

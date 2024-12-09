@@ -13,43 +13,149 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import com.toel.dto.seller.request.Request_Category;
+import com.toel.dto.seller.request.Category.Request_CategoryCreate;
+import com.toel.dto.seller.request.Category.Request_CategoryUpdate;
 import com.toel.dto.seller.response.Response_Category;
+import com.toel.dto.seller.response.Response_CategorySeller;
+import com.toel.exception.AppException;
+import com.toel.exception.ErrorCode;
 import com.toel.mapper.CategoryMapper;
+import com.toel.mapper.ProductMapper;
 import com.toel.model.Category;
+import com.toel.repository.AccountRepository;
 import com.toel.repository.CategoryRepository;
 
 @Service
 public class Service_CategorySeller {
 
-    @Autowired
-    CategoryMapper categoryMapper;
+        @Autowired
+        CategoryMapper categoryMapper;
 
-    @Autowired
-    CategoryRepository categoryRepository;
+        @Autowired
+        CategoryRepository categoryRepository;
 
-    public PageImpl<Response_Category> getAll(
-            Integer page, Integer size, boolean sortBy, String sortColumn) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
-        Page<Category> pageCategory = categoryRepository.findAll(pageable);
-        List<Response_Category> list = pageCategory.stream()
-                .map(category -> categoryMapper.response_Category(category))
-                .collect(Collectors.toList());
-        return new PageImpl<>(list, pageable, pageCategory.getTotalElements());
-    }
+        @Autowired
+        ProductMapper productMapper;
 
-    public Response_Category save(
-            Request_Category request_Category) {
-        return categoryMapper
-                .response_Category(categoryRepository.saveAndFlush(categoryMapper.category(request_Category)));
-    }
+        @Autowired
+        AccountRepository accountRepository;
 
-    public void delete(
-            Integer id_category) {
-        categoryRepository.findById(id_category)
-                .ifPresent(
-                        category -> {
-                            categoryRepository.delete(category);
-                        });
-    }
+        public PageImpl<Response_Category> getAll(
+                        Integer page, Integer size, boolean sortBy, String sortColumn, String search) {
+                try {
+                        Pageable pageable = PageRequest.of(page, size,
+                                        Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
+                        Page<Category> pageCategory = categoryRepository.findALlBySearch(search, pageable);
+                        return new PageImpl<>(pageCategory.stream()
+                                        .map(category -> categoryMapper.response_Category(category))
+                                        .collect(Collectors.toList()), pageable, pageCategory.getTotalElements());
+                } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION, "System");
+                }
+
+        }
+
+        public PageImpl<Response_CategorySeller> getAllSeller(
+                        Integer page, Integer size, boolean sortBy, String sortColum, String search,
+                        Integer account_id) {
+                try {
+                        Pageable pageable = PageRequest.of(page, size,
+                                        Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColum));
+                        Page<Object[]> pageCategory = categoryRepository.findCategoriesWithParentName(search,
+                                        account_id,
+                                        pageable);
+                        return new PageImpl<>(pageCategory.stream()
+                                        .map(objects -> {
+                                                Integer id = (Integer) objects[0];
+                                                String name = (String) objects[1];
+                                                Integer idParent = (Integer) objects[2];
+                                                String parentName = (String) objects[3];
+                                                Boolean hasProducts = (Boolean) objects[4];
+                                                return new Response_CategorySeller(id, name, idParent,
+                                                                parentName != null ? parentName : "Không Có Danh Mục",
+                                                                hasProducts);
+                                        })
+                                        .collect(Collectors.toList()), pageable, pageCategory.getTotalElements());
+                } catch (Exception e) {
+                        e.printStackTrace();
+                        throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION, "System");
+                }
+
+        }
+
+        public List<Response_Category> getAllList() {
+                return categoryRepository.findALlByIdParentZero().stream()
+                                .map(category -> categoryMapper.response_Category(category))
+                                .collect(Collectors.toList());
+        }
+
+        public List<Response_Category> getIdParentAndAccount(
+                        Integer idParent, Integer account_id) {
+                return categoryRepository.findALlByIdParentAndAccount(idParent, account_id).stream()
+                                .map(category -> categoryMapper.response_Category(category))
+                                .collect(Collectors.toList());
+        }
+
+        public List<Response_Category> getIdParent(
+                        Integer idParent) {
+                return categoryRepository.findALlByIdParent(idParent).stream()
+                                .map(category -> categoryMapper.response_Category(category))
+                                .collect(Collectors.toList());
+        }
+
+        public Response_Category create(
+                        Request_CategoryCreate request_Category) {
+                return Optional.of(request_Category)
+                                .map(categoryMapper::categoryCreate)
+                                .map(category -> {
+                                        category.setAccount(accountRepository.findById(request_Category.getAccount())
+                                                        .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
+                                                                        "Account")));
+                                        return category;
+                                })
+                                .filter(this::checkCategory)
+                                .map(categoryRepository::saveAndFlush)
+                                .map(categoryMapper::response_Category)
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Tên danh mục đã tồn tại"));
+        }
+
+        public Response_Category update(
+                        Request_CategoryUpdate request_Category) {
+                return Optional.of(request_Category)
+                                .map(categoryMapper::categoryUpdate)
+                                .map(category -> {
+                                        category.setAccount(accountRepository.findById(request_Category.getAccount())
+                                                        .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
+                                                                        "Account")));
+                                        return category;
+                                })
+                                .filter(this::checkCategory)
+                                .map(categoryRepository::saveAndFlush)
+                                .map(categoryMapper::response_Category)
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Tên danh mục đã tồn tại"));
+        }
+
+        public void delete(
+                        Integer id_category) {
+                categoryRepository.findById(id_category)
+                                .ifPresentOrElse(category -> categoryRepository.delete(category), () -> {
+                                        throw new AppException(ErrorCode.OBJECT_NOT_FOUND, "Category");
+                                });
+        }
+
+        public Response_Category edit(
+                        Integer id) {
+                return categoryMapper.response_Category(categoryRepository.findById(id)
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Danh mục")));
+        }
+
+        public boolean checkCategory(
+                        Category category) {
+                return categoryRepository.findALlByIdAccount(category.getAccount().getId()).stream()
+                                .noneMatch(categoryCheck -> category.getName()
+                                                .equals(categoryCheck.getName())
+                                                && (category.getId() == null
+                                                                || !category.getId().equals(categoryCheck.getId())));
+        }
 }

@@ -14,4 +14,8 @@ public class Request_Evalue {
     Integer idParent;
     @NotBlank(message = "FIELD_REQUIRED")
     String content;
+    @NotNull(message = "FIELD_REQUIRED")
+    Integer account;
+    @NotNull(message = "FIELD_REQUIRED")
+    Integer product;
 }
