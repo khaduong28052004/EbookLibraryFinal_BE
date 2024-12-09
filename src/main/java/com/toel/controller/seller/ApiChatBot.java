@@ -11,19 +11,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.admin.response.Response_ProductListFlashSale;
+import com.toel.dto.user.response.Response_Product;
 import com.toel.service.seller.Service_ChatBot;
 
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/chatBot")
 public class ApiChatBot {
-    // @Autowired
-    // Service_ChatBot service_ChatBot;
+    @Autowired
+    Service_ChatBot service_ChatBot;
 
-    // @GetMapping("/search")
-    // public ApiResponse<List<Response_ProductListFlashSale>> search(
-    // @RequestParam(value = "key", required = false) String key) {
-    // return ApiResponse.<List<Response_ProductListFlashSale>>build()
-    // .result(service_ChatBot.searchChatBot(key));
-    // }
+    @GetMapping("/search")
+    public ApiResponse<List<Response_Product>> search(
+            @RequestParam(value = "key", required = false) String key) {
+        return ApiResponse.<List<Response_Product>>build()
+                .result(service_ChatBot.searchChatBot(key));
+    }
 }

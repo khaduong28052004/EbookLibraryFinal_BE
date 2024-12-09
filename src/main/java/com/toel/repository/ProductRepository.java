@@ -132,16 +132,74 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			"ORDER BY SUM(bd.quantity) DESC")
 	List<Product> findTop10ByBillDetails(@Param("bills") List<Bill> bills);
 
-	@Query(value = "SELECT DISTINCT p FROM Product p " +
+	@Query("SELECT p FROM Product p " +
 			"LEFT JOIN BillDetail bd ON p.id = bd.product.id " +
 			"LEFT JOIN Evalue e ON e.product.id = p.id " +
 			"LEFT JOIN Like l ON l.product.id = p.id " +
 			"WHERE p.isDelete = false AND p.isActive = true " +
+			"GROUP BY p.id " +
 			"ORDER BY CASE " +
 			"           WHEN :keySearch = 'moi' THEN p.id " +
 			"           WHEN :keySearch = 'danh gia' THEN COUNT(e.id) " +
 			"           WHEN :keySearch = 'luot ban' THEN SUM(bd.quantity) " +
 			"           WHEN :keySearch = 'yeu thich' THEN COUNT(l.id) " +
-			"         END ASC", nativeQuery = true)
-	List<Product> findChatBot(@Param("keySearch") String keySearch);
+			"         END DESC")
+	List<Product> findChatBotDESC(@Param("keySearch") String keySearch);
+
+	@Query("SELECT p FROM Product p " +
+			"LEFT JOIN BillDetail bd ON p.id = bd.product.id " +
+			"LEFT JOIN Evalue e ON e.product.id = p.id " +
+			"LEFT JOIN Like l ON l.product.id = p.id " +
+			"WHERE p.isDelete = false AND p.isActive = true " +
+			"GROUP BY p.id " +
+			"ORDER BY CASE " +
+			"           WHEN :keySearch = 'moi' THEN p.id " +
+			"           WHEN :keySearch = 'danh gia' THEN COUNT(e.id) " +
+			"           WHEN :keySearch = 'luot ban' THEN SUM(bd.quantity) " +
+			"           WHEN :keySearch = 'yeu thich' THEN COUNT(l.id) " +
+			"         END DESC")
+	List<Product> findChatBotASC(@Param("keySearch") String keySearch);
+
+	@Query("SELECT p FROM Product p " +
+			"LEFT JOIN BillDetail bd ON p.id = bd.product.id " +
+			"LEFT JOIN Evalue e ON e.product.id = p.id " +
+			"LEFT JOIN Like l ON l.product.id = p.id " +
+			"WHERE p.isDelete = false AND p.isActive = true " +
+			"AND p.createAt BETWEEN :dateStart AND :dateEnd " +
+			"GROUP BY p.id " +
+			"ORDER BY " +
+			"  CASE " +
+			"    WHEN :keySearch = 'moi' THEN p.id " +
+			"    WHEN :keySearch = 'danh gia' THEN COUNT(e.id) " +
+			"    WHEN :keySearch = 'luot ban' THEN SUM(bd.quantity) " +
+			"    WHEN :keySearch = 'yeu thich' THEN COUNT(l.id) " +
+			"  END DESC")
+	List<Product> findChatBotByDateDESC(@Param("keySearch") String keySearch,
+			@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd);
+
+	@Query("SELECT p FROM Product p " +
+			"LEFT JOIN BillDetail bd ON p.id = bd.product.id " +
+			"LEFT JOIN Evalue e ON e.product.id = p.id " +
+			"LEFT JOIN Like l ON l.product.id = p.id " +
+			"WHERE p.isDelete = false AND p.isActive = true " +
+			"AND p.createAt BETWEEN :dateStart AND :dateEnd " +
+			"  CASE " +
+			"    WHEN :keySearch = 'moi' THEN p.id " +
+			"    WHEN :keySearch = 'danh gia' THEN COUNT(e.id) " +
+			"    WHEN :keySearch = 'luot ban' THEN SUM(bd.quantity) " +
+			"    WHEN :keySearch = 'yeu thich' THEN COUNT(l.id) " +
+			"  END " +
+			"GROUP BY p.id " +
+			"ORDER BY " +
+			"  CASE " +
+			"    WHEN :keySearch = 'moi' THEN p.id " +
+			"    WHEN :keySearch = 'danh gia' THEN COUNT(e.id) " +
+			"    WHEN :keySearch = 'luot ban' THEN SUM(bd.quantity) " +
+			"    WHEN :keySearch = 'yeu thich' THEN COUNT(l.id) " +
+			"  END ASC")
+	List<Product> findChatBotByDateASC(@Param("keySearch") String keySearch,
+			@Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd);
+
 }

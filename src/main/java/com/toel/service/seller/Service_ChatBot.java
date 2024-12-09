@@ -16,7 +16,9 @@ import org.springframework.stereotype.Service;
 
 import com.google.api.Page;
 import com.toel.dto.admin.response.Response_ProductListFlashSale;
+import com.toel.dto.user.response.Response_Product;
 import com.toel.mapper.ProductMapper;
+import com.toel.mapper.user.ProductMaperUser;
 import com.toel.model.Product;
 import com.toel.repository.BillRepository;
 import com.toel.repository.ProductRepository;
@@ -28,53 +30,60 @@ public class Service_ChatBot {
     @Autowired
     BillRepository billRepository;
     @Autowired
-    ProductMapper productMapper;
+    ProductMaperUser productMaperUser;
 
-    public List<Response_ProductListFlashSale> searchChatBot(
+    public List<Response_Product> searchChatBot(
             String key) {
         String search = normalizeString(key);
-        List<Response_ProductListFlashSale> list = new ArrayList<>();
+        List<Response_Product> list = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
         String status;
         String keySearch = "moi";
         Date dateStart;
         Date dateEnd;
         String orderBy = "DESC";
+
         // tim
-        // if (search.contains("san pham")) {
-        status = "san pham";
-        if (search.contains("moi")) {
-            keySearch = "moi";
-            orderBy = "DESC";
-        }
-        if (search.contains("luot ban")) {
-            keySearch = "luot ban";
-            if (search.contains("nhat")) {
+        if (search.contains("san pham")) {
+            status = "san pham";
+            if (search.contains("moi")) {
+                keySearch = "moi";
                 orderBy = "DESC";
-            } else {
-                orderBy = "ASC";
             }
-        }
-        if (search.contains("yeu thich")) {
-            keySearch = "yeu thich";
-            if (search.contains("nhat")) {
-                orderBy = "DESC";
-            } else {
-                orderBy = "ASC";
+            if (search.contains("luot ban")) {
+                keySearch = "luot ban";
+                if (search.contains("nhat")) {
+                    orderBy = "DESC";
+                } else {
+                    orderBy = "ASC";
+                }
             }
-        }
-        if (search.contains("yeu thich")) {
-            keySearch = "danh gia";
-            if (search.contains("nhat")) {
-                orderBy = "DESC";
-            } else {
-                orderBy = "ASC";
+            if (search.contains("yeu thich")) {
+                keySearch = "yeu thich";
+                if (search.contains("nhat")) {
+                    orderBy = "DESC";
+                } else {
+                    orderBy = "ASC";
+                }
             }
+            if (search.contains("yeu thich")) {
+                keySearch = "danh gia";
+                if (search.contains("nhat")) {
+                    orderBy = "DESC";
+                } else {
+                    orderBy = "ASC";
+                }
+            }
+            if (orderBy.equals("DESC")) {
+                products = productRepository.findChatBotDESC(keySearch);
+            } else {
+                products = productRepository.findChatBotASC(keySearch);
+
+            }
+            list = products.stream()
+                    .map(product -> productMaperUser.productToResponse_Product(product))
+                    .collect(Collectors.toList());
         }
-        List<Product> products = productRepository.findChatBot(keySearch);
-        list = products.stream()
-                .map(product -> productMapper.tProductListFlashSale(product))
-                .collect(Collectors.toList());
-        // }
         return list;
     }
 
