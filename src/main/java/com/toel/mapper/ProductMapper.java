@@ -1,6 +1,7 @@
 package com.toel.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -43,6 +44,7 @@ public interface ProductMapper {
 
 
     List<Response_ProductInfo> Response_ProductInfo(List<Product> product);
+
 
 
 }

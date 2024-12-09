@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
+import com.toel.dto.admin.request.Account.Request_AccountCreateOTP;
 import com.toel.dto.admin.response.Response_ProductListFlashSale;
 import com.toel.dto.seller.response.Response_InforSeller;
+import com.toel.dto.seller.response.Response_Like;
 import com.toel.dto.seller.response.Response_Product;
 import com.toel.dto.seller.response.Response_ProductInfo;
 import com.toel.dto.user.resquest.Request_Evaluate_User;
@@ -27,6 +29,7 @@ import com.toel.dto.user.resquest.Request_ReportShop_DTO;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.ProductMapper;
+import com.toel.mapper.user.LikeMapper;
 import com.toel.model.Account;
 import com.toel.model.Address;
 import com.toel.model.Bill;
@@ -35,6 +38,7 @@ import com.toel.model.Evalue;
 import com.toel.model.FlashSale;
 import com.toel.model.FlashSaleDetail;
 import com.toel.model.ImageProduct;
+import com.toel.model.Like;
 import com.toel.model.OrderStatus;
 import com.toel.model.Product;
 import com.toel.model.TypeVoucher;
@@ -47,6 +51,7 @@ import com.toel.repository.FlashSaleDetailRepository;
 import com.toel.repository.FlashSaleRepository;
 import com.toel.repository.FollowerRepository;
 import com.toel.repository.ImageProductRepository;
+import com.toel.repository.LikeRepository;
 import com.toel.repository.OrderStatusRepository;
 import com.toel.repository.ProductRepository;
 import com.toel.repository.TypeVoucherRepository;
@@ -54,6 +59,8 @@ import com.toel.repository.VoucherRepository;
 import com.toel.service.user.FollowerService;
 import com.toel.service.user.Service_SelectAllProductHome;
 import com.toel.service.user.Service_ShowInfoSeller;
+
+import jakarta.validation.Valid;
 
 import jakarta.validation.Valid;
 
@@ -193,18 +200,6 @@ public class ApiShowInformationSeller {
         }
     }
 
-    // @GetMapping("/api/user/voucherall/{idSeller}")
-    // public ApiResponse<?> voucherAll(@PathVariable Integer idSeller) {
-    // Account account = accountRepository.findById(idSeller)
-    // .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
-    // "ID:[" + idSeller + "] không tìm thấy người bán"));
-    // List<Voucher> listVoucher = voucherRepository.findAllByAccount(account);
-    // List<Voucher> listVoucher1 = voucherRepository.findAll();
-    // Map<String, Object> hash = new HashMap<>();
-    // hash.put("Voucher", listVoucher);
-    // return ApiResponse.<Map>build().code(0).message(null).result(hash);
-    // }
-
     @GetMapping("/api/v1/user/voucherAll/{idSeller}")
     public ApiResponse<?> voucherAll(@PathVariable Integer idSeller) {
         Account account = accountRepository.findById(idSeller)
@@ -261,128 +256,181 @@ public class ApiShowInformationSeller {
 
     }
 
-    @PostMapping("/api/v1/user/topProducts")
+
+    @Autowired
+    ProductMapper productMapper;
+
+    // @PostMapping("/api/v1/user/topProducts")
+    // public ApiResponse<?> topProducts(@RequestBody Map<String, String> body) {
+    // String sellerID = body.get("sellerID");
+    // // String userID = body.get("userID");
+    // System.out.println("ly lor" + sellerID);
+    // try {
+    // OrderStatus orderStatus = orderStatusRepository.findById(1).orElse(null);
+    // if (orderStatus == null) {
+    // return ApiResponse.<String>build().code(1).message("Đơn hoàn thành bằng
+    // 0").result(null);
+    // }
+    // List<Bill> listBill = billRepository.findByOrderStatus(orderStatus);
+    // if (listBill == null || listBill.isEmpty()) {
+    // return ApiResponse.<String>build().code(1).message("không có hóa đơn
+    // nào!").result(null);
+    // }
+    // List<BillDetail> listBillDetails =
+    // billDetailRepository.findAllByBillIn(listBill);
+    // List<Product> listProduct =
+    // productRepository.findByBillDetails(listBillDetails);
+    // // List<Response_ProductInfo> listResponse_Products = productMapper
+    // // .Response_ProductInfo(listProductO);
+    // Map<String, Object> hash = new HashMap<>();
+    // hash.put("listProduct", listBillDetails);
+    // return ApiResponse.<Map>build()
+    // .code(0)
+    // .message("Top sản moi phẩm bán chạy ")
+    // .result(hash);
+    // // List<Product> listProduct =
+    // // productRepository.findByBillDetails(listBillDetails);
+
+    // //
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    // // Map<String, Object> hash = new HashMap<>();
+    // // // List<Product> listProductO = new ArrayList<>();
+    // // List<Product> listProductO = new ArrayList<>();
+    // // if (isNumeric(sellerID)) {
+    // // listProductO = productRepository.findAll(Sort.by(Sort.Direction.DESC,
+    // // "id")).stream()
+    // // .filter(product ->
+    // // !product.getAccount().getId().equals(Integer.parseInt(sellerID))) // Lọc
+    // bỏ
+    // // .limit(10) // Giới hạn kết quả
+    // // .collect(Collectors.toList());
+    // // } else {
+    // // listProductO = productRepository.findAll(Sort.by(Sort.Direction.DESC,
+    // // "id")).stream()
+    // // // .filter(product ->
+    // // // !product.getAccount().getId().equals(Integer.parseInt(sellerID))) //
+    // Lọc
+    // // bỏ
+    // // // sellerID
+    // // .limit(10) // Giới hạn kết quả
+    // // .collect(Collectors.toList());
+    // // }
+    // // List<Response_ProductInfo> listResponse_Products = productMapper
+    // // .Response_ProductInfo(listProductO);
+    // // hash.put("listProduct", listResponse_Products);
+    // // return ApiResponse.<Map>build()
+    // // .code(0)
+    // // .message("Top sản moi phẩm bán chạy ")
+    // // .result(hash);
+    // //
+    // ............>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>..
+    // } catch (Exception e) {
+    // return ApiResponse.<Map>build()
+    // .code(0)
+    // .message(e.getMessage())
+    // .result(null);
+    // }
+
+    // }
+    @Autowired
+    LikeRepository likeRepository;
+    @Autowired
+    LikeMapper likeMapper;
+
+    @PostMapping("/api/v1/user/topLikeProducts1")
+    public ApiResponse<?> thichNhieu(@RequestBody Map<String, String> body) {
+        // TODO: process POST request
+        List<Like> listLike = likeRepository.findAll();
+        List<Response_Like> responeLike = likeMapper.mapToResponseLikeList(listLike);
+        List<Integer> idproduct = new ArrayList<>();
+        // idproduct = listLike.
+        for (Response_Like response_Like : responeLike) {
+            idproduct.add(response_Like.getProduct());
+        }
+
+        List<Product> lisProducts = productRepository.findAllById(idproduct);
+        Map<String, Object> response = new HashMap<>();
+        response.put("response", responeLike);
+        return ApiResponse.<Map>build().message("getMethodName()").result(response);
+    }
+
+    @PostMapping("/api/v1/user/topLikeProducts")//đang dùng
+    public ApiResponse<?> thichNhieu1(@RequestBody Map<String, String> body) {
+        // Lấy danh sách sản phẩm theo lượt like
+        List<Map<String, Object>> topLikedProducts = likeRepository.findTopLikedProducts();
+        // Lấy danh sách id sản phẩm từ kết quả truy vấn
+        List<Integer> productIds = topLikedProducts.stream()
+                .map(item -> (Integer) item.get("productId"))
+                .collect(Collectors.toList());
+        // Lấy chi tiết sản phẩm từ danh sách id
+        List<Product> products = productRepository.findAllById(productIds);
+        List<Response_ProductInfo> listResponse_Products = productMapper.Response_ProductInfo(products);
+        // Chuẩn bị dữ liệu phản hồi
+        List<Map<String, Object>> responseList = topLikedProducts.stream()
+                .map(item -> {
+                    Integer productId = (Integer) item.get("productId");
+                    Long likeCount = (Long) item.get("likeCount");
+                    // Tìm chi tiết sản phẩm tương ứng
+                    Response_ProductInfo product = listResponse_Products.stream()
+                            .filter(p -> p.getId().equals(productId))
+                            .findFirst()
+                            .orElse(null);
+                    // Trả về dữ liệu sản phẩm với số lượt like
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("product", product);
+                    response.put("likeCount", likeCount);
+                    return response;
+                })
+                .collect(Collectors.toList());
+
+        // Đóng gói phản hồi API
+        Map<String, Object> response = new HashMap<>();
+        response.put("topLikedProducts", responseList);
+        return ApiResponse.<Map>build().message("Top liked products retrieved successfully").result(response);
+    }
+
+    @PostMapping("/api/v1/user/topProducts")//đang dùng
     public ApiResponse<?> topProducts(@RequestBody Map<String, String> body) {
         String sellerID = body.get("sellerID");
-        // String userID = body.get("userID");
-        System.out.println("ly lor" + sellerID);
+        System.out.println("Seller ID: " + sellerID);
         try {
             OrderStatus orderStatus = orderStatusRepository.findById(1).orElse(null);
             if (orderStatus == null) {
-                return ApiResponse.<String>build().code(1).message("Đơn hoàn thành bằng 0").result(null);
+                return ApiResponse.<String>build().code(1).message("Order status not found").result(null);
             }
+
             List<Bill> listBill = billRepository.findByOrderStatus(orderStatus);
             if (listBill == null || listBill.isEmpty()) {
-                return ApiResponse.<String>build().code(1).message("không có hóa đơn nào!").result(null);
+                return ApiResponse.<String>build().code(1).message("No bills found").result(null);
             }
-            List<BillDetail> listBillDetails = billDetailRepository.findAllByBillIn(listBill);
-            Map<String, Object> hash = new HashMap<>();
-            // List<Product> listProductO = new ArrayList<>();
-            List<Product> listProductO = new ArrayList<>();
-            if (isNumeric(sellerID)) {
-                listProductO = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream()
-                        .filter(product -> !product.getAccount().getId().equals(Integer.parseInt(sellerID))) // Lọc bỏ
-                        .limit(10) // Giới hạn kết quả
-                        .collect(Collectors.toList());
-            } else {
-                listProductO = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream()
-                        // .filter(product ->
-                        // !product.getAccount().getId().equals(Integer.parseInt(sellerID))) // Lọc bỏ
-                        // sellerID
-                        .limit(10) // Giới hạn kết quả
-                        .collect(Collectors.toList());
-            }
-            List<Response_ProductInfo> listResponse_Products = productMapper
-                    .Response_ProductInfo(listProductO);
-            hash.put("listProduct", listResponse_Products);
-            return ApiResponse.<Map>build()
-                    .code(0)
-                    .message("Top sản moi phẩm bán chạy ")
-                    .result(hash);
-        } catch (Exception e) {
-            return ApiResponse.<Map>build()
-                    .code(0)
-                    .message(e.getMessage())
-                    .result(null);
-        }
 
+            // Fetch top 10 products using custom query
+            List<Product> topProducts = productRepository.findTop10ByBillDetails(listBill);
+            List<Response_ProductInfo> listResponse_Products = productMapper.Response_ProductInfo(topProducts);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("listProduct", listResponse_Products);
+
+            return ApiResponse.<Map<String, Object>>build()
+                    .code(0)
+                    .message("Top 10 best-selling products fetched successfully")
+                    .result(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ApiResponse.<String>build().code(1).message("Error fetching top products").result(null);
+        }
     }
 
     @GetMapping("/api/v1/user/topProducts1")
     public ApiResponse<?> topProducts1(@RequestBody Map<String, String> body) {
         String sellerID = body.get("sellerID");
-        // String userID = body.get("userID");
-        System.out.println("ly lor" + sellerID);
-        try {
-            OrderStatus orderStatus = orderStatusRepository.findById(1).orElse(null);
-            if (orderStatus == null) {
-                return ApiResponse.<String>build().code(1).message("Đơn hoàn thành bằng 0").result(null);
-            }
-            List<Bill> listBill = billRepository.findByOrderStatus(orderStatus);
-            if (listBill == null || listBill.isEmpty()) {
-                // ne
-                return ApiResponse.<String>build().code(1).message("không có hóa đơn nào!").result(null);
-            }
-            List<BillDetail> listBillDetails = billDetailRepository.findAllByBillIn(listBill);
-            // if(listBillDetails.isEmpty()){
-            // return ApiResponse.<Map>build()
-            // .code(0)
-            // .message("không có hóa đơn detail nào!")
-            // .result(null);
-            // }
-            // Thống kê số lượng sản phẩm đã bán
-            // Map<Product, Long> productCountMap = listBillDetails.stream()
-            // .collect(
-            // Collectors.groupingBy(BillDetail::getProduct,
-            // Collectors.summingLong(BillDetail::getQuantity)));
-            // List<BillDetail> listBillDetails1 = billDetailRepository.
-            Map<String, Object> hash = new HashMap<>();
-            // List<Product> listProduct =
-            // productRepository.findByBillDetails(listBillDetails);
-            List<Product> listProductO = new ArrayList<>();
-            String status = "";
-            if (isNumeric(sellerID)) {
-                listProductO = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream()
-                        // .filter(product -> product.getAccount() != null &&
-                        // !sellerID.equals(product.getAccount().getId()))
-                        // Giới hạn kết quả
-                        .collect(Collectors.toList());
-                List<Product> product = new ArrayList<>();
-                for (Product iterable_element : listProductO) {
-                    Integer accountID = iterable_element.getAccount().getId();
-                    Integer sellerI1D = Integer.valueOf(sellerID);
-                    if (!accountID.equals(sellerI1D)) {
-                        product.add(iterable_element);// thêm sản phâm vô list
-                    }
-                }
-                status = "đã  lọc " + sellerID + " ra ";
-                List<Response_ProductListFlashSale> listResponse_Products = productMapper
-                        .tProductListFlashSale(product);
-                hash.put("listProduct", listResponse_Products);
-                return ApiResponse.<Map>build()
-                        .code(0)
-                        .message("Top sản moi phẩm bán chạy " + status)
-                        .result(hash);
-
-            } else {
-                listProductO = productRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).stream()
-                        .limit(10) // Giới hạn kết quả
-                        .collect(Collectors.toList());
-                status = " không lọc ";
-            }
-            List<Response_ProductListFlashSale> listResponse_Products = productMapper
-                    .tProductListFlashSale(listProductO);
-            hash.put("listProduct", listResponse_Products);
-            return ApiResponse.<Map>build()
-                    .code(0)
-                    .message("Top sản moi phẩm bán chạy " + status)
-                    .result(hash);
-        } catch (Exception e) {
-            return ApiResponse.<Map>build()
-                    .code(0)
-                    .message(e.getMessage())
-                    .result(null);
-        }
+        // if(isNumeric(sellerID)) return
+        // ApiResponse.<String>build().message("sai"+sellerID);
+        Boolean isaccount = accountRepository.existsById(Integer.parseInt(sellerID));
+        return ApiResponse.<Boolean>build()
+                .code(0)
+                .message("e.getMessage()")
+                .result(isaccount);
 
     }
 
@@ -417,6 +465,31 @@ public class ApiShowInformationSeller {
 
     }
 
+    // @PostMapping("/api/v1/user/send-otpe")
+    // public ApiResponse<?> sendOtp(@RequestBody @Valid Request_AccountCreateOTP
+    // body) {
+
+    // // String otp = otpService.generateOtp(identifier); // Tạo OTP
+    // // otpService.saveOtp(identifier, otp); // Lưu OTP và thời gian hết hạn
+    // if (accountRepository.existsByUsername(body.getUsername())) {
+    // throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Tên tài khoản");
+    // }
+
+    // // Check if email already exists
+    // if (accountRepository.existsByEmail(body.getEmail())) {
+    // throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Email ");
+    // }
+
+    // if ("email".equalsIgnoreCase(body.getMethod())) {
+    // // emailService.sendOtpEmail(identifier, otp);
+    // return ApiResponse.build().message("OTP đã được gửi qua email.");
+    // } else if ("phone".equalsIgnoreCase(body.getMethod())) {
+    // // smsService.sendOtpSms(identifier, otp);
+    // return ApiResponse.build().message("OTP đã được gửi qua phone.");
+    // } else {
+    // return ApiResponse.build().message("OTP đã được gửi qua g.");
+    // }
+    // }
     // @GetMapping("/api/v1/user/topProducts")
     // public ApiResponse<?> topProducts() {
     // try {
@@ -493,4 +566,5 @@ public class ApiShowInformationSeller {
     // Data participationTime; // tới gian bán
     // Integer trackingNumber; // số lượng theo dõi
     // Integer shopCancellationRate; // Tỷ lệ Shop hủy đơn(%)
+
 }

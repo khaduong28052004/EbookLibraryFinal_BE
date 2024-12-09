@@ -51,6 +51,7 @@ public ResponseEntity<Map<String, Object>> updateAccount(
     account.setEmail(entity.getEmail());
     account.setBirthday(entity.getBirthday());
     account.setPhone(entity.getPhone());
+    account.setShopName(entity.getShopName());
     
     // Lưu thông tin cập nhật vào cơ sở dữ liệu
     accountRepository.save(account);
@@ -67,32 +68,6 @@ public Account getAccountById(@PathVariable Integer id) {
     return accountRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
 }
-// @PostMapping("/user/saveImg/{id}")
-//     public Map<String, Object> updateRegister(@PathVariable("id") Integer id,
-//             @RequestParam("imgAvartar") MultipartFile imgAvartar,
-//             @RequestParam("imgBackgrourd") MultipartFile imgBackgrourd) throws IOException, java.io.IOException {
-//         // logger.info("Received POST request to /user/registerSeller/uploadImg/{}", id);
-//         Optional<Account> account = accountRepository.findById(id);
-//         if (account.isPresent()) {
-//             String avatar = UploadImage.uploadFile("avatar", imgAvartar);
-//             String background = UploadImage.uploadFile("background", imgBackgrourd);
-//             account.get().setAvatar(avatar);
-//             account.get().setBackground(background);
-//             accountRepository.save(account.get());
-//             Map<String, Object> map = new HashMap<>();
-//             map.put("data", account);
-//             map.put("message", "Images uploaded successfully.");
-//             map.put("status", "success");
-//             return map;
-//         } else {
-//             // logger.error("Account with id {} not found", id);
-//             Map<String, Object> errorMap = new HashMap<>();
-//             errorMap.put("message", "Account not found");
-//             errorMap.put("status", "error");
-//             return errorMap;
-//         }
-//     }
-
 @PostMapping("/user/uploadAvatar/{id}")
 public Map<String, Object> uploadAvatar(@PathVariable("id") Integer id,
         @RequestParam("imgAvatar") MultipartFile imgAvatar) throws IOException {
