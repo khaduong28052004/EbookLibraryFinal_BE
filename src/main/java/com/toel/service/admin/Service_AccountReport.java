@@ -21,6 +21,7 @@ import com.toel.exception.ErrorCode;
 import com.toel.mapper.AccountReportMapper;
 import com.toel.model.AccountReport;
 import com.toel.repository.AccountReportRepository;
+import com.toel.service.Service_Log;
 import com.toel.service.Email.EmailService;
 import com.toel.service.Email.EmailTemplateType;
 
@@ -30,6 +31,10 @@ public class Service_AccountReport {
     AccountReportRepository accountReportRepository;
     @Autowired
     AccountReportMapper accountReportMapper;
+    @Autowired
+    Service_Log service_Log;
+    @Autowired
+    EmailService emailService;
 
     public List<AccountReport> getReportsByAccountId(int accountId) {
         return accountReportRepository.findByAccountId(accountId);
@@ -38,9 +43,6 @@ public class Service_AccountReport {
     public AccountReport saveReport(AccountReport report) {
         return accountReportRepository.save(report);
     }
- 
-    @Autowired
-    EmailService emailService;
 
     public PageImpl<Response_AccountReport> getAll(String option, int page, int size, Boolean sortBy, String column,
             String key) {
@@ -65,7 +67,7 @@ public class Service_AccountReport {
         return accountReportMapper.toResponse_AccountReport(accountReportRepository.findById(id).get());
     }
 
-    public Response_AccountReport updateStatus(int id, String contents) {
+    public Response_AccountReport updateStatus(int id, String contents, Integer accountID) {
         AccountReport entity = accountReportRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Report"));
         entity.setStatus(true);
@@ -76,6 +78,7 @@ public class Service_AccountReport {
         emailService.push(entity.getAccount().getEmail(), "TOEL - Thông Báo Phản Hồi Báo Cáo",
                 EmailTemplateType.PHANHOIREPORT, entity.getAccount().getFullname(), contents, formattedDate,
                 entity.getTitle(), entity.getContent());
+        service_Log.setLog(getClass(), accountID, "INFO", "ACCOUNT", id, "Xử lý tài khoản bị báo cáo");
         return accountReportMapper.toResponse_AccountReport(accountReportRepository.save(entity));
     }
 }

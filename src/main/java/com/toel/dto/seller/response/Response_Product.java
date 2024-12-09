@@ -38,4 +38,6 @@ public class Response_Product {
     boolean isActive;
     Response_Category category;
     List<Response_ImageProduct> imageProducts;
+    Response_Account account;
+
 }

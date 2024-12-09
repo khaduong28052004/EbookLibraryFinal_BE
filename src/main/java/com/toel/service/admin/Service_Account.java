@@ -5,12 +5,12 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-// import org.apache.logging.log4j.LogManager;
-// import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 // import org.apache.logging.log4j.ThreadContext;
-import org.slf4j.MDC;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+// import org.slf4j.MDC;
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +30,7 @@ import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.AccountMapper;
 import com.toel.model.Account;
+import com.toel.model.Log;
 import com.toel.model.Role;
 import com.toel.repository.AccountReportRepository;
 import com.toel.repository.AccountRepository;
@@ -38,6 +39,7 @@ import com.toel.repository.EvalueRepository;
 import com.toel.repository.FollowerRepository;
 import com.toel.repository.ProductRepository;
 import com.toel.repository.RoleRepository;
+import com.toel.service.Service_Log;
 import com.toel.service.Email.EmailService;
 import com.toel.service.Email.EmailTemplateType;
 
@@ -63,8 +65,12 @@ public class Service_Account {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         @Autowired
         EmailService emailService;
+        @Autowired
+        Service_Log service_Log;
 
-        private static final Logger logger = LoggerFactory.getLogger("Account");
+        // private static final Logger logger = LoggerFactory.getLogger("Account");
+
+        static Logger logger = LogManager.getLogger(Service_Account.class);
 
         public PageImpl<Response_Account> getAll(String rolename,
                         String search, Boolean gender, Integer page, Integer size, Boolean sortBy, String sortColumn) {
@@ -236,40 +242,38 @@ public class Service_Account {
                 return new PageImpl<>(list, pageable, pageAccount.getTotalElements());
         }
 
-        public Response_Account updateStatus(int id, String contents) {
+        public Response_Account updateStatus(int id, String contents, Integer accountID) {
                 Account entity = accountRepository.findById(id)
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
-                 MDC.put("affected_id", String.valueOf(id)); // Dùng ID của tài khoản làm "affected_id"
-                 MDC.put("account_id", "1"); // Cập nhật ID tài khoản nếu cần
+                // MDC.put("affected_id", String.valueOf(id)); // Dùng ID của tài khoản làm
+                // "affected_id"
+                // MDC.put("account_id", "1"); // Cập nhật ID tài khoản nếu cần
+                String action_type;
 
                 if (entity.isStatus()) {
                         emailService.push(entity.getEmail(), "TOEL - Thông Báo Khóa Tài Khoản",
-                        EmailTemplateType.KHOATAIKHOAN, entity.getFullname(), contents, "Tài khoản");
+                                        EmailTemplateType.KHOATAIKHOAN, entity.getFullname(), contents, "Tài khoản");
                         entity.setStatus(false);
-                        logger.info("Tài khoản {} đã bị khóa. Lý do: {}");
-                        logger.info("Tài khoản {} đã bị khóa. Lý do: {}");
-                        logger.info("Tài khoản {} đã bị khóa. Lý do: {}");
-                        logger.info("Tài khoản {} đã bị khóa. Lý do: {}");
-                        logger.info("Tài khoản {} đã bị khóa. Lý do: {}");
+                        action_type = "Khóa tài khoản";
+                        // logger.info("Tài khoản {} đã bị khóa. Lý do: {}");
+
                 } else {
                         emailService.push(entity.getEmail(), "TOEL - Thông Báo Mở Tài Khoản",
-                        EmailTemplateType.MOTAIKHOAN, entity.getFullname(), contents, "Tài khoản");
+                                        EmailTemplateType.MOTAIKHOAN, entity.getFullname(), contents, "Tài khoản");
                         entity.setStatus(true);
-                        logger.info("bbbbbbbbbbbbbbbbbbbbbb");
-                        logger.info("bbbbbbbbbbbbbbbbbbbbbb");
-                        logger.info("bbbbbbbbbbbbbbbbbbbbbb");
-                        logger.info("bbbbbbbbbbbbbbbbbbbbbb");
-                        logger.info("bbbbbbbbbbbbbbbbbbbbbb");
+                        action_type = "Mở tài khoản";
                 }
-                MDC.clear();
+                // MDC.clear();
+                service_Log.setLog(getClass(), accountID, "INFO", "ACCOUNT", id, action_type);
 
                 return accountMapper.toAccount(accountRepository.saveAndFlush(entity));
         }
 
-        public Response_Account updateActive(int id, Boolean status, String contents) {
+        public Response_Account updateActive(int id, Boolean status, String contents, Integer accountID) {
                 Account entity = accountRepository.findById(id)
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
                 Role role = roleRepository.findByNameIgnoreCase("Seller");
+                String action_type;
                 if (status) {
                         emailService.push(entity.getEmail(), "TOEL - Thông Báo Duyệt Shop",
                                         EmailTemplateType.DUYET, entity.getFullname(),
@@ -280,6 +284,7 @@ public class Service_Account {
                                         "Bán hàng");
                         entity.setRole(role);
                         entity.setCreateAtSeller(new Date());
+                        action_type = "duyệt";
                 } else {
                         emailService.push(entity.getEmail(), "TOEL - Thông Báo Hủy Duyệt Shop",
                                         EmailTemplateType.DUYET, entity.getFullname(),
@@ -289,13 +294,19 @@ public class Service_Account {
                                         "Shop", entity.getId().toString(), entity.getUsername(),
                                         "Bán hàng");
                         entity.setNumberId(null);
+                        action_type = "Không duyệt";
                 }
-                return accountMapper.toAccount(accountRepository.saveAndFlush(entity));
+                Account accountnew = accountRepository.saveAndFlush(entity);
+                // if (accountID != null) {
+                        service_Log.setLog(getClass(), accountID, "INFO", "ACCOUNT", accountnew.getId(), action_type);
+                // }
+                return accountMapper.toAccount(accountnew);
         }
 
-        public Response_Account create(Request_AccountCreate entity) {
+        public Response_Account create(Request_AccountCreate entity, Integer accountID) {
                 Account account = accountMapper.toAccountCreate(entity);
                 if (!isValidPhoneNumber(entity.getPhone())) {
+                        service_Log.setLog(getClass(), accountID, "ERROR", "ACCOUNT", null, "Tạo tài khoản");
                         throw new AppException(ErrorCode.OBJECT_SETUP, "Số điện thoại không hợp lệ");
                 }
                 account.setRole(roleRepository.findById(entity.getRole())
@@ -307,7 +318,9 @@ public class Service_Account {
                 // Mã hóa mật khẩu mới
                 String hashPass = passwordEncoder.encode(entity.getPassword());
                 account.setPassword(hashPass);
-                return accountMapper.toAccount(accountRepository.saveAndFlush(account));
+                Account accountnew = accountRepository.saveAndFlush(account);
+                service_Log.setLog(getClass(), accountID, "INFO", "ACCOUNT", accountnew.getId(), "Tạo tài khoản");
+                return accountMapper.toAccount(accountnew);
         }
 
         private boolean isValidPhoneNumber(String phoneNumber) {

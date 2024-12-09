@@ -45,9 +45,10 @@ public class ApiAccountReport {
 
     @PutMapping
     public ApiResponse<Response_AccountReport> putStatus(
+            @RequestParam(value = "accountID", required = false) Integer account,
             @RequestParam(value = "id", required = false) Integer id,
             @RequestParam(value = "contents", required = false) String contents) {
-        Response_AccountReport entity = service_AccountReport.updateStatus(id, contents);
+        Response_AccountReport entity = service_AccountReport.updateStatus(id, contents,account);
         return ApiResponse.<Response_AccountReport>build()
                 .result(entity)
                 .message("Giải quyết report thành công");

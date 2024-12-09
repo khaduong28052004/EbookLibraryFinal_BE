@@ -27,7 +27,7 @@ public class Log {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer id;
 	
-	boolean status;
+	String level;
 	Date timestamps;
 	String tableName;
 	Integer id_Object;

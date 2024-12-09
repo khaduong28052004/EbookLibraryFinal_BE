@@ -25,6 +25,7 @@ import com.toel.model.Account;
 import com.toel.model.FlashSale;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.FlashSaleRepository;
+import com.toel.service.Service_Log;
 
 @Service
 public class Service_FlashSale {
@@ -34,6 +35,8 @@ public class Service_FlashSale {
         FlashSaleMapper flashSaleMapper;
         @Autowired
         AccountRepository accountRepository;
+        @Autowired
+        Service_Log service_Log;
 
         public PageImpl<Response_FlashSale> getAll(int page, int size, Boolean sortBy, String column,
                         LocalDate dateStart, LocalDate dateEnd) {
@@ -58,45 +61,55 @@ public class Service_FlashSale {
                 return flashSaleMapper.tResponse_FlashSale(flashSale);
         }
 
-        public Response_FlashSale create(Request_FlashSaleCreate flashSaleCreate) {
+        public Response_FlashSale create(Request_FlashSaleCreate flashSaleCreate, Integer accountID) {
                 Account account = accountRepository.findById(flashSaleCreate.getAccount())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
                 FlashSale entity = flashSaleMapper.toFlashSaleCreate(flashSaleCreate);
                 entity.setAccount(account);
+                FlashSale flashSaleNew = flashSaleRepository.save(entity);
+                service_Log.setLog(getClass(), accountID, "INFO", "FLASHSALE", flashSaleNew.getId(), "Tạo Flash sale");
                 return flashSaleMapper
-                                .tResponse_FlashSale(flashSaleRepository.save(entity));
+                                .tResponse_FlashSale(flashSaleNew);
         }
 
-        public Response_FlashSale update(Request_FlashSaleUpdate flashSaleUpdate) {
+        public Response_FlashSale update(Request_FlashSaleUpdate flashSaleUpdate, Integer accountID) {
                 FlashSale entity = flashSaleRepository.findById(flashSaleUpdate.getId())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSale"));
                 Account account = accountRepository.findById(flashSaleUpdate.getAccount())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
                 flashSaleMapper.toFlashSaleUpdate(entity, flashSaleUpdate);
                 entity.setAccount(account);
-                return flashSaleMapper.tResponse_FlashSale(flashSaleRepository.save(entity));
+                FlashSale flashSaleNew = flashSaleRepository.save(entity);
+                service_Log.setLog(getClass(), accountID, "INFO", "FLASHSALE", flashSaleNew.getId(),
+                                "Cập nhật Flash sale");
+                return flashSaleMapper.tResponse_FlashSale(flashSaleNew);
         }
 
-        public void delete(Integer id) {
+        public void delete(Integer id, Integer accountID) {
                 FlashSale entity = flashSaleRepository.findById(id)
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSale"));
                 if (entity.getDateStart().isBefore(LocalDateTime.now())
                                 && entity.getDateEnd().isAfter(LocalDateTime.now())) {
+                        service_Log.setLog(getClass(), accountID, "ERROR", "FLASHSALE", id,
+                                        "Xóa Flash sale");
                         throw new AppException(ErrorCode.OBJECT_ACTIVE, "Flash Sale");
                 }
                 entity.setDelete(true);
+                FlashSale flashSaleNew = flashSaleRepository.save(entity);
+                service_Log.setLog(getClass(), accountID, "INFO", "FLASHSALE", flashSaleNew.getId(),
+                                "Xóa Flash sale");
                 flashSaleRepository.save(entity);
         }
 
         // @Scheduled(fixedDelay = 100)
         // public void run() {
-        //         if (flashSaleRepository.findByIsDelete(false).size() >= 1) {
-        //                 flashSaleRepository.findByIsDelete(false).forEach(flasesale -> {
-        //                         if (flasesale.getDateEnd().isBefore(LocalDateTime.now())) {
-        //                                 flasesale.setDelete(true);
-        //                                 flashSaleRepository.save(flasesale);
-        //                         }
-        //                 });
-        //         }
+        // if (flashSaleRepository.findByIsDelete(false).size() >= 1) {
+        // flashSaleRepository.findByIsDelete(false).forEach(flasesale -> {
+        // if (flasesale.getDateEnd().isBefore(LocalDateTime.now())) {
+        // flasesale.setDelete(true);
+        // flashSaleRepository.save(flasesale);
+        // }
+        // });
+        // }
         // }
 }

@@ -54,6 +54,7 @@ public class APiCategory {
 
         @PostMapping
         public ApiResponse<Response_Category> post(
+                        @RequestParam(value = "accountID", required = false) Integer account,
                         @RequestBody @Valid Request_CategoryCreate request_Category) {
                 if (!checkName(request_Category.getName())) {
                         throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Tên danh mục");
