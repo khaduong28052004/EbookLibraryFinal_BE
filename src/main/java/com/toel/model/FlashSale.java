@@ -36,6 +36,8 @@ public class FlashSale {
 
 	LocalDateTime dateEnd;
 
+	String title;
+
 	boolean isDelete;
 
 	@ManyToOne

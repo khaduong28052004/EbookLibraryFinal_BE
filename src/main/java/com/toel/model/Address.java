@@ -37,6 +37,9 @@ public class Address {
 	String phone;
 
 	@Nationalized
+	String street;
+
+	@Nationalized
 	String fullNameAddress;
 
 	Integer province;

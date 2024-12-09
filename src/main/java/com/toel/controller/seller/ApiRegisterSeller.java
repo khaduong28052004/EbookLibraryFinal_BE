@@ -1,6 +1,7 @@
 package com.toel.controller.seller;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -45,17 +46,17 @@ public class ApiRegisterSeller {
     @Autowired
     private AccountRepository accountRepository;
     @PutMapping("/user/registerSeller/{id}")
-    public ResponseEntity<Map<String, Object>> registerSeller(@PathVariable("id") Integer id,
-            @RequestBody Account entity) {
+    public ResponseEntity<Map<String, Object>> registerSeller(@PathVariable("id") Integer id,@RequestBody Account entity) { // id tham só truyền vào api, ánh xạ entity của lớp account gửi lên api 
         logger.info("Received PUT request to /registerSeller/{}", id);
         
         Optional<Account> optionalAccount = accountRepositoty.findById(id);
-        if (optionalAccount.isPresent()) {
-            Account account = optionalAccount.get();
+        if (optionalAccount.isPresent()) {// nếu là account hiện tại
+            Account account = optionalAccount.get();//Lấy giá trị từ một đối tượng Optional<Account>
             // Cập nhật thông tin tài khoản
             account.setNumberId((entity.getNumberId()));
             account.setShopName(entity.getShopName());
             account.setPhone(entity.getPhone());
+            account.setCreateAtSeller(new Date());
 
             // Lưu thay đổi
             accountRepositoty.save(account);

@@ -1,5 +1,7 @@
 package com.toel.dto.user.resquest.pay;
 
+import com.toel.model.FlashSaleDetail;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,4 +14,5 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Request_Product {
 	private int id;
+	FlashSaleDetail flashSaleDetail;
 }

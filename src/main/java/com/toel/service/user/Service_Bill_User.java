@@ -2,9 +2,6 @@ package com.toel.service.user;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,61 +9,107 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_Bill_User;
-import com.toel.dto.user.response.Response_Bill_Product_User;
+import com.toel.dto.BillDTO;
 import com.toel.dto.user.resquest.Request_Bill_User;
-
+import com.toel.exception.AppException;
+import com.toel.exception.ErrorCode;
+import com.toel.mapper.BillMapper;
 import com.toel.model.Account;
 import com.toel.model.Bill;
 import com.toel.model.Cart;
-import com.toel.model.OrderStatus;
+import com.toel.model.FlashSaleDetail;
 import com.toel.model.Product;
+import com.toel.model.Voucher;
+import com.toel.model.VoucherDetail;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.AddressRepository;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
 import com.toel.repository.CartRepository;
 import com.toel.repository.EvalueRepository;
+import com.toel.repository.FlashSaleDetailRepository;
 import com.toel.repository.OrderStatusRepository;
 import com.toel.repository.PaymentMethodRepository;
+import com.toel.repository.ProductRepository;
+import com.toel.repository.VoucherDetailRepository;
+import com.toel.repository.VoucherRepository;
 import com.toel.service.Email.EmailService;
+import com.toel.service.Email.EmailTemplateType;
 
 @Service("userServiceBill")
 public class Service_Bill_User {
 	@Autowired
 	BillRepository billRepository;
+
 	@Autowired
 	BillDetailRepository billDetailRepository;
+
 	@Autowired
 	OrderStatusRepository orderStatusRepository;
+
 	@Autowired
 	PaymentMethodRepository paymentMethodRepository;
+
 	@Autowired
 	AccountRepository accountRepository;
+
 	@Autowired
 	EvalueRepository evaluateRepository;
+
 	@Autowired
 	CartRepository cartRepository;
+
 	@Autowired
 	AddressRepository addressRepository;
+
 	@Autowired
 	OrderStatusRepository oderStatusRepository;
+
 	@Autowired
 	EmailService emailService;
 
+	@Autowired
+	BillMapper billMapper;
+
+	@Autowired
+	ProductRepository productRepository;
+
+	@Autowired
+	VoucherDetailRepository voucherDetailRepository;
+
+	@Autowired
+	FlashSaleDetailRepository flashSaleDetailRepository;
+
+	@Autowired
+	VoucherRepository voucherRepository;
+
 	public Map<String, Object> getBills(Request_Bill_User requestBillDTO) {
-		Map<String, Object> response = new HashMap<String, Object>();
+		Map<String, Object> response = new HashMap<>();
 		try {
-			System.out.println("productsInBill ");
-
 			List<Object[]> productsInBill = getBillsByOrderStatus(requestBillDTO);
-			System.out.println("productsInBill " + productsInBill.size());
+			List<Response_Bill_User> listConver = convertToResponseBillUser(productsInBill);
+			List<BillDTO> shopListInBill = createBillsWithProductsInBillDetail(listConver);
 
-			List<Response_Bill_User> shopListInBill = createBillsWithProductsInBillDetail(productsInBill);
-			response.put("data", shopListInBill);
+			int page = requestBillDTO.getPage();
+			int size = requestBillDTO.getSize();
+			int totalItems = shopListInBill.size();
+			int totalPages = (int) Math.ceil((double) totalItems / size);
+
+			// Lấy dữ liệu cho trang hiện tại
+			int start = Math.min(page * size, totalItems);
+			int end = Math.min(start + size, totalItems);
+			List<BillDTO> paginatedList = shopListInBill.subList(start, end);
+
+			response.put("data", paginatedList); // Dữ liệu cho trang hiện tại
+			response.put("currentPage", page);
+			response.put("totalItems", totalItems);
+			response.put("totalPages", totalPages);
+			response.put("pageSize", size);
+
+			// response.put("data", shopListInBill);
 			response.put("status", "successfully");
 			response.put("message", "Retrieve data successfully");
 		} catch (Exception e) {
@@ -82,130 +125,151 @@ public class Service_Bill_User {
 		String orderStatus = BillShopRequestDTO.getOrderStatusFind() == null ? ""
 				: BillShopRequestDTO.getOrderStatusFind();
 
-		System.out.println("orderstatusL " + orderStatus);
-		System.out.println("userId " + userId);
-
 		switch (orderStatus) {
-		case "CHODUYET":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByCreateAt(userId, 1);
-		case "DANGXULY":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 2);
-		case "DANGGIAO":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 3);
-		case "DAGIAO":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 4);
-		case "HOANTHANH":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 5);
-		case "DAHUY":
-			return billRepository.getBillsByUserIdNOrderStatusOrderByUpdateAt(userId, 6);
-		default:
-			return billRepository.getBillsByUserIdAll(userId);
-
+			case "CHODUYET":
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 1, "create"); // Status
+			case "DANGXULY":
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 2, "update"); // Status
+			case "DANGGIAO":
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 3, "update"); // Status
+			case "DAGIAO":
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 4, "update"); // Status
+			case "HOANTHANH":
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 5, "update"); // Status
+			case "DAHUY":
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 6, "update"); // Status
+			default:
+				return billRepository.findBillsByUserId(userId); // Default: No filter on order status
 		}
 	}
 
-	public List<Response_Bill_User> createBillsWithProductsInBillDetail(List<Object[]> productsInBill) {
-		Map<Integer, Response_Bill_User> billMap = new HashMap<>(); // Map để lưu các bill với key là billID
-		List<Response_Bill_User> bills = new ArrayList<>(); // Danh sách để trả về cuối cùng
-
-		for (Object[] product : productsInBill) {
-			Integer billID = Integer.parseInt(product[1].toString());
-			Integer userID = Integer.parseInt(product[0].toString());
-			Double billTotalPrice = Double.parseDouble(product[2].toString());
-			Double billDiscountPrice = Double.parseDouble(product[3].toString());
-			Double billTotalShippingPrice = Double.parseDouble(product[4].toString());
-			Integer billTotalQuantity = Integer.parseInt(product[5].toString());
-			String billAddress = product[6].toString();
-			Integer orderStatusID = Integer.parseInt(product[7].toString());
-			Date createdDatetime = (Date) product[8];
-			Double billDiscountRate = Double.parseDouble(product[10].toString());
-			Integer productID = Integer.parseInt(product[11].toString());
-			String productName = product[12].toString();
-			String productIntroduce = product[13].toString();
-			Integer productQuantity = Integer.parseInt(product[14].toString());
-			Double productPrice = Double.parseDouble(product[15].toString());
-			Double productDiscountPrice = Double.parseDouble(product[16].toString());
-			String productImageURL = product[17].toString();
-			Integer shopId = Integer.parseInt(product[18].toString());
-			String shopName = product[19].toString();
-			String shopAvatar = product[20].toString();
-			Integer billPaymentMethodId = Integer.parseInt(product[21].toString());
-
-			String orderStatus = orderStatusRepository.findById(orderStatusID).get().getName();
-			String billPaymentMethod = paymentMethodRepository.findById(billPaymentMethodId).get().getName();
-
-			String updatedDatetime;
-			if ((Date) product[9] == null) {
-				updatedDatetime = "";
-			}
-
-			Response_Bill_User billData = billMap.get(billID);
-			if (billData == null) {
-				billData = new Response_Bill_User();
-				billData.setBillID(billID);
-				billData.setUserID(userID);
-				billData.setBillTotalPrice(billTotalPrice);
-				billData.setBillDiscountPrice(billDiscountPrice);
-				billData.setBillTotalShippingPrice(billTotalShippingPrice);
-				billData.setBillTotalQuantity(billTotalQuantity);
-				billData.setBillAddress(billAddress);
-				billData.setBillOrderStatusId(orderStatusID);
-				billData.setBillOrderStatus(orderStatus);
-				billData.setBillPaymentMethod(billPaymentMethod);
-				billData.setCreatedDatetime(formatDate(createdDatetime.toString()));
-				billData.setBillDiscountRate(billDiscountRate);
-				billData.setShopId(shopId);
-				billData.setShopName(shopName);
-				billData.setShopAvatar(shopAvatar);
-
-				billData.setProducts(new ArrayList<>());
-				billMap.put(billID, billData); // Thêm bill mới vào Map
-			}
-
-			Response_Bill_Product_User productData = new Response_Bill_Product_User();
-			productData.setProductId(productID);
-			productData.setProductName(productName);
-			productData.setProductIntroduce(productIntroduce);
-			productData.setProductQuantity(productQuantity);
-			productData.setProductPrice(productPrice);
-			productData.setProductDiscountPrice(productDiscountPrice);
-			productData.setProductImageURL(productImageURL);
-
-			Integer billDetailId = billDetailRepository.findBillDetailByProductIdAndAccountId(userID, productID,
-					billID);
-			productData.setBillDetailId(billDetailId);
-
-			System.out.println("billDetailId " + billDetailId);
-			Integer isEvalued = evaluateRepository.isEvaluate(billDetailId, productID, userID);
-			productData.setIsEvaluate(isEvalued == 1);
-			billData.getProducts().add(productData);
+	public List<Response_Bill_User> convertToResponseBillUser(List<Object[]> result) {
+		List<Response_Bill_User> bills = new ArrayList<>();
+		for (Object[] row : result) {
+			Response_Bill_User bill = new Response_Bill_User();
+			bill.setBillId((Integer) row[0]);
+			bill.setUserId((Integer) row[1]);
+			bill.setTotalPriceBill((Double) row[2]);
+			bill.setPriceShippingBill((Double) row[3]);
+			bill.setTotalQuantityBill((Integer) row[4]);
+			bill.setOrderStatus((String) row[5]);
+			bill.setCreatedDatetime((Date) row[6]);
+			bill.setUpdatedDatetime((Date) row[7]);
+			bill.setPaymentMethod((String) row[8]);
+			bills.add(bill);
 		}
-
-		bills.addAll(billMap.values());
-		bills.sort((bill1, bill2) -> bill2.getCreatedDatetime().compareTo(bill1.getCreatedDatetime())); // Sắp xếp giảm
-
 		return bills;
 	}
 
-	public void cancelBill(Integer billId) {
-		checkBillStatus(billId, 1);
+	public List<BillDTO> createBillsWithProductsInBillDetail(List<Response_Bill_User> productsInBill) {
+		List<BillDTO> billList = new ArrayList<>();
 
+		for (Response_Bill_User bill : productsInBill) {
+			BillDTO newBill = new BillDTO();
+			Integer billId = bill.getBillId();
+			Integer userId = bill.getUserId();
+			Double totalPriceBill = bill.getTotalPriceBill();
+			Double priceShippingBill = bill.getPriceShippingBill();
+			Integer totalBillQuantity = bill.getTotalQuantityBill();
+			String orderStatus = bill.getOrderStatus();
+			Date createAt = bill.getCreatedDatetime();
+			Date updateAt = bill.getUpdatedDatetime();
+			String paymentMethod = bill.getPaymentMethod().toUpperCase();
+
+			newBill.setBillId(billId);
+			newBill.setUserId(userId);
+			newBill.setTotalPriceBill(totalPriceBill);
+			newBill.setPriceShippingBill(priceShippingBill);
+			newBill.setOrderStatus(orderStatus);
+			newBill.setCreatedDatetime(createAt);
+			newBill.setUpdatedDatetime(updateAt);
+			newBill.setTotalQuantityBill(totalBillQuantity);
+			newBill.setPaymentMethod(paymentMethod);
+
+			billList.add(newBill);
+		}
+		return billList;
+	}
+
+	public Bill cancelBill(Integer billId) {
+		checkBillStatus(billId, 1);
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
+		bill.setFinishAt(new Date());
 		bill.setOrderStatus(orderStatusRepository.findById(6).get());
 		billRepository.saveAndFlush(bill);
+		returnStatus(bill);
+
+		sendNotification(bill);
+
+		return billRepository.saveAndFlush(bill);
+	}
+
+	public void returnStatus(Bill bill) {
+		try {
+			List<Product> updatedProducts = new ArrayList<>();
+			List<FlashSaleDetail> updatedFlashSaleDetails = new ArrayList<>();
+			List<VoucherDetail> voucherDetailsToDelete = new ArrayList<>();
+			List<Voucher> updatedVouchers = new ArrayList<>();
+
+			bill.getBillDetails().forEach(billDetail -> {
+				Product product = billDetail.getProduct();
+				product.setQuantity(product.getQuantity() + billDetail.getQuantity());
+				updatedProducts.add(product);
+
+				if (billDetail.getFlashSaleDetail() != null) {
+					FlashSaleDetail flashSaleDetail = billDetail.getFlashSaleDetail();
+					flashSaleDetail.setQuantity(flashSaleDetail.getQuantity() + billDetail.getQuantity());
+					updatedFlashSaleDetails.add(flashSaleDetail);
+				}
+			});
+
+			if (bill.getVoucherDetails() != null) {
+				bill.getVoucherDetails().forEach(voucherDetails -> {
+					Voucher voucher = voucherDetails.getVoucher();
+					voucher.setQuantity(voucher.getQuantity() + 1);
+					updatedVouchers.add(voucher);
+					voucherDetailsToDelete.add(voucherDetails);
+				});
+			}
+			if (!updatedProducts.isEmpty()) {
+				productRepository.saveAll(updatedProducts);
+			}
+			if (!updatedFlashSaleDetails.isEmpty()) {
+				flashSaleDetailRepository.saveAll(updatedFlashSaleDetails);
+			}
+			if (!updatedVouchers.isEmpty()) {
+				voucherRepository.saveAll(updatedVouchers);
+
+			}
+			if (!voucherDetailsToDelete.isEmpty()) {
+				voucherDetailRepository.deleteAll(voucherDetailsToDelete);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION, "System");
+		}
 	}
 
 	public void confirmBill(Integer billId) {
-
 		checkBillStatus(billId, 4);
-
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
 		bill.setFinishAt(new Date());
 		bill.setOrderStatus(orderStatusRepository.findById(5).get());
-
 		billRepository.saveAndFlush(bill);
+
+	}
+
+	private void sendNotification(Bill bill) {
+		String email = bill.getAccount().getEmail();
+		System.out.println("email " + email);
+		String subject = "TOEL - Thông báo cập nhật trạng thái hủy đơn hàng ";
+		String content = " Khách hàng đã hủy đơn của shop. Xin cảm ơn vì sử dụng dịch vụ bán hàng trên TOEL.";
+		emailService.push(email, subject, EmailTemplateType.HUYDON,
+				bill.getBillDetails().get(0).getProduct().getAccount().getShopName(),
+				String.valueOf(bill.getId()), content);
 
 	}
 
@@ -255,39 +319,6 @@ public class Service_Bill_User {
 		}
 	}
 
-	@Scheduled(cron = "0 0 0 * * ?")
-	public void updateOrdersAutomatically() {
-		List<Bill> bills = billRepository.findByOrderStatusId(4);
-		LocalDateTime now = LocalDateTime.now();
-		for (Bill bill : bills) {
-			LocalDateTime lastUpdate = bill.getUpdateAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-			if (ChronoUnit.DAYS.between(lastUpdate, now) >= 5 && ChronoUnit.DAYS.between(lastUpdate, now) < 7) {
-				sendNotification(bill);
-			} else if (ChronoUnit.DAYS.between(lastUpdate, now) >= 7) {
-				OrderStatus updateOrderStatus = oderStatusRepository.findById(5).orElse(null);
-
-				sendNotification(bill);
-				if (updateOrderStatus != null) {
-					System.out.println("GỬI MEO NÈ");
-					bill.setOrderStatus(updateOrderStatus);
-					bill.setUpdateAt(new Date());
-					billRepository.saveAndFlush(bill);
-				}
-
-			}
-		}
-	}
-
-	private void sendNotification(Bill bill) {
-		String email = bill.getAccount().getEmail();
-		String username = bill.getAccount().getUsername();
-
-		String subject = "[TOEL] Thông báo cập nhật trạng thái xác nhận đơn hàng ";
-		String content = "Dear " + username
-				+ ", \n\nĐơn hàng của bạn sẽ được tự động cập nhật trạng thái sau 2 ngày. Vui lòng xác nhận trạng thái đã nhận hàng \n\n Xin cảm ơn vì đã mua hàng trên TOEL.";
-		emailService.push(email, subject, content);
-	}
-
 	public static String formatDate(String inputDate) {
 		// Định dạng đầu vào
 		SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
@@ -304,4 +335,5 @@ public class Service_Bill_User {
 			return null; // Hoặc xử lý lỗi theo cách khác
 		}
 	}
+
 }

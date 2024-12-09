@@ -1,5 +1,7 @@
 package com.toel.dto.admin.response;
 
+import java.util.List;
+
 import lombok.*;
 
 @Data
@@ -10,5 +12,5 @@ public class Response_Role {
 	String name;
 	String description;
 	// List<Response_RolePermission> rolePermissions;
-	// List<Response_Account> accounts;
+	List<Response_Account> accounts;
 }

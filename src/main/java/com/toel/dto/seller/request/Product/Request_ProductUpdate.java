@@ -16,6 +16,8 @@ public class Request_ProductUpdate {
     double price;
     @NotNull(message = "FIELD_REQUIRED")
     double sale;
+    @NotNull(message = "FIELD_REQUIRED")
+    double weight;
     @NotBlank(message = "FIELD_REQUIRED")
     String name;
     @NotBlank(message = "FIELD_REQUIRED")

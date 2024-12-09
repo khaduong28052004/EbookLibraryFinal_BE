@@ -44,7 +44,6 @@ public class ApiFavorite {
 			return ApiResponse.<Map<String, Object>>build().result(service_Favorite.getAllFavorite(id_user));
 		}
 		return ApiResponse.<Map<String, Object>>build().result(null).code(1002);
-
 	}
 
 }

@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.toel.dto.admin.response.Response_Account;
 import com.toel.dto.admin.response.Response_FlashSaleDetail;
 import com.toel.model.Category;
-import com.toel.model.FlashSaleDetail;
 import com.toel.model.ImageProduct;
 
 import lombok.AllArgsConstructor;

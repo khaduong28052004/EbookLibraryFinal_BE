@@ -14,7 +14,7 @@ public class Resquest_FlashSaleDetailsCreate {
 	@Min(value = 1, message = "FIELD_MIN_VALUE")
 	Integer quantity;
 	@NotNull(message = "FIELD_REQUIRED")
-	@Min(value = 10, message = "FIELD_MIN_VALUE")
+	@Min(value = 1, message = "FIELD_MIN_VALUE")
 	Integer sale;
 	@NotNull(message = "FIELD_REQUIRED")
 	@Min(value = 1, message = "FIELD_INVALID_ID")
