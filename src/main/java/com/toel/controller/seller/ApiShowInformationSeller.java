@@ -256,10 +256,6 @@ public class ApiShowInformationSeller {
 
     }
 
-
-    @Autowired
-    ProductMapper productMapper;
-
     // @PostMapping("/api/v1/user/topProducts")
     // public ApiResponse<?> topProducts(@RequestBody Map<String, String> body) {
     // String sellerID = body.get("sellerID");
@@ -354,7 +350,7 @@ public class ApiShowInformationSeller {
         return ApiResponse.<Map>build().message("getMethodName()").result(response);
     }
 
-    @PostMapping("/api/v1/user/topLikeProducts")//đang dùng
+    @PostMapping("/api/v1/user/topLikeProducts") // đang dùng
     public ApiResponse<?> thichNhieu1(@RequestBody Map<String, String> body) {
         // Lấy danh sách sản phẩm theo lượt like
         List<Map<String, Object>> topLikedProducts = likeRepository.findTopLikedProducts();
@@ -389,7 +385,7 @@ public class ApiShowInformationSeller {
         return ApiResponse.<Map>build().message("Top liked products retrieved successfully").result(response);
     }
 
-    @PostMapping("/api/v1/user/topProducts")//đang dùng
+    @PostMapping("/api/v1/user/topProducts") // đang dùng
     public ApiResponse<?> topProducts(@RequestBody Map<String, String> body) {
         String sellerID = body.get("sellerID");
         System.out.println("Seller ID: " + sellerID);
