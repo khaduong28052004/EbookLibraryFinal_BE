@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.toel.model.Account;
+import com.toel.model.Address;
 import com.toel.model.Bill;
 
 import com.toel.model.OrderStatus;
@@ -310,7 +311,9 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	@Query("SELECT b.orderStatus.name  FROM Bill b JOIN  b.orderStatus os WHERE b.id = ?1")
 	String findOrderStatusByBill(Integer billId);
 
-	@Query("SELECT b.address.fullNameAddress  FROM Bill b JOIN  b.address os WHERE b.id = ?1")
-	String findAddressByBill(Integer id);
+	// Optional<Integer> findAddressByBill(Integer id);
+
+	@Query("SELECT b.address FROM Bill b WHERE b.id = ?1")
+	Optional<Address> findAddressByBill(Integer id);
 
 }

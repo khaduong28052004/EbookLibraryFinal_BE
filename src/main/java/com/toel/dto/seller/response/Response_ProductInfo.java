@@ -23,7 +23,7 @@ public class Response_ProductInfo {
 
     String name;
 
-    String introduce;
+    // String introduce;    
 
     String writerName;
     

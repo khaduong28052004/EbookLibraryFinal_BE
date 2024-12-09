@@ -9,12 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.toel.mapper.user.ProductMaperUser;
 //import com.toel.exception.CustomException;
 import com.toel.model.Account;
+import com.toel.model.Address;
 import com.toel.model.Bill;
 import com.toel.model.BillDetail;
 import com.toel.model.Cart;
@@ -97,12 +99,8 @@ public class Service_BillDetail_User {
 		newBill.put("priceTemp", priceTemp);
 
 		String orderStatus = billRepository.findOrderStatusByBill(billId);
-		String address = billRepository.findAddressByBill(billId) == null ? ""
-				: billRepository.findAddressByBill(billId);
-
 		result.put("bill", newBill);
 		result.put("orderstatus", orderStatus);
-		result.put("address", address);
 
 		return result;
 
@@ -173,15 +171,21 @@ public class Service_BillDetail_User {
 		Account user = accountRepository.findById(accountId)
 				.orElseThrow(() -> new NoSuchElementException("User không tồn tại với accountId: " + accountId));
 
-		// Thêm thông tin người dùng vào Map
-		userInfo.put("userFullname", user.getFullname());
-		userInfo.put("userPhone", user.getPhone());
-
 		// Lấy địa chỉ từ billRepository, nếu không có trả về chuỗi rỗng
-		String address = billRepository.findAddressByBill(billId);
-		userInfo.put("userAddress", (address != null) ? address : "");
+
+		// Thêm thông tin vào userInfo
+		userInfo.put("userFullname", user.getFullname());
+		Optional<Address> address = billRepository.findAddressByBill(billId);
+		if (address.isPresent()) {
+			userInfo.put("userAddress", address.get().getFullNameAddress());
+			userInfo.put("userPhone", address.get().getPhone());
+		} else {
+			userInfo.put("userAddress", "");
+			userInfo.put("userPhone", "");
+		}
 
 		return userInfo;
+
 	}
 
 	// public List<Response_BillDetail_User>
