@@ -47,6 +47,7 @@ import com.toel.repository.OrderStatusRepository;
 import com.toel.repository.ProductRepository;
 import com.toel.repository.TypeVoucherRepository;
 import com.toel.repository.VoucherRepository;
+import com.toel.service.auth.OtpService1;
 import com.toel.service.user.FollowerService;
 
 import jakarta.validation.Valid;
@@ -326,7 +327,7 @@ public class ApiShowInformationSeller {
         return ApiResponse.<Map>build().message("getMethodName()").result(response);
     }
 
-    @PostMapping("/api/v1/user/topLikeProducts")//đang dùng
+    @PostMapping("/api/v1/user/topLikeProducts") // đang dùng
     public ApiResponse<?> thichNhieu1(@RequestBody Map<String, String> body) {
         // Lấy danh sách sản phẩm theo lượt like
         List<Map<String, Object>> topLikedProducts = likeRepository.findTopLikedProducts();
@@ -361,7 +362,7 @@ public class ApiShowInformationSeller {
         return ApiResponse.<Map>build().message("Top liked products retrieved successfully").result(response);
     }
 
-    @PostMapping("/api/v1/user/topProducts")//đang dùng
+    @PostMapping("/api/v1/user/topProducts") // đang dùng
     public ApiResponse<?> topProducts(@RequestBody Map<String, String> body) {
         String sellerID = body.get("sellerID");
         System.out.println("Seller ID: " + sellerID);
@@ -406,8 +407,45 @@ public class ApiShowInformationSeller {
 
     }
 
+    @Autowired
+    private OtpService1 otpService1;
 
-    
+    /**
+     * @param behavior
+     *                 user_id
+     *                 product_id
+     *                 action_type
+     *                 action_time
+     *                 device
+     *                 loaction
+     * @return
+     */
+    @PostMapping("/api/v1/user/track-action")
+    public ResponseEntity<?> trackAction() {
+        // userBehaviorService.saveUserBehavior(behavior);
+        int userid = 1;
+        String userID = String.valueOf(userid);
+        // Map<String, Object> userData = new HashMap();
+        // userData.put("action_type", List.of("view", "seach", "mau","as"));
+        // userData.put("action_time", "con cặt nè");
+        // userData.put("product_id", "userData");
+        // otpService1.saveUserData(userID, userData);
+        // otpService1.storeUserBehavior(userid, userid, userID, null, userID, userID);
+        otpService1.storeUserBehavior("1001L", "5001L", "VIEW", "mobile", "New York");
+        // List<Product> lisProducts = recommendationService.recommendProducts(userId);
+        // }
+        return ResponseEntity.ok("Action tracked successfully");
+    }
+
+    @GetMapping("/api/v1/user/getlist1")
+    public List<Map<String, Object>> getMethodName1dad() {
+        // user123
+        // Map<String, Object> retrievedData = otpService1.getUserData(param);
+        // retrievedData.
+        List<Map<String, Object>> list = otpService1.getUserBehavior("1001L");
+        return list;
+    }
+
     // @PostMapping("/api/v1/user/send-otpe")
     // public ApiResponse<?> sendOtp(@RequestBody @Valid Request_AccountCreateOTP
     // body) {

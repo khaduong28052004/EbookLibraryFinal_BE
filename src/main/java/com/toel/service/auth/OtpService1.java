@@ -7,9 +7,13 @@ import org.springframework.stereotype.Service;
 
 import com.toel.service.ServiceToel;
 
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -22,16 +26,65 @@ public class OtpService1 {
     private static final long OTP_EXPIRATION_MINUTES = 5;
     private HashOperations<String, String, Object> hashOperations;
 
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    public void storeUserBehavior(String userId, String productId, String actionType, String device,
+            String location) {
+        // String key = "USER_BEHAVIOR:" + userId + ":" + UUID.randomUUID().toString();
+        String key = "USER_BEHAVIOR:" + userId;
+        Map<String, Object> behaviorData = new HashMap<>();
+        behaviorData.put("user_id", userId);
+        behaviorData.put("product_id", productId);
+        behaviorData.put("action_type", actionType);
+        // behaviorData.put("action_time", actionTime.getTime());
+        behaviorData.put("device", device);
+        behaviorData.put("location", location);
+
+        hashOperations.putAll(key, behaviorData);
+    }
+
+    // New method to retrieve user behavior data
+    public List<Map<String, Object>> getUserBehavior(String userId) {
+        String pattern = "USER_BEHAVIOR:" + userId + ":*";
+        Set<String> keys = redisTemplate.keys(pattern);
+        List<Map<String, Object>> behaviors = new ArrayList<>();
+
+        if (keys != null) {
+            for (String key : keys) {
+                Map<String, Object> behaviorData = hashOperations.entries(key);
+                behaviors.add(behaviorData);
+            }
+        }
+
+        return behaviors;
+    }
+
+    // New method to retrieve all user behavior data
+    public List<Map<String, Object>> getAllUserBehavior() {
+        String pattern = "USER_BEHAVIOR:*";
+        Set<String> keys = redisTemplate.keys(pattern);
+        List<Map<String, Object>> behaviors = new ArrayList<>();
+
+        if (keys != null) {
+            for (String key : keys) {
+                Map<String, Object> behaviorData = hashOperations.entries(key);
+                behaviors.add(behaviorData);
+            }
+        }
+
+        return behaviors;
+    }
+
+    // ..>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     @Autowired
     public OtpService1(RedisTemplate<String, Object> redisTemplate) {
         this.hashOperations = redisTemplate.opsForHash();
     }
 
     // ... (keep all existing methods)
-     
+
     // public Map<String,Map<String, Object>> getAllData() {
-    //     String key = "USER:" + userId;
-    //     return hashOperations.;
+    // String key = "USER:" + userId;
+    // return hashOperations.;
     // }
 
     // New method to save user data
@@ -57,8 +110,6 @@ public class OtpService1 {
         String key = "USER:" + userId;
         redisTemplate.delete(key);
     }
-
-
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     public String setData(String key, List<String> data) {
