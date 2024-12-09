@@ -22,6 +22,8 @@ public class Response_TKDT_Seller {
     boolean status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", timezone = "UTC")
     Date createAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", timezone = "UTC")
+    Date createAtSeller;
     Double DTshop;
     Double DTSan;
     Double Phi;

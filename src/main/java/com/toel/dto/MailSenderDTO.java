@@ -28,5 +28,6 @@ public class MailSenderDTO {
 		this.subject = subject;
 		this.content = content;
 	}
+	
 
 }

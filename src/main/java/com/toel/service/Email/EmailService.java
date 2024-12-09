@@ -3,6 +3,7 @@ package com.toel.service.Email;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -38,13 +39,50 @@ public class EmailService {
         MailSenderDTO mail = new MailSenderDTO(to, subject, from(content));
         this.push(mail);
     }
-    public void push(String to, String subject, EmailTemplateType templateType, String...dynamicData) {
+
+    public void pushList(String subject, List<String> listmail, EmailTemplateType templateType,
+            Map<String, String> emailToNameMap, String... staticData) {
+        List<MailSenderDTO> personalizedEmails = listmail.stream().map(email -> {
+            String name = emailToNameMap.getOrDefault(email, "Người dùng"); // Lấy tên, mặc định là "Người dùng"
+
+            // Kết hợp dữ liệu động cho email cụ thể
+            String[] dynamicData = new String[staticData.length + 1];
+            dynamicData[0] = name; // Thêm tên vào dữ liệu động
+            System.arraycopy(staticData, 0, dynamicData, 1, staticData.length);
+
+            String content = TemplateBuilder.buildContent(templateType, dynamicData);
+
+            MailSenderDTO mail = new MailSenderDTO();
+            mail.setToEmail(email);
+            mail.setSubject(subject);
+            mail.setContent(content);
+
+            return mail;
+        }).toList();
+
+        // Đẩy tất cả email trong một lần gửi
+        personalizedEmails.forEach(this::push);
+    }
+
+    public void push(String to, String subject, EmailTemplateType templateType, String... dynamicData) {
         String content = TemplateBuilder.buildContent(templateType, dynamicData);
         MailSenderDTO mail = new MailSenderDTO(to, subject, content);
         this.push(mail);
     }
 
     public void push(MailSenderDTO mail) {
+        // JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        // mailSender.setHost("smtp.gmail.com");
+        // mailSender.setPort(587);
+        // mailSender.setUsername(email);
+        // mailSender.setPassword(password);
+
+        // Properties props = mailSender.getJavaMailProperties();
+        // props.put("mail.transport.protocol", "smtp");
+        // props.put("mail.smtp.auth", "true");
+        // props.put("mail.smtp.starttls.enable", "true");
+        // props.put("mail.debug", "true");
+
         MimeMessage mime = sender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mime, true, "utf-8");
@@ -63,7 +101,6 @@ public class EmailService {
                     helper.addAttachment(file.getName(), file);
                 }
             } catch (Exception e) {
-                // TODO: handle exception
             }
         } catch (MessagingException e) {
             e.printStackTrace();
@@ -144,7 +181,8 @@ public class EmailService {
                 " <p>Xin chào,</p>\r\n" +
                 " <p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản của mình. Dưới đây là mã OTP để xác nhận quá trình này:</p>\r\n"
                 +
-                " <div class=\"otp-box\">Mã OTP của bạn là: ["+connect+"] <a href=\"https://www.w3schools.com/\">Đổi mật khẩu ngay!</a></div>\r\n" +
+                " <div class=\"otp-box\">Mã OTP của bạn là: [" + connect
+                + "] <a href=\"https://www.w3schools.com/\">Đổi mật khẩu ngay!</a></div>\r\n" +
                 " <p>Xin vui lòng nhập mã này vào trang đặt lại mật khẩu để tiếp tục quá trình đặt lại mật khẩu.</p>\r\n"
                 +
                 " <p>Lưu ý rằng mã OTP sẽ hết hạn sau 1 phút kể từ lúc nhận được mail.</p>\r\n" +
@@ -174,6 +212,7 @@ public class EmailService {
                 success++;
             }
         } catch (Exception e) {
-            error++;        }
+            error++;
+        }
     }
 }

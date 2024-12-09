@@ -8,11 +8,18 @@ import com.toel.model.Like;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
 import com.toel.model.Product;
 
 import io.lettuce.core.dynamic.annotation.Param;
 
 public interface LikeRepository extends JpaRepository<Like, Integer> {
+       @Query("SELECT l.product.id AS productId, COUNT(l.id) AS likeCount " +
+                     "FROM Like l " +
+                     "GROUP BY l.product.id " +
+                     "ORDER BY likeCount DESC")
+       List<Map<String, Object>> findTopLikedProducts();
 
        Like findByAccountAndProduct(Account account, Product product);
 
@@ -23,13 +30,15 @@ public interface LikeRepository extends JpaRepository<Like, Integer> {
 
        List<Like> findAllByProduct(Product product);
 
-       Integer countByProduct(Product product);
+       @Query("Select COUNT(l) FROM Like l WHERE l.product = :product and l.createAt BETWEEN :dateStart AND :dateEnd")
+       Integer countByProductAndCreateAt(@Param("product") Product product, @Param("dateStart") Date dateStart,
+                     @Param("dateEnd") Date dateEnd);
 
        @Query("SELECT p From Product p WHERE p.id IN (SELECT DISTINCT l.product.id FROM Like l Where l.createAt BETWEEN :dateStart AND :dateEnd)")
        List<Product> selectAllProduct(@Param("dateStart") Date dateStart,
                      @Param("dateEnd") Date dateEnd);
 
-       @Query("SELECT p From Product p WHERE p.id IN (SELECT DISTINCT l.product.id FROM Like l Where l.createAt BETWEEN :dateStart AND :dateEnd AND (:key iS NULL OR l.product.name LIKE %:key% OR l.product.introduce LIKE %:key% OR l.product.writerName LIKE %:key% OR l.product.publishingCompany LIKE %:key%))")
+       @Query("SELECT p From Product p WHERE p.id IN (SELECT DISTINCT l.product.id FROM Like l Where l.createAt BETWEEN :dateStart AND :dateEnd AND (:key iS NULL OR l.product.name LIKE %:key% OR l.product.writerName LIKE %:key% OR l.product.publishingCompany LIKE %:key%))")
        List<Product> selectAllProductByDateStartDateEnd(@Param("key") String key, @Param("dateStart") Date dateStart,
                      @Param("dateEnd") Date dateEnd);
 

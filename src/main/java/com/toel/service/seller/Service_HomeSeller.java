@@ -47,17 +47,15 @@ public class Service_HomeSeller {
 
         List<Response_DoanhSo> defaultList = IntStream.range(0, 12)
                 .mapToObj(i -> new Response_DoanhSo(0.0, i + 1))
-
                 .collect(Collectors.toList());
 
-        // Nếu có dữ liệu, cập nhật doanh số cho từng tháng
         for (Object[] record : listDoanhSo) {
             int month = (Integer) record[0];
             double totalRevenue = (Double) record[1];
             defaultList.set(month - 1, new Response_DoanhSo(totalRevenue, month));
         }
 
-        return defaultList; // Trả về danh sách đã được cập nhật
+        return defaultList;
     }
 
     public List<Response_DoanhThu> getListDoanhThu(Integer year, Integer account_id) {
@@ -76,10 +74,8 @@ public class Service_HomeSeller {
     }
 
     public List<Response_Year> getYears(Integer account_id) {
-        // Lấy danh sách các năm khác nhau từ repository
         List<Integer> years = billRepository.getDistinctYears(account_id);
 
-        // Nếu danh sách trống, trả về năm hiện tại, ngược lại trả về danh sách các năm
         return years.isEmpty()
                 ? Collections.singletonList(new Response_Year(Year.now().getValue()))
                 : years.stream().map(Response_Year::new).collect(Collectors.toList());

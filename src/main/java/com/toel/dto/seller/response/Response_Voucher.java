@@ -12,11 +12,11 @@ public class Response_Voucher {
     Integer id;
     String name;
     String note;
-    double minOrder;
     double totalPriceOrder;
-    double sale;
+    int sale;
     int quantity;
     boolean isDelete;
+    double minOrder;
     Date dateStart;
     Date dateEnd;
     Response_Account account;

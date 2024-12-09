@@ -19,6 +19,7 @@ public class Response_Bill {
     Date finishAt;
     Date createAt;
     Date updateAt;
+    List<Response_VoucherDetail> voucherDetails;
     List<Response_BillDetail> billDetails;
     Response_OrderStatus orderStatus;
     Response_Account account;

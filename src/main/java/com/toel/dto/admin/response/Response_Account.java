@@ -31,4 +31,5 @@ public class Response_Account {
     String numberId;
     String beforeIdImage;
     String afterIdImage;
+    Response_Role_NotAccount role;
 }

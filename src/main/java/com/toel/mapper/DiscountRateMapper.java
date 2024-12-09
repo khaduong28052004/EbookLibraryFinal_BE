@@ -12,5 +12,6 @@ public interface DiscountRateMapper {
     Response_DiscountRate tochChietKhauResponse(DiscountRate discountRate);
 
     @Mapping(target = "account", ignore = true)
+    @Mapping(target = "dateInsert", ignore = true)
     DiscountRate toDiscountRateCreate(Request_DiscountRateCreate dRateCreate);
 }
