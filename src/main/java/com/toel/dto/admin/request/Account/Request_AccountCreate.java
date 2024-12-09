@@ -28,4 +28,5 @@ public class Request_AccountCreate {
     Date birthday;
     @NotBlank(message = "FIELD_REQUIRED")
     String phone;
+    Integer role;
 }

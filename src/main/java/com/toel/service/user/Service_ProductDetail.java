@@ -102,8 +102,7 @@ public class Service_ProductDetail {
 	public Map<String, Object> getAllProduct(Integer size, String sort) {
 		Map<String, Object> response = new HashMap<>();
 		Pageable pageable = PageRequest.of(0, size, Sort.by(sort));
-		Page<Product> pageProducts = productRepo.findAllByAccountAndCategoryNot(seller, product.getCategory(),
-				pageable);
+		Page<Product> pageProducts = productRepo.findAllByAccountAndIdNot(seller, product.getId(), pageable);
 		List<Response_Product> response_Products = new ArrayList<>();
 		for (Product product : pageProducts) {
 			response_Products.add(productMaper.productToResponse_Product(product));

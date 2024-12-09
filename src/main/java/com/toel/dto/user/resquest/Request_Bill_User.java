@@ -12,4 +12,6 @@ public class Request_Bill_User {
 	@NotNull(message = "User ID cannot be null")
 	Integer userID;
 	String orderStatusFind;
+	private int page;
+	private int size;
 }

@@ -2,6 +2,8 @@ package com.toel.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,11 +38,10 @@ public class FlashSaleDetail {
 	@ManyToOne
 	@JoinColumn(name = "product_id")
 	Product product;
-
 	@ManyToOne
 	@JoinColumn(name = "flashsale_id")
 	FlashSale flashSale;
-
+	@JsonIgnore
 	@OneToMany(mappedBy = "flashSaleDetail")
 	List<BillDetail> billDetails;
 

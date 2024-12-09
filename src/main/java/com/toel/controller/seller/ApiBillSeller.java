@@ -47,10 +47,11 @@ public class ApiBillSeller {
 
         @PostMapping("huy")
         public ApiResponse<Response_Bill> huy(
+                        @RequestParam(value = "content", defaultValue = "") String content,
                         @RequestBody @Valid Request_Bill request_Bill) {
                 return ApiResponse.<Response_Bill>build()
                                 .message("Hủy đơn hàng thành công")
-                                .result(service_Bill.huy(request_Bill));
+                                .result(service_Bill.huy(content, request_Bill));
         }
 
 }

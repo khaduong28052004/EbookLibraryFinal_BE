@@ -1,13 +1,16 @@
 package com.toel.dto.admin.response.ThongKe;
 
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.toel.dto.admin.response.Response_Account;
-import com.toel.model.Address;
 import com.toel.model.DiscountRate;
-import com.toel.model.OrderStatus;
-import com.toel.model.PaymentMethod;
+import com.toel.dto.seller.response.Response_Address;
+import com.toel.dto.seller.response.Response_BillDetail;
+import com.toel.dto.seller.response.Response_OrderStatus;
+import com.toel.dto.seller.response.Response_PaymentMethod;
+import com.toel.dto.seller.response.Response_VoucherDetail;
 
 import lombok.*;
 
@@ -16,6 +19,7 @@ import lombok.*;
 @AllArgsConstructor
 public class Response_TK_Bill {
     private int id;
+    private double priceShipping;
     private double totalPrice;
     private double discountPrice;
     private int totalQuantity;
@@ -26,8 +30,10 @@ public class Response_TK_Bill {
     private double phi;
     private double loinhuan;
     private DiscountRate discountRate;
-    private OrderStatus orderStatus;
-    private Address address;
-    private PaymentMethod paymentMethod;
     private Response_Account account;
+    private List<Response_VoucherDetail> voucherDetails;
+    private List<Response_BillDetail> billDetails;
+    private Response_OrderStatus orderStatus;
+    private Response_PaymentMethod paymentMethod;
+    private Response_Address address;
 }

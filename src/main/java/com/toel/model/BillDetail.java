@@ -27,6 +27,7 @@ public class BillDetail {
 	Integer id;
 	int quantity;
 	double price;
+	
 	@ManyToOne
 	@JoinColumn(name = "product_id")
 	Product product;

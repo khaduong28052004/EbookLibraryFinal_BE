@@ -37,11 +37,7 @@ public class AccountReport {
 	@ManyToOne
 	@JoinColumn(name = "shop_id")
 	Account shop;
-	// Integer parent_id;
-	// @ManyToOne
-	// @JoinColumn(name = "product_id")
-	// Product product;
-
+	
 	@ManyToOne
 	@JoinColumn(name = "account_id")
 	Account account;

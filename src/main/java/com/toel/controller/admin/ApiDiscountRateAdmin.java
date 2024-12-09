@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,12 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.admin.request.DiscountRate.Request_DiscountRateCreate;
+import com.toel.dto.admin.request.DiscountRate.Request_DiscountRateUpdate;
 import com.toel.dto.admin.response.Response_DiscountRate;
 import com.toel.service.admin.Service_DiscountRate;
 
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @CrossOrigin("*")
@@ -56,11 +59,31 @@ public class ApiDiscountRateAdmin {
                 .result(discountReateService.getAll(page, size, searchDateTime, sortBy, sortColumn));
     }
 
+    @GetMapping("id")
+    public ApiResponse<Response_DiscountRate> getId(@RequestParam(value = "id", required = false) Integer id) {
+        return ApiResponse.<Response_DiscountRate>build()
+                .result(discountReateService.getById(id));
+    }
+
     @PostMapping
     public ApiResponse<Response_DiscountRate> post(@RequestBody @Valid Request_DiscountRateCreate entity) {
         return ApiResponse.<Response_DiscountRate>build()
-                .message("Cập nhật chiết khẩu thành công")
+                .message("Thêm chiết khẩu thành công")
                 .result(discountReateService.create(entity));
+    }
+
+    @PutMapping
+    public ApiResponse<Response_DiscountRate> put(@RequestBody @Valid Request_DiscountRateUpdate entity) {
+        return ApiResponse.<Response_DiscountRate>build()
+                .message("Cập nhật chiết khẩu thành công")
+                .result(discountReateService.update(entity));
+    }
+
+    @DeleteMapping
+    public ApiResponse<Response_DiscountRate> delete(@RequestParam(value = "id", required = false) Integer id) {
+        discountReateService.delete(id);
+        return ApiResponse.<Response_DiscountRate>build()
+                .message("Xóa thành công");
     }
 
 }

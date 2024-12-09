@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.toel.model.Account;
+import com.toel.model.BillDetail;
 import com.toel.model.Evalue;
 import com.toel.model.Product;
 
@@ -19,16 +20,24 @@ public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
 	Page<Evalue> findByAccountId(Integer account_id, String search, Pageable pageable);
 
 	@Query(value = "SELECT CASE WHEN EXISTS (SELECT 1 FROM evalues WHERE evalues.billDetail_id = :billDetailId AND evalues.product_id = :productId AND evalues.account_id = :accountId) THEN 1 ELSE 0 END AS isEvaluated ", nativeQuery = true)
-	Integer isEvaluate(@Param("billDetailId") Integer billDetailId, @Param("productId") Integer product_id,
+	Integer isEvaluated(@Param("billDetailId") Integer billDetailId, @Param("productId") Integer product_id,
 			@Param("accountId") Integer account_id);
 
 	@Query("SELECT COALESCE(AVG(e.star),0) FROM Evalue e WHERE e.product.account.id = :accountId")
 	Double calculateAverageStarByAccountId(@Param("accountId") Integer accountId);
 
+	@Query("SELECT COALESCE(AVG(e.star),0) FROM Evalue e WHERE e.product.id = :productId and e.createAt BETWEEN :dateStart AND :dateEnd")
+	Double calculateAverageStarByProduct(@Param("productId") Integer productId, @Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd);
+
 	@Query("SELECT COALESCE(AVG(e.star),0) FROM Evalue e WHERE e.product.id = :productId")
 	Double calculateAverageStarByProduct(@Param("productId") Integer productId);
 
 	List<Evalue> findAllByProduct(Product product);
+
+	@Query("SELECT e FROM Evalue e WHERE e.product = :product AND e.createAt BETWEEN :dateStart AND :dateEnd")
+	List<Evalue> findAllByProductAndCreateAt(@Param("product") Product product, @Param("dateStart") Date dateStart,
+			@Param("dateEnd") Date dateEnd);
 
 	Integer countByProduct(Product product);
 
@@ -42,4 +51,9 @@ public interface EvalueRepository extends JpaRepository<Evalue, Integer> {
 
 	@Query("SELECT COALESCE(AVG(e.star),0) FROM Evalue e WHERE e.account = :account")
 	Double calculateAverageStarByKhachHang(@Param("account") Account account);
+
+	List<Evalue> findByBillDetail(BillDetail billDetail);
+
+	List<Evalue> findByBillDetailIn(List<BillDetail> billDetail);
+
 }

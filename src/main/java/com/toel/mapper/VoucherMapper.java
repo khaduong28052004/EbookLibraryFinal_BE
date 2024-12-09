@@ -1,4 +1,4 @@
-package com.toel.mapper;
+ package com.toel.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

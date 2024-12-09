@@ -82,7 +82,7 @@ public class Service_Cart {
 					flashSaleService.getFlashSaleDetailForProduct(response_Cart.getProduct().getId()));
 			responseSeller.getCart().add(response_Cart);
 
-			List<Voucher> listVoucher = voucherRepository.findAllByAccount(item.getProduct().getAccount());
+			List<Voucher> listVoucher = voucherRepository.findAllByAccount(item.getProduct().getAccount(), new Date());
 			responseSeller.setVouchers(new ArrayList<Voucher>());
 			for (Voucher voucher : listVoucher) {
 				responseSeller.getVouchers().add(voucher);
@@ -128,7 +128,7 @@ public class Service_Cart {
 	}
 
 	public Map<String, Object> getVoucherAdmin() {
-		TypeVoucher typeVoucher = typeVoucherRepository.findById(1).get();
+		TypeVoucher typeVoucher = typeVoucherRepository.findById(2).get();
 		List<Voucher> listVouchers = voucherRepository.findAllByTypeVoucher(typeVoucher, new Date());
 		Map<String, Object> response = new HashMap<String, Object>();
 		response.put("datas", listVouchers);
