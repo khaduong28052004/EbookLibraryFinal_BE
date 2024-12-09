@@ -1,7 +1,9 @@
 package com.toel.service.user;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,10 +20,14 @@ import com.toel.model.Account;
 import com.toel.model.Bill;
 import com.toel.model.BillDetail;
 import com.toel.model.FlashSaleDetail;
+import com.toel.model.Follower;
+import com.toel.model.Like;
 import com.toel.model.Product;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
+import com.toel.repository.FollowerRepository;
+import com.toel.repository.LikeRepository;
 import com.toel.repository.ProductRepository;
 
 import lombok.AccessLevel;
@@ -37,6 +43,9 @@ public class Service_SelectAllProductHome {
 	final BillRepository billRepository;
 	final AccountRepository accountRepository;
 	final BillDetailRepository billDetailRepository;
+	final FollowerRepository followerRepository;
+	final LikeRepository likeRepository;
+	final ProductMaperUser productMaperUser;
 
 	public Map<String, Object> selectAll(List<FlashSaleDetail> list, Integer idShop, Integer page, Integer size,
 			String sort) {
@@ -62,9 +71,39 @@ public class Service_SelectAllProductHome {
 
 //	 Gợi ý
 	public List<Response_Product> suggestProduct(Integer id_user) {
-		Account account = accountRepository.findById(id_user).get();
-		List<BillDetail> listBillDetails = billDetailRepository.findAllByUser(id_user);
+		Account user = accountRepository.findById(id_user).get();
+		List<Follower> listFollowers = followerRepository.findAllByAccount(user);
+		List<Product> listProducts = new ArrayList<>();
+		for (Follower follow : listFollowers) {
+			Account shop = accountRepository.findById(follow.getShopId()).get();
+			if (shop.isStatus()) {
+				for (Product product : shop.getProducts().subList(0, 1)) {
+					if (product.isActive() && product.isDelete() == false) {
+						listProducts.add(product);
+					}
+				}
+			}
+		}
+		List<Integer> listIdProduct = listProducts.stream().map(Product::getId).collect(Collectors.toList());
+		List<Like> listLikes = likeRepository.findAllByAccount(user);
+		for (Like like : listLikes) {
+			if (!listIdProduct.contains(like.getProduct().getId())) {
+				listProducts.add(like.getProduct());
+			}
+		}
+		listIdProduct = listProducts.stream().map(Product::getId).collect(Collectors.toList());
+		List<Product> listProductByBills = productRepo.findAllByBillOfUser(id_user);
+		for (Product product : listProductByBills) {
+			if (!listIdProduct.contains(product.getId())) {
+				listProducts.add(product);
+			}
+		}
+		Collections.shuffle(listProducts);
 		List<Response_Product> listResponse_Products = new ArrayList<Response_Product>();
+		for (Product product : listProducts.size() > 8 ? listProducts.subList(0, 12)
+				: listProducts.subList(0, listProducts.size())) {
+			listResponse_Products.add(productMaperUser.productToResponse_Product(product));
+		}
 		return listResponse_Products;
 	}
 }

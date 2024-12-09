@@ -15,14 +15,16 @@ public interface FollowerRepository extends JpaRepository<Follower, Integer> {
 
 	Follower findByAccountAndShopId(Account user, Integer id_shop);
 
-    @Query("SELECT COUNT(f) FROM Follower f WHERE f.shopId.id = :shopId")
-    Integer countFollowersByShopId(@Param("shopId") Integer shopId);
+	@Query("SELECT COUNT(f) FROM Follower f WHERE f.shopId.id = :shopId")
+	Integer countFollowersByShopId(@Param("shopId") Integer shopId);
 
-    @Query("SELECT COUNT(f) FROM Follower f WHERE f.accountId.id = :accountId")
-    Integer countFollowingByAccountId(@Param("accountId") Integer accountId);
-    
-    // @Query("SELECT COUNT(f) FROM Product f WHERE f.account.id = :accountId")
-    //     Integer countProductByAccountId(@Param("accountId") Integer accountId);
-    @Query("SELECT COUNT(f) FROM Product f WHERE f.account.id = :accountId")
-    Integer countProductByAccountId(@Param("accountId") Integer accountId);
+	@Query("SELECT COUNT(f) FROM Follower f WHERE f.accountId.id = :accountId")
+	Integer countFollowingByAccountId(@Param("accountId") Integer accountId);
+
+	// @Query("SELECT COUNT(f) FROM Product f WHERE f.account.id = :accountId")
+	// Integer countProductByAccountId(@Param("accountId") Integer accountId);
+	@Query("SELECT COUNT(f) FROM Product f WHERE f.account.id = :accountId")
+	Integer countProductByAccountId(@Param("accountId") Integer accountId);
+
+	List<Follower> findAllByAccount(Account user);
 }

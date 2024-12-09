@@ -134,6 +134,12 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 	// 'findAllById'");
 	// }
 
-	@Query("SELECT bd FROM BillDetail bd WHERE bd.bill.account.id = ?1 AND bd.bill.orderStatus.id =5 AND bd.bill.orderStatus.id=4 AND bd.product.isDelete = false AND bd.product.isActive = true AND bd.bill.account.status = true group by bd.product.id order by count(bd.product.id) desc")
-	List<BillDetail> findAllByUser(Integer id_user);
+//	@Query("SELECT bd " + "FROM BillDetail bd " + "WHERE " + " bd.product.id IN ("
+//			+ "   SELECT bdSub.product.id "
+//			+ "   FROM BillDetail bdSub " + "   WHERE bdSub.bill.account.id = ?1 "
+//			+ "   AND bdSub.bill.orderStatus.id IN (4, 5) " + "   AND bdSub.product.isDelete = false "
+//			+ "   AND bdSub.product.isActive = true " + "   AND bdSub.bill.account.status = true "
+//			+ "   GROUP BY bdSub.product.id " + "   ORDER BY COUNT(bdSub.product.id) DESC" + ")")
+//	List<BillDetail> findAllByUser(Integer id_user);
+
 }

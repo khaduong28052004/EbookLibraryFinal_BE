@@ -76,8 +76,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			Date dateEnd);
 
 	@Query("SELECT p FROM Product p WHERE p.isActive = true and p.isDelete=false "
-			+ "AND (p.createAt BETWEEN :dateStart AND :dateEnd) "
-			+ "AND (:key iS NULL OR p.name LIKE %:key%  "
+			+ "AND (p.createAt BETWEEN :dateStart AND :dateEnd) " + "AND (:key iS NULL OR p.name LIKE %:key%  "
 			+ "OR p.writerName LIKE %:key% OR p.publishingCompany LIKE %:key%)")
 	List<Product> selectAllMatchingAttributesByDateStartAndDateEnd(@Param("key") String key,
 			@Param("dateStart") Date dateStart, @Param("dateEnd") Date dateEnd);
@@ -100,7 +99,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			@Param("email") String email, @Param("phone") String phone);
 
 	@Query("SELECT p FROM Product p WHERE p.id NOT IN :idProducts AND p.account.id != :idShop AND p.isActive = true AND p.isDelete=false AND p.account.status = true")
-	Page<Product> findAllIdNotIn(@Param("idProducts") List<Integer> idProducts, @Param("idShop") Integer idShop,Pageable pageable);
+	Page<Product> findAllIdNotIn(@Param("idProducts") List<Integer> idProducts, @Param("idShop") Integer idShop,
+			Pageable pageable);
 
 	@Query("SELECT p FROM Product p WHERE p.isActive = true AND p.isDelete = false AND p.account.status = true")
 	List<Product> findAllProduct(Sort sort);
@@ -111,17 +111,17 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	@Query("SELECT COUNT(f) FROM Product f WHERE f.account.id = :accountId")
 	Integer countProductByAccountId(@Param("accountId") Integer accountId);
 
-	@Query("SELECT DISTINCT p FROM Product p " +
-			"LEFT JOIN BillDetail bd ON bd.product = p " +
-			"WHERE p.id IN :ids " +
-			"AND p.isActive = true " +
-			"AND p.isDelete = false " +
-			"GROUP BY p.id " +
-			"ORDER BY COALESCE(SUM(bd.quantity), 0) DESC")
+	@Query("SELECT DISTINCT p FROM Product p " + "LEFT JOIN BillDetail bd ON bd.product = p " + "WHERE p.id IN :ids "
+			+ "AND p.isActive = true " + "AND p.isDelete = false " + "GROUP BY p.id "
+			+ "ORDER BY COALESCE(SUM(bd.quantity), 0) DESC")
 	Page<Product> findProductsByIdsSortedByTotalSales(@Param("ids") List<Integer> ids, Pageable pageable);
 
 	List<Product> findByBillDetails(List<BillDetail> billDetails);
 
-	
+	@Query("SELECT p FROM Product p " + "WHERE p.isActive = true " + "AND p.isDelete = false " + "  AND p.quantity > 0"
+			+ "AND p.account.status = true " + "AND p.id IN (" + "    SELECT bd.product.id " + "    FROM BillDetail bd "
+			+ "    WHERE bd.bill.account.id = ?1 " + "    AND bd.bill.orderStatus.id IN (4, 5) "
+			+ "    GROUP BY bd.product.id " + ")")
+	List<Product> findAllByBillOfUser(Integer id_user);
 
 }
