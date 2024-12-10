@@ -99,4 +99,14 @@ public class Service_FlashSale {
         // });
         // }
         // }
+        // if (flashSaleRepository.findByIsDelete(false).size() >= 1) {
+        // flashSaleRepository.findByIsDelete(false).forEach(flasesale -> {
+        // if (flasesale.getDateEnd().isBefore(LocalDateTime.now())) {
+        // flasesale.setDelete(true);
+        // flashSaleRepository.save(flasesale);
+        // }
+        // });
+        // }
+        // }
+
 }

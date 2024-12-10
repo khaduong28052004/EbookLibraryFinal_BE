@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Request_FlashSaleCreate {
     @NotNull(message = "FIELD_REQUIRED")
+    private String title;
+    @NotNull(message = "FIELD_REQUIRED")
     @Future(message = "FIELD_INVALID_FUTURE_DATE")
     private LocalDateTime dateStart;
     @NotNull(message = "FIELD_REQUIRED")

@@ -144,4 +144,8 @@ public class Account {
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<Category> categories;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "account")
+	List<ProductReport> productReports;
 }

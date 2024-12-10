@@ -93,7 +93,23 @@ public class Service_Bill_User {
 			List<Response_Bill_User> listConver = convertToResponseBillUser(productsInBill);
 			List<BillDTO> shopListInBill = createBillsWithProductsInBillDetail(listConver);
 
-			response.put("data", shopListInBill);
+			int page = requestBillDTO.getPage();
+			int size = requestBillDTO.getSize();
+			int totalItems = shopListInBill.size();
+			int totalPages = (int) Math.ceil((double) totalItems / size);
+
+			// Lấy dữ liệu cho trang hiện tại
+			int start = Math.min(page * size, totalItems);
+			int end = Math.min(start + size, totalItems);
+			List<BillDTO> paginatedList = shopListInBill.subList(start, end);
+
+			response.put("data", paginatedList); // Dữ liệu cho trang hiện tại
+			response.put("currentPage", page);
+			response.put("totalItems", totalItems);
+			response.put("totalPages", totalPages);
+			response.put("pageSize", size);
+
+			// response.put("data", shopListInBill);
 			response.put("status", "successfully");
 			response.put("message", "Retrieve data successfully");
 		} catch (Exception e) {
@@ -250,7 +266,7 @@ public class Service_Bill_User {
 		String email = bill.getAccount().getEmail();
 		System.out.println("email " + email);
 		String subject = "TOEL - Thông báo cập nhật trạng thái hủy đơn hàng ";
-		String content = " Khách hàng đã hủy đơn của shop. Xin cảm ơn vì sử dụng bán hàng trên TOEL.";
+		String content = " Khách hàng đã hủy đơn của shop. Xin cảm ơn vì sử dụng dịch vụ bán hàng trên TOEL.";
 		emailService.push(email, subject, EmailTemplateType.HUYDON,
 				bill.getBillDetails().get(0).getProduct().getAccount().getShopName(),
 				String.valueOf(bill.getId()), content);
