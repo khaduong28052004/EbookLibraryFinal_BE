@@ -70,6 +70,7 @@ public class OtpController {
         return "entity";
     }
 
+    // "/api/v1/otp/generate"
     @PostMapping("/api/v1/otp/generate")
     public ResponseEntity<String> generateOtp(@RequestBody Account entity) {
         System.out.println("email" + entity.getEmail());
