@@ -149,8 +149,7 @@ public class ApiShowInformationSeller {
     }
 
     @GetMapping("path")
-    public String getMethodName() {
-
+    public String getMethodName() {  
         return new String();
     }
 

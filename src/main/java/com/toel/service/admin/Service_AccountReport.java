@@ -32,7 +32,7 @@ public class Service_AccountReport {
     AccountReportMapper accountReportMapper;
 // <<<<<<< HEAD
 
-// Report
+// Report shop 
     public List<AccountReport> getReportsByAccountId(int accountId) {
         return accountReportRepository.findByAccountId(accountId);
     }
@@ -40,7 +40,7 @@ public class Service_AccountReport {
     public AccountReport saveReport(AccountReport report) {
         return accountReportRepository.save(report);
     }
- 
+
     @Autowired
     EmailService emailService;
 
