@@ -158,4 +158,5 @@ public class Account {
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<Token> tokens;
+
 }

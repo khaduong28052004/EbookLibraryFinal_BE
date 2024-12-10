@@ -3,6 +3,8 @@ package com.toel.model;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.annotations.Nationalized;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
@@ -37,13 +39,13 @@ public class Product {
 	double sale;
 
 	double weight;
-
+	@Nationalized
 	String name;
-
+	@Nationalized
 	String introduce;
-
+	@Nationalized
 	String writerName;
-
+	@Nationalized
 	String publishingCompany;
 
 	Date createAt;
@@ -74,7 +76,7 @@ public class Product {
 	@JsonIgnore
 	@OneToMany(mappedBy = "product")
 	List<ImageProduct> imageProducts;
-	
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "product")
 	List<Evalue> evalues;
