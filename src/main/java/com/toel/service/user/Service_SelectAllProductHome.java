@@ -71,8 +71,24 @@ public class Service_SelectAllProductHome {
 
 //	 Gợi ý
 	public List<Response_Product> suggestProduct(Integer id_user) {
-		Account user = accountRepository.findById(id_user).get();
-		List<Follower> listFollowers = followerRepository.findAllByAccount(user);
+
+		List<Follower> listFollowers = new ArrayList<Follower>();
+		List<Like> listLikes = new ArrayList<Like>();
+		List<Product> listProductByBills = new ArrayList<>();
+		if (id_user == 0) {
+			Pageable pageable = PageRequest.of(0, 5);
+			List<Integer> listIdTopLikes = likeRepository.selectIdLikeByTopProductLike(pageable);
+			listLikes = likeRepository.selectAllByListID(listIdTopLikes);
+
+			List<Integer> listIdProductByBillDetails = productRepo.selectIdBillDetailTopProduct(pageable);
+			listProductByBills = productRepo.selectProductInIdProduct(listIdProductByBillDetails);
+		} else {
+			Account user = accountRepository.findById(id_user).get();
+			listFollowers = followerRepository.findAllByAccount(user);
+			listLikes = likeRepository.findAllByAccount(user);
+			listProductByBills = productRepo.findAllByBillOfUser(id_user);
+		}
+
 		List<Product> listProducts = new ArrayList<>();
 		for (Follower follow : listFollowers) {
 			Account shop = accountRepository.findById(follow.getShopId()).get();
@@ -85,14 +101,14 @@ public class Service_SelectAllProductHome {
 			}
 		}
 		List<Integer> listIdProduct = listProducts.stream().map(Product::getId).collect(Collectors.toList());
-		List<Like> listLikes = likeRepository.findAllByAccount(user);
+
 		for (Like like : listLikes) {
 			if (!listIdProduct.contains(like.getProduct().getId())) {
 				listProducts.add(like.getProduct());
 			}
 		}
 		listIdProduct = listProducts.stream().map(Product::getId).collect(Collectors.toList());
-		List<Product> listProductByBills = productRepo.findAllByBillOfUser(id_user);
+
 		for (Product product : listProductByBills) {
 			if (!listIdProduct.contains(product.getId())) {
 				listProducts.add(product);
@@ -100,7 +116,7 @@ public class Service_SelectAllProductHome {
 		}
 		Collections.shuffle(listProducts);
 		List<Response_Product> listResponse_Products = new ArrayList<Response_Product>();
-		for (Product product : listProducts.size() > 8 ? listProducts.subList(0, 12)
+		for (Product product : listProducts.size() > 8 ? listProducts.subList(0, 8)
 				: listProducts.subList(0, listProducts.size())) {
 			listResponse_Products.add(productMaperUser.productToResponse_Product(product));
 		}

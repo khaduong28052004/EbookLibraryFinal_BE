@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.toel.model.Account;
+import com.toel.model.Bill;
 import com.toel.model.BillDetail;
 import com.toel.model.Category;
 import com.toel.model.Product;
@@ -123,5 +124,13 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			+ "    WHERE bd.bill.account.id = ?1 " + "    AND bd.bill.orderStatus.id IN (4, 5) "
 			+ "    GROUP BY bd.product.id " + ")")
 	List<Product> findAllByBillOfUser(Integer id_user);
+
+	@Query("SELECT bd.product.id " + "FROM BillDetail bd " + "WHERE bd.bill.orderStatus.id IN (4, 5) "
+			+ "GROUP BY bd.product.id")
+	List<Integer> selectIdBillDetailTopProduct(Pageable pageable);
+
+	@Query("SELECT p FROM Product p " + "WHERE p.isActive = true " + "AND p.isDelete = false " + "  AND p.quantity > 0"
+			+ "AND p.account.status = true " + "AND p.id IN ?1")
+	List<Product> selectProductInIdProduct(List<Integer> ids);
 
 }

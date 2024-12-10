@@ -1,5 +1,6 @@
 package com.toel.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -25,6 +26,7 @@ public interface FollowerRepository extends JpaRepository<Follower, Integer> {
 	// Integer countProductByAccountId(@Param("accountId") Integer accountId);
 	@Query("SELECT COUNT(f) FROM Product f WHERE f.account.id = :accountId")
 	Integer countProductByAccountId(@Param("accountId") Integer accountId);
+
 
 	List<Follower> findAllByAccount(Account user);
 }
