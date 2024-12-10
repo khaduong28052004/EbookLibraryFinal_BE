@@ -13,8 +13,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.toel.dto.ChangePassOtp;
-import com.toel.exception.AppException;
-import com.toel.exception.ErrorCode;
 import com.toel.model.Account;
 import com.toel.repository.AccountRepository;
 import com.toel.service.ServiceToel;

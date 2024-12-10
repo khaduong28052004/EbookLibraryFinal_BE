@@ -1,11 +1,9 @@
 package com.toel.dto.user.resquest;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

@@ -54,23 +54,28 @@ public class ApiFlashSaleDetails {
         }
 
         @PostMapping
-        public ApiResponse<Response_FlashSaleDetail> post(@RequestBody @Valid Resquest_FlashSaleDetailsCreate entity) {
+        public ApiResponse<Response_FlashSaleDetail> post(
+                        @RequestParam(value = "accountID", required = false) Integer account,
+                        @RequestBody @Valid Resquest_FlashSaleDetailsCreate entity) {
                 return ApiResponse.<Response_FlashSaleDetail>build()
                                 .message("Thêm chi tiết flash sale thành công")
-                                .result(service_FlashSaleDetail.create(entity));
+                                .result(service_FlashSaleDetail.create(entity, account));
         }
 
         @PutMapping
-        public ApiResponse<Response_FlashSaleDetail> put(@RequestBody @Valid Resquest_FlashSaleDetailsUpdate entity) {
+        public ApiResponse<Response_FlashSaleDetail> put(
+                        @RequestParam(value = "accountID", required = false) Integer account,
+                        @RequestBody @Valid Resquest_FlashSaleDetailsUpdate entity) {
                 return ApiResponse.<Response_FlashSaleDetail>build()
                                 .message("Cập nhật chi tiết flash sale thành công")
-                                .result(service_FlashSaleDetail.update(entity));
+                                .result(service_FlashSaleDetail.update(entity, account));
         }
 
         @DeleteMapping
         public ApiResponse<Response_FlashSaleDetail> delete(
+                        @RequestParam(value = "accountID", required = false) Integer account,
                         @RequestParam(value = "id", required = false) Integer id) {
-                service_FlashSaleDetail.delete(id);
+                service_FlashSaleDetail.delete(id, account);
                 return ApiResponse.<Response_FlashSaleDetail>build()
                                 .message("Xóa chi tiết flashsale thành công");
         }

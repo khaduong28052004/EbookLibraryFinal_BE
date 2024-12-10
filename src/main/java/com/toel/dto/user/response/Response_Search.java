@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.data.domain.PageImpl;
 
-import com.toel.dto.seller.response.Response_Category;
 import com.toel.model.Category;
 
 import lombok.AllArgsConstructor;

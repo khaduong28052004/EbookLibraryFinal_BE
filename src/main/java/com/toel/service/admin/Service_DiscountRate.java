@@ -29,6 +29,7 @@ import com.toel.model.Role;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.DiscountRateRepository;
 import com.toel.repository.RoleRepository;
+import com.toel.service.Service_Log;
 import com.toel.service.Email.EmailService;
 import com.toel.service.Email.EmailTemplateType;
 
@@ -44,6 +45,8 @@ public class Service_DiscountRate {
     EmailService emailService;
     @Autowired
     RoleRepository roleRepository;
+    @Autowired
+    Service_Log service_Log;
 
     public PageImpl<Response_DiscountRate> getAll(int page, int size, LocalDateTime search, boolean sortBy,
             String sortColumn) {
@@ -67,7 +70,7 @@ public class Service_DiscountRate {
         return discountRateMapper.tochChietKhauResponse(discountRate);
     }
 
-    public Response_DiscountRate update(Request_DiscountRateUpdate discountRateUpdate) {
+    public Response_DiscountRate update(Request_DiscountRateUpdate discountRateUpdate, Integer accountID) {
         DiscountRate entity = discountRateRepository.findById(discountRateUpdate.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Chiết khấu"));
         DiscountRate discountRateNow = discountRateRepository.findLatestDiscountRate().get(0);
@@ -97,6 +100,8 @@ public class Service_DiscountRate {
                     emailToNameMap,
                     formattedDate,
                     entity.getDiscount().toString() + " %");
+            service_Log.setLog(getClass(), accountID, "INFO", "DISCOUNTRATE", dResponse_DiscountRate.getId(),
+                    "Cập nhật chiết khấu");
             return dResponse_DiscountRate;
         } else {
             throw new AppException(ErrorCode.OBJECT_SETUP, "Ngày áp dụng đã tồn tại");
@@ -115,7 +120,7 @@ public class Service_DiscountRate {
 
     }
 
-    public Response_DiscountRate create(Request_DiscountRateCreate discountRateCreate) {
+    public Response_DiscountRate create(Request_DiscountRateCreate discountRateCreate, Integer accountID) {
         DiscountRate entity = discountRateMapper.toDiscountRateCreate(discountRateCreate);
         entity.setAccount(accountRepository.findById(1)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
@@ -145,18 +150,24 @@ public class Service_DiscountRate {
                     emailToNameMap,
                     formattedDate,
                     entity.getDiscount().toString() + " %");
+            service_Log.setLog(getClass(), accountID, "INFO", "DISCOUNTRATE", discountRate.getId(),
+                    "Thêm chiết khấu");
             return discountRateMapper.tochChietKhauResponse(discountRate);
         } else {
             throw new AppException(ErrorCode.OBJECT_SETUP, "Ngày áp dụng đã tồn tại");
         }
     }
 
-    public void delete(Integer id) {
+    public void delete(Integer id, Integer accountID) {
         DiscountRate discountRate = discountRateRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Chiết khấu"));
         if (discountRate.getDateStart().isAfter(LocalDateTime.now())) {
             discountRateRepository.delete(discountRate);
+            service_Log.setLog(getClass(), accountID, "INFO", "DISCOUNTRATE", id,
+                    "Xóa chiết khấu");
         } else {
+            service_Log.setLog(getClass(), accountID, "ERROR", "DISCOUNTRATE", id,
+                    "Xóa chiết khấu");
             throw new AppException(ErrorCode.OBJECT_ACTIVE, "Chiết khấu");
         }
     }

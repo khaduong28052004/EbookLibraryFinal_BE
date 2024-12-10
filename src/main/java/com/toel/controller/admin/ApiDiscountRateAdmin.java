@@ -66,22 +66,28 @@ public class ApiDiscountRateAdmin {
     }
 
     @PostMapping
-    public ApiResponse<Response_DiscountRate> post(@RequestBody @Valid Request_DiscountRateCreate entity) {
+    public ApiResponse<Response_DiscountRate> post(
+            @RequestParam(value = "accountID", required = false) Integer account,
+            @RequestBody @Valid Request_DiscountRateCreate entity) {
         return ApiResponse.<Response_DiscountRate>build()
                 .message("Thêm chiết khẩu thành công")
-                .result(discountReateService.create(entity));
+                .result(discountReateService.create(entity, account));
     }
 
     @PutMapping
-    public ApiResponse<Response_DiscountRate> put(@RequestBody @Valid Request_DiscountRateUpdate entity) {
+    public ApiResponse<Response_DiscountRate> put(
+            @RequestParam(value = "accountID", required = false) Integer account,
+            @RequestBody @Valid Request_DiscountRateUpdate entity) {
         return ApiResponse.<Response_DiscountRate>build()
                 .message("Cập nhật chiết khẩu thành công")
-                .result(discountReateService.update(entity));
+                .result(discountReateService.update(entity, account));
     }
 
     @DeleteMapping
-    public ApiResponse<Response_DiscountRate> delete(@RequestParam(value = "id", required = false) Integer id) {
-        discountReateService.delete(id);
+    public ApiResponse<Response_DiscountRate> delete(
+            @RequestParam(value = "accountID", required = false) Integer account,
+            @RequestParam(value = "id", required = false) Integer id) {
+        discountReateService.delete(id, account);
         return ApiResponse.<Response_DiscountRate>build()
                 .message("Xóa thành công");
     }
