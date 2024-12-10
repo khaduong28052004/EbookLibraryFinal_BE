@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -312,5 +313,8 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	@Query("SELECT b.address.fullNameAddress  FROM Bill b JOIN  b.address os WHERE b.id = ?1")
 	String findAddressByBill(Integer id);
+
+	@Query("SELECT b FROM Bill b WHERE b.account.id = ?1 ORDER BY b.id DESC")
+	List<Bill> findByAccountId(Integer account_id);
 
 }

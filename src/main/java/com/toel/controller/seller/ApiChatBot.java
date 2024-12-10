@@ -22,9 +22,17 @@ public class ApiChatBot {
     Service_ChatBot service_ChatBot;
 
     @GetMapping("/search")
-    public ApiResponse<List<Response_Product>> search(
+    public ApiResponse<List<?>> search(
             @RequestParam(value = "key", required = false) String key) {
-        return ApiResponse.<List<Response_Product>>build()
+        return ApiResponse.<List<?>>build()
                 .result(service_ChatBot.searchChatBot(key));
+    }
+
+    @GetMapping("/searchBill")
+    public ApiResponse<List<?>> search(
+            @RequestParam(value = "key", required = false) String key,
+            @RequestParam(value = "account_id", defaultValue = "0") Integer account_id) {
+        return ApiResponse.<List<?>>build()
+                .result(service_ChatBot.searchChatBotBill(key, account_id));
     }
 }

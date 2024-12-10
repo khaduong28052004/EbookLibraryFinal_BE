@@ -165,7 +165,13 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			"LEFT JOIN Evalue e ON e.product.id = p.id " +
 			"LEFT JOIN Like l ON l.product.id = p.id " +
 			"WHERE p.isDelete = false AND p.isActive = true " +
-			"AND p.createAt BETWEEN :dateStart AND :dateEnd " +
+			"AND " +
+			"  CASE " +
+			"    WHEN :keySearch = 'moi' THEN p.createAt BETWEEN :dateStart AND :dateEnd " +
+			"    WHEN :keySearch = 'danh gia' THEN e.createAt BETWEEN :dateStart AND :dateEnd " +
+			"    WHEN :keySearch = 'luot ban' THEN bd.bill.createAt BETWEEN :dateStart AND :dateEnd" +
+			"    WHEN :keySearch = 'yeu thich' THEN l.createAt BETWEEN :dateStart AND :dateEnd" +
+			"  END " +
 			"GROUP BY p.id " +
 			"ORDER BY " +
 			"  CASE " +
@@ -183,12 +189,12 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			"LEFT JOIN Evalue e ON e.product.id = p.id " +
 			"LEFT JOIN Like l ON l.product.id = p.id " +
 			"WHERE p.isDelete = false AND p.isActive = true " +
-			"AND p.createAt BETWEEN :dateStart AND :dateEnd " +
+			"AND " +
 			"  CASE " +
-			"    WHEN :keySearch = 'moi' THEN p.id " +
-			"    WHEN :keySearch = 'danh gia' THEN COUNT(e.id) " +
-			"    WHEN :keySearch = 'luot ban' THEN SUM(bd.quantity) " +
-			"    WHEN :keySearch = 'yeu thich' THEN COUNT(l.id) " +
+			"    WHEN :keySearch = 'moi' THEN p.createAt BETWEEN :dateStart AND :dateEnd " +
+			"    WHEN :keySearch = 'danh gia' THEN e.createAt BETWEEN :dateStart AND :dateEnd " +
+			"    WHEN :keySearch = 'luot ban' THEN bd.bill.createAt BETWEEN :dateStart AND :dateEnd" +
+			"    WHEN :keySearch = 'yeu thich' THEN l.createAt BETWEEN :dateStart AND :dateEnd" +
 			"  END " +
 			"GROUP BY p.id " +
 			"ORDER BY " +
