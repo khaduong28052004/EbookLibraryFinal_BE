@@ -71,14 +71,18 @@ public class Service_DiscountRate {
     public Response_DiscountRate update(Request_DiscountRateUpdate discountRateUpdate) {
         DiscountRate discountRate = discountRateRepository.findById(discountRateUpdate.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Chiết khấu"));
-        DiscountRate discountRateNow = discountRateRepository.findLatestDiscountRate().get(0);
-        if (discountRateNow.getDiscount() == discountRateUpdate.getDiscount()) {
-            throw new AppException(ErrorCode.OBJECT_ACTIVE, "Mức chiết khấu");
+        List<DiscountRate> discountRateNow = discountRateRepository.findAllBydateDeleteIsNull();
+        for (DiscountRate discountRate2 : discountRateNow) {
+            if (discountRate2.getDiscount() == discountRateUpdate.getDiscount()
+                    && discountRate2.getId() != discountRateUpdate.getId()) {
+                throw new AppException(ErrorCode.OBJECT_ACTIVE, "Mức chiết khấu");
+            }
         }
+
         return Optional.of(discountRate)
                 .map(entity -> {
-                    entity.setDateStart(entity.getDateStart());
-                    entity.setDiscount(entity.getDiscount());
+                    entity.setDateStart(discountRateUpdate.getDateStart());
+                    entity.setDiscount(discountRateUpdate.getDiscount());
                     return entity;
                 })
                 .filter(this::check)
@@ -94,9 +98,11 @@ public class Service_DiscountRate {
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
                         "Account")));
         if (check(entity)) {
-            DiscountRate discountRateNow = discountRateRepository.findLatestDiscountRate().get(0);
-            if (discountRateNow.getDiscount() == discountRateCreate.getDiscount()) {
-                throw new AppException(ErrorCode.OBJECT_ACTIVE, "Mức chiết khấu");
+            List<DiscountRate> discountRateNow = discountRateRepository.findAllBydateDeleteIsNull();
+            for (DiscountRate discountRate2 : discountRateNow) {
+                if (discountRate2.getDiscount() == discountRateCreate.getDiscount()) {
+                    throw new AppException(ErrorCode.OBJECT_ACTIVE, "Mức chiết khấu");
+                }
             }
             entity.setDateInsert(LocalDateTime.now());
             DiscountRate discountRate = discountRateRepository.save(entity);
