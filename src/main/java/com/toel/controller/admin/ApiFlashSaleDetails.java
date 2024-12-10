@@ -29,25 +29,27 @@ public class ApiFlashSaleDetails {
 
         @GetMapping
         public ApiResponse<PageImpl<?>> getAllByidFlashSale(
+                        @RequestParam(value = "search", required = false) String search,
                         @RequestParam(value = "idFlashSale", required = false) Integer idFlashSale,
                         @RequestParam(value = "page", defaultValue = "0") Integer page,
                         @RequestParam(value = "size", defaultValue = "5") Integer size,
                         @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
                         @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
                 return ApiResponse.<PageImpl<?>>build()
-                                .result(service_FlashSaleDetail.getAll(page, size, sortBy, sortColumn, true,
+                                .result(service_FlashSaleDetail.getAll(search, page, size, sortBy, sortColumn, true,
                                                 idFlashSale));
         }
 
         @GetMapping("notflashsale")
         public ApiResponse<PageImpl<?>> getAllNotFlashSale(
+                        @RequestParam(value = "search", required = false) String search,
                         @RequestParam(value = "idFlashSale", required = false) Integer idFlashSale,
                         @RequestParam(value = "page", defaultValue = "0") Integer page,
                         @RequestParam(value = "size", defaultValue = "5") Integer size,
                         @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
                         @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
                 return ApiResponse.<PageImpl<?>>build()
-                                .result(service_FlashSaleDetail.getAll(page, size, sortBy, sortColumn, false,
+                                .result(service_FlashSaleDetail.getAll(search, page, size, sortBy, sortColumn, false,
                                                 idFlashSale));
         }
 
