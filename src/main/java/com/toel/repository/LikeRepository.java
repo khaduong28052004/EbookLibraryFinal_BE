@@ -9,11 +9,18 @@ import com.toel.model.Like;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
 import com.toel.model.Product;
 
 import io.lettuce.core.dynamic.annotation.Param;
 
 public interface LikeRepository extends JpaRepository<Like, Integer> {
+       @Query("SELECT l.product.id AS productId, COUNT(l.id) AS likeCount " +
+                     "FROM Like l " +
+                     "GROUP BY l.product.id " +
+                     "ORDER BY likeCount DESC")
+       List<Map<String, Object>> findTopLikedProducts();
 
 	Like findByAccountAndProduct(Account account, Product product);
 

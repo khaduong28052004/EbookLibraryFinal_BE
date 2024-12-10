@@ -58,8 +58,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	@Query("SELECT p FROM Product p where p.account.id = ?1 AND p.isDelete = false ")
 	List<Product> findByAccountId(Integer account_id);
 
-	@Query("SELECT p FROM Product p WHERE p.isDelete=false and p.isActive=true and p.id NOT IN (SELECT fl.product.id FROM FlashSaleDetail fl Where fl.flashSale.id =?1)")
-	Page<Product> selectAllProductNotInFlashSale(Integer flashSaleId, Pageable pageable);
+	@Query("SELECT p FROM Product p WHERE p.isDelete=false and p.isActive=true AND (:search IS NULL OR LOWER(p.name) LIKE CONCAT('%', LOWER(:search), '%')) and p.id NOT IN (SELECT fl.product.id FROM FlashSaleDetail fl Where fl.flashSale.id = :flashSaleId)")
+	Page<Product> selectAllProductNotInFlashSale(@Param("flashSaleId") Integer flashSaleId,
+			@Param("search") String search, Pageable pageable);
 
 	@Query("SELECT p FROM Product p WHERE p.isDelete=false and p.isActive=true and p.id IN (SELECT fl.product.id FROM FlashSaleDetail fl Where fl.flashSale.id =?1)")
 	Page<Product> selectAllProductInFlashSale(Integer flashSaleId, Pageable pageable);
@@ -103,6 +104,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	Page<Product> findAllIdNotIn(@Param("idProducts") List<Integer> idProducts, @Param("idShop") Integer idShop,
 			Pageable pageable);
 
+	@Query("SELECT p FROM Product p WHERE p.account.id = :idShop AND p.isActive = true AND p.isDelete=false AND p.account.status = true")
+	List<Product> findAllIdIn(@Param("idShop") Integer idShop);
+
 	@Query("SELECT p FROM Product p WHERE p.isActive = true AND p.isDelete = false AND p.account.status = true")
 	List<Product> findAllProduct(Sort sort);
 
@@ -132,5 +136,14 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	@Query("SELECT p FROM Product p " + "WHERE p.isActive = true " + "AND p.isDelete = false " + "  AND p.quantity > 0"
 			+ "AND p.account.status = true " + "AND p.id IN ?1")
 	List<Product> selectProductInIdProduct(List<Integer> ids);
+
+	@Query("SELECT p " +
+			"FROM Product p " +
+			"JOIN BillDetail bd ON p.id = bd.product.id " +
+			"JOIN Bill b ON bd.bill.id = b.id " +
+			"WHERE b IN :bills " +
+			"GROUP BY p.id " +
+			"ORDER BY SUM(bd.quantity) DESC")
+	List<Product> findTop10ByBillDetails(@Param("bills") List<Bill> bills);
 
 }

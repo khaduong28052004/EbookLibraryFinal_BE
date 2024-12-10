@@ -78,7 +78,7 @@ public class ApiCategorySeller {
         public ApiResponse<Response_Category> create(
                         @RequestBody @Valid Request_CategoryCreate request_Category) {
                 return ApiResponse.<Response_Category>build()
-                                .message("Thêm thể loại thành công")
+                                .message("Thêm danh mục thành công")
                                 .result(categoryService.create(request_Category));
         }
 
@@ -86,7 +86,7 @@ public class ApiCategorySeller {
         public ApiResponse<Response_Category> update(
                         @RequestBody @Valid Request_CategoryUpdate request_Category) {
                 return ApiResponse.<Response_Category>build()
-                                .message("Cập nhật thể loại sản phẩm thành công")
+                                .message("Cập nhật danh mục sản phẩm thành công")
                                 .result(categoryService.update(request_Category));
         }
 
@@ -94,6 +94,6 @@ public class ApiCategorySeller {
         public ApiResponse<?> delete(@RequestParam("id") Integer id_category) {
                 categoryService.delete(id_category);
                 return ApiResponse.build()
-                                .message("Xóa thành công thể loại");
+                                .message("Xóa thành công danh mục");
         }
 }

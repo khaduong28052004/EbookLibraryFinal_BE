@@ -29,9 +29,154 @@ public class TemplateBuilder {
                 return phanHoiReport(dynamicData);
             case DANGKYTAIKHOAN:
                 return builDANGKYTAIKHOAN(dynamicData);
+            case DANGKYV3:
+                return buildDANGKYV3(dynamicData);
             default:
                 throw new IllegalArgumentException("Invalid template type");
         }
+    }
+
+    private static String buildDANGKYV3(String... data) {
+        String otp = data[0];
+        String fullname = data.length > 1 ? data[1] : "User"; // Optional data handling
+        String content = "<!DOCTYPE html>\r\n" + //
+                "<html lang=\"en\">\r\n" + //
+                "<head>\r\n" + //
+                "    <meta charset=\"UTF-8\">\r\n" + //
+                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n" + //
+                "    <title>Đăng ký tài khoản</title>\r\n" + //
+                "    <style>\r\n" + //
+                "        body {\r\n" + //
+                "            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\r\n" + //
+                "            background-color: #f0f9ff; /* Tailwind sky-50 */\r\n" + //
+                "            margin: 0;\r\n" + //
+                "            padding: 0;\r\n" + //
+                "            color: #333;\r\n" + //
+                "        }\r\n" + //
+                "        .a {\r\n" + //
+                "        }\r\n" + //
+                "        .email-container {\r\n" + //
+                "            max-width: 600px;\r\n" + //
+                "            margin: 30px auto;\r\n" + //
+                "            background-color: #ffffff;\r\n" + //
+                "            border-radius: 10px;\r\n" + //
+                "            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);\r\n" + //
+                "            overflow: hidden;\r\n" + //
+                "            border: 1px solid #bae6fd; /* Tailwind sky-200 */\r\n" + //
+                "        }\r\n" + //
+                "        .email-header {\r\n" + //
+                "            background-color: #2fbaf6; /* Tailwind sky-400 */\r\n" + //
+                "            color: #ffffff;\r\n" + //
+                "            padding: 25px;\r\n" + //
+                "            text-align: center;\r\n" + //
+                "        }\r\n" + //
+                "        .email-header h1 {\r\n" + //
+                "            margin: 0;\r\n" + //
+                "            font-size: 22px;\r\n" + //
+                "            font-weight: bold;\r\n" + //
+                "        }\r\n" + //
+                "        .email-body {\r\n" + //
+                "            padding: 20px 30px;\r\n" + //
+                "        }\r\n" + //
+                "        .email-body h2 {\r\n" + //
+                "            font-size: 18px;\r\n" + //
+                "            color: #0ea5e9; /* Tailwind sky-500 */\r\n" + //
+                "            margin-bottom: 15px;\r\n" + //
+                "        }\r\n" + //
+                "        .email-body p {\r\n" + //
+                "            font-size: 14px;\r\n" + //
+                "            line-height: 1.8;\r\n" + //
+                "            margin: 10px 0;\r\n" + //
+                "        }\r\n" + //
+                "        .email-body strong {\r\n" + //
+                "            color: #0284c7; /* Tailwind sky-600 */\r\n" + //
+                "        }\r\n" + //
+                "        .email-footer {\r\n" + //
+                "            background-color: #f0f9ff; /* Tailwind sky-50 */\r\n" + //
+                "            padding: 15px;\r\n" + //
+                "            font-size: 12px;\r\n" + //
+                "            color: #64748b; /* Tailwind slate-500 */\r\n" + //
+                "            text-align: center;\r\n" + //
+                "            border-top: 1px solid #bae6fd; /* Tailwind sky-200 */\r\n" + //
+                "        }\r\n" + //
+                "        .button {\r\n" + //
+                "            display: inline-block;\r\n" + //
+                "            background-color: #0ea5e9; /* Tailwind sky-500 */\r\n" + //
+                "            color: #ffffff;\r\n" + //
+                "            text-decoration: none;\r\n" + //
+                "            padding: 10px 20px;\r\n" + //
+                "            border-radius: 6px;\r\n" + //
+                "            margin-top: 15px;\r\n" + //
+                "            font-size: 14px;\r\n" + //
+                "            font-weight: 600;\r\n" + //
+                "            transition: background-color 0.3s ease, transform 0.2s ease;\r\n" + //
+                "        }\r\n" + //
+                "        .button:hover {\r\n" + //
+                "            background-color: #0284c7; /* Tailwind sky-600 */\r\n" + //
+                "            transform: scale(1.05);\r\n" + //
+                "        }\r\n" + //
+                "        @media screen and (max-width: 600px) {\r\n" + //
+                "            .email-body {\r\n" + //
+                "                padding: 15px 20px;\r\n" + //
+                "            }\r\n" + //
+                "            .email-footer {\r\n" + //
+                "                font-size: 10px;\r\n" + //
+                "                padding: 10px;\r\n" + //
+                "            }\r\n" + //
+                "        }\r\n" + //
+                "    </style>\r\n" + //
+                "</head>\r\n" + //
+                "<body>\r\n" + //
+                " <div class=\"email-container\">\r\n" + //
+                " <div class=\"email-header\">\r\n" + //
+                " <h1>TOEL - Đăng ký</h1>\r\n" + //
+                " </div>\r\n" + //
+                " <div class=\"email-body\">\r\n" + //
+                " <div class=\"container\">\r\n" +
+                " <div class=\"content\">\r\n"
+                // " <p>Xin chào,</p>\r\n" +
+                // " <p>Bạn đã yêu Đăng ký tài khoản của mình. Dưới đây là mã link để xác nhận
+                // quá trình này:</p>\r\n"
+                + " <p>Xin chào,"+fullname+"</p>\n" + //
+                "                    <p>Bạn đã yêu cầu đăng ký tài khoản của mình. Dưới đây là mã OTP để xác nhận quá trình này:</p>\n"
+                + //
+                "                    <div class=\"otp-box\" style=\"font-size: 18px; font-weight: bold; color: #333; background: #f4f4f4; padding: 10px; text-align: center; border-radius: 5px;\">\n"
+                + //
+                "                        mã OTP đăng ký: <span style=\"color: #007bff;\">["+otp+"]</span>\n" + //
+                "                    </div>\n" + //
+                
+                "                    <p>Xin vui lòng nhập mã này vào trang đăng ký để tiếp tục quá trình đăng ký.</p>\n"
+                + //
+                "                    <p style=\"color: #555; font-size: 14px;\">Lưu ý rằng mã OTP sẽ hết hạn sau <strong>5 phút</strong> kể từ lúc nhận được email.</p>\n"
+                + //
+                "                    <p>Vui lòng giữ email này riêng tư và không chia sẻ với bất kỳ ai khác. Đây là thông tin quan trọng và được bảo vệ theo chính sách bảo mật của chúng tôi.</p>"
+                +
+                // " <div class=\"otp-box\">mã OTP đăng ký: []"+otp+"]</div>\r\n" +
+                // " <p>Xin vui lòng nhập mã này vào trang đăng ký để tiếp tục quá trình đăng
+                // ký.</p>\r\n"
+                // +
+                // " <p>Lưu ý rằng mã link sẽ hết hạn sau 1 phút kể từ lúc nhận được
+                // mail.</p>\r\n" +
+                // // " <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email
+                // này.</p>\r\n" +
+                // " <p>Vui lòng giữ email này riêng tư và không chia sẻ với bất kỳ ai khác. Đây
+                // là thông tin quan trọng và được bảo vệ theo chính sách bảo mật của chúng
+                // tôi.</p>\r\n"
+                // +
+                " </div>\r\n" +
+                " <div class=\"footer\">\r\n" +
+                " <p>Trân trọng,</p>\r\n" +
+                " <p>Đội ngũ Hỗ trợ</p>\r\n" +
+                " <p>Đây là email tự động, vui lòng không trả lời email này.</p>\r\n" +
+                " </div>\r\n" +
+                " </div>\r\n" +
+                " <div class=\"email-footer\">\r\n" + //
+                " © 2024 TOEL. Tất cả các quyền được bảo lưu. \r\n" + //
+                " </div>\r\n" + //
+                " </div>\r\n" + //
+                "</body>\r\n" + //
+                "</html>\r\n";
+        return content;
     }
 
     private static String DangkyV2Template(String... data) {
@@ -308,36 +453,38 @@ public class TemplateBuilder {
                 "        }\r\n" + //
                 "    </style>\r\n" + //
                 "</head>\r\n" + //
-               "<body>\r\n" + //
-        " <div class=\"email-container\">\r\n" + //
-        " <div class=\"email-header\">\r\n" + //
-        " <h1>TOEL - cập nhật mật khẩu</h1>\r\n" + //
-        " </div>\r\n" + //
-        " <div class=\"email-body\">\r\n" + //
-        " <div class=\"container\">\r\n" +
-        " <div class=\"content\">\r\n" +
-        " <p>Xin chào,</p>\r\n" +
-        " <p>Bạn chào "+username+". Dưới đây là mã link để cập nhật mật khẩu:</p>\r\n"
-        +
-        " <div class=\"otp-box\">Click vào để tiếp tục: <a href='" + link + "'>Đổi mật khẩu ý ngay!</a></div>\r\n" +
-        " <p>Xin vui lòng click mã này vào trang đăng ký để tiếp tục quá trình đổi mật khẩu .</p>\r\n"
-        +
-        " <p>Lưu ý rằng mã link sẽ hết hạn sau 1 phút kể từ lúc nhận được mail.</p>\r\n" +
-        // " <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>\r\n" +
-        " <p>Vui lòng giữ email này riêng tư và không chia sẻ với bất kỳ ai khác. Đây là thông tin quan trọng và được bảo vệ theo chính sách bảo mật của chúng tôi.</p>\r\n"
-        +
-        " </div>\r\n" +
-        " <div class=\"footer\">\r\n" +
-        " <p>Trân trọng,</p>\r\n" +
-        " <p>Đội ngũ Hỗ trợ</p>\r\n" +
-        " <p>Đây là email tự động, vui lòng không trả lời email này.</p>\r\n" +
-        " </div>\r\n" +
-        " </div>\r\n" +
-        " <div class=\"email-footer\">\r\n" + //
-        " © 2024 TOEL. Tất cả các quyền được bảo lưu. \r\n" + //
-        " </div>\r\n" + //
-        " </div>\r\n" + //
-        "</body>\r\n" + //
+                "<body>\r\n" + //
+                " <div class=\"email-container\">\r\n" + //
+                " <div class=\"email-header\">\r\n" + //
+                " <h1>TOEL - cập nhật mật khẩu</h1>\r\n" + //
+                " </div>\r\n" + //
+                " <div class=\"email-body\">\r\n" + //
+                " <div class=\"container\">\r\n" +
+                " <div class=\"content\">\r\n" +
+                " <p>Xin chào,</p>\r\n" +
+                " <p>Bạn chào " + username + ". Dưới đây là mã link để cập nhật mật khẩu:</p>\r\n"
+                +
+                " <div class=\"otp-box\">Click vào để tiếp tục: <a href='" + link
+                + "'>Đổi mật khẩu ý ngay!</a></div>\r\n" +
+                " <p>Xin vui lòng click mã này vào trang đăng ký để tiếp tục quá trình đổi mật khẩu .</p>\r\n"
+                +
+                " <p>Lưu ý rằng mã link sẽ hết hạn sau 1 phút kể từ lúc nhận được mail.</p>\r\n" +
+                // " <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email
+                // này.</p>\r\n" +
+                " <p>Vui lòng giữ email này riêng tư và không chia sẻ với bất kỳ ai khác. Đây là thông tin quan trọng và được bảo vệ theo chính sách bảo mật của chúng tôi.</p>\r\n"
+                +
+                " </div>\r\n" +
+                " <div class=\"footer\">\r\n" +
+                " <p>Trân trọng,</p>\r\n" +
+                " <p>Đội ngũ Hỗ trợ</p>\r\n" +
+                " <p>Đây là email tự động, vui lòng không trả lời email này.</p>\r\n" +
+                " </div>\r\n" +
+                " </div>\r\n" +
+                " <div class=\"email-footer\">\r\n" + //
+                " © 2024 TOEL. Tất cả các quyền được bảo lưu. \r\n" + //
+                " </div>\r\n" + //
+                " </div>\r\n" + //
+                "</body>\r\n" + //
                 "</html>\r\n";
         return content;
     }
@@ -433,36 +580,37 @@ public class TemplateBuilder {
                 "        }\r\n" + //
                 "    </style>\r\n" + //
                 "</head>\r\n" + //
-               "<body>\r\n" + //
-        " <div class=\"email-container\">\r\n" + //
-        " <div class=\"email-header\">\r\n" + //
-        " <h1>TOEL - Đăng ký</h1>\r\n" + //
-        " </div>\r\n" + //
-        " <div class=\"email-body\">\r\n" + //
-        " <div class=\"container\">\r\n" +
-        " <div class=\"content\">\r\n" +
-        " <p>Xin chào,</p>\r\n" +
-        " <p>Bạn đã yêu Đăng ký tài khoản của mình. Dưới đây là mã link để xác nhận quá trình này:</p>\r\n"
-        +
-        " <div class=\"otp-box\">Click vào để tiếp tục: <a href='" + link + "'>Đăng ký ngay!</a></div>\r\n" +
-        " <p>Xin vui lòng nhập mã này vào trang đăng ký để tiếp tục quá trình đăng ký.</p>\r\n"
-        +
-        " <p>Lưu ý rằng mã link sẽ hết hạn sau 1 phút kể từ lúc nhận được mail.</p>\r\n" +
-        // " <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.</p>\r\n" +
-        " <p>Vui lòng giữ email này riêng tư và không chia sẻ với bất kỳ ai khác. Đây là thông tin quan trọng và được bảo vệ theo chính sách bảo mật của chúng tôi.</p>\r\n"
-        +
-        " </div>\r\n" +
-        " <div class=\"footer\">\r\n" +
-        " <p>Trân trọng,</p>\r\n" +
-        " <p>Đội ngũ Hỗ trợ</p>\r\n" +
-        " <p>Đây là email tự động, vui lòng không trả lời email này.</p>\r\n" +
-        " </div>\r\n" +
-        " </div>\r\n" +
-        " <div class=\"email-footer\">\r\n" + //
-        " © 2024 TOEL. Tất cả các quyền được bảo lưu. \r\n" + //
-        " </div>\r\n" + //
-        " </div>\r\n" + //
-        "</body>\r\n" + //
+                "<body>\r\n" + //
+                " <div class=\"email-container\">\r\n" + //
+                " <div class=\"email-header\">\r\n" + //
+                " <h1>TOEL - Đăng ký</h1>\r\n" + //
+                " </div>\r\n" + //
+                " <div class=\"email-body\">\r\n" + //
+                " <div class=\"container\">\r\n" +
+                " <div class=\"content\">\r\n" +
+                " <p>Xin chào,</p>\r\n" +
+                " <p>Bạn đã yêu Đăng ký tài khoản của mình. Dưới đây là mã link để xác nhận quá trình này:</p>\r\n"
+                +
+                " <div class=\"otp-box\">Click vào để tiếp tục: <a href='" + link + "'>Đăng ký ngay!</a></div>\r\n" +
+                " <p>Xin vui lòng nhập mã này vào trang đăng ký để tiếp tục quá trình đăng ký.</p>\r\n"
+                +
+                " <p>Lưu ý rằng mã link sẽ hết hạn sau 1 phút kể từ lúc nhận được mail.</p>\r\n" +
+                // " <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email
+                // này.</p>\r\n" +
+                " <p>Vui lòng giữ email này riêng tư và không chia sẻ với bất kỳ ai khác. Đây là thông tin quan trọng và được bảo vệ theo chính sách bảo mật của chúng tôi.</p>\r\n"
+                +
+                " </div>\r\n" +
+                " <div class=\"footer\">\r\n" +
+                " <p>Trân trọng,</p>\r\n" +
+                " <p>Đội ngũ Hỗ trợ</p>\r\n" +
+                " <p>Đây là email tự động, vui lòng không trả lời email này.</p>\r\n" +
+                " </div>\r\n" +
+                " </div>\r\n" +
+                " <div class=\"email-footer\">\r\n" + //
+                " © 2024 TOEL. Tất cả các quyền được bảo lưu. \r\n" + //
+                " </div>\r\n" + //
+                " </div>\r\n" + //
+                "</body>\r\n" + //
                 "</html>\r\n";
         return content;
         // String content = "<!DOCTYPE html>\r\n" + //
