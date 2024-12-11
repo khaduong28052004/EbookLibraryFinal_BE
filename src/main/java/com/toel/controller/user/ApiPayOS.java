@@ -51,7 +51,7 @@ public class ApiPayOS {
 	public void checkout(@RequestBody Request_Pay pay,
 			@RequestParam(name = "id_user", defaultValue = "0") Integer idUser,
 			@RequestParam(name = "id_address", defaultValue = "0") Integer idAddress,
-			HttpServletResponse httpServletResponse) {
+			@RequestParam("total") double totalOrder, HttpServletResponse httpServletResponse) {
 		id_address = idAddress;
 		id_user = idUser;
 		try {
@@ -60,7 +60,9 @@ public class ApiPayOS {
 			final String description = "Thanh toán đơn hàng";
 			final String returnUrl = "http://localhost:8080/api/v1/user/success";
 			final String cancelUrl = "http://localhost:8080/api/v1/user/cancel";
-			String total = String.valueOf(requestPay.getTotal()).replace(".0", "");
+			System.err.println("order =================================" + totalOrder);
+			Integer totalOrderNew = (int) totalOrder;
+			String total = String.valueOf(totalOrderNew).replace(".0", "");
 
 			final int price = Integer.parseInt(total);
 

@@ -1,6 +1,7 @@
 package com.toel.controller.auth;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,11 +51,11 @@ public class OtpController {
         String userId = "user123";
         Map<String, Object> userData = new HashMap<>();
         userData.put("interestList", List.of("item_1", "item_2", "item_3"));
+        userData.put("data", Arrays.asList("light", "bell", "rack"));
         // userData.put("name", "John Doe");
         // userData.put("email", "john@example.com");
         otpService1.saveUserData(userId, userData);
         System.out.println("User data saved successfully");
-
         return entity;
     }
 
@@ -66,6 +67,7 @@ public class OtpController {
         return "entity";
     }
 
+    // "/api/v1/otp/generate"
     @PostMapping("/api/v1/otp/generate")
     public ResponseEntity<String> generateOtp(@RequestBody Account entity) {
         System.out.println("email" + entity.getEmail());

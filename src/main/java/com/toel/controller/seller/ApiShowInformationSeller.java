@@ -49,6 +49,7 @@ import com.toel.repository.OrderStatusRepository;
 import com.toel.repository.ProductRepository;
 import com.toel.repository.TypeVoucherRepository;
 import com.toel.repository.VoucherRepository;
+import com.toel.service.auth.OtpService1;
 import com.toel.service.user.FollowerService;
 import com.toel.service.user.Service_SelectAllProductHome;
 import com.toel.service.user.Service_ShowInfoSeller;
@@ -420,6 +421,46 @@ public class ApiShowInformationSeller {
 
     }
 
+    @Autowired
+    private OtpService1 otpService1;
+
+    /**
+     * @param behavior
+     * user_id
+     * product_id
+     * action_type
+     * action_time
+     * device
+     * loaction
+     * @return
+     */
+    @PostMapping("/api/v1/user/track-action")
+    public ResponseEntity<?> trackAction() {
+        // userBehaviorService.saveUserBehavior(behavior);
+        int userid = 1;
+        String userID = String.valueOf(userid);
+        // Map<String, Object> userData = new HashMap();
+        // userData.put("action_type", List.of("view", "seach", "mau","as"));
+        // userData.put("action_time", "con cặt nè");
+        // userData.put("product_id", "userData");
+        // otpService1.saveUserData(userID, userData);
+        // otpService1.storeUserBehavior(userid, userid, userID, null, userID, userID);
+        otpService1.storeUserBehavior("1001L", "5001L", "VIEW", "mobile", "New York");
+        // List<Product> lisProducts = recommendationService.recommendProducts(userId);
+        // }
+        return ResponseEntity.ok("Action tracked successfully");
+    }
+
+    @GetMapping("/api/v1/user/getlist1")
+    public List<Map<String, Object>> getMethodName1dad() {
+        // user123
+        // Map<String, Object> retrievedData = otpService1.getUserData(param);
+        // retrievedData.
+        List<Map<String, Object>> list = otpService1.getUserBehavior("1001L");
+        return list;
+
+    }
+
     @RequestMapping("api/v1/user/shop/selectall")
     public ApiResponse<Map<String, Object>> selectAll(
             @RequestParam(name = "id_Shop", defaultValue = "0") Integer id_Shop,
@@ -448,8 +489,8 @@ public class ApiShowInformationSeller {
             BindingResult bindingResult) {
         Map<String, Object> response = serviceShowInfoSeller.createReportShop(reportDTO);
         return ResponseEntity.ok(response);
-
     }
+
 
     // @PostMapping("/api/v1/user/send-otpe")
     // public ApiResponse<?> sendOtp(@RequestBody @Valid Request_AccountCreateOTP
