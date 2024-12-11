@@ -88,7 +88,6 @@ public class ApiController {
     EmailService emailService;
     @Autowired
     InfobipService infobipService;
-
     @Autowired
     private OtpService otpService;
     @Autowired
