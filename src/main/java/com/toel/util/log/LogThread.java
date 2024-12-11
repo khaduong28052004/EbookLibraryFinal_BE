@@ -1,6 +1,8 @@
 package com.toel.util.log;
 
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.toel.model.Log;
 
@@ -10,10 +12,9 @@ import java.util.List;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public class LogThread extends Task {
+
     private final Logger logger = LogManager.getLogger(LogThread.class);
 
     @Override
@@ -36,14 +37,16 @@ public class LogThread extends Task {
         try {
             con = DatabaseUtils.getConnection();
 
-            stmt = con.prepareStatement("INSERT INTO logs (timestamps, level, tableName, id_Object, action_type, account_id)"+
-			" VALUES (CURRENT_TIMESTAMP,?,?,?,?,?)");
-            for (Log item : lst) {
-                stmt.setString(1, item.getLevel());
-                stmt.setString(2, item.getTableName());
-                stmt.setInt(3, item.getId_Object());
-                stmt.setString(4, item.getAction_type());
-                stmt.setInt(5, item.getAccount().getId());
+            stmt = con.prepareStatement(
+                    " INSERT INTO logs (timestamps, level, tableName, dataNew, dataOld, action_type, account_id) " +
+                            " VALUES (CURRENT_TIMESTAMP, ?,?,?,?,?,?)");
+            for (Log log : lst) {
+                stmt.setString(1, log.getLevel());
+                stmt.setString(2, log.getTableName());
+                stmt.setString(3, log.getDataNew());
+                stmt.setString(4, log.getDataOld());
+                stmt.setString(5, log.getAction_type());
+                stmt.setInt(6, log.getAccount().getId());
 
                 stmt.execute();
             }

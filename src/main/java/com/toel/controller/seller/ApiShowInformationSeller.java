@@ -326,7 +326,6 @@ public class ApiShowInformationSeller {
 
     @PostMapping("/api/v1/user/topLikeProducts1")
     public ApiResponse<?> thichNhieu(@RequestBody Map<String, String> body) {
-        // TODO: process POST request
         List<Like> listLike = likeRepository.findAll();
         List<Response_Like> responeLike = likeMapper.mapToResponseLikeList(listLike);
         List<Integer> idproduct = new ArrayList<>();

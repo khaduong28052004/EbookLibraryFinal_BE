@@ -23,7 +23,7 @@ import com.toel.model.RolePermission;
 import com.toel.repository.PermissionRepository;
 import com.toel.repository.RolePermissionRepository;
 import com.toel.repository.RoleRepository;
-import com.toel.service.Service_Log;
+import com.toel.util.log.LogUtil;
 
 @Service
 public class Service_Role {
@@ -36,7 +36,7 @@ public class Service_Role {
         @Autowired
         RolePermissionRepository rolePermissionRepository;
         @Autowired
-        Service_Log service_Log;
+        LogUtil service_Log;
 
         public PageImpl<Response_Role> getRoleNhanVien(String search, Integer page, Integer size,
                         Boolean sortBy,
@@ -66,7 +66,8 @@ public class Service_Role {
                         throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Tên");
                 }
                 Role roleNew = roleRepository.save(entity);
-                service_Log.setLog(getClass(), accountID, "INFO", "ROLE", roleNew.getId(), "Thêm quyền");
+                service_Log.setLog(getClass(), accountID, "INFO", "Role", roleMapper.tResponse_Role(roleNew), null,
+                                "Thêm quyền");
                 return roleMapper
                                 .tResponse_Role(roleNew);
         }
@@ -74,12 +75,16 @@ public class Service_Role {
         public Response_Role update(RequestRoleUpdate requestRoleUpdate, Integer accountID) {
                 Role role = roleRepository.findById(requestRoleUpdate.getId())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Quyền"));
+                Role roleOld = roleRepository.findById(requestRoleUpdate.getId())
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Quyền"));
                 roleMapper.updatRole(role, requestRoleUpdate);
                 if (!check(role)) {
                         throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Tên");
                 }
                 Role roleNew = roleRepository.save(role);
-                service_Log.setLog(getClass(), accountID, "INFO", "ROLE", roleNew.getId(), "Cập nhật quyền");
+                service_Log.setLog(getClass(), accountID, "INFO", "Role", roleMapper.tResponse_Role(roleNew),
+                                roleMapper.tResponse_Role(roleOld),
+                                "Cập nhật quyền");
                 return roleMapper.tResponse_Role(roleNew);
         }
 
@@ -92,7 +97,9 @@ public class Service_Role {
                         List<RolePermission> list = rolePermissionRepository.findAllByRole(entity);
                         list.forEach(rlp -> rolePermissionRepository.delete(rlp));
                         roleRepository.delete(entity);
-                        service_Log.setLog(getClass(), accountID, "INFO", "ROLE", id, "Xóa quyền");
+                        service_Log.setLog(getClass(), accountID, "INFO", "Role", roleMapper.tResponse_Role(entity),
+                                        null,
+                                        "Xóa quyền");
                 }
         }
 

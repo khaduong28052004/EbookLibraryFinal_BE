@@ -24,7 +24,7 @@ import com.toel.mapper.ProductMapper;
 import com.toel.model.Category;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.CategoryRepository;
-import com.toel.service.Service_Log;
+import com.toel.util.log.LogUtil;
 
 @Service
 public class Service_CategorySeller {
@@ -41,7 +41,7 @@ public class Service_CategorySeller {
         @Autowired
         AccountRepository accountRepository;
         @Autowired
-        Service_Log service_Log;
+        LogUtil service_Log;
 
         public PageImpl<Response_Category> getAll(
                         Integer page, Integer size, boolean sortBy, String sortColumn, String search) {
@@ -121,8 +121,9 @@ public class Service_CategorySeller {
                                 .map(categoryRepository::saveAndFlush)
                                 .map(category -> {
                                         service_Log.setLog(getClass(), request_Category.getAccount(), "INFO",
-                                                        "CATEGORY",
-                                                        category.getId(), "Thêm thể loại");
+                                                        "Category",
+                                                        categoryMapper.response_Category(category), null,
+                                                        "Thêm thể loại");
                                         return category;
                                 })
                                 .map(categoryMapper::response_Category)
@@ -131,6 +132,9 @@ public class Service_CategorySeller {
 
         public Response_Category update(
                         Request_CategoryUpdate request_Category, Integer accountID) {
+                Category categoryOle = categoryRepository.findById(request_Category.getAccount())
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
+                                                "Account"));
                 return Optional.of(request_Category)
                                 .map(categoryMapper::categoryUpdate)
                                 .map(category -> {
@@ -144,8 +148,9 @@ public class Service_CategorySeller {
                                 .map(category -> {
                                         if (accountID != null) {
                                                 service_Log.setLog(getClass(), accountID, "INFO",
-                                                                "CATEGORY",
-                                                                category.getId(), "Cập nhật thể loại");
+                                                                "Category", categoryOle,
+                                                                categoryMapper.response_Category(category),
+                                                                "Cập nhật thể loại");
                                         }
                                         return category;
                                 })
@@ -159,9 +164,10 @@ public class Service_CategorySeller {
                                 .ifPresentOrElse(category -> {
                                         categoryRepository.delete(category);
                                         if (accountID != null) {
-                                        service_Log.setLog(getClass(), accountID, "INFO",
-                                                        "CATEGORY",
-                                                        id_category, "Xóa thể loại");
+                                                service_Log.setLog(getClass(), accountID, "INFO",
+                                                                "Category",
+                                                                categoryMapper.response_Category(category), null,
+                                                                "Xóa thể loại");
                                         }
                                 }, () -> {
                                         throw new AppException(ErrorCode.OBJECT_NOT_FOUND, "Category");

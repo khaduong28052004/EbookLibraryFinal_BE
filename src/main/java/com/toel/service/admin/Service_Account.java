@@ -30,7 +30,6 @@ import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.mapper.AccountMapper;
 import com.toel.model.Account;
-import com.toel.model.Log;
 import com.toel.model.Role;
 import com.toel.repository.AccountReportRepository;
 import com.toel.repository.AccountRepository;
@@ -39,9 +38,9 @@ import com.toel.repository.EvalueRepository;
 import com.toel.repository.FollowerRepository;
 import com.toel.repository.ProductRepository;
 import com.toel.repository.RoleRepository;
-import com.toel.service.Service_Log;
 import com.toel.service.Email.EmailService;
 import com.toel.service.Email.EmailTemplateType;
+import com.toel.util.log.LogUtil;
 
 @Service
 public class Service_Account {
@@ -66,7 +65,7 @@ public class Service_Account {
         @Autowired
         EmailService emailService;
         @Autowired
-        Service_Log service_Log;
+        LogUtil service_Log;
 
         // private static final Logger logger = LoggerFactory.getLogger("Account");
 
@@ -264,9 +263,10 @@ public class Service_Account {
                         action_type = "Mở tài khoản";
                 }
                 // MDC.clear();
-                service_Log.setLog(getClass(), accountID, "INFO", "ACCOUNT", id, action_type);
-
-                return accountMapper.toAccount(accountRepository.saveAndFlush(entity));
+                Account accountNew = accountRepository.saveAndFlush(entity);
+                service_Log.setLog(getClass(), accountID, "INFO", "Account",
+                                accountMapper.toAccount(accountNew),null, action_type);
+                return accountMapper.toAccount(accountNew);
         }
 
         public Response_Account updateActive(int id, Boolean status, String contents, Integer accountID) {
@@ -297,16 +297,16 @@ public class Service_Account {
                         action_type = "Không duyệt";
                 }
                 Account accountnew = accountRepository.saveAndFlush(entity);
-                // if (accountID != null) {
-                        service_Log.setLog(getClass(), accountID, "INFO", "ACCOUNT", accountnew.getId(), action_type);
-                // }
+                Response_Account aResponse_Account = accountMapper.toAccount(accountnew);
+                service_Log.setLog(getClass(), accountID, "INFO", "Account",
+                                aResponse_Account,null, action_type);
+
                 return accountMapper.toAccount(accountnew);
         }
 
         public Response_Account create(Request_AccountCreate entity, Integer accountID) {
                 Account account = accountMapper.toAccountCreate(entity);
                 if (!isValidPhoneNumber(entity.getPhone())) {
-                        service_Log.setLog(getClass(), accountID, "ERROR", "ACCOUNT", null, "Tạo tài khoản");
                         throw new AppException(ErrorCode.OBJECT_SETUP, "Số điện thoại không hợp lệ");
                 }
                 account.setRole(roleRepository.findById(entity.getRole())
@@ -319,7 +319,8 @@ public class Service_Account {
                 String hashPass = passwordEncoder.encode(entity.getPassword());
                 account.setPassword(hashPass);
                 Account accountnew = accountRepository.saveAndFlush(account);
-                service_Log.setLog(getClass(), accountID, "INFO", "ACCOUNT", accountnew.getId(), "Tạo tài khoản");
+                service_Log.setLog(getClass(), accountID, "INFO", "Account",
+                                accountMapper.toAccount(accountnew),null, "Tạo tài khoản");
                 return accountMapper.toAccount(accountnew);
         }
 

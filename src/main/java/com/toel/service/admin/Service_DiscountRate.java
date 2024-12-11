@@ -29,9 +29,9 @@ import com.toel.model.Role;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.DiscountRateRepository;
 import com.toel.repository.RoleRepository;
-import com.toel.service.Service_Log;
 import com.toel.service.Email.EmailService;
 import com.toel.service.Email.EmailTemplateType;
+import com.toel.util.log.LogUtil;
 
 @Service
 public class Service_DiscountRate {
@@ -46,7 +46,7 @@ public class Service_DiscountRate {
     @Autowired
     RoleRepository roleRepository;
     @Autowired
-    Service_Log service_Log;
+    LogUtil service_Log;
 
     public PageImpl<Response_DiscountRate> getAll(int page, int size, LocalDateTime search, boolean sortBy,
             String sortColumn) {
@@ -72,6 +72,8 @@ public class Service_DiscountRate {
 
     public Response_DiscountRate update(Request_DiscountRateUpdate discountRateUpdate, Integer accountID) {
         DiscountRate entity = discountRateRepository.findById(discountRateUpdate.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Chiết khấu"));
+        DiscountRate entityOld = discountRateRepository.findById(discountRateUpdate.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Chiết khấu"));
         DiscountRate discountRateNow = discountRateRepository.findLatestDiscountRate().get(0);
         if (discountRateNow.getDiscount() == discountRateUpdate.getDiscount()) {
@@ -100,24 +102,14 @@ public class Service_DiscountRate {
                     emailToNameMap,
                     formattedDate,
                     entity.getDiscount().toString() + " %");
-            service_Log.setLog(getClass(), accountID, "INFO", "DISCOUNTRATE", dResponse_DiscountRate.getId(),
+            service_Log.setLog(getClass(), accountID, "INFO", "DiscountRate", discountRateMapper
+                    .tochChietKhauResponse(entityOld),
+                    dResponse_DiscountRate,
                     "Cập nhật chiết khấu");
             return dResponse_DiscountRate;
         } else {
             throw new AppException(ErrorCode.OBJECT_SETUP, "Ngày áp dụng đã tồn tại");
         }
-        // return Optional.of(discountRate)
-        // .map(entity -> {
-        // entity.setDateStart(entity.getDateStart());
-        // entity.setDiscount(entity.getDiscount());
-        // return entity;
-        // })
-        // .filter(this::check)
-        // .map(discountRateRepository::saveAndFlush)
-        // .map(discountRateMapper::tochChietKhauResponse)
-        // .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Ngày áp dụng đã
-        // tồn tại"));
-
     }
 
     public Response_DiscountRate create(Request_DiscountRateCreate discountRateCreate, Integer accountID) {
@@ -150,7 +142,8 @@ public class Service_DiscountRate {
                     emailToNameMap,
                     formattedDate,
                     entity.getDiscount().toString() + " %");
-            service_Log.setLog(getClass(), accountID, "INFO", "DISCOUNTRATE", discountRate.getId(),
+            service_Log.setLog(getClass(), accountID, "INFO", "DiscountRate",
+                    discountRateMapper.tochChietKhauResponse(discountRate), null,
                     "Thêm chiết khấu");
             return discountRateMapper.tochChietKhauResponse(discountRate);
         } else {
@@ -163,11 +156,13 @@ public class Service_DiscountRate {
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Chiết khấu"));
         if (discountRate.getDateStart().isAfter(LocalDateTime.now())) {
             discountRateRepository.delete(discountRate);
-            service_Log.setLog(getClass(), accountID, "INFO", "DISCOUNTRATE", id,
+            service_Log.setLog(getClass(), accountID, "INFO", "DiscountRate",
+                    discountRateMapper.tochChietKhauResponse(discountRate), null,
                     "Xóa chiết khấu");
         } else {
-            service_Log.setLog(getClass(), accountID, "ERROR", "DISCOUNTRATE", id,
-                    "Xóa chiết khấu");
+            // service_Log.setLog(getClass(), accountID, "ERROR", "DiscountRate",
+            // discountRateMapper.tochChietKhauResponse(discountRate),null,
+            // "Xóa chiết khấu");
             throw new AppException(ErrorCode.OBJECT_ACTIVE, "Chiết khấu");
         }
     }

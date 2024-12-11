@@ -25,7 +25,7 @@ import com.toel.model.Product;
 import com.toel.repository.FlashSaleDetailRepository;
 import com.toel.repository.FlashSaleRepository;
 import com.toel.repository.ProductRepository;
-import com.toel.service.Service_Log;
+import com.toel.util.log.LogUtil;
 
 @Service
 public class Service_FlashSaleDetail {
@@ -40,7 +40,7 @@ public class Service_FlashSaleDetail {
     @Autowired
     ProductMapper productMapper;
     @Autowired
-    Service_Log service_Log;
+    LogUtil service_Log;
 
     public PageImpl<?> getAll(String search, int page, int size, Boolean sortBy, String column, Boolean status,
             Integer idFlashSale) {
@@ -80,7 +80,8 @@ public class Service_FlashSaleDetail {
         flashSaleDetail.setFlashSale(flashSale);
         flashSaleDetail.setProduct(product);
         FlashSaleDetail flashsaledetailsNew = flashSaleDetailRepository.saveAndFlush(flashSaleDetail);
-        service_Log.setLog(getClass(), accountID, "INFO", "FLASHSALEDETAILS", flashsaledetailsNew.getId(),
+        service_Log.setLog(getClass(), accountID, "INFO", "FlashSaleDetails",
+                flashSaleDetailsMapper.toFlashSaleDetail(flashsaledetailsNew), null,
                 "Thêm chi tiết flash sale");
         return flashSaleDetailsMapper.toFlashSaleDetail(flashsaledetailsNew);
     }
@@ -92,19 +93,23 @@ public class Service_FlashSaleDetail {
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Product"));
         FlashSaleDetail flashSaleDetail = flashSaleDetailRepository.findById(entity.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSaleDetail"));
+        FlashSaleDetail flashSaleDetailOld = flashSaleDetailRepository.findById(entity.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSaleDetail"));
         flashSaleDetailsMapper.toFlashSaleDetailUpdate(flashSaleDetail, entity);
         flashSaleDetail.setFlashSale(flashSale);
         flashSaleDetail.setProduct(product);
         FlashSaleDetail flashsaledetailsNew = flashSaleDetailRepository.saveAndFlush(flashSaleDetail);
-        service_Log.setLog(getClass(), accountID, "INFO", "FLASHSALEDETAILS", flashsaledetailsNew.getId(),
-        "Cập nhật chi tiết flash sale");
+        service_Log.setLog(getClass(), accountID, "INFO", "FlashSaleDetails",
+                flashSaleDetailsMapper.toFlashSaleDetail(flashSaleDetailOld),
+                flashSaleDetailsMapper.toFlashSaleDetail(flashsaledetailsNew),
+                "Cập nhật chi tiết flash sale");
         return flashSaleDetailsMapper.toFlashSaleDetail(flashsaledetailsNew);
     }
 
     public void delete(Integer id, Integer accountID) {
         FlashSaleDetail entity = flashSaleDetailRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Không tìm thấy FlashSaleDetail"));
-        service_Log.setLog(getClass(), accountID, "INFO", "FLASHSALEDETAILS", entity.getId(),
+        service_Log.setLog(getClass(), accountID, "INFO", "FlashSaleDetails", entity, null,
                 "Xóa chi tiết flash sale");
         flashSaleDetailRepository.delete(entity);
     }

@@ -144,4 +144,5 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
     // :gender")
     // Optional<Account> findByBillOptional(Bill bill);
 
+//     List<Account> findByFullname(String fullname);
 }

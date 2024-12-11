@@ -18,9 +18,9 @@ import com.toel.exception.ErrorCode;
 import com.toel.mapper.ProductMapper;
 import com.toel.model.Product;
 import com.toel.repository.ProductRepository;
-import com.toel.service.Service_Log;
 import com.toel.service.Email.EmailService;
 import com.toel.service.Email.EmailTemplateType;
+import com.toel.util.log.LogUtil;
 
 @Service
 public class Service_Product {
@@ -31,7 +31,7 @@ public class Service_Product {
     @Autowired
     EmailService emailService;
     @Autowired
-    Service_Log service_Log;
+    LogUtil service_Log;
 
     public PageImpl<Response_ProductListFlashSale> getAll(int page, int size, Boolean sortBy, String column,
             String key, String option) {
@@ -115,7 +115,9 @@ public class Service_Product {
         }
         entity.setDelete(!entity.isDelete());
         Product productNew = productRepository.save(entity);
-        service_Log.setLog(getClass(), accountID, "INFO", "PRODUCT", productNew.getId(), active_Type);
+        service_Log.setLog(getClass(), accountID, "INFO", "Product", productMapper.tProductListFlashSale(productNew),
+                null,
+                active_Type);
         return productMapper.tProductListFlashSale(productNew);
     }
 
@@ -140,7 +142,9 @@ public class Service_Product {
             active_Type = "Không duyệt sản phẩm";
         }
         Product productNew = productRepository.save(entity);
-        service_Log.setLog(getClass(), accountID, "INFO", "PRODUCT", productNew.getId(), active_Type);
+        service_Log.setLog(getClass(), accountID, "INFO", "Product", productMapper.tProductListFlashSale(productNew),
+                null,
+                active_Type);
         return productMapper.tProductListFlashSale(productNew);
     }
 

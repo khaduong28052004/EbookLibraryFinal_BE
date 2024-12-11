@@ -17,7 +17,7 @@ import com.toel.model.RolePermission;
 import com.toel.repository.PermissionRepository;
 import com.toel.repository.RolePermissionRepository;
 import com.toel.repository.RoleRepository;
-import com.toel.service.Service_Log;
+import com.toel.util.log.LogUtil;
 
 @Service
 public class Service_RolePermission {
@@ -30,7 +30,7 @@ public class Service_RolePermission {
     @Autowired
     RolePermissionMapper rolePermissionMapper;
     @Autowired
-    Service_Log service_Log;
+    LogUtil service_Log;
 
     public List<Response_RolePermission> create(Request_RolePermissionCreate entity, Integer accountID) {
         Role role = roleRepository.findByNameIgnoreCase(entity.getRole());
@@ -41,8 +41,9 @@ public class Service_RolePermission {
                     .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Permission"));
             rolePermission.setPermission(permission);
             rolePermission.setRole(role);
-            RolePermission rolePermissionNew =rolePermissionRepository.save(rolePermission);
-            service_Log.setLog(getClass(), accountID, "INFO", "ROLEPERMISSION", rolePermissionNew.getId(), "Thêm tiết quyền");
+            RolePermission rolePermissionNew = rolePermissionRepository.save(rolePermission);
+            service_Log.setLog(getClass(), accountID, "INFO", "RolePermission",
+                    rolePermissionMapper.toRolePermission(rolePermissionNew), null, "Thêm tiết quyền");
             list.add(rolePermissionMapper.toRolePermission(rolePermissionNew));
         });
 
@@ -53,6 +54,7 @@ public class Service_RolePermission {
         RolePermission rolePermission = rolePermissionRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Permission"));
         rolePermissionRepository.delete(rolePermission);
-        service_Log.setLog(getClass(), accountID, "INFO", "ROLEPERMISSION", id, "Xóa chi tiết quyền");
+        service_Log.setLog(getClass(), accountID, "INFO", "RolePermission",
+                rolePermissionMapper.toRolePermission(rolePermission), null, "Xóa chi tiết quyền");
     }
 }

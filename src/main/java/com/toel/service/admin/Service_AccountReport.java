@@ -21,9 +21,9 @@ import com.toel.exception.ErrorCode;
 import com.toel.mapper.AccountReportMapper;
 import com.toel.model.AccountReport;
 import com.toel.repository.AccountReportRepository;
-import com.toel.service.Service_Log;
 import com.toel.service.Email.EmailService;
 import com.toel.service.Email.EmailTemplateType;
+import com.toel.util.log.LogUtil;
 
 @Service
 public class Service_AccountReport {
@@ -32,7 +32,7 @@ public class Service_AccountReport {
     @Autowired
     AccountReportMapper accountReportMapper;
     @Autowired
-    Service_Log service_Log;
+    LogUtil service_Log;
     @Autowired
     EmailService emailService;
 
@@ -78,7 +78,9 @@ public class Service_AccountReport {
         emailService.push(entity.getAccount().getEmail(), "TOEL - Thông Báo Phản Hồi Báo Cáo",
                 EmailTemplateType.PHANHOIREPORT, entity.getAccount().getFullname(), contents, formattedDate,
                 entity.getTitle(), entity.getContent());
-        service_Log.setLog(getClass(), accountID, "INFO", "ACCOUNT", id, "Xử lý tài khoản bị báo cáo");
-        return accountReportMapper.toResponse_AccountReport(accountReportRepository.save(entity));
+        AccountReport accountReportNew = accountReportRepository.save(entity);
+        service_Log.setLog(getClass(), accountID, "INFO", "Account", accountReportNew,null,
+                "Xử lý tài khoản bị báo cáo");
+        return accountReportMapper.toResponse_AccountReport(accountReportNew);
     }
 }
