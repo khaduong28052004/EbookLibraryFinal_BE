@@ -2,11 +2,13 @@ package com.toel.model;
 
 import java.util.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -27,14 +29,19 @@ public class Log {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	Integer id;
 	
-	boolean status;
+	String level;
 	Date timestamps;
 	String tableName;
-	Integer id_Object;
+
+	@Lob
+    @Column(columnDefinition = "LONGTEXT",name = "dataNew")
+	String dataNew;
+	@Lob
+    @Column(columnDefinition = "LONGTEXT",name = "dataOld")
+	String dataOld;
 	String action_type;
 
 	@ManyToOne
 	@JoinColumn(name = "account_id")
 	Account account;
-
 }

@@ -3,13 +3,17 @@ package com.toel.model;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.annotations.Nationalized;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -37,13 +41,15 @@ public class Product {
 	double sale;
 
 	double weight;
-
+	@Nationalized
 	String name;
 
+	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	String introduce;
-
+	@Nationalized
 	String writerName;
-
+	@Nationalized
 	String publishingCompany;
 
 	Date createAt;
@@ -74,7 +80,7 @@ public class Product {
 	@JsonIgnore
 	@OneToMany(mappedBy = "product")
 	List<ImageProduct> imageProducts;
-	
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "product")
 	List<Evalue> evalues;

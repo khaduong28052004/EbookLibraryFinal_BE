@@ -2,7 +2,10 @@ package com.toel.dto.user.response;
 
 import java.util.Date;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.toel.model.Account;
+import com.toel.model.BillDetail;
 import com.toel.model.Category;
 import com.toel.model.FlashSaleDetail;
 
@@ -24,6 +27,9 @@ public class Response_Product {
 	Date createAt;
 	Integer quantity;
 	List<Response_Evalue> evalues;
+	@JsonIgnore
+	List<BillDetail> billDetails;
+	Integer sold;
 	Category category;
 	double star;
 	float quantityEvalue;

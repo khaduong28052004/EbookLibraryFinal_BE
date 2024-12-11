@@ -153,12 +153,40 @@
 			<artifactId>payos-java</artifactId>
 			<version>1.0.1</version>
 		</dependency>
+		
+		   <!-- Log4j2 -->
+		<!-- <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-logging</artifactId>
+			<version>3.1.0</version> 
+		</dependency> -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.5.12</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.5.12</version>
+		</dependency>
+	<!-- <dependency>
+    <groupId>ch.qos.logback.db</groupId>
+    <artifactId>logback-core-db</artifactId>
+    <version>1.2.11.1</version>
+</dependency> -->
+<dependency>
+    <groupId>ch.qos.logback.db</groupId>
+    <artifactId>logback-classic-db</artifactId>
+    <version>1.2.11.1</version>
+</dependency>
 	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				    <version>3.3.4</version>
 				<configuration>
 					<excludes>
 						<exclude>

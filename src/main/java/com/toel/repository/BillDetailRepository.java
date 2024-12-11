@@ -15,39 +15,28 @@ import com.toel.model.Bill;
 public interface BillDetailRepository extends JpaRepository<BillDetail, Integer> {
 	@Query("SELECT COALESCE(SUM( (bd.price * bd.quantity) * (1 - (bd.bill.discountRate.discount / 100.0)) - (bd.price * bd.quantity * "
 			+ "COALESCE((SELECT COALESCE(vd.voucher.sale, 0)/ 100  FROM bd.bill.voucherDetails vd WHERE vd.bill = bd.bill and vd.voucher.typeVoucher.id=1),0))), 0)"
-			+
-			"FROM BillDetail bd " +
-			"WHERE bd.product.account.id = :accountId " +
-			"AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd) ")
-	Double calculateAverageBillByShop(@Param("accountId") Integer accountId,
-			@Param("dateStart") Date dateStart,
+			+ "FROM BillDetail bd " + "WHERE bd.product.account.id = :accountId "
+			+ "AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd) ")
+	Double calculateAverageBillByShop(@Param("accountId") Integer accountId, @Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd);
 
 	@Query("SELECT COALESCE(SUM( (bd.product.price * bd.quantity) * "
 			+ "( SELECT COALESCE(vd.voucher.sale, 0)/100  FROM bd.bill.voucherDetails vd WHERE vd.voucher.typeVoucher.id=2)),0)"
-			+
-			"FROM BillDetail bd " +
-			"WHERE bd.product.account.id = :accountId " +
-			"AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd) ")
-	Double calculateVoucherByShop_San(@Param("accountId") Integer accountId,
-			@Param("dateStart") Date dateStart,
+			+ "FROM BillDetail bd " + "WHERE bd.product.account.id = :accountId "
+			+ "AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd) ")
+	Double calculateVoucherByShop_San(@Param("accountId") Integer accountId, @Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd);
 
-	@Query("SELECT COALESCE(SUM(bd.product.price * (COALESCE(bd.flashSaleDetail.sale,0)/100)), 0) " +
-			"FROM BillDetail bd " +
-			"WHERE bd.product.account.id = :accountId " +
-			"AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd) ")
-	Double calculateFlashSaleByShop_San(@Param("accountId") Integer accountId,
-			@Param("dateStart") Date dateStart,
+	@Query("SELECT COALESCE(SUM(bd.product.price * (COALESCE(bd.flashSaleDetail.sale,0)/100)), 0) "
+			+ "FROM BillDetail bd " + "WHERE bd.product.account.id = :accountId "
+			+ "AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd) ")
+	Double calculateFlashSaleByShop_San(@Param("accountId") Integer accountId, @Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd);
 
 	@Query("SELECT COALESCE(SUM((bd.product.price * bd.quantity) * (COALESCE(bd.bill.discountRate.discount / 100,0))),0) "
-			+
-			"FROM BillDetail bd " +
-			"WHERE bd.product.account.id = :accountId " +
-			"AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd) ")
-	Double calculateChietKhauByShop_San(@Param("accountId") Integer accountId,
-			@Param("dateStart") Date dateStart,
+			+ "FROM BillDetail bd " + "WHERE bd.product.account.id = :accountId "
+			+ "AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd) ")
+	Double calculateChietKhauByShop_San(@Param("accountId") Integer accountId, @Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd);
 
 	@Query("SELECT  bd.quantity,  bd.bill.account.id, bd.product.id  FROM BillDetail bd  WHERE bd.bill.id = ?1")
@@ -89,33 +78,29 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 			@Param("account_id") Integer accountId);
 
 	@Query("SELECT p FROM Product p WHERE p.id IN (SELECT DISTINCT bd.product.id FROM BillDetail bd WHERE bd.bill.finishAt BETWEEN :dateStart AND :dateEnd)")
-	List<Product> selectAll(@Param("dateStart") Date dateStart,
-			@Param("dateEnd") Date dateEnd);
+	List<Product> selectAll(@Param("dateStart") Date dateStart, @Param("dateEnd") Date dateEnd);
 
 	@Query("SELECT p FROM Product p WHERE p.id IN (Select DISTINCT bd.product.id FROM BillDetail bd WHERE bd.bill.finishAt BETWEEN :dateStart AND :dateEnd AND (:key iS NULL OR bd.product.name LIKE %:key% OR bd.product.introduce LIKE %:key% OR bd.product.writerName LIKE %:key% OR bd.product.publishingCompany LIKE %:key%)) ")
 	List<Product> selectAllByFinishAt(@Param("key") String key, @Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd);
 
 	@Query("Select COUNT(bd) FROM BillDetail bd WHERE bd.product = :product AND (bd.bill.finishAt BETWEEN :dateStart AND :dateEnd)")
-	Integer calculateByFinishAtAndProduct(@Param("dateStart") Date dateStart,
-			@Param("dateEnd") Date dateEnd,
+	Integer calculateByFinishAtAndProduct(@Param("dateStart") Date dateStart, @Param("dateEnd") Date dateEnd,
 			@Param("product") Product product);
 
-	@Query(value = "SELECT CASE WHEN EXISTS " +
-			"(SELECT billdetails.* FROM billdetails JOIN bills ON bills.id = billdetails.bill_id\r\n" +
-			"WHERE billdetails.id = :billId\r\n" +
-			"AND billdetails.product_id = :productId\r\n" +
-			"AND bills.account_id = :accountId) \r\n " +
-			"THEN 1 ELSE 0 END AS billDetailIsExisted ", nativeQuery = true)
+	@Query(value = "SELECT CASE WHEN EXISTS "
+			+ "(SELECT billdetails.* FROM billdetails JOIN bills ON bills.id = billdetails.bill_id\r\n"
+			+ "WHERE billdetails.id = :billId\r\n" + "AND billdetails.product_id = :productId\r\n"
+			+ "AND bills.account_id = :accountId) \r\n "
+			+ "THEN 1 ELSE 0 END AS billDetailIsExisted ", nativeQuery = true)
 	Integer billDetailIsExisted(@Param("billId") Integer bill_id, @Param("productId") Integer product_id,
 			@Param("accountId") Integer account_id);
 
-	@Query(value = "SELECT billdetails.id  \r\n" +
-			"FROM  billdetails JOIN bills ON bills.id= billdetails.bill_id WHERE bills.account_id=:accountId \r\n" +
-			"AND billdetails.product_id=:productId AND billdetails.bill_id=:billId", nativeQuery = true)
+	@Query(value = "SELECT billdetails.id  \r\n"
+			+ "FROM  billdetails JOIN bills ON bills.id= billdetails.bill_id WHERE bills.account_id=:accountId \r\n"
+			+ "AND billdetails.product_id=:productId AND billdetails.bill_id=:billId", nativeQuery = true)
 	Integer findBillDetailByProductIdAndAccountId(@Param("accountId") Integer accountId,
-			@Param("productId") Integer productId,
-			@Param("billId") Integer billId);
+			@Param("productId") Integer productId, @Param("billId") Integer billId);
 
 	List<BillDetail> findByProduct(Product product);
 
@@ -148,4 +133,13 @@ public interface BillDetailRepository extends JpaRepository<BillDetail, Integer>
 	// throw new UnsupportedOperationException("Unimplemented method
 	// 'findAllById'");
 	// }
+
+//	@Query("SELECT bd " + "FROM BillDetail bd " + "WHERE " + " bd.product.id IN ("
+//			+ "   SELECT bdSub.product.id "
+//			+ "   FROM BillDetail bdSub " + "   WHERE bdSub.bill.account.id = ?1 "
+//			+ "   AND bdSub.bill.orderStatus.id IN (4, 5) " + "   AND bdSub.product.isDelete = false "
+//			+ "   AND bdSub.product.isActive = true " + "   AND bdSub.bill.account.status = true "
+//			+ "   GROUP BY bdSub.product.id " + "   ORDER BY COUNT(bdSub.product.id) DESC" + ")")
+//	List<BillDetail> findAllByUser(Integer id_user);
+
 }

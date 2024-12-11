@@ -14,8 +14,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.toel.dto.ChangePassOtp;
-import com.toel.exception.AppException;
-import com.toel.exception.ErrorCode;
 import com.toel.model.Account;
 import com.toel.repository.AccountRepository;
 import com.toel.service.ServiceToel;
@@ -63,8 +61,7 @@ public class OtpController {
 
     @PostMapping("/api/v1/user/canhanhoa")
     public String Adddata() {
-        // TODO: process POST request
-        List<String> list = new ArrayList<>();
+        List<String> list = new  ArrayList<>();
         list.add(0, "chao");
         otpService1.setData("1", list);
         return "entity";

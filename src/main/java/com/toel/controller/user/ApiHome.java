@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.info.ProjectInfoProperties.Build;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.user.response.Response_FlashSaleDetail;
+import com.toel.dto.user.response.Response_Product;
 import com.toel.model.FlashSale;
 import com.toel.model.FlashSaleDetail;
 import com.toel.repository.AccountRepository;
@@ -21,6 +23,8 @@ import com.toel.repository.FlashSaleDetailRepository;
 import com.toel.repository.FlashSaleRepository;
 import com.toel.service.user.Service_SelectAllProductHome;
 import com.toel.service.user.Service_SelectFlashSale;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("api/v1/user/home")
@@ -60,6 +64,7 @@ public class ApiHome {
 	public ApiResponse<Map<String, Object>> selectAll(
 			@RequestParam(name = "id_Shop", defaultValue = "0") Integer id_Shop,
 			@RequestParam(name = "size", defaultValue = "8") Integer size,
+			@RequestParam(name = "page", defaultValue = "0") Integer page,
 			@RequestParam(name = "sort", defaultValue = "price") String sort) {
 		List<FlashSaleDetail> flashSaleDetails = new ArrayList<FlashSaleDetail>();
 		LocalDateTime localDateTime = LocalDateTime.now();
@@ -70,13 +75,31 @@ public class ApiHome {
 		} catch (Exception e) {
 		}
 
-		Map<String, Object> response = serviceSellectAll.selectAll(flashSaleDetails, id_Shop, 0, size, sort);
-		response.put("flashSalene", flashSale);
+		Map<String, Object> response = serviceSellectAll.selectAll(flashSaleDetails, id_Shop, page, size, sort);
+//		response.put("flashSalene", flashSale);
 		if (response.get("error") != null) {
 			return ApiResponse.<Map<String, Object>>build().message("not fault").code(1002);
 		}
 
 		return ApiResponse.<Map<String, Object>>build().message("success").result(response);
 	}
+
+//	suggest 
+	@GetMapping("suggest")
+	public ApiResponse<List<Response_Product>> suggests(
+			@RequestParam(name = "id_user", defaultValue = "6") Integer id_user) {
+		return ApiResponse.<List<Response_Product>>build().message("fetch suggest success")
+				.result(serviceSellectAll.suggestProduct(id_user));
+	}
+	
+////	suggest 
+//	@GetMapping("suggest")
+//	public ApiResponse<Integer> suggests(
+//			@RequestParam(name = "id_user", defaultValue = "6") Integer id_user) {
+////		return ApiResponse.<List<Response_Product>>build().message("fetch suggest success")
+////				.result(serviceSellectAll.suggestProduct(id_user));
+//		return ApiResponse.<Integer>build().message("fetch suggest success")
+//				.result(id_user);
+//	}
 
 }

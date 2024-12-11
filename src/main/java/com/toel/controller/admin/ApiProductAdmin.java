@@ -34,9 +34,10 @@ public class ApiProductAdmin {
 
         @PutMapping
         public ApiResponse<Response_ProductListFlashSale> putStatus(
+                        @RequestParam(value = "accountID", required = false) Integer account,
                         @RequestParam(value = "id", required = false) Integer id,
                         @RequestParam(value = "contents", required = false) String contents) {
-                Response_ProductListFlashSale entity = service_Product.updateStatus(id, contents);
+                Response_ProductListFlashSale entity = service_Product.updateStatus(id, contents, account);
                 return ApiResponse.<Response_ProductListFlashSale>build()
                                 .message(!entity.isDelete() ? "Khôi phục hoạt động thành công"
                                                 : "Ngừng hoạt động thành công")
@@ -45,11 +46,12 @@ public class ApiProductAdmin {
 
         @PutMapping("browse")
         public ApiResponse<Response_ProductListFlashSale> putActive(
+                        @RequestParam(value = "accountID", required = false) Integer account,
                         @RequestParam(value = "id", required = false) Integer id,
                         @RequestParam(value = "status", required = false) Boolean status,
                         @RequestParam(value = "contents", required = false) String content) {
                 return ApiResponse.<Response_ProductListFlashSale>build()
                                 .message(status ? "Duyệt thành công" : "Hủy thành công")
-                                .result(service_Product.updateActive(id, status, content));
+                                .result(service_Product.updateActive(id, status, content, account));
         }
 }

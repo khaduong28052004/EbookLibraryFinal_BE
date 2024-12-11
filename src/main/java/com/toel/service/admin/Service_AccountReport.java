@@ -23,6 +23,7 @@ import com.toel.model.AccountReport;
 import com.toel.repository.AccountReportRepository;
 import com.toel.service.Email.EmailService;
 import com.toel.service.Email.EmailTemplateType;
+import com.toel.util.log.LogUtil;
 
 @Service
 public class Service_AccountReport {
@@ -30,9 +31,11 @@ public class Service_AccountReport {
     AccountReportRepository accountReportRepository;
     @Autowired
     AccountReportMapper accountReportMapper;
-// <<<<<<< HEAD
+    @Autowired
+    LogUtil service_Log;
+    @Autowired
+    EmailService emailService;
 
-// Report shop 
     public List<AccountReport> getReportsByAccountId(int accountId) {
         return accountReportRepository.findByAccountId(accountId);
     }
@@ -40,9 +43,6 @@ public class Service_AccountReport {
     public AccountReport saveReport(AccountReport report) {
         return accountReportRepository.save(report);
     }
-
-    @Autowired
-    EmailService emailService;
 
     public PageImpl<Response_AccountReport> getAll(String option, int page, int size, Boolean sortBy, String column,
             String key) {
@@ -67,7 +67,7 @@ public class Service_AccountReport {
         return accountReportMapper.toResponse_AccountReport(accountReportRepository.findById(id).get());
     }
 
-    public Response_AccountReport updateStatus(int id, String contents) {
+    public Response_AccountReport updateStatus(int id, String contents, Integer accountID) {
         AccountReport entity = accountReportRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Report"));
         entity.setStatus(true);
@@ -78,6 +78,9 @@ public class Service_AccountReport {
         emailService.push(entity.getAccount().getEmail(), "TOEL - Thông Báo Phản Hồi Báo Cáo",
                 EmailTemplateType.PHANHOIREPORT, entity.getAccount().getFullname(), contents, formattedDate,
                 entity.getTitle(), entity.getContent());
-        return accountReportMapper.toResponse_AccountReport(accountReportRepository.save(entity));
+        AccountReport accountReportNew = accountReportRepository.save(entity);
+        service_Log.setLog(getClass(), accountID, "INFO", "Account", accountReportNew,null,
+                "Xử lý tài khoản bị báo cáo");
+        return accountReportMapper.toResponse_AccountReport(accountReportNew);
     }
 }

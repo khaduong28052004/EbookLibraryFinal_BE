@@ -7,24 +7,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
-import com.toel.dto.admin.request.Account.Request_AccountCreateOTP;
-import com.toel.dto.admin.response.Response_ProductListFlashSale;
 import com.toel.dto.seller.response.Response_InforSeller;
 import com.toel.dto.seller.response.Response_Like;
-import com.toel.dto.seller.response.Response_Product;
 import com.toel.dto.seller.response.Response_ProductInfo;
-import com.toel.dto.user.resquest.Request_Evaluate_User;
 import com.toel.dto.user.resquest.Request_ReportShop_DTO;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
@@ -37,7 +31,6 @@ import com.toel.model.BillDetail;
 import com.toel.model.Evalue;
 import com.toel.model.FlashSale;
 import com.toel.model.FlashSaleDetail;
-import com.toel.model.ImageProduct;
 import com.toel.model.Like;
 import com.toel.model.OrderStatus;
 import com.toel.model.Product;
@@ -63,13 +56,11 @@ import com.toel.service.user.Service_ShowInfoSeller;
 
 import jakarta.validation.Valid;
 
-import jakarta.validation.Valid;
-
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -335,7 +326,6 @@ public class ApiShowInformationSeller {
 
     @PostMapping("/api/v1/user/topLikeProducts1")
     public ApiResponse<?> thichNhieu(@RequestBody Map<String, String> body) {
-        // TODO: process POST request
         List<Like> listLike = likeRepository.findAll();
         List<Response_Like> responeLike = likeMapper.mapToResponseLikeList(listLike);
         List<Integer> idproduct = new ArrayList<>();

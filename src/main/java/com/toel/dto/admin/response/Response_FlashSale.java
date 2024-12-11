@@ -1,9 +1,8 @@
 package com.toel.dto.admin.response;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL) // Bỏ qua các trường null
 public class Response_FlashSale {
 	Integer id;
 	String title;

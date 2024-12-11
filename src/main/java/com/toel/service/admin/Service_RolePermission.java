@@ -17,6 +17,7 @@ import com.toel.model.RolePermission;
 import com.toel.repository.PermissionRepository;
 import com.toel.repository.RolePermissionRepository;
 import com.toel.repository.RoleRepository;
+import com.toel.util.log.LogUtil;
 
 @Service
 public class Service_RolePermission {
@@ -28,8 +29,10 @@ public class Service_RolePermission {
     RolePermissionRepository rolePermissionRepository;
     @Autowired
     RolePermissionMapper rolePermissionMapper;
+    @Autowired
+    LogUtil service_Log;
 
-    public List<Response_RolePermission> create(Request_RolePermissionCreate entity) {
+    public List<Response_RolePermission> create(Request_RolePermissionCreate entity, Integer accountID) {
         Role role = roleRepository.findByNameIgnoreCase(entity.getRole());
         List<Response_RolePermission> list = new ArrayList<>();
         entity.getPermission().forEach(permissionId -> {
@@ -38,15 +41,20 @@ public class Service_RolePermission {
                     .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Permission"));
             rolePermission.setPermission(permission);
             rolePermission.setRole(role);
-            list.add(rolePermissionMapper.toRolePermission(rolePermissionRepository.save(rolePermission)));
+            RolePermission rolePermissionNew = rolePermissionRepository.save(rolePermission);
+            service_Log.setLog(getClass(), accountID, "INFO", "RolePermission",
+                    rolePermissionMapper.toRolePermission(rolePermissionNew), null, "Thêm tiết quyền");
+            list.add(rolePermissionMapper.toRolePermission(rolePermissionNew));
         });
 
         return list;
     }
 
-    public void delete(Integer id) {
+    public void delete(Integer id, Integer accountID) {
         RolePermission rolePermission = rolePermissionRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Permission"));
         rolePermissionRepository.delete(rolePermission);
+        service_Log.setLog(getClass(), accountID, "INFO", "RolePermission",
+                rolePermissionMapper.toRolePermission(rolePermission), null, "Xóa chi tiết quyền");
     }
 }

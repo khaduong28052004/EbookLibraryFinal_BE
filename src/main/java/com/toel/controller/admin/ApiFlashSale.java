@@ -57,25 +57,30 @@ public class ApiFlashSale {
     }
 
     @PostMapping
-    public ApiResponse<Response_FlashSale> post(@RequestBody @Valid Request_FlashSaleCreate entity) {
+    public ApiResponse<Response_FlashSale> post(
+            @RequestParam(value = "accountID", required = false) Integer account,
+            @RequestBody @Valid Request_FlashSaleCreate entity) {
         check(entity.getDateStart(), entity.getDateEnd(), null);
         return ApiResponse.<Response_FlashSale>build()
                 .message("Thêm flash sale thành công")
-                .result(service_FlashSale.create(entity));
+                .result(service_FlashSale.create(entity, account));
     }
 
     @PutMapping
-    public ApiResponse<Response_FlashSale> put(@RequestBody @Valid Request_FlashSaleUpdate entity) {
+    public ApiResponse<Response_FlashSale> put(
+            @RequestParam(value = "accountID", required = false) Integer account,
+            @RequestBody @Valid Request_FlashSaleUpdate entity) {
         check(entity.getDateStart(), entity.getDateEnd(), entity.getId());
         return ApiResponse.<Response_FlashSale>build()
                 .message("Cập nhật flash sale thành công")
-                .result(service_FlashSale.update(entity));
+                .result(service_FlashSale.update(entity, account));
     }
 
     @DeleteMapping
     public ApiResponse<Response_FlashSale> delete(
+            @RequestParam(value = "accountID", required = false) Integer account,
             @RequestParam(value = "id", required = false) Integer id) {
-        service_FlashSale.delete(id);
+        service_FlashSale.delete(id, account);
         return ApiResponse.<Response_FlashSale>build()
                 .message("Xóa flashsale thành công");
     }
