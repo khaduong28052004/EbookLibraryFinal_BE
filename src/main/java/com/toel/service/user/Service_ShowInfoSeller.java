@@ -1,6 +1,7 @@
 package com.toel.service.user;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -18,8 +19,10 @@ import com.toel.exception.ErrorCode;
 import com.toel.model.Account;
 import com.toel.model.AccountReport;
 import com.toel.model.Evalue;
+import com.toel.model.ImageAccountReport;
 import com.toel.model.ImageEvalue;
 import com.toel.repository.AccountRepository;
+import com.toel.repository.ImageAccountReportReposity;
 import com.toel.repository.ReportRepository;
 import com.toel.service.firebase.UploadImage;
 
@@ -33,6 +36,8 @@ public class Service_ShowInfoSeller {
     private ReportRepository reportRepository;
     @Autowired
     UploadImage firebaseUploadImages;
+    @Autowired
+    ImageAccountReportReposity imageAccountReport;
 
     public Map<String, Object> createReportShop(Request_ReportShop_DTO reportDTO) {
         Map<String, Object> response = new HashMap<>();
@@ -59,11 +64,12 @@ public class Service_ShowInfoSeller {
         Date createAt = reportDTO.getCreateAt() == null ? null : reportDTO.getCreateAt();
         String title = reportDTO.getTitle() == null ? "" : reportDTO.getTitle();
 
-        System.out.println("accountIdval " + accountId);
-        System.out.println("shopIdval " + shopId);
-        System.out.println("contentval " + content);
-        System.out.println("createAtval " + createAt);
-        System.out.println("titleval " + title);
+        System.out.println("accountId: " + reportDTO.getAccountId());
+        System.out.println("shopId: " + reportDTO.getShopId());
+        System.out.println("content: " + reportDTO.getContent());
+        System.out.println("createAt: " + reportDTO.getCreateAt());
+        System.out.println("title: " + reportDTO.getTitle());
+        System.out.println("images: " + Arrays.toString(reportDTO.getImages()));
 
         if (!accountRepository.existsById(accountId) || accountId == null) {
             throw new AppException(ErrorCode.OBJECT_SETUP, "Tài khoản đang sử dụng không tồn tại");
@@ -93,50 +99,48 @@ public class Service_ShowInfoSeller {
         newReport.setAccount(account);
         newReport.setShop(shop);
         newReport.setContent(reportDTO.getContent());
-        System.out.println("reportDTO.getCreateAt()" + reportDTO.getCreateAt());
         newReport.setCreateAt(reportDTO.getCreateAt());
         newReport.setStatus(reportDTO.isStatus());
         newReport.setTitle(reportDTO.getTitle());
-
-        // if (reportDTO.getImages() != null) {
-        // List<Object[]> imageEvalues = saveImages(reportDTO.getImages(), newReport);
-        // newReport.setImages(imageEvalues);
-        // imageReportShop.save(newReport);
-        // }
-
         reportRepository.save(newReport);
+
+        if (reportDTO.getImages() != null) {
+            List<ImageAccountReport> imageEvalues = saveImages(reportDTO.getImages(), newReport);
+            newReport.setImageAccountReports(imageEvalues);
+            reportRepository.save(newReport);
+        }
+
         return newReport;
     }
 
-    // private List<ImageReportShop> saveImages(MultipartFile[] imageFiles,
-    // AccountReport report) {
-    // List<ImageReportShop> imageReportShop = new ArrayList<>();
+    private List<ImageAccountReport> saveImages(MultipartFile[] imageFiles, AccountReport report) {
+        List<ImageAccountReport> imagesAccountReport = new ArrayList<>();
 
-    // for (MultipartFile imageFile : imageReportShop) {
-    // if (!imageFile.isEmpty()) {
-    // try {
-    // String imageFirebaseURL = firebaseUploadImages.uploadFile("report",
-    // imageFile);
-    // if (imageFirebaseURL == null || imageFirebaseURL.isEmpty()) {
-    // throw new AppException(ErrorCode.OBJECT_SETUP,
-    // "Failed to upload image to Firebase: " + imageFile.getOriginalFilename());
-    // }
+        for (MultipartFile imageFile : imageFiles) {
+            if (!imageFile.isEmpty()) {
+                try {
+                    String imageFirebaseURL = firebaseUploadImages.uploadFile("report",
+                            imageFile);
+                    if (imageFirebaseURL == null || imageFirebaseURL.isEmpty()) {
+                        throw new AppException(ErrorCode.OBJECT_SETUP,
+                                "Failed to upload image to Firebase: " + imageFile.getOriginalFilename());
+                    }
 
-    // ImageReportShop imageReport = new ImageReportShop();
-    // imageReport.setName(imageFirebaseURL);
-    // imageReport.setReport(report);
-    // imageEvaluateRepository.saveAndFlush(imageReport);
+                    ImageAccountReport imageReport = new ImageAccountReport();
+                    imageReport.setSrc(imageFirebaseURL);
+                    imageReport.setAccountReport(report);
+                    imageAccountReport.saveAndFlush(imageReport);
 
-    // imageReportShop.add(imageReport);
-    // } catch (Exception e) {
-    // e.printStackTrace();
-    // throw new AppException(ErrorCode.OBJECT_SETUP,
-    // "Error processing image: " + imageFile.getOriginalFilename(), e);
-    // }
-    // }
-    // }
+                    imagesAccountReport.add(imageReport);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new AppException(ErrorCode.OBJECT_SETUP,
+                            "Error processing image: " + imageFile.getOriginalFilename(), e);
+                }
+            }
+        }
 
-    // return imageReportShop;
-    // }
+        return imagesAccountReport;
+    }
 
 }

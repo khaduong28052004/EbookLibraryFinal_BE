@@ -1,10 +1,10 @@
 package com.toel.dto.user.resquest;
 
 import java.util.Date;
-import java.util.List;
 
+import org.mapstruct.Mapper;
 import org.springframework.format.annotation.DateTimeFormat;
-
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Mapper(componentModel = "spring")
 public class Request_ReportShop_DTO {
     @NotNull(message = "Vui lòng kiểm tra account id")
     private Integer accountId;
@@ -34,5 +35,5 @@ public class Request_ReportShop_DTO {
     @NotNull(message = "Không để trống title")
     private String title;
 
-    // List<Response_ImageEvalue> images;
+    private MultipartFile[] images;
 }
