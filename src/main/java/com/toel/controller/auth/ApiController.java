@@ -401,7 +401,7 @@ public class ApiController {
         } else if ("phone".equalsIgnoreCase(entity.getMethod())) {
             String otp = otpService.generateOtp1(convertPhoneNumber(entity.getPhone()));
             try {
-                infobipService.sendSMS(entity.getPhone(), otp);
+                infobipService.sendSMS(convertPhoneNumber(entity.getPhone()), otp);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -411,14 +411,21 @@ public class ApiController {
         }
     }
 
+    @GetMapping("/api/v1/user/testphone/{phone}")
+    public String test(@PathVariable String phone){
+        // String phone =
+        return  convertPhoneNumber(phone);
+    }
+
+
     public static String convertPhoneNumber(String phoneNumber) {
         // Kiểm tra nếu số điện thoại bắt đầu với '0'
         if (phoneNumber != null && phoneNumber.startsWith("0")) {
             // Cắt '0' đầu tiên và thay thế bằng +84
-            return "+84" + phoneNumber.substring(1);
+            return "84" + phoneNumber.substring(1);
         }
         // Nếu số điện thoại không bắt đầu bằng '0', trả về chính nó
-        return phoneNumber;
+        return  phoneNumber;
     }
 
     @PostMapping("/api/v2/user/register_1/{otp}")
