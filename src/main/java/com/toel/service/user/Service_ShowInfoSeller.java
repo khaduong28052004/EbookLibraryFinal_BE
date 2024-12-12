@@ -1,11 +1,18 @@
 package com.toel.service.user;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 
 import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,13 +70,7 @@ public class Service_ShowInfoSeller {
         String content = reportDTO.getContent() == null ? "" : reportDTO.getContent();
         Date createAt = reportDTO.getCreateAt() == null ? null : reportDTO.getCreateAt();
         String title = reportDTO.getTitle() == null ? "" : reportDTO.getTitle();
-
-        System.out.println("accountId: " + reportDTO.getAccountId());
-        System.out.println("shopId: " + reportDTO.getShopId());
-        System.out.println("content: " + reportDTO.getContent());
-        System.out.println("createAt: " + reportDTO.getCreateAt());
-        System.out.println("title: " + reportDTO.getTitle());
-        System.out.println("images: " + Arrays.toString(reportDTO.getImages()));
+        MultipartFile[] images = reportDTO.getImages();
 
         if (!accountRepository.existsById(accountId) || accountId == null) {
             throw new AppException(ErrorCode.OBJECT_SETUP, "Tài khoản đang sử dụng không tồn tại");
@@ -90,6 +91,20 @@ public class Service_ShowInfoSeller {
         if (reportRepository.waitAfterReport(accountId, shopId) == 1) {
             throw new AppException(ErrorCode.OBJECT_SETUP, "Bạn đã báo cáo. Đang trong quá trình xử lý");
         }
+
+        if (images != null) {
+            for (MultipartFile image : images) {
+                try {
+                    if (!isValidImageFormat(image)) {
+                        throw new AppException(ErrorCode.OBJECT_SETUP, "Chỉ chấp nhận các định dạng jpg, jpeg, và png");
+                    }
+                    checkImageAttributes(image);
+                } catch (IOException e) {
+                    throw new AppException(ErrorCode.OBJECT_SETUP, "Lỗi khi xử lý ảnh: " + image.getOriginalFilename(),
+                            e);
+                }
+            }
+        }
     }
 
     private AccountReport createReport(Request_ReportShop_DTO reportDTO) {
@@ -100,7 +115,7 @@ public class Service_ShowInfoSeller {
         newReport.setShop(shop);
         newReport.setContent(reportDTO.getContent());
         newReport.setCreateAt(reportDTO.getCreateAt());
-        newReport.setStatus(reportDTO.isStatus());
+        newReport.setStatus(reportDTO.getStatus());
         newReport.setTitle(reportDTO.getTitle());
         reportRepository.save(newReport);
 
@@ -143,4 +158,34 @@ public class Service_ShowInfoSeller {
         return imagesAccountReport;
     }
 
+    private boolean isValidImageFormat(MultipartFile image) {
+        try (ImageInputStream iis = ImageIO.createImageInputStream(image.getInputStream())) {
+            Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
+            if (readers.hasNext()) {
+                ImageReader reader = readers.next();
+                String formatName = reader.getFormatName().toLowerCase();
+                return formatName.equals("jpg") || formatName.equals("jpeg") || formatName.equals("png");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private void checkImageAttributes(MultipartFile image) throws IOException {
+
+        BufferedImage bufferedImage = ImageIO.read(image.getInputStream());
+        if (bufferedImage == null) {
+            throw new AppException(ErrorCode.OBJECT_SETUP, "Không thể đọc ảnh: " + image.getOriginalFilename());
+        }
+
+        int width = bufferedImage.getWidth();
+        int height = bufferedImage.getHeight();
+        long size = image.getSize();
+
+        if (size > 5 * 1024 * 1024) {
+            throw new AppException(ErrorCode.OBJECT_SETUP, "Kích thước ảnh không vượt quá 5MB");
+        }
+
+    }
 }
