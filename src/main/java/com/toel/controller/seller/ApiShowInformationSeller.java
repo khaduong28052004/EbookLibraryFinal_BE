@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.response.Response_InforSeller;
@@ -118,12 +119,16 @@ public class ApiShowInformationSeller {
         String sellerID = body.get("sellerID");
         String userID = body.get("userID");
         Integer defaultValue = 1;
-        if (sellerID.equals(userID)) {
-            return ApiResponse.<String>build()
-                    .code(400)
-                    .message("Invalid Seller ID: Not a number")
-                    .result(null);
+
+        if (userID != null) {
+            if (sellerID.equals(userID)) {
+                return ApiResponse.<String>build()
+                        .code(400)
+                        .message("Invalid Seller ID: Not a number")
+                        .result(null);
+            }
         }
+
         if (!isNumeric(sellerID)) {
             return ApiResponse.<String>build()
                     .code(400)
@@ -131,6 +136,7 @@ public class ApiShowInformationSeller {
                     .result(null);
         }
         try {
+            System.out.println("sellerID" + sellerID);
             Account account = accountRepository.findById(Integer.parseInt(sellerID))
                     .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
                             "ID:[" + sellerID + "] không tìm thấy người bán"));
@@ -484,10 +490,18 @@ public class ApiShowInformationSeller {
         return ApiResponse.<Map<String, Object>>build().message("success").result(response);
     }
 
-    @PostMapping("api/v1/user/shop/createReport")
+    @PostMapping("api/v1/user/shop/createReport/saveImg")
     public ResponseEntity<Map<String, Object>> createReportShop(
             @Valid @ModelAttribute Request_ReportShop_DTO reportDTO,
             BindingResult bindingResult) {
+
+        System.out.println("accountId: " + reportDTO.getAccountId());
+        System.out.println("shopId: " + reportDTO.getShopId());
+        System.out.println("content: " + reportDTO.getContent());
+        System.out.println("createAt: " + reportDTO.getCreateAt());
+        System.out.println("title: " + reportDTO.getTitle());
+        System.out.println("images: " + Arrays.toString(reportDTO.getImages()));
+
         Map<String, Object> response = serviceShowInfoSeller.createReportShop(reportDTO);
         return ResponseEntity.ok(response);
     }
