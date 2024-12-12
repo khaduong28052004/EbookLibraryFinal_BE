@@ -221,5 +221,13 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	List<Product> findChatBotByDateASC(@Param("keySearch") String keySearch,
 			@Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd);
+	// @Query("SELECT p.id, p.name, sum(billdetails.quantity) as totalSell\r\n" + //
+	// "from BillDetail bd\r\n" + //
+	// "join Product p on bd.product.id = p.id \r\n" + //
+	// "join Bill on bd.bill.id = b.id\r\n" + //
+	// "where p.isActive = 1 and p.account.id = ?1\r\n" + //
+	// "and bills.createAt >= DATE_SUB(NOW())\r\n" + //
+	// "GROUP BY p.id, p.name\r\n")
+	// List<Product> findTopProductShop(Integer id_Shop);
 
 }

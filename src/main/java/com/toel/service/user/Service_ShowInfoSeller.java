@@ -1,12 +1,15 @@
 package com.toel.service.user;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.google.api.Http;
 import com.toel.dto.user.resquest.Request_ReportShop_DTO;
@@ -14,8 +17,11 @@ import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.model.Account;
 import com.toel.model.AccountReport;
+import com.toel.model.Evalue;
+import com.toel.model.ImageEvalue;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.ReportRepository;
+import com.toel.service.firebase.UploadImage;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -25,6 +31,8 @@ public class Service_ShowInfoSeller {
     AccountRepository accountRepository;
     @Autowired
     private ReportRepository reportRepository;
+    @Autowired
+    UploadImage firebaseUploadImages;
 
     public Map<String, Object> createReportShop(Request_ReportShop_DTO reportDTO) {
         Map<String, Object> response = new HashMap<>();
@@ -89,8 +97,46 @@ public class Service_ShowInfoSeller {
         newReport.setCreateAt(reportDTO.getCreateAt());
         newReport.setStatus(reportDTO.isStatus());
         newReport.setTitle(reportDTO.getTitle());
+
+        // if (reportDTO.getImages() != null) {
+        // List<Object[]> imageEvalues = saveImages(reportDTO.getImages(), newReport);
+        // newReport.setImages(imageEvalues);
+        // imageReportShop.save(newReport);
+        // }
+
         reportRepository.save(newReport);
         return newReport;
     }
+
+    // private List<ImageReportShop> saveImages(MultipartFile[] imageFiles,
+    // AccountReport report) {
+    // List<ImageReportShop> imageReportShop = new ArrayList<>();
+
+    // for (MultipartFile imageFile : imageReportShop) {
+    // if (!imageFile.isEmpty()) {
+    // try {
+    // String imageFirebaseURL = firebaseUploadImages.uploadFile("report",
+    // imageFile);
+    // if (imageFirebaseURL == null || imageFirebaseURL.isEmpty()) {
+    // throw new AppException(ErrorCode.OBJECT_SETUP,
+    // "Failed to upload image to Firebase: " + imageFile.getOriginalFilename());
+    // }
+
+    // ImageReportShop imageReport = new ImageReportShop();
+    // imageReport.setName(imageFirebaseURL);
+    // imageReport.setReport(report);
+    // imageEvaluateRepository.saveAndFlush(imageReport);
+
+    // imageReportShop.add(imageReport);
+    // } catch (Exception e) {
+    // e.printStackTrace();
+    // throw new AppException(ErrorCode.OBJECT_SETUP,
+    // "Error processing image: " + imageFile.getOriginalFilename(), e);
+    // }
+    // }
+    // }
+
+    // return imageReportShop;
+    // }
 
 }
