@@ -399,7 +399,7 @@ public class ApiController {
                     entity.getFullname()); // DANGKYTAIKHOAN
             return ApiResponse.<String>build().message("OTP đã được gửi qua email.").result(otp);
         } else if ("phone".equalsIgnoreCase(entity.getMethod())) {
-            String otp = otpService.generateOtp1(convertPhoneNumber(entity.getPhone()));
+            String otp = otpService.generateOtp1(entity.getPhone());
             try {
                 infobipService.sendSMS(convertPhoneNumber(entity.getPhone()), otp);
             } catch (Exception e) {
