@@ -10,6 +10,7 @@ import com.toel.service.user.Service_ReportProduct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -20,7 +21,7 @@ public class ApiReportProduct {
 	Service_ReportProduct service_ReportProduct;
 
 	@PostMapping("product")
-	public ApiResponse<Boolean> createReport(@RequestBody Request_ProductReport report) {
+	public ApiResponse<Boolean> createReport(@ModelAttribute Request_ProductReport report) {
 		return ApiResponse.<Boolean>build().result(service_ReportProduct.report(report));
 	}
 
