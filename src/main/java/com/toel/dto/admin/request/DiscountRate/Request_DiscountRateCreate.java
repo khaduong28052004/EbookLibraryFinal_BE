@@ -1,5 +1,6 @@
 package com.toel.dto.admin.request.DiscountRate;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import jakarta.validation.constraints.Future;
@@ -16,5 +17,5 @@ public class Request_DiscountRateCreate {
     private Integer discount;
     @NotNull(message = "FIELD_REQUIRED")
     @Future(message = "FIELD_INVALID_FUTURE_DATE")
-    private LocalDateTime dateStart;
+    private LocalDate dateStart;
 }

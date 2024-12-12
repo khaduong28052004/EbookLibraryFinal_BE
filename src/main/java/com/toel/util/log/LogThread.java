@@ -1,8 +1,6 @@
 package com.toel.util.log;
 
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.toel.model.Log;
 

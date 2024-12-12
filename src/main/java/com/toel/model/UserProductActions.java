@@ -2,9 +2,6 @@ package com.toel.model;
 
 import java.time.LocalDateTime;
 
-import org.hibernate.annotations.Nationalized;
-
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

@@ -15,7 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.request.DiscountRate.Request_DiscountRateCreate;
@@ -79,8 +78,8 @@ public class Service_DiscountRate {
         if (discountRateNow.getDiscount() == discountRateUpdate.getDiscount()) {
             throw new AppException(ErrorCode.OBJECT_ACTIVE, "Mức chiết khấu");
         }
-        entity.setDateStart(entity.getDateStart());
-        entity.setDiscount(entity.getDiscount());
+        entity.setDateStart(discountRateUpdate.getDateStart().atStartOfDay());
+        entity.setDiscount(discountRateUpdate.getDiscount());
         if (check(entity)) {
             Response_DiscountRate dResponse_DiscountRate = discountRateMapper
                     .tochChietKhauResponse(discountRateRepository.save(entity));
@@ -113,7 +112,9 @@ public class Service_DiscountRate {
     }
 
     public Response_DiscountRate create(Request_DiscountRateCreate discountRateCreate, Integer accountID) {
-        DiscountRate entity = discountRateMapper.toDiscountRateCreate(discountRateCreate);
+        DiscountRate entity = new DiscountRate();
+        entity.setDiscount(discountRateCreate.getDiscount());
+        entity.setDateStart(discountRateCreate.getDateStart().atStartOfDay());
         entity.setAccount(accountRepository.findById(1)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
                         "Account")));
@@ -164,19 +165,6 @@ public class Service_DiscountRate {
             // discountRateMapper.tochChietKhauResponse(discountRate),null,
             // "Xóa chiết khấu");
             throw new AppException(ErrorCode.OBJECT_ACTIVE, "Chiết khấu");
-        }
-    }
-
-    @Scheduled(fixedDelay = 60000)
-    // @Scheduled(fixedDelay = 100)
-    public void run() {
-        if (discountRateRepository.findAllBydateDeleteIsNull().size() >= 2) {
-            DiscountRate discountRate = discountRateRepository.findLatestDiscountRate().get(0);
-            discountRateRepository.findAllBydateDeleteIsNull().forEach(rate -> {
-                if (rate.getDateStart().isBefore(LocalDateTime.now()) && rate.getId() != discountRate.getId())
-                    rate.setDateDelete(LocalDateTime.now());
-                discountRateRepository.save(rate);
-            });
         }
     }
 

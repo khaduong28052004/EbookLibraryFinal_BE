@@ -70,7 +70,7 @@ public class Service_ProductReport {
                 EmailTemplateType.PHANHOIREPORT, entity.getAccount().getFullname(), contents, formattedDate,
                 entity.getTitle(), entity.getContent());
         ProductReport productReportNew = productReportRepository.save(entity);
-        service_Log.setLog(getClass(), accountID, "INFO", "Product", productReportMapper.toresponse_ProductReport(productReportNew),null,
+        service_Log.setLog(getClass(), accountID, "INFO", "ProductReport", productReportMapper.toresponse_ProductReport(productReportNew),null,
                 "Xử lý tài khoản bị báo cáo");
         return productReportMapper.toresponse_ProductReport(productReportNew);
     }

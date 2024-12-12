@@ -8,7 +8,6 @@ import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.api.Http;
 import com.toel.dto.user.resquest.Request_ReportShop_DTO;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;

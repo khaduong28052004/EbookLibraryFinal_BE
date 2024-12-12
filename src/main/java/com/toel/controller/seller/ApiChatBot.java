@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
-import com.toel.dto.admin.response.Response_ProductListFlashSale;
-import com.toel.dto.user.response.Response_Product;
 import com.toel.service.seller.Service_ChatBot;
 
 @CrossOrigin("*")

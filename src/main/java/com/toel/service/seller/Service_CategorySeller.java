@@ -132,7 +132,7 @@ public class Service_CategorySeller {
 
         public Response_Category update(
                         Request_CategoryUpdate request_Category, Integer accountID) {
-                Category categoryOle = categoryRepository.findById(request_Category.getAccount())
+                Category categoryOle = categoryRepository.findById(request_Category.getId())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
                                                 "Account"));
                 return Optional.of(request_Category)
@@ -148,7 +148,7 @@ public class Service_CategorySeller {
                                 .map(category -> {
                                         if (accountID != null) {
                                                 service_Log.setLog(getClass(), accountID, "INFO",
-                                                                "Category", categoryOle,
+                                                                "Category", categoryMapper.response_Category(categoryOle),
                                                                 categoryMapper.response_Category(category),
                                                                 "Cập nhật thể loại");
                                         }

@@ -12,7 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.request.FlashSale.Request_FlashSaleCreate;
@@ -106,15 +105,4 @@ public class Service_FlashSale {
                                 "Xóa Flash sale");
         }
 
-        @Scheduled(fixedDelay = 60000)
-        public void run() {
-                if (flashSaleRepository.findByIsDelete(false).size() >= 1) {
-                        flashSaleRepository.findByIsDelete(false).forEach(flasesale -> {
-                                if (flasesale.getDateEnd().isBefore(LocalDateTime.now())) {
-                                        flasesale.setDelete(true);
-                                        flashSaleRepository.save(flasesale);
-                                }
-                        });
-                }
-        }
 }

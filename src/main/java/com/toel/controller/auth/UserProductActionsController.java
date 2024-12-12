@@ -1,11 +1,8 @@
 package com.toel.controller.auth;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,7 +13,6 @@ import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.response.Response_ProductInfo;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
-import com.toel.model.Product;
 import com.toel.model.UserProductActions;
 import com.toel.service.UserProductActionsService;
 

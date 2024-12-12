@@ -34,13 +34,13 @@ public class LogUtil {
         log.setAccount(account);
         log.setAction_type(action_type);
         log.setTableName(tableName);
-        String jsonDataOld = convertToJson(dataOld); // Chuyển đối tượng thành JSON
+        String jsonDataOld = convertToJson(dataOld);
 
         log.setDataOld(jsonDataOld);
         
-        String jsonDataNew = convertToJson(dataNew); // Chuyển đối tượng thành JSON
+        String jsonDataNew = convertToJson(dataNew); 
 
-        log.setDataNew(jsonDataNew);// Lưu chuỗi JSON vào trường dat
+        log.setDataNew(jsonDataNew);
         com.toel.util.log.LogManager logManager = new com.toel.util.log.LogManager();
         logManager.listen();
         logManager.submit(log);
