@@ -21,7 +21,6 @@ public class UploadImage {
         String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
         Bucket bucket = StorageClient.getInstance().bucket();
         Blob blob = bucket.create(status + "/" + fileName, file.getInputStream(), file.getContentType());
-
         return String.format("https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media",
                 bucket.getName(), blob.getName().replace("/", "%2F"));
     }

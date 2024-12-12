@@ -140,7 +140,7 @@ public class Service_SelectAllProductHome {
 			Account user = accountRepository.findById(id_user).get();
 			listFollowers = followerRepository.findAllByAccount(user);
 			listLikes = likeRepository.findAllByAccount(user);
-			listProductByBills = productRepo.findAllByBillOfUser(id_user);
+//			listProductByBills = productRepo.findAllByBillOfUser(id_user);
 		}
 
 		List<Product> listProducts = new ArrayList<>();
