@@ -30,7 +30,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			+ "	 ORDER BY CASE WHEN :orderBy = 'create' THEN b.createAt "
 			+ "              WHEN :orderBy = 'update' THEN b.updateAt " + "              ELSE b.createAt END DESC")
 	List<Object[]> findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(@Param("userId") Integer userId,
-			@Param("orderStatus") Integer orderStatus, @Param("orderBy") String orderBy);
+			@Param("orderStatus") Integer orderStatus, @Param("orderBy") String orderBy, Pageable pageable);
 
 	@Query("SELECT \r\n" + //
 			"    b.id AS billId, \r\n" + //
@@ -45,7 +45,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			"JOIN  b.orderStatus os WHERE a.id = :userId \r\n" + //
 			"ORDER BY b.createAt DESC\r\n" + //
 			"")
-	List<Object[]> findBillsByUserId(@Param("userId") Integer userId);
+	List<Object[]> findBillsByUserId(@Param("userId") Integer userIdm, Pageable pageable);
 
 	// Seller (Update Shop)
 
