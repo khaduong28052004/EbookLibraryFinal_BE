@@ -105,7 +105,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			Pageable pageable);
 
 	@Query("SELECT p FROM Product p WHERE p.account.id = :idShop AND p.isActive = true AND p.isDelete=false AND p.account.status = true")
-	List<Product> findAllIdIn(@Param("idShop") Integer idShop);
+	Page<Product> findAllIdIn(@Param("idShop") Integer idShop, Pageable pageable);
 
 	@Query("SELECT p FROM Product p WHERE p.isActive = true AND p.isDelete = false AND p.account.status = true")
 	List<Product> findAllProduct(Sort sort);

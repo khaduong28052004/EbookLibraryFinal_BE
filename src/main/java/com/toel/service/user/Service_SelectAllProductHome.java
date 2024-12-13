@@ -74,8 +74,8 @@ public class Service_SelectAllProductHome {
 
 		// List<Integer> idProducts = list.stream().map(p ->
 		// p.getProduct().getId()).collect(Collectors.toList());
-		Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
-		List<Product> pageProducts = productRepo.findAllIdIn(idShop);
+		Pageable pageable = PageRequest.of(0, size, Sort.by(sort));
+		Page<Product> pageProducts = productRepo.findAllIdIn(idShop, pageable);
 		List<Response_Product> response_Products = new ArrayList<Response_Product>();
 		for (Product product : pageProducts) {
 			if (product.getAccount().getId() == idShop) {
