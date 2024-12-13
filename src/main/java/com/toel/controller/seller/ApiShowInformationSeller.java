@@ -478,7 +478,6 @@ public class ApiShowInformationSeller {
             flashSaleDetails = flashSaleDetailRepo.findAllByFlashSale(flashSale);
         } catch (Exception e) {
         }
-        System.out.println("size 2" + size);
 
         Map<String, Object> response = serviceSellectAll.selectAllHomeShop(flashSaleDetails, id_Shop, 0, size, sort);
         response.put("flashSale", flashSale);
@@ -505,6 +504,27 @@ public class ApiShowInformationSeller {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/api/v1/user/shop/top3ProductShop")
+    public ApiResponse<?> top3ProductShop(
+            @RequestParam(name = "id_Shop", defaultValue = "0") Integer id_Shop) {
+
+        List<FlashSaleDetail> flashSaleDetails = new ArrayList<FlashSaleDetail>();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime);
+        try {
+            Boolean isaccount = accountRepository.existsById(id_Shop);
+            flashSaleDetails = flashSaleDetailRepo.findAllByFlashSale(flashSale);
+        } catch (Exception e) {
+        }
+
+        Map<String, Object> products = serviceShowInfoSeller.selectTop3ProductHomeShop(flashSaleDetails, id_Shop);
+        return ApiResponse.<Map<String, Object>>build()
+                .code(0)
+                .message("e.getMessage()")
+                .result(products);
+
+    }
+
     // @PostMapping("/api/v1/user/send-otpe")
     // public ApiResponse<?> sendOtp(@RequestBody @Valid Request_AccountCreateOTP
     // body) {
@@ -529,51 +549,6 @@ public class ApiShowInformationSeller {
     // } else {
     // return ApiResponse.build().message("OTP đã được gửi qua g.");
     // }
-    // }
-    // @GetMapping("/api/v1/user/topProducts")
-    // public ApiResponse<?> topProducts() {
-    // try {
-    // OrderStatus orderStatus = orderStatusRepository.findById(1).orElse(null);
-    // if (orderStatus == null) {
-    // return ApiResponse.<String>build().code(1).message("Đơn hoàn thành bằng
-    // 0").result(null);
-    // }
-    // List<Bill> listBill = billRepository.findByOrderStatus(orderStatus);
-    // if (listBill == null || listBill.isEmpty()) {
-    // // ne
-    // return ApiResponse.<String>build().code(1).message("không có hóa đơn
-    // nào!").result(null);
-    // }
-    // List<BillDetail> listBillDetails =
-    // billDetailRepository.findAllByBillIn(listBill);
-    // // Thống kê số lượng sản phẩm đã bán
-    // if (listBillDetails.isEmpty()) {
-    // return ApiResponse.<String>build().code(1).message("không có hóa đơn
-    // nào!").result(null);
-    // }
-    // Map<Product, Long> productCountMap = listBillDetails.stream()
-    // .collect(
-    // Collectors.groupingBy(BillDetail::getProduct,
-    // Collectors.summingLong(BillDetail::getQuantity)));
-
-    // // List<BillDetail> listBillDetails1 = billDetailRepository.
-
-    // // // hash.put("listProduct", listProductO);
-
-    // Map<String, Object> hash = new HashMap<>();
-    // hash.put("list", listBillDetails);
-
-    // return ApiResponse.<Map>build()
-    // .code(0)
-    // .message("Top sold products fetched successfully")
-    // .result(hash);
-    // } catch (Exception e) {
-    // return ApiResponse.<Map>build()
-    // .code(0)
-    // .message(e.getMessage())
-    // .result(null);
-    // }
-
     // }
 
     // public double averageStars(Account account) {
