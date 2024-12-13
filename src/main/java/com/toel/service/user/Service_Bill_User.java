@@ -2,6 +2,8 @@ package com.toel.service.user;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_Bill_User;
@@ -308,6 +311,25 @@ public class Service_Bill_User {
 
 	}
 
+	// @Scheduled(fixedRate = 60000) // 60000ms = 1 phút
+	@Scheduled(cron = "0 0 0 * * ?") // Runs every day at midnight
+	public void autoConfirmOrders() {
+		System.out.println("Tự động xác nhận hóa đơn đang chạy lúc: " + LocalDateTime.now());
+		// Get the current date and the date 7 days ago
+		LocalDate currentDate = LocalDate.now();
+		LocalDate sevenDaysAgo = currentDate.minusDays(7);
+		LocalDateTime sevenDaysAgoDateTime = sevenDaysAgo.atStartOfDay();
+
+		// Get all orders where 'finishAt' is older than 7 days and not yet confirmed
+		// (orderStatus is not 'confirmed')
+		List<Bill> billsToConfirm = billRepository.findBillsToAutoConfirm(sevenDaysAgoDateTime);
+
+		// Loop through each bill and confirm it
+		for (Bill bill : billsToConfirm) {
+			confirmBill(bill.getId());
+		}
+	}
+
 	private void sendNotification(Bill bill) {
 		String email = bill.getAccount().getEmail();
 		System.out.println("email " + email);
@@ -381,26 +403,4 @@ public class Service_Bill_User {
 			return null; // Hoặc xử lý lỗi theo cách khác
 		}
 	}
-
-	// public Integer checkAndBlockUsers(Integer userId) {
-	// Map<String, Object> response = new HashMap<>();
-	// Account user = accountRepository.findById(userId).orElseThrow(() -> new
-	// RuntimeException("User not found"));
-	// Integer cancelCounts = billRepository.findUserCancelCountsForDay(userId);
-
-	// // if (cancelCounts == 2) {
-	// // response.put("checkCancel",
-	// // "Bạn đã hủy đơn quá nhiều lần trong hôm nay. Nếu tiếp tục, tài khoản của
-	// bạn
-	// // có thế bị khóa");
-	// // }
-
-	// if (cancelCounts > 2) {
-	// user.setStatus(false);
-	// accountRepository.save(user);
-	// }
-
-	// return cancelCounts;
-
-	// }
 }
