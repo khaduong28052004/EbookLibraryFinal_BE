@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -61,6 +62,20 @@ public class UserProductActionsController {
     public ApiResponse<?> getAllProduct() {
         // List<UserProductActions> listUserProductActions = re
         List<Response_ProductInfo> list = actionsService.recommendProducts();
+        return ApiResponse.<List<Response_ProductInfo>>build().code(0).message("oke").result(list);
+    }
+
+    @GetMapping("/api/v1/user/actions_product_user")
+    public ApiResponse<?> getAllProductAndUser(@RequestParam(defaultValue = "0") Integer id) {
+        // List<UserProductActions> listUserProductActions = re
+        List<Response_ProductInfo> list = actionsService.recommendProducts(id);
+        return ApiResponse.<List<Response_ProductInfo>>build().code(0).message("oke").result(list);
+    }
+
+    @GetMapping("/api/v1/user/actions_product_category")
+    public ApiResponse<?> getAllProductAndcategory() {
+        // List<UserProductActions> listUserProductActions = re
+        List<Response_ProductInfo> list = actionsService.recomendProductsAndCategory();
         return ApiResponse.<List<Response_ProductInfo>>build().code(0).message("oke").result(list);
     }
 

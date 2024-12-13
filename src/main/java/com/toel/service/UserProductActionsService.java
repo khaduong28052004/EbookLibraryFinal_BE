@@ -1,10 +1,12 @@
 package com.toel.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Locale.Category;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.toel.mapper.user.ProductMaperUser;
 import com.toel.model.Product;
 import com.toel.model.UserProductActions;
+import com.toel.repository.CategoryRepository;
 import com.toel.repository.ProductRepository;
 import com.toel.repository.UserProductActionsRepository;
 import com.toel.dto.Api.ApiResponse;
@@ -28,7 +31,8 @@ public class UserProductActionsService {
     private UserProductActionsRepository actionsRepository;
     @Autowired
     private ProductRepository productRepository;
-
+    @Autowired
+    private CategoryRepository categoryRepository;
     @Autowired
     ProductMapper productMapper;
 
@@ -95,6 +99,13 @@ public class UserProductActionsService {
         }
     }
 
+    public String handleUserAction(Integer userId, List<Integer> productId, String actionType) {
+        for (Integer integer : productId) {
+            handleUserAction(userId, integer, actionType);
+        }
+        return "Action processed successfully";
+    }
+
     /**
      * VIEW_WEIGHT = 1;
      * ADD_TO_CART_WEIGHT = 3;
@@ -140,6 +151,9 @@ public class UserProductActionsService {
         List<Product> listhoatdong = listProduct.stream() // loc san pham product.isDelete() == false // nguoc lai
                 .filter(product -> product.isActive() && product.isDelete() == false)
                 .collect(Collectors.toList());
+
+        // categoryRepository.findALlByIdAccount(listhoatdong.getAccount);
+
         return productMapper.Response_ProductInfo(listhoatdong);
         // Sắp xếp sản phẩm theo điểm, từ cao đến thấp
         // productScores.entrySet().stream()
@@ -186,6 +200,23 @@ public class UserProductActionsService {
                 .filter(product -> product.isActive() && product.isDelete() == false)
                 .collect(Collectors.toList());
         return productMapper.Response_ProductInfo(listhoatdong);
+    }
+
+    public List<Response_ProductInfo> recomendProductsAndCategory() {
+        // List<Response_ProductInfo> list =
+        // recommendProducts().stream().limit(1).toList()
+        List<Response_ProductInfo> list = recommendProducts();
+        List<com.toel.model.Category> listCategory = new ArrayList<>(); // danh mục in sản phẩm đề xuất
+        for (Response_ProductInfo response_ProductInfo : list) {
+            List<com.toel.model.Category> categories = categoryRepository
+                    .findALlByIdAccount(response_ProductInfo.getAccount().getId());
+            listCategory.addAll(categories);
+        }
+        listCategory = listCategory.stream() // Loại bỏ trùng lặp danh mục
+                .distinct()
+                .collect(Collectors.toList());
+        List<Product> products = productRepository.findByCategoryIn(listCategory); // pr inin danh mục trong                                                                 
+        return productMapper.Response_ProductInfo(products);
     }
 
     // public List<Product> recommendProducts() {
