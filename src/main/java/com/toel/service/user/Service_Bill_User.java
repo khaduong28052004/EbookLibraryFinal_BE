@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_Bill_User;
@@ -399,24 +403,4 @@ public class Service_Bill_User {
 			return null; // Hoặc xử lý lỗi theo cách khác
 		}
 	}
-
-	// public Integer checkAndBlockUsers(Integer userId) {
-	// 	Map<String, Object> response = new HashMap<>();
-	// 	Account user = accountRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-	// 	Integer cancelCounts = billRepository.findUserCancelCountsForDay(userId);
-
-	// 	// if (cancelCounts == 2) {
-	// 	// response.put("checkCancel",
-	// 	// "Bạn đã hủy đơn quá nhiều lần trong hôm nay. Nếu tiếp tục, tài khoản của bạn
-	// 	// có thế bị khóa");
-	// 	// }
-
-	// 	if (cancelCounts > 2) {
-	// 		user.setStatus(false);
-	// 		accountRepository.save(user);
-	// 	}
-
-	// 	return cancelCounts;
-
-	// }
 }
