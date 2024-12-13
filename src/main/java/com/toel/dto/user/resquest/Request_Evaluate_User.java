@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Mapper(componentModel = "spring")
+// @Mapper(componentModel = "spring")
 public class Request_Evaluate_User {
 	@NotNull(message = "Vui lòng để lại đánh giá")
 	private Integer star;
