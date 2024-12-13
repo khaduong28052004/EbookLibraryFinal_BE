@@ -73,10 +73,10 @@ public class Service_ShowInfoSeller {
         MultipartFile[] images = reportDTO.getImages();
 
         if (!accountRepository.existsById(accountId) || accountId == null) {
-            throw new AppException(ErrorCode.OBJECT_SETUP, "Tài khoản đang sử dụng không tồn tại");
+            throw new AppException(ErrorCode.OBJECT_SETUP, "Vui lòng đăng nhập");
         }
         if (!accountRepository.existsById(shopId) || shopId == null) {
-            throw new AppException(ErrorCode.OBJECT_SETUP, "Tài khoản cửa hàng không tồn tại");
+            throw new AppException(ErrorCode.OBJECT_SETUP, "Cửa hàng không tồn tại");
         }
         if (content.trim().isBlank() || content == "") {
             throw new AppException(ErrorCode.OBJECT_SETUP, "Cần điền nội dung báo cáo");
