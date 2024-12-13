@@ -245,4 +245,9 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	@Query("SELECT b FROM Bill b WHERE b.account.id = ?1 ORDER BY b.id DESC")
 	List<Bill> findByAccountId(Integer account_id);
 
+	@Query("SELECT b FROM Bill b JOIN b.billDetails bd WHERE bd.bill.account.id = :accountId "
+			+ "AND DATE(bd.bill.createAt) BETWEEN COALESCE(:startDate, CURRENT_DATE) AND COALESCE(:endDate, CURRENT_DATE) GROUP BY b.id ORDER BY b.id DESC")
+	List<Bill> getBillChatBot(@Param("accountId") Integer accountId, @Param("startDate") Date dateStart,
+			@Param("endDate") Date dateEnd);
+
 }
