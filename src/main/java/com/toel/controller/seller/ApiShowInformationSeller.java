@@ -120,23 +120,16 @@ public class ApiShowInformationSeller {
         String userID = body.get("userID");
         Integer defaultValue = 1;
 
-        if (userID != null) {
-            if (sellerID.equals(userID)) {
-                return ApiResponse.<String>build()
-                        .code(400)
-                        .message("Invalid Seller ID: Not a number")
-                        .result(null);
-            }
-        }
-
+        // Kiểm tra nếu sellerID không phải là số
         if (!isNumeric(sellerID)) {
             return ApiResponse.<String>build()
                     .code(400)
                     .message("Invalid Seller ID: Not a number")
                     .result(null);
         }
+
         try {
-            System.out.println("sellerID" + sellerID);
+            System.out.println("sellerID: " + sellerID);
             Account account = accountRepository.findById(Integer.parseInt(sellerID))
                     .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
                             "ID:[" + sellerID + "] không tìm thấy người bán"));
@@ -144,20 +137,23 @@ public class ApiShowInformationSeller {
             Response_InforSeller inforSeller = new Response_InforSeller();
             inforSeller.setIdSeller(account.getId());
             inforSeller.setNumberOfProducts(account.getProducts().size());
-            inforSeller.setTrackingNumber(defaultValue); // nguoi ban da dax theo gioi casi gi
+            inforSeller.setTrackingNumber(defaultValue);
             inforSeller.setShopCancellationRate(defaultValue);
             inforSeller.setAvatar(account.getAvatar());
             inforSeller.setBackground(account.getBackground());
 
+            // Lấy số lượng follower
             Integer follower = followRepository.countFollowersByShopId(account.getId());
             inforSeller.setNumberOfFollowers(follower);
+
             // Kiểm tra userID và set trạng thái theo dõi
-            if (isNumeric(userID) || !sellerID.equals(userID)) {
+            if (userID != null && isNumeric(userID) && !sellerID.equals(userID)) {
                 inforSeller.setIsFollowed(
                         followerService.checkFollower(Integer.parseInt(userID), Integer.parseInt(sellerID)));
             } else {
                 inforSeller.setIsFollowed(null);
             }
+
             // Lấy địa chỉ mặc định
             String district = account.getAddresses().stream()
                     .filter(Address::isStatus)
@@ -165,9 +161,12 @@ public class ApiShowInformationSeller {
                     .findFirst()
                     .orElse("Chưa cập nhật!");
             inforSeller.setDistrict(district);
+
+            // Thông tin thêm
             inforSeller.setCreateAtSeller(account.getCreateAtSeller());
             inforSeller.setParticipationTime(inforSeller.calculateActiveDays());
             inforSeller.setShopName(account.getShopName());
+
             // Kết quả trả về
             Map<String, Object> map = new HashMap<>();
             map.put("shopDataEX", inforSeller);
@@ -478,10 +477,10 @@ public class ApiShowInformationSeller {
         LocalDateTime localDateTime = LocalDateTime.now();
         FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime);
         try {
-
             flashSaleDetails = flashSaleDetailRepo.findAllByFlashSale(flashSale);
         } catch (Exception e) {
         }
+        System.out.println("size 2" + size);
 
         Map<String, Object> response = serviceSellectAll.selectAllHomeShop(flashSaleDetails, id_Shop, 0, size, sort);
         response.put("flashSale", flashSale);
