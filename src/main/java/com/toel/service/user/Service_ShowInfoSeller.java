@@ -16,20 +16,27 @@ import javax.imageio.stream.ImageInputStream;
 
 import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.google.api.Http;
+import com.toel.dto.user.response.Response_Product;
 import com.toel.dto.user.resquest.Request_ReportShop_DTO;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
+import com.toel.mapper.user.ProductMaperUser;
 import com.toel.model.Account;
 import com.toel.model.AccountReport;
 import com.toel.model.Evalue;
+import com.toel.model.FlashSaleDetail;
 import com.toel.model.ImageAccountReport;
 import com.toel.model.ImageEvalue;
+import com.toel.model.Product;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.ImageAccountReportReposity;
+import com.toel.repository.ProductRepository;
 import com.toel.repository.ReportRepository;
 import com.toel.service.firebase.UploadImage;
 
@@ -45,6 +52,10 @@ public class Service_ShowInfoSeller {
     UploadImage firebaseUploadImages;
     @Autowired
     ImageAccountReportReposity imageAccountReport;
+    @Autowired
+    ProductRepository productRepo;
+    @Autowired
+    ProductMaperUser productMaper;
 
     public Map<String, Object> createReportShop(Request_ReportShop_DTO reportDTO) {
         Map<String, Object> response = new HashMap<>();
@@ -187,5 +198,25 @@ public class Service_ShowInfoSeller {
             throw new AppException(ErrorCode.OBJECT_SETUP, "Kích thước ảnh không vượt quá 5MB");
         }
 
+    }
+
+    public Map<String, Object> selectTop3ProductHomeShop(List<FlashSaleDetail> flashSaleDetails, Integer id_Shop) {
+        // Pageable pageable = PageRequest.of(0, 3); // Chỉ lấy 3 sản phẩm đầu tiên
+        List<Product> pageProducts = productRepo.findTop3ProductsByShopId(id_Shop);
+        List<Response_Product> response_Products = new ArrayList<Response_Product>();
+        for (Product product : pageProducts) {
+            if (product.getAccount().getId() == id_Shop) {
+                response_Products.add(productMaper.productToResponse_Product(product));
+            }
+        }
+        Map<String, Object> response = new HashMap<String, Object>();
+        if (response_Products.size() > 0) {
+            response.put("datas", response_Products);
+            // response.put("totalPages", pageProducts.getTotalPages() *
+            // response_Products.size());
+        } else {
+            response.put("error", 1002);
+        }
+        return response;
     }
 }
