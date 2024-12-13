@@ -1,5 +1,6 @@
 package com.toel.controller.auth;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -77,6 +78,25 @@ public class UserProductActionsController {
         // List<UserProductActions> listUserProductActions = re
         List<Response_ProductInfo> list = actionsService.recomendProductsAndCategory();
         return ApiResponse.<List<Response_ProductInfo>>build().code(0).message("oke").result(list);
+    }
+
+    @GetMapping("/api/v1/user/actions_product_date")
+    public ApiResponse<?> getProductsAndCategoriesByDate(@RequestParam LocalDateTime date) {
+        List<Response_ProductInfo> recommendedProducts = actionsService.recommendProducts(date);
+        return ApiResponse.<List<Response_ProductInfo>>build().code(0).message("oke").result(recommendedProducts);
+    }
+
+    
+    @GetMapping("/api/v1/user/actions_product_date_user")
+    public ApiResponse<?> getProductsAndByDateUser(@RequestParam LocalDateTime date,@RequestParam(defaultValue = "0") Integer user) {
+        List<Response_ProductInfo> recommendedProducts = actionsService.recommendProducts(user,date);
+        return ApiResponse.<List<Response_ProductInfo>>build().code(0).message("oke").result(recommendedProducts);
+    }
+
+    @GetMapping("/api/v1/user/actions_product_category_date_user")
+    public ApiResponse<?> getProductsAndCategoriesByDateUser(@RequestParam LocalDateTime date,@RequestParam(defaultValue = "0") Integer user) {
+        List<Response_ProductInfo> recommendedProducts = actionsService.recomendProductsAndCategoryDate(user,date);
+        return ApiResponse.<List<Response_ProductInfo>>build().code(0).message("oke").result(recommendedProducts);
     }
 
 }
