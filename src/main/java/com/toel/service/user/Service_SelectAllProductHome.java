@@ -65,7 +65,7 @@ public class Service_SelectAllProductHome {
 		}
 		return response;
 	}
-	
+
 	public Map<String, Object> selectAllHomeShop(List<FlashSaleDetail> list, Integer idShop, Integer page, Integer size,
 			String sort) {
 
@@ -91,36 +91,37 @@ public class Service_SelectAllProductHome {
 
 	}
 
-// 	=======
-// 			// response.put("totalPages", pageProducts.getTotalPages() *
-// 			// response_Products.size());
-// 		} else {
-// 			response.put("error", 1002);
-// 		}
-// 		return response;
-// 	}
+	// =======
+	// // response.put("totalPages", pageProducts.getTotalPages() *
+	// // response_Products.size());
+	// } else {
+	// response.put("error", 1002);
+	// }
+	// return response;
+	// }
 
-// 	public Map<String, Object> selectAllHomeShop(List<FlashSaleDetail> list, Integer idShop, Integer page, Integer size,
-// 			String sort) {
+	// public Map<String, Object> selectAllHomeShop(List<FlashSaleDetail> list,
+	// Integer idShop, Integer page, Integer size,
+	// String sort) {
 
-// 		// List<Integer> idProducts = list.stream().map(p ->
-// 		// p.getProduct().getId()).collect(Collectors.toList());
-// 		Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
-// 		List<Product> pageProducts = productRepo.findAllIdIn(idShop);
-// 		List<Response_Product> response_Products = new ArrayList<Response_Product>();
-// 		for (Product product : pageProducts) {
-// 			if (product.getAccount().getId() == idShop) {
-// 				response_Products.add(productMaper.productToResponse_Product(product));
-// 			}
-// 		}
-// 		Map<String, Object> response = new HashMap<String, Object>();
-// 		if (response_Products.size() > 0) {
-// 			response.put("datas", response_Products);
-// 			// response.put("totalPages", pageProducts.getTotalPages() *
-// 			// response_Products.size());
-// >>>>>>> kienv2
+	// // List<Integer> idProducts = list.stream().map(p ->
+	// // p.getProduct().getId()).collect(Collectors.toList());
+	// Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+	// List<Product> pageProducts = productRepo.findAllIdIn(idShop);
+	// List<Response_Product> response_Products = new ArrayList<Response_Product>();
+	// for (Product product : pageProducts) {
+	// if (product.getAccount().getId() == idShop) {
+	// response_Products.add(productMaper.productToResponse_Product(product));
+	// }
+	// }
+	// Map<String, Object> response = new HashMap<String, Object>();
+	// if (response_Products.size() > 0) {
+	// response.put("datas", response_Products);
+	// // response.put("totalPages", pageProducts.getTotalPages() *
+	// // response_Products.size());
+	// >>>>>>> kienv2
 
-//	 Gợi ý
+	// Gợi ý
 	public List<Response_Product> suggestProduct(Integer id_user) {
 
 		List<Follower> listFollowers = new ArrayList<Follower>();
@@ -137,7 +138,7 @@ public class Service_SelectAllProductHome {
 			Account user = accountRepository.findById(id_user).get();
 			listFollowers = followerRepository.findAllByAccount(user);
 			listLikes = likeRepository.findAllByAccount(user);
-			listProductByBills = productRepo.findAllByBillOfUser(id_user);
+			// listProductByBills = productRepo.findAllByBillOfUser(id_user);
 		}
 
 		List<Product> listProducts = new ArrayList<>();
@@ -173,4 +174,24 @@ public class Service_SelectAllProductHome {
 		}
 		return listResponse_Products;
 	}
+	// public Map<String, Object> selectTopProductHomeShop(List<FlashSaleDetail>
+	// flashSaleDetails, Integer id_Shop) {
+	// List<Product> pageProducts = productRepo.findTopProductShop(id_Shop);
+	// List<Response_Product> response_Products = new ArrayList<Response_Product>();
+	// for (Product product : pageProducts) {
+	// if (product.getAccount().getId() == id_Shop) {
+	// response_Products.add(productMaper.productToResponse_Product(product));
+	// }
+	// }
+	// Map<String, Object> response = new HashMap<String, Object>();
+	// if (response_Products.size() > 0) {
+	// response.put("datas", response_Products);
+	// // response.put("totalPages", pageProducts.getTotalPages() *
+	// // response_Products.size());
+	// } else {
+	// response.put("error", 1002);
+	// }
+	// return response;
+	// }
+
 }

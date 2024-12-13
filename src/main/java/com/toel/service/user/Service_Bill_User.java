@@ -194,6 +194,13 @@ public class Service_Bill_User {
 	public Bill cancelBill(Integer billId) {
 		checkBillStatus(billId, 1);
 		Bill bill = billRepository.findById(billId).get();
+		Account user = bill.getAccount();
+
+		// if (checkAndBlockUsers(user.getId()) > 2) {
+		// 	throw new AppException(ErrorCode.OBJECT_SETUP,
+		// 			"Tài khoản của bạn đã bị khóa, do đã hủy đơn quá nhiều lần trong ngày. Vui lòng liên hệ TOEL để mở khóa");
+		// }
+
 		bill.setUpdateAt(new Date());
 		bill.setFinishAt(new Date());
 		bill.setOrderStatus(orderStatusRepository.findById(6).get());
@@ -336,4 +343,23 @@ public class Service_Bill_User {
 		}
 	}
 
+	// public Integer checkAndBlockUsers(Integer userId) {
+	// 	Map<String, Object> response = new HashMap<>();
+	// 	Account user = accountRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+	// 	Integer cancelCounts = billRepository.findUserCancelCountsForDay(userId);
+
+	// 	// if (cancelCounts == 2) {
+	// 	// response.put("checkCancel",
+	// 	// "Bạn đã hủy đơn quá nhiều lần trong hôm nay. Nếu tiếp tục, tài khoản của bạn
+	// 	// có thế bị khóa");
+	// 	// }
+
+	// 	if (cancelCounts > 2) {
+	// 		user.setStatus(false);
+	// 		accountRepository.save(user);
+	// 	}
+
+	// 	return cancelCounts;
+
+	// }
 }
