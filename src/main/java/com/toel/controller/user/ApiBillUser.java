@@ -1,12 +1,15 @@
 package com.toel.controller.user;
 
+import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -81,6 +84,21 @@ public class ApiBillUser {
 			service_Bill_User.confirmBill(billId);
 			response.put("message", "Xác nhận đơn hàng thành công");
 			response.put("status", "successfully");
+			return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			response.put("message", e.getMessage());
+			response.put("status", "error");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
+	}
+
+	@PostMapping("/test_auto_confirm")
+	public ResponseEntity<Map<String, Object>> autoConfirmOrders() {
+		Map<String, Object> response = new HashMap<>();
+		try {
+			service_Bill_User.autoConfirmOrders();
+			response.put("message", "Đơn hàng đã được xác nhận tự động sau 7 ngày giao hàng");
+			response.put("status", "success");
 			return ResponseEntity.ok(response);
 		} catch (Exception e) {
 			response.put("message", e.getMessage());
