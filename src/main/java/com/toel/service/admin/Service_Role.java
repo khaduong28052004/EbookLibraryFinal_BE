@@ -73,18 +73,20 @@ public class Service_Role {
         }
 
         public Response_Role update(RequestRoleUpdate requestRoleUpdate, Integer accountID) {
+                Response_Role roleOld = roleMapper.tResponse_Role(roleRepository.findById(requestRoleUpdate.getId())
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Quyền")));
                 Role role = roleRepository.findById(requestRoleUpdate.getId())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Quyền"));
-                Role roleOld = roleRepository.findById(requestRoleUpdate.getId())
-                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Quyền"));
                 roleMapper.updatRole(role, requestRoleUpdate);
+
                 if (!check(role)) {
                         throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Tên");
                 }
-                Role roleNew = roleRepository.save(role);
-                service_Log.setLog(getClass(), accountID, "INFO", "Role", roleMapper.tResponse_Role(roleNew),
-                                roleMapper.tResponse_Role(roleOld),
+                service_Log.setLog(getClass(), accountID, "INFO", "Role", roleOld,
+                                roleMapper.tResponse_Role(role),
                                 "Cập nhật quyền");
+                Role roleNew = roleRepository.save(role);
+
                 return roleMapper.tResponse_Role(roleNew);
         }
 

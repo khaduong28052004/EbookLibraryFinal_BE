@@ -132,9 +132,7 @@ public class Service_CategorySeller {
 
         public Response_Category update(
                         Request_CategoryUpdate request_Category, Integer accountID) {
-                Category categoryOle = categoryRepository.findById(request_Category.getId())
-                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
-                                                "Account"));
+                Category categoryOle = categoryRepository.findById(request_Category.getId()).get();
                 return Optional.of(request_Category)
                                 .map(categoryMapper::categoryUpdate)
                                 .map(category -> {
@@ -144,16 +142,17 @@ public class Service_CategorySeller {
                                         return category;
                                 })
                                 .filter(this::checkCategory)
-                                .map(categoryRepository::saveAndFlush)
                                 .map(category -> {
                                         if (accountID != null) {
                                                 service_Log.setLog(getClass(), accountID, "INFO",
-                                                                "Category", categoryMapper.response_Category(categoryOle),
+                                                                "Category",
+                                                                categoryMapper.response_Category(categoryOle),
                                                                 categoryMapper.response_Category(category),
                                                                 "Cập nhật thể loại");
                                         }
                                         return category;
                                 })
+                                .map(categoryRepository::saveAndFlush)
                                 .map(categoryMapper::response_Category)
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Tên danh mục đã tồn tại"));
         }

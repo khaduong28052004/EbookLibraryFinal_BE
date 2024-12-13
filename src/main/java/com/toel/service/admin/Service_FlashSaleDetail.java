@@ -88,26 +88,23 @@ public class Service_FlashSaleDetail {
         }
 
         public Response_FlashSaleDetail update(Resquest_FlashSaleDetailsUpdate entity, Integer accountID) {
-                FlashSaleDetail flashSaleDetailOld = flashSaleDetailRepository.findById(entity.getId())
-                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSaleDetail"));
-                FlashSale flashSale = flashSaleRepository.findById(entity.getFlashSale())
-                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Flash sale"));
-                Product product = productRepository.findById(entity.getProduct())
-                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Product"));
+                Response_FlashSaleDetail flashSaleDetailOld = flashSaleDetailsMapper
+                                .toFlashSaleDetail(flashSaleDetailRepository.findById(entity.getId())
+                                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
+                                                                "FlashSaleDetail")));
                 FlashSaleDetail flashSaleDetail = flashSaleDetailRepository.findById(entity.getId())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSaleDetail"));
                 flashSaleDetailsMapper.toFlashSaleDetailUpdate(flashSaleDetail, entity);
-                flashSaleDetail.setFlashSale(flashSale);
-                flashSaleDetail.setProduct(product);
- 
-                System.out.println("flashSaleOle: ==================================================="+ flashSaleDetailOld.getQuantity());
-                System.out.println("flashSaleNew: ==================================================="+ entity.getQuantity());
 
+                flashSaleDetail.setFlashSale(flashSaleRepository.findById(entity.getFlashSale())
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Flash sale")));
+                flashSaleDetail.setProduct(productRepository.findById(entity.getProduct())
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Product")));
                 service_Log.setLog(getClass(), accountID, "INFO", "FlashSaleDetails",
-                                flashSaleDetailsMapper.toFlashSaleDetail(flashSaleDetailOld),
+                                flashSaleDetailOld,
                                 flashSaleDetailsMapper.toFlashSaleDetail(flashSaleDetail),
                                 "Cập nhật chi tiết flash sale");
-                                FlashSaleDetail flashsaledetailsNew = flashSaleDetailRepository.saveAndFlush(flashSaleDetail);
+                FlashSaleDetail flashsaledetailsNew = flashSaleDetailRepository.saveAndFlush(flashSaleDetail);
                 return flashSaleDetailsMapper.toFlashSaleDetail(flashsaledetailsNew);
         }
 

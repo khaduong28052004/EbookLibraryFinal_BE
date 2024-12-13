@@ -73,17 +73,17 @@ public class Service_FlashSale {
         }
 
         public Response_FlashSale update(Request_FlashSaleUpdate flashSaleUpdate, Integer accountID) {
+                Response_FlashSale entityOld = flashSaleMapper.tResponse_FlashSale(flashSaleRepository
+                                .findById(flashSaleUpdate.getId())
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSale")));
                 FlashSale entity = flashSaleRepository.findById(flashSaleUpdate.getId())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSale"));
-                FlashSale entityOld = flashSaleRepository.findById(flashSaleUpdate.getId())
-                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSale"));
-                Account account = accountRepository.findById(flashSaleUpdate.getAccount())
-                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
                 flashSaleMapper.toFlashSaleUpdate(entity, flashSaleUpdate);
-                entity.setAccount(account);
+                entity.setAccount(accountRepository.findById(flashSaleUpdate.getAccount())
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
                 FlashSale flashSaleNew = flashSaleRepository.save(entity);
                 service_Log.setLog(getClass(), accountID, "INFO", "FlashSale",
-                                flashSaleMapper.tResponse_FlashSale(entityOld),
+                                entityOld,
                                 flashSaleMapper.tResponse_FlashSale(flashSaleNew),
                                 "Cập nhật Flash sale");
                 return flashSaleMapper.tResponse_FlashSale(flashSaleNew);

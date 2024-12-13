@@ -72,8 +72,10 @@ public class Service_DiscountRate {
     public Response_DiscountRate update(Request_DiscountRateUpdate discountRateUpdate, Integer accountID) {
         DiscountRate entity = discountRateRepository.findById(discountRateUpdate.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Chiết khấu"));
-        DiscountRate entityOld = discountRateRepository.findById(discountRateUpdate.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Chiết khấu"));
+        Response_DiscountRate entityOld = discountRateMapper
+                .tochChietKhauResponse(discountRateRepository.findById(discountRateUpdate.getId())
+                        .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Chiết khấu")));
+
         DiscountRate discountRateNow = discountRateRepository.findLatestDiscountRate().get(0);
         if (discountRateNow.getDiscount() == discountRateUpdate.getDiscount()) {
             throw new AppException(ErrorCode.OBJECT_ACTIVE, "Mức chiết khấu");
@@ -101,9 +103,7 @@ public class Service_DiscountRate {
                     emailToNameMap,
                     formattedDate,
                     entity.getDiscount().toString() + " %");
-            service_Log.setLog(getClass(), accountID, "INFO", "DiscountRate", discountRateMapper
-                    .tochChietKhauResponse(entityOld),
-                    dResponse_DiscountRate,
+            service_Log.setLog(getClass(), accountID, "INFO", "DiscountRate", entityOld, dResponse_DiscountRate,
                     "Cập nhật chiết khấu");
             return dResponse_DiscountRate;
         } else {
