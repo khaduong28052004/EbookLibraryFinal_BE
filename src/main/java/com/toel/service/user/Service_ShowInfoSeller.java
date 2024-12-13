@@ -1,12 +1,16 @@
 package com.toel.service.user;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.google.api.Http;
 import com.toel.dto.user.resquest.Request_ReportShop_DTO;
@@ -14,8 +18,13 @@ import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
 import com.toel.model.Account;
 import com.toel.model.AccountReport;
+import com.toel.model.Evalue;
+import com.toel.model.ImageAccountReport;
+import com.toel.model.ImageEvalue;
 import com.toel.repository.AccountRepository;
+import com.toel.repository.ImageAccountReportReposity;
 import com.toel.repository.ReportRepository;
+import com.toel.service.firebase.UploadImage;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -25,6 +34,10 @@ public class Service_ShowInfoSeller {
     AccountRepository accountRepository;
     @Autowired
     private ReportRepository reportRepository;
+    @Autowired
+    UploadImage firebaseUploadImages;
+    @Autowired
+    ImageAccountReportReposity imageAccountReport;
 
     public Map<String, Object> createReportShop(Request_ReportShop_DTO reportDTO) {
         Map<String, Object> response = new HashMap<>();
@@ -51,11 +64,12 @@ public class Service_ShowInfoSeller {
         Date createAt = reportDTO.getCreateAt() == null ? null : reportDTO.getCreateAt();
         String title = reportDTO.getTitle() == null ? "" : reportDTO.getTitle();
 
-        System.out.println("accountIdval " + accountId);
-        System.out.println("shopIdval " + shopId);
-        System.out.println("contentval " + content);
-        System.out.println("createAtval " + createAt);
-        System.out.println("titleval " + title);
+        System.out.println("accountId: " + reportDTO.getAccountId());
+        System.out.println("shopId: " + reportDTO.getShopId());
+        System.out.println("content: " + reportDTO.getContent());
+        System.out.println("createAt: " + reportDTO.getCreateAt());
+        System.out.println("title: " + reportDTO.getTitle());
+        System.out.println("images: " + Arrays.toString(reportDTO.getImages()));
 
         if (!accountRepository.existsById(accountId) || accountId == null) {
             throw new AppException(ErrorCode.OBJECT_SETUP, "Tài khoản đang sử dụng không tồn tại");
@@ -85,12 +99,48 @@ public class Service_ShowInfoSeller {
         newReport.setAccount(account);
         newReport.setShop(shop);
         newReport.setContent(reportDTO.getContent());
-        System.out.println("reportDTO.getCreateAt()" + reportDTO.getCreateAt());
         newReport.setCreateAt(reportDTO.getCreateAt());
         newReport.setStatus(reportDTO.isStatus());
         newReport.setTitle(reportDTO.getTitle());
         reportRepository.save(newReport);
+
+        if (reportDTO.getImages() != null) {
+            List<ImageAccountReport> imageEvalues = saveImages(reportDTO.getImages(), newReport);
+            newReport.setImageAccountReports(imageEvalues);
+            reportRepository.save(newReport);
+        }
+
         return newReport;
+    }
+
+    private List<ImageAccountReport> saveImages(MultipartFile[] imageFiles, AccountReport report) {
+        List<ImageAccountReport> imagesAccountReport = new ArrayList<>();
+
+        for (MultipartFile imageFile : imageFiles) {
+            if (!imageFile.isEmpty()) {
+                try {
+                    String imageFirebaseURL = firebaseUploadImages.uploadFile("report",
+                            imageFile);
+                    if (imageFirebaseURL == null || imageFirebaseURL.isEmpty()) {
+                        throw new AppException(ErrorCode.OBJECT_SETUP,
+                                "Failed to upload image to Firebase: " + imageFile.getOriginalFilename());
+                    }
+
+                    ImageAccountReport imageReport = new ImageAccountReport();
+                    imageReport.setSrc(imageFirebaseURL);
+                    imageReport.setAccountReport(report);
+                    imageAccountReport.saveAndFlush(imageReport);
+
+                    imagesAccountReport.add(imageReport);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new AppException(ErrorCode.OBJECT_SETUP,
+                            "Error processing image: " + imageFile.getOriginalFilename(), e);
+                }
+            }
+        }
+
+        return imagesAccountReport;
     }
 
 }

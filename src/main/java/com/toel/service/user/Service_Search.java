@@ -21,7 +21,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.toel.dto.admin.response.Response_SearchAudio;
 import com.toel.dto.user.response.Response_Product;
+import com.toel.dto.user.response.Response_Search;
 import com.toel.mapper.user.ProductMaperUser;
 import com.toel.model.Category;
 import com.toel.model.Product;
@@ -168,7 +170,7 @@ public class Service_Search {
 
 	}
 
-	public PageImpl<?> searchAudio(String search, Integer page, Integer size) {
+	public Response_Search<?> searchAudio(String search, Integer page, Integer size) {
 		String normalizedSearch = normalizeString(search);
 		LocalDate startDate = null;
 		LocalDate endDate = null;
@@ -176,8 +178,10 @@ public class Service_Search {
 		boolean thoigian = false;
 		String sortKey = "";
 		String option = null;
+		PageImpl<Response_SearchAudio> listAudio = new PageImpl<>(new ArrayList<>());
 		Pageable pageable = PageRequest.of(page, size, Sort.by(Direction.DESC, "id"));
-		Page<Product> pageProduct;
+		Page<Product> pageProduct = null;
+		List<Category> listCategories = new ArrayList<>();
 
 		if (normalizedSearch.contains("san pham ") || normalizedSearch.contains("sach")) {
 
@@ -252,25 +256,55 @@ public class Service_Search {
 
 			// Gọi service và trả về dữ liệu
 			if (thoigian) {
-				return service_ThongKe_Product.get_Search_Product(
+				listAudio = service_ThongKe_Product.get_Search_Product(
 						java.sql.Date.valueOf(startDate),
 						java.sql.Date.valueOf(endDate), option, null, page, size, true, sortKey);
 			} else if (option != null) {
-				return service_ThongKe_Product.get_Search_Product(null,
+				listAudio = service_ThongKe_Product.get_Search_Product(null,
 						null, option, null, page, size, true, sortKey);
 			} else {
 				pageProduct = productRepository.selectAllMatchingKey(search, null,
 						pageable);
 			}
 		} else {
+			listAudio = new PageImpl<>(new ArrayList<>()); // Khởi tạo một PageImpl rỗng nếu không có dữ liệu
 			pageProduct = productRepository.selectAllMatchingKey(search, null,
 					pageable);
 
 		}
-		List<Response_Product> list = pageProduct.stream()
-				.map(Product -> productMaperUser.productToResponse_Product(Product))
-				.collect(Collectors.toList());
-		return new PageImpl<>(list, pageable, pageProduct.getTotalElements());
+
+		// Xử lý dữ liệu trả về
+		if (listAudio != null && !listAudio.getContent().isEmpty()) {
+			Response_Search<Response_SearchAudio> responseSearch = new Response_Search<>();
+
+			for (Response_SearchAudio audio : listAudio.getContent()) {
+				// if (audio.getCategory() != null && !listCategories.stream().anyMatch(c -> c.getId().equals(audio.getCategory().getId()))) {
+					if (audio.getCategory() != null && !listCategories.contains(audio.getCategory())) {	
+				listCategories.add(audio.getCategory());
+				}
+			}
+			responseSearch.setProduct(listAudio);
+			responseSearch.setCategories(listCategories);
+			return responseSearch;
+		} else if (pageProduct != null && !pageProduct.getContent().isEmpty()) {
+			Response_Search<Response_Product> responseSearch = new Response_Search<>();
+			List<Response_Product> list = pageProduct.stream()
+					.map(product -> productMaperUser.productToResponse_Product(product))
+					.collect(Collectors.toList());
+			for (Product product : pageProduct.getContent()) {
+				// if (product.getCategory() != null && !listCategories.stream().anyMatch(c -> c.getId().equals(product.getCategory().getId()))) {
+				    if (product.getCategory() != null && !listCategories.contains(product.getCategory())) {
+	
+				listCategories.add(product.getCategory());
+				}
+			}
+			PageImpl<Response_Product> pageImpl = new PageImpl<>(list, pageable, pageProduct.getTotalElements());
+			responseSearch.setProduct(pageImpl);
+			responseSearch.setCategories(listCategories);
+			return responseSearch;
+		} else {
+			return null;
+		}
 	}
 
 	// Hàm lấy số sau từ khóa

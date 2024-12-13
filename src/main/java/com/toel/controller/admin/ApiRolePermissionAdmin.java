@@ -26,16 +26,19 @@ public class ApiRolePermissionAdmin {
     Service_RolePermission service_RolePermission;
 
     @PostMapping
-    public ApiResponse<List<Response_RolePermission>> create(@RequestBody @Valid Request_RolePermissionCreate entity) {
+    public ApiResponse<List<Response_RolePermission>> create(
+            @RequestParam(value = "accountID", required = false) Integer account,
+            @RequestBody @Valid Request_RolePermissionCreate entity) {
         return ApiResponse.<List<Response_RolePermission>>build()
                 .message("Thêm quyền thành công")
-                .result(service_RolePermission.create(entity));
+                .result(service_RolePermission.create(entity, account));
     }
 
     @DeleteMapping
     public ApiResponse<Response_RolePermission> delete(
+            @RequestParam(value = "accountID", required = false) Integer account,
             @RequestParam(value = "id", required = false) Integer id) {
-        service_RolePermission.delete(id);
+        service_RolePermission.delete(id, account);
         return ApiResponse.<Response_RolePermission>build()
                 .message("Xóa quyền thành công");
     }

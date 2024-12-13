@@ -25,6 +25,7 @@ import com.toel.model.Product;
 import com.toel.repository.FlashSaleDetailRepository;
 import com.toel.repository.FlashSaleRepository;
 import com.toel.repository.ProductRepository;
+import com.toel.util.log.LogUtil;
 
 @Service
 public class Service_FlashSaleDetail {
@@ -38,6 +39,8 @@ public class Service_FlashSaleDetail {
     ProductRepository productRepository;
     @Autowired
     ProductMapper productMapper;
+    @Autowired
+    LogUtil service_Log;
 
     public PageImpl<?> getAll(String search, int page, int size, Boolean sortBy, String column, Boolean status,
             Integer idFlashSale) {
@@ -68,7 +71,7 @@ public class Service_FlashSaleDetail {
         return new PageImpl<>(list, pageable, pageItems.getTotalElements());
     }
 
-    public Response_FlashSaleDetail create(Resquest_FlashSaleDetailsCreate entity) {
+    public Response_FlashSaleDetail create(Resquest_FlashSaleDetailsCreate entity, Integer accountID) {
         FlashSale flashSale = flashSaleRepository.findById(entity.getFlashSale())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Flash sale"));
         Product product = productRepository.findById(entity.getProduct())
@@ -76,25 +79,38 @@ public class Service_FlashSaleDetail {
         FlashSaleDetail flashSaleDetail = flashSaleDetailsMapper.toFlashSaleDetailCreate(entity);
         flashSaleDetail.setFlashSale(flashSale);
         flashSaleDetail.setProduct(product);
-        return flashSaleDetailsMapper.toFlashSaleDetail(flashSaleDetailRepository.saveAndFlush(flashSaleDetail));
+        FlashSaleDetail flashsaledetailsNew = flashSaleDetailRepository.saveAndFlush(flashSaleDetail);
+        service_Log.setLog(getClass(), accountID, "INFO", "FlashSaleDetails",
+                flashSaleDetailsMapper.toFlashSaleDetail(flashsaledetailsNew), null,
+                "Thêm chi tiết flash sale");
+        return flashSaleDetailsMapper.toFlashSaleDetail(flashsaledetailsNew);
     }
 
-    public Response_FlashSaleDetail update(Resquest_FlashSaleDetailsUpdate entity) {
+    public Response_FlashSaleDetail update(Resquest_FlashSaleDetailsUpdate entity, Integer accountID) {
         FlashSale flashSale = flashSaleRepository.findById(entity.getFlashSale())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Flash sale"));
         Product product = productRepository.findById(entity.getProduct())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Product"));
         FlashSaleDetail flashSaleDetail = flashSaleDetailRepository.findById(entity.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSaleDetail"));
+        FlashSaleDetail flashSaleDetailOld = flashSaleDetailRepository.findById(entity.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSaleDetail"));
         flashSaleDetailsMapper.toFlashSaleDetailUpdate(flashSaleDetail, entity);
         flashSaleDetail.setFlashSale(flashSale);
         flashSaleDetail.setProduct(product);
-        return flashSaleDetailsMapper.toFlashSaleDetail(flashSaleDetailRepository.saveAndFlush(flashSaleDetail));
+        FlashSaleDetail flashsaledetailsNew = flashSaleDetailRepository.saveAndFlush(flashSaleDetail);
+        service_Log.setLog(getClass(), accountID, "INFO", "FlashSaleDetails",
+                flashSaleDetailsMapper.toFlashSaleDetail(flashSaleDetailOld),
+                flashSaleDetailsMapper.toFlashSaleDetail(flashsaledetailsNew),
+                "Cập nhật chi tiết flash sale");
+        return flashSaleDetailsMapper.toFlashSaleDetail(flashsaledetailsNew);
     }
 
-    public void delete(Integer id) {
+    public void delete(Integer id, Integer accountID) {
         FlashSaleDetail entity = flashSaleDetailRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Không tìm thấy FlashSaleDetail"));
+        service_Log.setLog(getClass(), accountID, "INFO", "FlashSaleDetails", entity, null,
+                "Xóa chi tiết flash sale");
         flashSaleDetailRepository.delete(entity);
     }
 }

@@ -132,20 +132,31 @@ public class Account {
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<Log> logs;
-	// 15 pending request
-	@JsonIgnore
-	@OneToMany(mappedBy = "account")
-	List<PendingRequest> pendingRequests;
-	// 16 flash sale
+	// 15 flash sale
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<FlashSale> flashSales;
 
+	// 16 categories
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<Category> categories;
 
+	// 17 deviceId
+	@JsonIgnore
+	@OneToMany(mappedBy = "account")
+	List<DeviceId> deviceIds;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "account")
+	List<Platform> platforms;
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
 	List<ProductReport> productReports;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "account")
+	List<Token> tokens;
+
 }

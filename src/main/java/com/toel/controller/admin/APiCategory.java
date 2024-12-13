@@ -65,22 +65,25 @@ public class APiCategory {
 
         @PutMapping
         public ApiResponse<Response_Category> put(
+                @RequestParam(value = "accountID", required = false) Integer account,
                         @RequestBody @Valid Request_CategoryUpdate request_Category) {
                 if (!checkNameUpdate(request_Category.getName(), request_Category.getId())) {
                         throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Tên danh mục");
                 }
                 return ApiResponse.<Response_Category>build()
                                 .message("Cập nhật danh mục thành công")
-                                .result(service_CategorySeller.update(request_Category));
+                                .result(service_CategorySeller.update(request_Category,account));
         }
 
         @DeleteMapping
-        public ApiResponse<Response_Category> delete(@RequestParam(value = "id", required = false) Integer id) {
+        public ApiResponse<Response_Category> delete(
+                        @RequestParam(value = "accountID", required = false) Integer account,
+                        @RequestParam(value = "id", required = false) Integer id) {
                 Integer count = categoryRepository.findALlByIdParent(id).size();
                 if (count > 0) {
                         throw new AppException(ErrorCode.OBJECT_ACTIVE, "Danh mục");
                 }
-                service_CategorySeller.delete(id);
+                service_CategorySeller.delete(id,account);
                 return ApiResponse.<Response_Category>build()
                                 .message("Xóa thành công");
         }

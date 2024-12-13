@@ -1,6 +1,7 @@
 package com.toel.controller.auth;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,8 +14,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.toel.dto.ChangePassOtp;
-import com.toel.exception.AppException;
-import com.toel.exception.ErrorCode;
 import com.toel.model.Account;
 import com.toel.repository.AccountRepository;
 import com.toel.service.ServiceToel;
@@ -52,23 +51,23 @@ public class OtpController {
         String userId = "user123";
         Map<String, Object> userData = new HashMap<>();
         userData.put("interestList", List.of("item_1", "item_2", "item_3"));
+        userData.put("data", Arrays.asList("light", "bell", "rack"));
         // userData.put("name", "John Doe");
         // userData.put("email", "john@example.com");
         otpService1.saveUserData(userId, userData);
         System.out.println("User data saved successfully");
-
         return entity;
     }
 
     @PostMapping("/api/v1/user/canhanhoa")
     public String Adddata() {
-        // TODO: process POST request
-        List<String> list = new ArrayList<>();
+        List<String> list = new  ArrayList<>();
         list.add(0, "chao");
         otpService1.setData("1", list);
         return "entity";
     }
 
+    // "/api/v1/otp/generate"
     @PostMapping("/api/v1/otp/generate")
     public ResponseEntity<String> generateOtp(@RequestBody Account entity) {
         System.out.println("email" + entity.getEmail());

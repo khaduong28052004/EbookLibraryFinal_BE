@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.user.resquest.Request_Bill_User;
+import com.toel.model.Account;
 import com.toel.model.Bill;
 import com.toel.repository.BillRepository;
 import com.toel.service.Email.EmailService;
@@ -51,7 +52,17 @@ public class ApiBillUser {
 	public ResponseEntity<Map<String, Object>> cancelOrderByBill(@PathVariable("billId") Integer billId) {
 		Map<String, Object> response = new HashMap<>();
 		try {
+
 			service_Bill_User.cancelBill(billId);
+
+			// Bill bill = billRepository.findById(billId).get();
+			// Account user = bill.getAccount();
+			// if (service_Bill_User.checkAndBlockUsers(user.getId()) == 2) {
+			// response.put("checkCancel",
+			// "Bạn đã hủy đơn quá nhiều lần trong hôm nay. Nếu tiếp tục, tài khoản của bạn
+			// có thế bị khóa");
+			// }
+
 			response.put("message", "Hủy đơn thành công");
 			response.put("status", "successfully");
 			return ResponseEntity.ok(response);

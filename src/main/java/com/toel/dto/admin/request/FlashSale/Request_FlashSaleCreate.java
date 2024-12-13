@@ -3,6 +3,7 @@ package com.toel.dto.admin.request.FlashSale;
 import java.time.LocalDateTime;
 
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Request_FlashSaleCreate {
-    @NotNull(message = "FIELD_REQUIRED")
+    @NotBlank(message = "FIELD_REQUIRED")
     private String title;
     @NotNull(message = "FIELD_REQUIRED")
     @Future(message = "FIELD_INVALID_FUTURE_DATE")

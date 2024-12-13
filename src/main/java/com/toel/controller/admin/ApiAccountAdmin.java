@@ -79,21 +79,24 @@ public class ApiAccountAdmin {
     }
 
     @PostMapping("adminv1")
-    public ApiResponse<Response_Account> post(@RequestBody @Valid Request_AccountCreate entity) {
+    public ApiResponse<Response_Account> post(
+            @RequestBody @Valid Request_AccountCreate entity,
+            @RequestParam(value = "accountID", required = false) Integer account) {
         String message = checkName(entity.getUsername(), entity.getPhone(), entity.getEmail());
         if (message != null) {
             throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, message);
         }
         return ApiResponse.<Response_Account>build()
-                .result(service_Account.create(entity))
+                .result(service_Account.create(entity, account))
                 .message("Thêm nhân viên thành công");
     }
 
     @PutMapping
     public ApiResponse<Response_Account> putStatus(
+            @RequestParam(value = "accountID", required = false) Integer account,
             @RequestParam(value = "id", required = false) Integer id,
             @RequestParam(value = "contents", required = false) String contents) {
-        Response_Account entity = service_Account.updateStatus(id, contents);
+        Response_Account entity = service_Account.updateStatus(id, contents, account);
         return ApiResponse.<Response_Account>build()
                 .result(entity)
                 .message(entity.isStatus() ? "Khôi phục hoạt động thành công"
@@ -102,10 +105,11 @@ public class ApiAccountAdmin {
 
     @PutMapping("seller/browse")
     public ApiResponse<Response_Account> putActive(
+            @RequestParam(value = "accountID", required = false) Integer account,
             @RequestParam(value = "id", required = false) Integer id,
             @RequestParam(value = "status", required = false) Boolean status,
             @RequestParam(value = "contents", required = false) String contents) {
-        Response_Account entity = service_Account.updateActive(id, status, contents);
+        Response_Account entity = service_Account.updateActive(id, status, contents, account);
         return ApiResponse.<Response_Account>build()
                 .message(status ? "Duyệt thành công" : "Hủy thành công")
                 .result(entity);

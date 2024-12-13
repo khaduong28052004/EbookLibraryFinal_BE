@@ -3,28 +3,23 @@ package com.toel.controller.seller;
 import java.util.Date;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
-import com.toel.dto.admin.request.Account.Request_AccountCreateOTP;
-import com.toel.dto.admin.response.Response_ProductListFlashSale;
 import com.toel.dto.seller.response.Response_InforSeller;
 import com.toel.dto.seller.response.Response_Like;
-import com.toel.dto.seller.response.Response_Product;
 import com.toel.dto.seller.response.Response_ProductInfo;
-import com.toel.dto.user.resquest.Request_Evaluate_User;
 import com.toel.dto.user.resquest.Request_ReportShop_DTO;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
@@ -37,7 +32,6 @@ import com.toel.model.BillDetail;
 import com.toel.model.Evalue;
 import com.toel.model.FlashSale;
 import com.toel.model.FlashSaleDetail;
-import com.toel.model.ImageProduct;
 import com.toel.model.Like;
 import com.toel.model.OrderStatus;
 import com.toel.model.Product;
@@ -56,11 +50,10 @@ import com.toel.repository.OrderStatusRepository;
 import com.toel.repository.ProductRepository;
 import com.toel.repository.TypeVoucherRepository;
 import com.toel.repository.VoucherRepository;
+import com.toel.service.auth.OtpService1;
 import com.toel.service.user.FollowerService;
 import com.toel.service.user.Service_SelectAllProductHome;
 import com.toel.service.user.Service_ShowInfoSeller;
-
-import jakarta.validation.Valid;
 
 import jakarta.validation.Valid;
 
@@ -69,6 +62,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -335,7 +329,6 @@ public class ApiShowInformationSeller {
 
     @PostMapping("/api/v1/user/topLikeProducts1")
     public ApiResponse<?> thichNhieu(@RequestBody Map<String, String> body) {
-        // TODO: process POST request
         List<Like> listLike = likeRepository.findAll();
         List<Response_Like> responeLike = likeMapper.mapToResponseLikeList(listLike);
         List<Integer> idproduct = new ArrayList<>();
@@ -430,6 +423,46 @@ public class ApiShowInformationSeller {
 
     }
 
+    @Autowired
+    private OtpService1 otpService1;
+
+    /**
+     * @param behavior
+     *                 user_id
+     *                 product_id
+     *                 action_type
+     *                 action_time
+     *                 device
+     *                 loaction
+     * @return
+     */
+    @PostMapping("/api/v1/user/track-action")
+    public ResponseEntity<?> trackAction() {
+        // userBehaviorService.saveUserBehavior(behavior);
+        int userid = 1;
+        String userID = String.valueOf(userid);
+        // Map<String, Object> userData = new HashMap();
+        // userData.put("action_type", List.of("view", "seach", "mau","as"));
+        // userData.put("action_time", "con cặt nè");
+        // userData.put("product_id", "userData");
+        // otpService1.saveUserData(userID, userData);
+        // otpService1.storeUserBehavior(userid, userid, userID, null, userID, userID);
+        otpService1.storeUserBehavior("1001L", "5001L", "VIEW", "mobile", "New York");
+        // List<Product> lisProducts = recommendationService.recommendProducts(userId);
+        // }
+        return ResponseEntity.ok("Action tracked successfully");
+    }
+
+    @GetMapping("/api/v1/user/getlist1")
+    public List<Map<String, Object>> getMethodName1dad() {
+        // user123
+        // Map<String, Object> retrievedData = otpService1.getUserData(param);
+        // retrievedData.
+        List<Map<String, Object>> list = otpService1.getUserBehavior("1001L");
+        return list;
+
+    }
+
     @RequestMapping("api/v1/user/shop/selectall")
     public ApiResponse<Map<String, Object>> selectAll(
             @RequestParam(name = "id_Shop", defaultValue = "0") Integer id_Shop,
@@ -454,11 +487,11 @@ public class ApiShowInformationSeller {
     }
 
     @PostMapping("api/v1/user/shop/createReport")
-    public ResponseEntity<Map<String, Object>> createReportShop(@Valid @RequestBody Request_ReportShop_DTO reportDTO,
+    public ResponseEntity<Map<String, Object>> createReportShop(
+            @Valid @ModelAttribute Request_ReportShop_DTO reportDTO,
             BindingResult bindingResult) {
         Map<String, Object> response = serviceShowInfoSeller.createReportShop(reportDTO);
         return ResponseEntity.ok(response);
-
     }
 
     // @PostMapping("/api/v1/user/send-otpe")

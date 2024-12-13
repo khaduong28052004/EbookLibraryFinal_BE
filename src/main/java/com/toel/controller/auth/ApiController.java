@@ -88,7 +88,6 @@ public class ApiController {
     EmailService emailService;
     @Autowired
     InfobipService infobipService;
-
     @Autowired
     private OtpService otpService;
     @Autowired
@@ -115,6 +114,9 @@ public class ApiController {
             if (ACCOUNTIgnoreCase == null) {
                 return ApiResponse.<String>build().code(1001).message("Tài khoản không tồn tại!").result(null);
             }
+            if (!ACCOUNTIgnoreCase.isStatus()) {
+                return ApiResponse.<String>build().code(1001).message("Tài khoản đã bị khóa!").result(null);
+            }
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(),
                             authRequestDTO.getPassword()));
@@ -138,7 +140,7 @@ public class ApiController {
                                 .accessToken(token)
                                 .username(account.getUsername())
                                 .id_account(account.getId())
-                                .avatar(null)
+                                .avatar(account.getAvatar())
                                 .roles(role.getName())
                                 .Permission(dtos)
                                 .fullname(account.getFullname())
@@ -176,7 +178,6 @@ public class ApiController {
             String newToken = jwtService.GenerateToken(username, map);
             return ResponseEntity.ok(newToken);
         }
-
         return ResponseEntity.noContent().build(); // Không cần gia hạn
     }
 
@@ -191,25 +192,18 @@ public class ApiController {
             String newToken = jwtService.GenerateToken(username, map); // Generate a new token
             System.out.println("Generated Token: " + newToken);
             System.out.println("t o ke=====:" + jwtService.isTokenExpired(accessToken));
-            //
-
             Role role = account.getRole();
             List<RolePermission> permissions = rolesPermissionRepository.findByRole(role); // Ensure this retrieves
-
             List<PermissionDTO> dtos = permissions.stream()
                     .map(pr -> new PermissionDTO(
                             pr.getId(),
                             pr.getPermission().getDescription(),
                             pr.getPermission().getCotSlug()))
-                    .collect(Collectors.toList());
-
-            // Map<String, Object> map = new HashMap<>(); // Infor mation to include in the
-            // JWT
+                    .collect(Collectors.toList()); // Map<String, Object> map = new HashMap<>(); // Infor mation to
+                                                   // include in the
             String token = jwtService.GenerateToken(account.getUsername(), map);
             System.out.println("Generated Token: " + token); // Debugging log
-
-            // Return the JWT response
-            return ResponseEntity.ok(JwtResponseDTO.builder()
+            return ResponseEntity.ok(JwtResponseDTO.builder() // Return the JWT response
                     .accessToken(token)
                     .username(account.getUsername())
                     .id_account(account.getId())
@@ -218,8 +212,7 @@ public class ApiController {
                     .Permission(dtos)
                     .fullname(account.getFullname())
                     .avatar(account.getAvatar())
-                    .build());
-            // return ResponseEntity.ok(newToken);
+                    .build()); // return ResponseEntity.ok(newToken);
         } else {
             return ResponseEntity.badRequest().body("đã hết hạn");
         }
@@ -241,14 +234,12 @@ public class ApiController {
             System.out.println("Generated Token: " + token); // Debugging log
             Role role = account.getRole();
             List<RolePermission> permissions = rolesPermissionRepository.findByRole(role); // Ensure this retrieves
-
             List<PermissionDTO> dtos = permissions.stream()
                     .map(pr -> new PermissionDTO(
                             pr.getId(),
                             pr.getPermission().getDescription(),
                             pr.getPermission().getCotSlug()))
                     .collect(Collectors.toList());
-
             return ResponseEntity.ok(JwtResponseDTO.builder().accessToken(token)
                     .username(account.getUsername())
                     .id_account(account.getId())
@@ -256,8 +247,7 @@ public class ApiController {
                     .roles(role.getName())
                     .Permission(dtos)
                     .build());
-        } else {
-            // return ResponseEntity.ok("Chưa đăng ký tài khoản!");
+        } else { // return ResponseEntity.ok("Chưa đăng ký tài khoản!");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("tài khoản email chưa đăng ký!");
         }
     }
@@ -335,26 +325,30 @@ public class ApiController {
         }
     }
 
-    @PostMapping("/api/v2/user/register") // nhập otp //them moth phân biệt là phone hay email
-    public ApiResponse<?> registerAccountV2(@RequestBody Account entity, @RequestParam String otp) {
+    @PostMapping("/api/v2/user/register") // nhập OTP, phân biệt email hoặc phone
+    public ApiResponse<?> registerAccountV2(@RequestBody Request_AccountCreateOTP entity, @RequestParam String otp) {
         try {
-            // Check if username already exists
             if (accountRepository.existsByUsername(entity.getUsername())) {
-                throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Username ");
+                throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Username already exists.");
             }
-            // Check if email already exists
             if (accountRepository.existsByEmail(entity.getEmail())) {
-                throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Email ");
+                throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Email already exists.");
             }
-            // Verify OTP
-            boolean isValidOtp = otpService.verifyOtp(entity.getEmail(), otp);
+            boolean isValidOtp = false;
+            if ("email".equalsIgnoreCase(entity.getMethod())) {
+                isValidOtp = otpService.verifyOtp(entity.getEmail(), otp); // Kiểm tra OTP cho email
+            } else if ("phone".equalsIgnoreCase(entity.getMethod())) {
+                isValidOtp = otpService.verifyOtp(entity.getPhone(), otp); // Kiểm tra OTP cho phone
+            } else {
+                throw new AppException(ErrorCode.OBJECT_SETUP, "Invalid method. Use 'email' or 'phone'.");
+            }
             if (!isValidOtp) {
-                throw new AppException(ErrorCode.OBJECT_NOT_FOUND, "Invalid OTP");
+                throw new AppException(ErrorCode.OBJECT_NOT_FOUND, "Invalid or expired OTP.");
             }
-            // Fetch default role for the user
+            // Lấy role mặc định
             Role role = roleRepository.findById(4)
-                    .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Role not found"));
-            // Create and save new account
+                    .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Default role not found."));
+            // Tạo tài khoản mới
             Account account = new Account();
             account.setRole(role);
             account.setUsername(entity.getUsername());
@@ -363,28 +357,28 @@ public class ApiController {
             account.setEmail(entity.getEmail());
             account.setCreateAt(new Date());
             account.setStatus(true);
-            account.setAvatar(avatarURL);
+            account.setAvatar(avatarURL); // URL avatar mặc định
             account.setPassword(passwordEncoder.encode(entity.getPassword()));
             accountRepository.save(account);
-            // Send welcome email
+            // Gửi email chào mừng
             emailService.push(
                     entity.getEmail(),
                     "Welcome to Toel Shop!",
                     EmailTemplateType.WELCOME,
                     entity.getFullname());
-            // Return success response
+            // Phản hồi thành công
             return ApiResponse.<String>build()
                     .code(200)
                     .message("Registration successful!")
                     .result("ok");
         } catch (AppException e) {
-            // Return error response for known exceptions
+            // Phản hồi lỗi cho các ngoại lệ đã xác định
             return ApiResponse.<String>build()
                     .code(400)
                     .message(e.getMessage())
                     .result("error");
         } catch (Exception e) {
-            // Handle unexpected exceptions
+            // Phản hồi lỗi cho các ngoại lệ không mong đợi
             return ApiResponse.<String>build()
                     .code(500)
                     .message("An unexpected error occurred: " + e.getMessage())
@@ -407,7 +401,7 @@ public class ApiController {
             throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Số điện thoại");
         }
         // if (accountRepository.existsBySh(entity.getEmail())) {
-        //     throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Số điện thoại");
+        // throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Số điện thoại");
         // }
 
         if ("email".equalsIgnoreCase(entity.getMethod())) {
@@ -418,9 +412,9 @@ public class ApiController {
                     entity.getFullname()); // DANGKYTAIKHOAN
             return ApiResponse.<String>build().message("OTP đã được gửi qua email.").result(otp);
         } else if ("phone".equalsIgnoreCase(entity.getMethod())) {
-            String otp = otpService.generateOtp1(convertPhoneNumber(entity.getPhone()));
+            String otp = otpService.generateOtp1(entity.getPhone());
             try {
-                infobipService.sendSMS(entity.getPhone(), otp);
+                infobipService.sendSMS(convertPhoneNumber(entity.getPhone()), otp);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -430,11 +424,17 @@ public class ApiController {
         }
     }
 
+    @GetMapping("/api/v1/user/testphone/{phone}")
+    public String test(@PathVariable String phone) {
+        // String phone =
+        return convertPhoneNumber(phone);
+    }
+
     public static String convertPhoneNumber(String phoneNumber) {
         // Kiểm tra nếu số điện thoại bắt đầu với '0'
         if (phoneNumber != null && phoneNumber.startsWith("0")) {
             // Cắt '0' đầu tiên và thay thế bằng +84
-            return "+84" + phoneNumber.substring(1);
+            return "84" + phoneNumber.substring(1);
         }
         // Nếu số điện thoại không bắt đầu bằng '0', trả về chính nó
         return phoneNumber;
@@ -473,3 +473,57 @@ public class ApiController {
     }
 
 }
+
+// @PostMapping("/api/v2/user/register") // nhập otp //them moth phân biệt là
+// phone hay email
+// public ApiResponse<?> registerAccountV2(@RequestBody Account entity,
+// @RequestParam String otp) {
+// try {
+// if (accountRepository.existsByUsername(entity.getUsername())) { // Check if
+// username already exists
+// throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Username ");
+// }
+// if (accountRepository.existsByEmail(entity.getEmail())) { // Check if email
+// already exists
+// throw new AppException(ErrorCode.OBJECT_ALREADY_EXISTS, "Email ");
+// }
+// boolean isValidOtp = otpService.verifyOtp(entity.getEmail(), otp);
+// if (isValidOtp) { // Verify OTP
+// throw new AppException(ErrorCode.OBJECT_NOT_FOUND, "Invalid OTP");
+// }
+// Role role = roleRepository.findById(4) // Fetch default role for the user
+// .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Role not
+// found"));
+// Account account = new Account();
+// account.setRole(role);
+// account.setUsername(entity.getUsername());
+// account.setFullname(entity.getFullname());
+// account.setPhone(entity.getPhone());
+// account.setEmail(entity.getEmail());
+// account.setCreateAt(new Date());
+// account.setStatus(true);
+// account.setAvatar(avatarURL);
+// account.setPassword(passwordEncoder.encode(entity.getPassword()));
+// accountRepository.save(account);
+
+// emailService.push( // Send welcome email
+// entity.getEmail(),
+// "Welcome to Toel Shop!",
+// EmailTemplateType.WELCOME,
+// entity.getFullname());
+// return ApiResponse.<String>build()
+// .code(200)
+// .message("Registration successful!")
+// .result("ok");
+// } catch (AppException e) { // Return error response for known exceptions
+// return ApiResponse.<String>build()
+// .code(400)
+// .message(e.getMessage())
+// .result("error");
+// } catch (Exception e) { // Handle unexpected exceptions
+// return ApiResponse.<String>build()
+// .code(500)
+// .message("An unexpected error occurred: " + e.getMessage())
+// .result("error");
+// }
+// }

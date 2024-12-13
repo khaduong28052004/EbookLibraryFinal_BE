@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.user.response.Response_Product;
+import com.toel.dto.user.response.Response_Search;
 import com.toel.service.user.Service_Search;
 
 @RestController
@@ -52,17 +53,17 @@ public class ApiSearch {
 	}
 
 	@GetMapping("search/audio")
-	public ApiResponse<PageImpl<?>> searchText(
+	public ApiResponse<Response_Search<?>> searchText(
 			@RequestParam("text") String text,
 			@RequestParam(value = "page", defaultValue = "0") Integer page,
 			@RequestParam(value = "size", defaultValue = "9") Integer size) {
 		try {
-			PageImpl<?> pageSearch = service_Search.searchAudio(text, page, size);
-			return ApiResponse.<PageImpl<?>>build()
+			Response_Search<?> pageSearch = service_Search.searchAudio(text, page, size);
+			return ApiResponse.<Response_Search<?>>build()
 					.message("Tìm thành công")
 					.result(pageSearch);
 		} catch (Exception e) {
-			return ApiResponse.<PageImpl<?>>build()
+			return ApiResponse.<Response_Search<?>>build()
 					.message(e.getMessage());
 		}
 
