@@ -15,6 +15,17 @@ public interface UserProductActionsRepository extends JpaRepository<UserProductA
     Optional<UserProductActions> findByUserIdAndProductId(Integer userId, Integer productId);
 
     List<UserProductActions> findByUserId(Integer userId);
+
+    List<UserProductActions> findByLastActionTime(LocalDateTime lastActionTime);
+
+    List<UserProductActions> findByLastActionTimeBetween(LocalDateTime start, LocalDateTime end);
+
+    List<UserProductActions> findByUserIdAndLastActionTime(Integer userId, LocalDateTime lastActionTime);
+
+    List<UserProductActions> findByUserIdAndLastActionTimeBetween(Integer userId, LocalDateTime start, LocalDateTime end);
+
+    
+    
     // Cập nhật số lượng cho hành động cụ thể
     // @Modifying
     // @Query("UPDATE UserProductActions u SET u.viewCount = u.viewCount + :count,

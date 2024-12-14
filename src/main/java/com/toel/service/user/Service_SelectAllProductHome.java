@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Map; 
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -43,11 +43,12 @@ public class Service_SelectAllProductHome {
 	final FollowerRepository followerRepository;
 	final LikeRepository likeRepository;
 	final ProductMaperUser productMaperUser;
+	List<Integer> idProducts = new ArrayList<>();
 
 	public Map<String, Object> selectAll(List<FlashSaleDetail> list, Integer idShop, Integer page, Integer size,
 			String sort) {
 
-		List<Integer> idProducts = list.stream().map(p -> p.getProduct().getId()).collect(Collectors.toList());
+		idProducts.addAll(list.stream().map(p -> p.getProduct().getId()).collect(Collectors.toList()));
 		Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
 		Page<Product> pageProducts = productRepo.findAllIdNotIn(idProducts, idShop, pageable);
 		List<Response_Product> response_Products = new ArrayList<Response_Product>();
@@ -71,8 +72,8 @@ public class Service_SelectAllProductHome {
 
 		// List<Integer> idProducts = list.stream().map(p ->
 		// p.getProduct().getId()).collect(Collectors.toList());
-		Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
-		List<Product> pageProducts = productRepo.findAllIdIn(idShop);
+		Pageable pageable = PageRequest.of(0, size);
+		Page<Product> pageProducts = productRepo.findAllIdIn(idShop, pageable);
 		List<Response_Product> response_Products = new ArrayList<Response_Product>();
 		for (Product product : pageProducts) {
 			if (product.getAccount().getId() == idShop) {
@@ -138,7 +139,32 @@ public class Service_SelectAllProductHome {
 			Account user = accountRepository.findById(id_user).get();
 			listFollowers = followerRepository.findAllByAccount(user);
 			listLikes = likeRepository.findAllByAccount(user);
-			// listProductByBills = productRepo.findAllByBillOfUser(id_user);
+
+			if (listFollowers.size() + listLikes.size() < 8) {
+				List<Integer> ids = new ArrayList<Integer>();
+				ids.addAll(productRepo.findAllByBillOfUser(id_user).stream().map(product -> product.getId())
+						.collect(Collectors.toList()));
+				ids.addAll(listLikes.stream().map(product -> product.getId()).collect(Collectors.toList()));
+
+				for (Follower follow : listFollowers) {
+					Account shop = accountRepository.findById(follow.getShopId()).get();
+					if (shop.isStatus()) {
+						for (Product product : shop.getProducts().subList(0, 1)) {
+							if (product.isActive() && product.isDelete() == false) {
+								ids.add(product.getId());
+							}
+						}
+					}
+//					ids.addAll(productRepo.findAllIdIn(shop.getId()).stream().map(product -> product.getId())
+//							.collect(Collectors.toList()));
+
+				}
+				Pageable pageable = PageRequest.of(0, 8 - (listFollowers.size() + listLikes.size()));
+				List<Integer> listIdProductByBillDetails = productRepo.selectIdBillDetailTopProductNotIds(idProducts,
+						pageable);
+				listProductByBills = productRepo.selectProductInIdProduct(listIdProductByBillDetails);
+			}
+
 		}
 
 		List<Product> listProducts = new ArrayList<>();
@@ -159,7 +185,7 @@ public class Service_SelectAllProductHome {
 				listProducts.add(like.getProduct());
 			}
 		}
-		listIdProduct = listProducts.stream().map(Product::getId).collect(Collectors.toList());
+		listIdProduct.addAll(listProducts.stream().map(Product::getId).collect(Collectors.toList()));
 
 		for (Product product : listProductByBills) {
 			if (!listIdProduct.contains(product.getId())) {
@@ -171,27 +197,8 @@ public class Service_SelectAllProductHome {
 		for (Product product : listProducts.size() > 8 ? listProducts.subList(0, 8)
 				: listProducts.subList(0, listProducts.size())) {
 			listResponse_Products.add(productMaperUser.productToResponse_Product(product));
+			idProducts.add(product.getId());
 		}
 		return listResponse_Products;
 	}
-	// public Map<String, Object> selectTopProductHomeShop(List<FlashSaleDetail>
-	// flashSaleDetails, Integer id_Shop) {
-	// List<Product> pageProducts = productRepo.findTopProductShop(id_Shop);
-	// List<Response_Product> response_Products = new ArrayList<Response_Product>();
-	// for (Product product : pageProducts) {
-	// if (product.getAccount().getId() == id_Shop) {
-	// response_Products.add(productMaper.productToResponse_Product(product));
-	// }
-	// }
-	// Map<String, Object> response = new HashMap<String, Object>();
-	// if (response_Products.size() > 0) {
-	// response.put("datas", response_Products);
-	// // response.put("totalPages", pageProducts.getTotalPages() *
-	// // response_Products.size());
-	// } else {
-	// response.put("error", 1002);
-	// }
-	// return response;
-	// }
-
 }
