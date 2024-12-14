@@ -20,7 +20,7 @@ public class Response_ProductInfo {
     double price;
     double sale;
     String name;
-    String introduce;
+    // String introduce;
     String writerName;
     String publishingCompany;
     Date createAt;
@@ -28,9 +28,9 @@ public class Response_ProductInfo {
     Integer quantity;
     boolean isActive;
     Response_Account account;
-    // Category category;
+    Category category;
     List<Response_ImageProduct> imageProducts;
     // List<Response_FlashSaleDetail> flashSaleDetails;
 }
-    
+
 

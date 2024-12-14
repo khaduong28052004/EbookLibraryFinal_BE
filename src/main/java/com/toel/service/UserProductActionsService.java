@@ -11,6 +11,7 @@ import java.util.Locale.Category;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.springdoc.core.converters.models.Sort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -142,8 +143,15 @@ public class UserProductActionsService {
         // .limit(2)
         List<Product> listProduct = productScores.entrySet().stream()
                 .sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed())
-                .map(entry -> productRepository.findById(entry.getKey()).orElse(null)) // .limit(2)
+                .map(entry -> productRepository.findById(entry.getKey()).orElse(null)).limit(1) // .limit(2)
                 .collect(Collectors.toList());
+        // List<Product> topProducts = productScores.entrySet().stream()
+        //         .sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed()) // Sắp xếp theo điểm số giảm dần
+        //         .limit(10) // Lấy tối đa 10 sản phẩm
+        //         .map(entry -> productRepository.findById(entry.getKey()).orElse(null)) // Lấy sản phẩm từ repository
+        //         .filter(product -> product != null) // Lọc bỏ sản phẩm null (nếu không tìm thấy trong DB)
+        //         .collect(Collectors.toList());
+        System.out.println("size : " + listProduct.size());
         List<Product> listhoatdong = listProduct.stream() // loc san pham product.isDelete() == false // nguoc lai
                 .filter(product -> product.isActive() && product.isDelete() == false)
                 .collect(Collectors.toList());
@@ -231,7 +239,7 @@ public class UserProductActionsService {
         }
         List<Product> listProduct = productScores.entrySet().stream()
                 .sorted(Map.Entry.<Integer, Integer>comparingByValue().reversed())
-                .map(entry -> productRepository.findById(entry.getKey()).orElse(null)) // .limit(2)
+                .map(entry -> productRepository.findById(entry.getKey()).orElse(null)).limit(5) // .limit(2)
                 .collect(Collectors.toList());
 
         List<Product> listhoatdong = listProduct.stream() // loc san pham product.isDelete() == false // nguoc lai
@@ -244,8 +252,11 @@ public class UserProductActionsService {
         LocalDateTime startOfDay = date.toLocalDate().atStartOfDay(); // 00:00:00 của ngày
         LocalDateTime endOfDay = startOfDay.plusDays(1).minusSeconds(1); // 23:59:59 của ngày
         // Lọc ra các hành động xảy ra trong khoảng thời gian này
-        List<UserProductActions> behaviors = actionsRepository.findByUserIdAndLastActionTimeBetween(userId,startOfDay, endOfDay);
-        // List<UserProductActions> behaviors = actionsRepository.findByUserIdAndLastActionTime(userId, date);// get all                                                                                              // UserProductActions
+        List<UserProductActions> behaviors = actionsRepository.findByUserIdAndLastActionTimeBetween(userId, startOfDay,
+                endOfDay);
+        // List<UserProductActions> behaviors =
+        // actionsRepository.findByUserIdAndLastActionTime(userId, date);// get all //
+        // UserProductActions
         Map<Integer, Integer> productScores = new HashMap<>(); // luu do // Map lưu trữ số điểm (trọng số) cho mỗi sp
         // Trọng số cho từng hành động
         final int VIEW_WEIGHT = 1;
@@ -287,14 +298,20 @@ public class UserProductActionsService {
         List<Response_ProductInfo> list = recommendProducts();
         List<com.toel.model.Category> listCategory = new ArrayList<>(); // danh mục in sản phẩm đề xuất
         for (Response_ProductInfo response_ProductInfo : list) {
-            List<com.toel.model.Category> categories = categoryRepository
-                    .findALlByIdAccount(response_ProductInfo.getAccount().getId());
-            listCategory.addAll(categories);
+            // List<com.toel.model.Category> categories = categoryRepository
+            //         .findALlByIdAccount(response_ProductInfo.getAccount().getId());
+            listCategory.add(response_ProductInfo.getCategory());
         }
         listCategory = listCategory.stream() // Loại bỏ trùng lặp danh mục
                 .distinct()
                 .collect(Collectors.toList());
-        List<Product> products = productRepository.findByCategoryIn(listCategory); // pr inin danh mục trong
+        List<Product> products = productRepository.findByCategoryIn(listCategory).stream() // loc san pham product.isDelete() == false // nguoc lai
+        .filter(product -> product.isActive() && product.isDelete() == false)
+        .collect(Collectors.toList());; // pr inin danh mục trong
+
+        List<Product> listhoatdong = products.stream() // loc san pham product.isDelete() == false // nguoc lai
+                .filter(product -> product.isActive() && product.isDelete() == false)
+                .collect(Collectors.toList());
         return productMapper.Response_ProductInfo(products);
     }
 
@@ -327,8 +344,8 @@ public class UserProductActionsService {
                 .collect(Collectors.toList());
         List<Product> products = productRepository.findByCategoryIn(listCategory); // pr inin danh mục trong
         List<Product> listhoatdong = products.stream() // loc san pham product.isDelete() == false // nguoc lai
-        .filter(product -> product.isActive() && product.isDelete() == false)
-        .collect(Collectors.toList());
+                .filter(product -> product.isActive() && product.isDelete() == false)
+                .collect(Collectors.toList());
         return productMapper.Response_ProductInfo(listhoatdong);
     }
 
