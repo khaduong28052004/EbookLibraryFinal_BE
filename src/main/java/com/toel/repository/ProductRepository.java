@@ -142,15 +142,11 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			+ "AND p.account.status = true " + "AND p.id IN ?1")
 	List<Product> selectProductInIdProduct(List<Integer> ids);
 
+	@Query("SELECT p " + "FROM Product p " + "JOIN BillDetail bd ON p.id = bd.product.id "
+			+ "JOIN Bill b ON bd.bill.id = b.id " + "WHERE b IN :bills " + "GROUP BY p.id "
+			+ "ORDER BY SUM(bd.quantity) DESC")
 	List<Product> findTop10ByBillDetails(@Param("bills") List<Bill> bills);
 
-	@Query("SELECT p FROM Product p " +
-			"LEFT JOIN BillDetail bd ON p.id = bd.product.id " +
-			"LEFT JOIN Evalue e ON e.product.id = p.id " +
-			"LEFT JOIN Like l ON l.product.id = p.id " +
-			"WHERE p.isDelete = false AND p.isActive = true " +
-			"GROUP BY p.id " +
-			"ORDER BY CASE " +
 	@Query("SELECT p FROM Product p " + "LEFT JOIN BillDetail bd ON p.id = bd.product.id "
 			+ "LEFT JOIN Evalue e ON e.product.id = p.id " + "LEFT JOIN Like l ON l.product.id = p.id "
 			+ "WHERE p.isDelete = false AND p.isActive = true " + "GROUP BY p.id " + "ORDER BY CASE "
