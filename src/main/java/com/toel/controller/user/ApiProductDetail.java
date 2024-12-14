@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
+import com.toel.service.UserProductActionsService;
 import com.toel.service.user.Service_ProductDetail;
 import com.toel.service.user.Service_RelatedProduct;
 
@@ -22,10 +23,12 @@ public class ApiProductDetail {
 	Service_ProductDetail service_ProductDetail;
 	@Autowired
 	Service_RelatedProduct service_RelatedProduct;
-
+	@Autowired
+    UserProductActionsService userProductActionsService;
 	@GetMapping("product/{idProduct}")
 	public ApiResponse<Map<String, Object>> productDetail(@PathVariable("idProduct") Integer id_Product) {
 		try {
+			userProductActionsService.handleUserAction(null, id_Product, "VIEW");
 			return ApiResponse.<Map<String, Object>>build().message("success")
 					.result(service_ProductDetail.getProduct(id_Product));
 		} catch (Exception e) {
