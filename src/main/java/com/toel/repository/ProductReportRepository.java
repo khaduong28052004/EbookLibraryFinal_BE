@@ -3,6 +3,7 @@ package com.toel.repository;
 import java.util.Date;
 import java.util.List;
 import com.toel.model.Account;
+import com.toel.model.AccountReport;
 import com.toel.model.Product;
 
 import org.springframework.data.domain.Page;
@@ -13,6 +14,8 @@ import com.toel.model.ProductReport;
 
 public interface ProductReportRepository extends JpaRepository<ProductReport, Integer> {
         // Report
+        List<AccountReport> findByAccountId(int accountId);
+        
         Page<ProductReport> findAllByStatus(boolean status, Pageable pageable);
 
         Page<ProductReport> findAllByStatusAndTitleContainingOrContentContaining(boolean status, String title,
