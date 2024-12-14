@@ -226,7 +226,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			"FROM billdetails bd " +
 			"JOIN products p ON bd.product_id = p.id " +
 			"JOIN bills b ON bd.bill_id = b.id " +
-			"WHERE p.isActive = 1 AND p.isDelete = 0 AND p.account_id = ?1 " +
+			"WHERE p.isActive = 1 AND p.isDelete = 0 AND p.account_id = ?1  AND (b.orderstatus_id = 6 OR b.orderstatus_id = 5) "+
 			"GROUP BY p.id " +
 			"ORDER BY SUM(bd.quantity) DESC " +
 			"LIMIT 3", nativeQuery = true)
