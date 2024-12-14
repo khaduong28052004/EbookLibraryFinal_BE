@@ -40,7 +40,6 @@ public interface ProductMapper {
 
 
     List<Response_Product> listResponse_Products(List<Product> products);
-    
     List<Response_ProductListFlashSale> tProductListFlashSale(List<Product> product);
 
 
