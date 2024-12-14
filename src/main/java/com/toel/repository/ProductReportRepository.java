@@ -14,8 +14,8 @@ import com.toel.model.ProductReport;
 
 public interface ProductReportRepository extends JpaRepository<ProductReport, Integer> {
         // Report
-        List<AccountReport> findByAccountId(int accountId);
-        
+  
+
         Page<ProductReport> findAllByStatus(boolean status, Pageable pageable);
 
         Page<ProductReport> findAllByStatusAndTitleContainingOrContentContaining(boolean status, String title,
@@ -31,5 +31,7 @@ public interface ProductReportRepository extends JpaRepository<ProductReport, In
                         Pageable pageable);
 
         List<ProductReport> findByAccountAndProduct(Account user, Product product);
+
+        List<ProductReport> findByAccountId(int accountId);
 
 }
