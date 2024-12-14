@@ -13,20 +13,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.model.AccountReport;
+import com.toel.model.ProductReport;
 import com.toel.service.admin.Service_Account;
 import com.toel.service.admin.Service_AccountReport;
+import com.toel.service.admin.Service_Product;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/v1/reports")
+@RequestMapping("/api/v1")
 public class AccountReportController {
     @Autowired
     private Service_AccountReport accountReportService;
-
     @Autowired
-    private Service_Account accountService;
-
-    @GetMapping("/{accountId}")
+    private Service_Product productReportService;
+    @GetMapping("/reports/{accountId}")
     public ResponseEntity<?> getReportsByAccountId(@PathVariable int accountId) {
         List<AccountReport> reports = accountReportService.getReportsByAccountId(accountId);
         return ResponseEntity.ok(reports);
@@ -36,6 +36,12 @@ public class AccountReportController {
     public ResponseEntity<?> createReport(@RequestBody AccountReport report) {
         AccountReport savedReport = accountReportService.saveReport(report);
         return ResponseEntity.ok(savedReport);
+    }
+// Báo cáo sản phẩm
+    @GetMapping("/reports/product/{accountId}")
+    public ResponseEntity<?> getReportsByProductId(@PathVariable int accountId) {
+        List<ProductReport> reports = productReportService.getReportsByAccountId(accountId);
+        return ResponseEntity.ok(reports);
     }
 }
 

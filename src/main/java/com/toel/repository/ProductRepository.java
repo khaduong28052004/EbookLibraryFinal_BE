@@ -105,7 +105,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			Pageable pageable);
 
 	@Query("SELECT p FROM Product p WHERE p.account.id = :idShop AND p.isActive = true AND p.isDelete=false AND p.account.status = true")
-	List<Product> findAllIdIn(@Param("idShop") Integer idShop);
+	Page<Product> findAllIdIn(@Param("idShop") Integer idShop, Pageable pageable);
 
 	@Query("SELECT p FROM Product p WHERE p.isActive = true AND p.isDelete = false AND p.account.status = true")
 	List<Product> findAllProduct(Sort sort);
@@ -207,6 +207,22 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	@Query("SELECT p FROM Product p WHERE p.category IN :categories")
 	List<Product> findByCategoryIn(@Param("categories") List<Category> categories);
 	
+	
+
+	@Query(value = "SELECT p.* " +
+			"FROM billdetails bd " +
+			"JOIN products p ON bd.product_id = p.id " +
+			"JOIN bills b ON bd.bill_id = b.id " +
+			"WHERE p.isActive = 1 AND p.isDelete = 0 AND p.account_id = ?1  AND (b.orderstatus_id = 6 OR b.orderstatus_id = 5) "+
+			"GROUP BY p.id " +
+			"ORDER BY SUM(bd.quantity) DESC " +
+			"LIMIT 3", nativeQuery = true)
+	List<Product> findTop3ProductsByShopId(Integer idShop);
+
+	List<Product> findByCategory(Category category);
+
+	@Query("SELECT p FROM Product p WHERE p.category IN :categories")
+	List<Product> findByCategoryIn(@Param("categories") List<Category> categories);
 	
 
 }

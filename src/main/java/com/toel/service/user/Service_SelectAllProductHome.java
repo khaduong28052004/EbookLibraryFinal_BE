@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Map; 
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -69,14 +69,14 @@ public class Service_SelectAllProductHome {
 		}
 		return response;
 	}
-	
+
 	public Map<String, Object> selectAllHomeShop(List<FlashSaleDetail> list, Integer idShop, Integer page, Integer size,
 			String sort) {
 
 		// List<Integer> idProducts = list.stream().map(p ->
 		// p.getProduct().getId()).collect(Collectors.toList());
-		Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
-		List<Product> pageProducts = productRepo.findAllIdIn(idShop);
+		Pageable pageable = PageRequest.of(0, size);
+		Page<Product> pageProducts = productRepo.findAllIdIn(idShop, pageable);
 		List<Response_Product> response_Products = new ArrayList<Response_Product>();
 		for (Product product : pageProducts) {
 			if (product.getAccount().getId() == idShop) {
@@ -95,36 +95,37 @@ public class Service_SelectAllProductHome {
 
 	}
 
-// 	=======
-// 			// response.put("totalPages", pageProducts.getTotalPages() *
-// 			// response_Products.size());
-// 		} else {
-// 			response.put("error", 1002);
-// 		}
-// 		return response;
-// 	}
+	// =======
+	// // response.put("totalPages", pageProducts.getTotalPages() *
+	// // response_Products.size());
+	// } else {
+	// response.put("error", 1002);
+	// }
+	// return response;
+	// }
 
-// 	public Map<String, Object> selectAllHomeShop(List<FlashSaleDetail> list, Integer idShop, Integer page, Integer size,
-// 			String sort) {
+	// public Map<String, Object> selectAllHomeShop(List<FlashSaleDetail> list,
+	// Integer idShop, Integer page, Integer size,
+	// String sort) {
 
-// 		// List<Integer> idProducts = list.stream().map(p ->
-// 		// p.getProduct().getId()).collect(Collectors.toList());
-// 		Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
-// 		List<Product> pageProducts = productRepo.findAllIdIn(idShop);
-// 		List<Response_Product> response_Products = new ArrayList<Response_Product>();
-// 		for (Product product : pageProducts) {
-// 			if (product.getAccount().getId() == idShop) {
-// 				response_Products.add(productMaper.productToResponse_Product(product));
-// 			}
-// 		}
-// 		Map<String, Object> response = new HashMap<String, Object>();
-// 		if (response_Products.size() > 0) {
-// 			response.put("datas", response_Products);
-// 			// response.put("totalPages", pageProducts.getTotalPages() *
-// 			// response_Products.size());
-// >>>>>>> kienv2
+	// // List<Integer> idProducts = list.stream().map(p ->
+	// // p.getProduct().getId()).collect(Collectors.toList());
+	// Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+	// List<Product> pageProducts = productRepo.findAllIdIn(idShop);
+	// List<Response_Product> response_Products = new ArrayList<Response_Product>();
+	// for (Product product : pageProducts) {
+	// if (product.getAccount().getId() == idShop) {
+	// response_Products.add(productMaper.productToResponse_Product(product));
+	// }
+	// }
+	// Map<String, Object> response = new HashMap<String, Object>();
+	// if (response_Products.size() > 0) {
+	// response.put("datas", response_Products);
+	// // response.put("totalPages", pageProducts.getTotalPages() *
+	// // response_Products.size());
+	// >>>>>>> kienv2
 
-//	 Gợi ý
+	// Gợi ý
 	public List<Response_Product> suggestProduct(Integer id_user) {
 
 		List<Follower> listFollowers = new ArrayList<Follower>();
@@ -166,6 +167,7 @@ public class Service_SelectAllProductHome {
 						pageable);
 				listProductByBills = productRepo.selectProductInIdProduct(listIdProductByBillDetails);
 			}
+
 		}
 
 		List<Product> listProducts = new ArrayList<>();

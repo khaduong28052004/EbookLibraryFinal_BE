@@ -1,12 +1,13 @@
 package com.toel.dto.user.resquest;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import org.mapstruct.Mapper;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Mapper(componentModel = "spring")
 public class Request_ReportShop_DTO {
     @NotNull(message = "Vui lòng kiểm tra account id")
     private Integer accountId;
@@ -23,15 +25,16 @@ public class Request_ReportShop_DTO {
     private Integer shopId;
 
     @NotNull(message = "Không để trống status")
-    private boolean status;
+    private Boolean status;
 
     @NotNull(message = "Không để trống createAt")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private Date createAt;
 
-    @NotNull(message = "Không để trống content")
+    @NotBlank(message = "Không để trống content")
     private String content;
 
     @NotNull(message = "Không để trống title")
     private String title;
+
+    private MultipartFile[] images;
 }

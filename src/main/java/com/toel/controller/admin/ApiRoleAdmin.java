@@ -26,45 +26,50 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/v1/admin/role")
 public class ApiRoleAdmin {
-    @Autowired
-    Service_Role service_Role;
+        @Autowired
+        Service_Role service_Role;
 
-    @GetMapping
-    public ApiResponse<PageImpl<Response_Role>> getRoleNhanVien(
-            @RequestParam(value = "search", required = false) String search,
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "size", defaultValue = "5") Integer size,
-            @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
-            @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
-        return ApiResponse.<PageImpl<Response_Role>>build()
-                .result(service_Role.getRoleNhanVien(search, page, size, sortBy, sortColumn));
-    }
+        @GetMapping
+        public ApiResponse<PageImpl<Response_Role>> getRoleNhanVien(
+                        @RequestParam(value = "search", required = false) String search,
+                        @RequestParam(value = "page", defaultValue = "0") Integer page,
+                        @RequestParam(value = "size", defaultValue = "5") Integer size,
+                        @RequestParam(value = "sortBy", defaultValue = "true") Boolean sortBy,
+                        @RequestParam(value = "sortColumn", defaultValue = "id") String sortColumn) {
+                return ApiResponse.<PageImpl<Response_Role>>build()
+                                .result(service_Role.getRoleNhanVien(search, page, size, sortBy, sortColumn));
+        }
 
-    @GetMapping("/listnotnhanvien")
-    public ApiResponse<List<Response_Role>> getlistRoleNotNhanVien() {
-        return ApiResponse.<List<Response_Role>>build()
-                .result(service_Role.getlistRoleNotNhanVien());
-    }
+        @GetMapping("/listnotnhanvien")
+        public ApiResponse<List<Response_Role>> getlistRoleNotNhanVien() {
+                return ApiResponse.<List<Response_Role>>build()
+                                .result(service_Role.getlistRoleNotNhanVien());
+        }
 
-    @PostMapping
-    public ApiResponse<Response_Role> create(@RequestBody @Valid RequestRoleCreate entity) {
-        return ApiResponse.<Response_Role>build()
-                .message("Thêm quyền thành công")
-                .result(service_Role.create(entity));
-    }
+        @PostMapping
+        public ApiResponse<Response_Role> create(
+                        @RequestParam(value = "accountID", required = false) Integer account,
+                        @RequestBody @Valid RequestRoleCreate entity) {
+                return ApiResponse.<Response_Role>build()
+                                .message("Thêm quyền thành công")
+                                .result(service_Role.create(entity, account));
+        }
 
-    @PutMapping
-    public ApiResponse<Response_Role> update(@RequestBody @Valid RequestRoleUpdate entity) {
-        return ApiResponse.<Response_Role>build()
-                .message("Cập nhật quyền thành công")
-                .result(service_Role.update(entity));
-    }
+        @PutMapping
+        public ApiResponse<Response_Role> update(
+                        @RequestParam(value = "accountID", required = false) Integer account,
+                        @RequestBody @Valid RequestRoleUpdate entity) {
+                return ApiResponse.<Response_Role>build()
+                                .message("Cập nhật quyền thành công")
+                                .result(service_Role.update(entity, account));
+        }
 
-    @DeleteMapping
-    public ApiResponse<Response_Role> delete(
-            @RequestParam(value = "id", required = false) Integer id) {
-            service_Role.delete(id);
-            return ApiResponse.<Response_Role>build()
-                    .message("Xóa quyền thành công");
-    }
+        @DeleteMapping
+        public ApiResponse<Response_Role> delete(
+                        @RequestParam(value = "accountID", required = false) Integer account,
+                        @RequestParam(value = "id", required = false) Integer id) {
+                service_Role.delete(id, account);
+                return ApiResponse.<Response_Role>build()
+                                .message("Xóa quyền thành công");
+        }
 }

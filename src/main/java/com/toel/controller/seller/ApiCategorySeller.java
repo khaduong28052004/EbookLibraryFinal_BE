@@ -87,12 +87,12 @@ public class ApiCategorySeller {
                         @RequestBody @Valid Request_CategoryUpdate request_Category) {
                 return ApiResponse.<Response_Category>build()
                                 .message("Cập nhật danh mục sản phẩm thành công")
-                                .result(categoryService.update(request_Category));
+                                .result(categoryService.update(request_Category,null));
         }
 
         @DeleteMapping("/delete")
         public ApiResponse<?> delete(@RequestParam("id") Integer id_category) {
-                categoryService.delete(id_category);
+                categoryService.delete(id_category,null);
                 return ApiResponse.build()
                                 .message("Xóa thành công danh mục");
         }

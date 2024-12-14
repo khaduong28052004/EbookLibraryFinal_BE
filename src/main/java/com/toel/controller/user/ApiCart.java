@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
+import com.toel.service.UserProductActionsService;
 import com.toel.service.user.Service_Cart;
 
 @RestController
@@ -18,6 +19,8 @@ import com.toel.service.user.Service_Cart;
 public class ApiCart {
 	@Autowired
 	Service_Cart service_Cart;
+	@Autowired
+	UserProductActionsService userProductActionsService;
 
 	@RequestMapping("cart/{id}")
 	public ApiResponse<Map<String, Object>> getAllCart(@PathVariable("id") Integer id_User) {
@@ -27,6 +30,7 @@ public class ApiCart {
 	@RequestMapping("cart/add")
 	public ApiResponse<Map<String, Object>> addCart(@RequestParam("id_user") Integer id_user,
 			@RequestParam("id_product") Integer product, @RequestParam("quantity") Integer quantity) {
+		userProductActionsService.handleUserAction(id_user, product, "ADD_TO_CART");
 		return ApiResponse.<Map<String, Object>>build().message("success")
 				.result(service_Cart.addCart(id_user, quantity, product));
 	}

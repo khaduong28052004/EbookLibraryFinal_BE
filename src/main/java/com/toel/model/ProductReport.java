@@ -15,33 +15,35 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "ProductReports")
 public class ProductReport {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	Integer id;
-	@Nationalized
-	String title;
-	Date createAt;
-	boolean status;
-	String content;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
+    @Nationalized
+    String title;
+    Date createAt;
+    boolean status;
+    String content;
+
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    Account account;
 
 	@ManyToOne
 	@JoinColumn(name = "product_id")
 	Product product;
-	@ManyToOne
-	@JoinColumn(name = "account_id")
-	Account account;
-
+	
 	@JsonIgnore
 	@OneToMany(mappedBy = "productReport")
 	List<ImageProductReport> imageReportProducts;
+
 }
