@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.seller.response.Response_Bill;
-import com.toel.dto.seller.response.Response_Category;
 import com.toel.dto.seller.response.Response_ChatBotCategory;
 import com.toel.dto.user.response.Response_Product;
 import com.toel.mapper.BillMapper;
@@ -102,7 +101,7 @@ public class Service_ChatBot {
                 break;
             case "luot ban":
                 keySearch = "luot ban";
-                orderBy = search.contains("nhat") ? "DESC" : "ASC";
+                orderBy = search.contains("cao") ? "DESC" : "ASC";
                 break;
             case "yeu thich":
                 keySearch = "yeu thich";
@@ -110,13 +109,13 @@ public class Service_ChatBot {
                 break;
             case "danh gia":
                 keySearch = "danh gia";
-                orderBy = search.contains("nhat") ? "DESC" : "ASC";
+                orderBy = search.contains("cao") ? "DESC" : "ASC";
                 break;
             default:
                 break;
         }
 
-        if (search.contains("san pham")) {
+        if (search.contains("san pham") || search.contains("sach")) {
             if (sqlDateStart != null && sqlDateEnd != null) {
                 products = orderBy.equals("DESC")
                         ? productRepository.findChatBotByDateDESC(keySearch, sqlDateStart, sqlDateEnd)
@@ -126,6 +125,7 @@ public class Service_ChatBot {
                         ? productRepository.findChatBotDESC(keySearch)
                         : productRepository.findChatBotASC(keySearch);
             }
+            products = products.stream().limit(5).collect(Collectors.toList());
 
             responseList = products.stream()
                     .map(product -> productMaperUser.productToResponse_Product(product))
@@ -194,6 +194,8 @@ public class Service_ChatBot {
         } else {
             listBill = billRepository.findByAccountId(account_id);
         }
+        listBill = listBill.stream().limit(5).collect(Collectors.toList());
+
         list = listBill.stream().map(bill -> billMapper.response_Bill(bill))
                 .collect(Collectors.toList());
         return list;
@@ -300,7 +302,7 @@ public class Service_ChatBot {
             return "luot ban";
         if (search.contains("yeu thich"))
             return "yeu thich";
-        if (search.contains("danh gia"))
+        if (search.contains("đanh gia") || search.contains("danh gia"))
             return "danh gia";
         return "moi";
     }

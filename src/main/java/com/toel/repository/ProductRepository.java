@@ -154,9 +154,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			"GROUP BY p.id " +
 			"ORDER BY CASE " +
 			"           WHEN :keySearch = 'moi' THEN p.id " +
-			"           WHEN :keySearch = 'danh gia' THEN COUNT(e.id) " +
+			"           WHEN :keySearch = 'danh gia' THEN COUNT(DISTINCT e.id) " +
 			"           WHEN :keySearch = 'luot ban' THEN SUM(bd.quantity) " +
-			"           WHEN :keySearch = 'yeu thich' THEN COUNT(l.id) " +
+			"           WHEN :keySearch = 'yeu thich' THEN COUNT( DISTINCT l.id) " +
 			"         END DESC")
 	List<Product> findChatBotDESC(@Param("keySearch") String keySearch);
 
@@ -168,9 +168,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			"GROUP BY p.id " +
 			"ORDER BY CASE " +
 			"           WHEN :keySearch = 'moi' THEN p.id " +
-			"           WHEN :keySearch = 'danh gia' THEN COUNT(e.id) " +
+			"           WHEN :keySearch = 'danh gia' THEN COUNT(DISTINCT e.id) " +
 			"           WHEN :keySearch = 'luot ban' THEN SUM(bd.quantity) " +
-			"           WHEN :keySearch = 'yeu thich' THEN COUNT(l.id) " +
+			"           WHEN :keySearch = 'yeu thich' THEN COUNT(DISTINCT l.id) " +
 			"         END DESC")
 	List<Product> findChatBotASC(@Param("keySearch") String keySearch);
 
