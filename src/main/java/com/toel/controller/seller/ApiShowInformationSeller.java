@@ -340,6 +340,7 @@ public class ApiShowInformationSeller {
         for (Response_Like response_Like : responeLike) {
             idproduct.add(response_Like.getProduct());
         }
+
         List<Product> lisProducts = productRepository.findAllById(idproduct);
         Map<String, Object> response = new HashMap<>();
         response.put("response", responeLike);
@@ -381,7 +382,7 @@ public class ApiShowInformationSeller {
         return ApiResponse.<Map>build().message("Top liked products retrieved successfully").result(response);
     }
 
-    @PostMapping("/api/v1/user/topProducts") // đang dùng 
+    @PostMapping("/api/v1/user/topProducts") // đang dùng
     public ApiResponse<?> topProducts(@RequestBody Map<String, String> body) {
         String sellerID = body.get("sellerID");
         System.out.println("Seller ID: " + sellerID);

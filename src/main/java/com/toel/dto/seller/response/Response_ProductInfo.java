@@ -3,9 +3,6 @@ package com.toel.dto.seller.response;
 import java.util.Date;
 import java.util.List;
 
-import com.toel.model.Category;
-import com.toel.model.ImageProduct;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,20 +14,30 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Response_ProductInfo {
     Integer id;
+
     double price;
+
     double sale;
+
+    double weight;
+
     String name;
-    // String introduce;
+
+    // String introduce;    
+
     String writerName;
+    
     String publishingCompany;
+
     Date createAt;
+
     boolean isDelete;
+
     Integer quantity;
-    boolean isActive;
     Response_Account account;
-    Category category;
+    boolean isActive;
+    // Response_Category category;
     List<Response_ImageProduct> imageProducts;
-    // List<Response_FlashSaleDetail> flashSaleDetails;
 }
 
 
