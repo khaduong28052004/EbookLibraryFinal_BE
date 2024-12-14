@@ -1,7 +1,6 @@
 package com.toel.dto.admin.request.DiscountRate;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;

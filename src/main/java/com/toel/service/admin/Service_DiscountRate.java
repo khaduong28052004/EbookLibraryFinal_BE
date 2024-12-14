@@ -82,8 +82,8 @@ public class Service_DiscountRate {
                 throw new AppException(ErrorCode.OBJECT_ACTIVE, "Mức chiết khấu");
             }
         }
-        entity.setDateStart(entity.getDateStart());
-        entity.setDiscount(entity.getDiscount());
+        entity.setDateStart(discountRateUpdate.getDateStart().atStartOfDay());
+        entity.setDiscount(discountRateUpdate.getDiscount());
         if (check(entity)) {
             Response_DiscountRate dResponse_DiscountRate = discountRateMapper
                     .tochChietKhauResponse(discountRateRepository.save(entity));
@@ -111,20 +111,6 @@ public class Service_DiscountRate {
         } else {
             throw new AppException(ErrorCode.OBJECT_SETUP, "Ngày áp dụng đã tồn tại");
         }
-// =======
-
-//         return Optional.of(discountRate)
-//                 .map(entity -> {
-//                     entity.setDateStart(discountRateUpdate.getDateStart());
-//                     entity.setDiscount(discountRateUpdate.getDiscount());
-//                     return entity;
-//                 })
-//                 .filter(this::check)
-//                 .map(discountRateRepository::saveAndFlush)
-//                 .map(discountRateMapper::tochChietKhauResponse)
-//                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Ngày áp dụng đã tồn tại"));
-
-// >>>>>>> khadev28
     }
 
     public Response_DiscountRate create(Request_DiscountRateCreate discountRateCreate, Integer accountID) {
