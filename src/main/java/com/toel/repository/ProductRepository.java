@@ -230,4 +230,10 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	// "GROUP BY p.id, p.name\r\n")
 	// List<Product> findTopProductShop(Integer id_Shop);
 
+	List<Product> findByCategory(Category category);
+
+	@Query("SELECT p FROM Product p WHERE p.category IN :categories")
+	List<Product> findByCategoryIn(@Param("categories") List<Category> categories);
+	
+
 }
