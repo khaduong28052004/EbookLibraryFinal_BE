@@ -219,10 +219,8 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			"LIMIT 3", nativeQuery = true)
 	List<Product> findTop3ProductsByShopId(Integer idShop);
 
-	List<Product> findByCategory(Category category);
 
-	@Query("SELECT p FROM Product p WHERE p.category IN :categories")
-	List<Product> findByCategoryIn(@Param("categories") List<Category> categories);
+
 	
 
 }
