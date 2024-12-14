@@ -3,6 +3,7 @@ package com.toel.controller.seller;
 import java.util.Date;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +58,7 @@ import com.toel.service.user.Service_ShowInfoSeller;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -425,12 +427,12 @@ public class ApiShowInformationSeller {
 
     /**
      * @param behavior
-     * user_id
-     * product_id
-     * action_type
-     * action_time
-     * device
-     * loaction
+     *                 user_id
+     *                 product_id
+     *                 action_type
+     *                 action_time
+     *                 device
+     *                 loaction
      * @return
      */
     @PostMapping("/api/v1/user/track-action")
@@ -484,12 +486,12 @@ public class ApiShowInformationSeller {
     }
 
     @PostMapping("api/v1/user/shop/createReport")
-    public ResponseEntity<Map<String, Object>> createReportShop(@Valid @RequestBody Request_ReportShop_DTO reportDTO,
+    public ResponseEntity<Map<String, Object>> createReportShop(
+            @Valid @ModelAttribute Request_ReportShop_DTO reportDTO,
             BindingResult bindingResult) {
         Map<String, Object> response = serviceShowInfoSeller.createReportShop(reportDTO);
         return ResponseEntity.ok(response);
     }
-
 
     // @PostMapping("/api/v1/user/send-otpe")
     // public ApiResponse<?> sendOtp(@RequestBody @Valid Request_AccountCreateOTP
