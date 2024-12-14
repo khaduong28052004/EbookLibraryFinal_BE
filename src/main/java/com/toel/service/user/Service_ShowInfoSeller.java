@@ -1,28 +1,42 @@
 package com.toel.service.user;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+
 import org.apache.hc.core5.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.google.api.Http;
+import com.toel.dto.user.response.Response_Product;
 import com.toel.dto.user.resquest.Request_ReportShop_DTO;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
+import com.toel.mapper.user.ProductMaperUser;
 import com.toel.model.Account;
 import com.toel.model.AccountReport;
 import com.toel.model.Evalue;
+import com.toel.model.FlashSaleDetail;
 import com.toel.model.ImageAccountReport;
 import com.toel.model.ImageEvalue;
+import com.toel.model.Product;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.ImageAccountReportReposity;
+import com.toel.repository.ProductRepository;
 import com.toel.repository.ReportRepository;
 import com.toel.service.firebase.UploadImage;
 
@@ -38,6 +52,10 @@ public class Service_ShowInfoSeller {
     UploadImage firebaseUploadImages;
     @Autowired
     ImageAccountReportReposity imageAccountReport;
+    @Autowired
+    ProductRepository productRepo;
+    @Autowired
+    ProductMaperUser productMaper;
 
     public Map<String, Object> createReportShop(Request_ReportShop_DTO reportDTO) {
         Map<String, Object> response = new HashMap<>();
@@ -63,19 +81,13 @@ public class Service_ShowInfoSeller {
         String content = reportDTO.getContent() == null ? "" : reportDTO.getContent();
         Date createAt = reportDTO.getCreateAt() == null ? null : reportDTO.getCreateAt();
         String title = reportDTO.getTitle() == null ? "" : reportDTO.getTitle();
-
-        System.out.println("accountId: " + reportDTO.getAccountId());
-        System.out.println("shopId: " + reportDTO.getShopId());
-        System.out.println("content: " + reportDTO.getContent());
-        System.out.println("createAt: " + reportDTO.getCreateAt());
-        System.out.println("title: " + reportDTO.getTitle());
-        System.out.println("images: " + Arrays.toString(reportDTO.getImages()));
+        MultipartFile[] images = reportDTO.getImages();
 
         if (!accountRepository.existsById(accountId) || accountId == null) {
-            throw new AppException(ErrorCode.OBJECT_SETUP, "Tài khoản đang sử dụng không tồn tại");
+            throw new AppException(ErrorCode.OBJECT_SETUP, "Vui lòng đăng nhập");
         }
         if (!accountRepository.existsById(shopId) || shopId == null) {
-            throw new AppException(ErrorCode.OBJECT_SETUP, "Tài khoản cửa hàng không tồn tại");
+            throw new AppException(ErrorCode.OBJECT_SETUP, "Cửa hàng không tồn tại");
         }
         if (content.trim().isBlank() || content == "") {
             throw new AppException(ErrorCode.OBJECT_SETUP, "Cần điền nội dung báo cáo");
@@ -90,6 +102,20 @@ public class Service_ShowInfoSeller {
         if (reportRepository.waitAfterReport(accountId, shopId) == 1) {
             throw new AppException(ErrorCode.OBJECT_SETUP, "Bạn đã báo cáo. Đang trong quá trình xử lý");
         }
+
+        if (images != null) {
+            for (MultipartFile image : images) {
+                try {
+                    if (!isValidImageFormat(image)) {
+                        throw new AppException(ErrorCode.OBJECT_SETUP, "Chỉ chấp nhận các định dạng jpg, jpeg, và png");
+                    }
+                    checkImageAttributes(image);
+                } catch (IOException e) {
+                    throw new AppException(ErrorCode.OBJECT_SETUP, "Lỗi khi xử lý ảnh: " + image.getOriginalFilename(),
+                            e);
+                }
+            }
+        }
     }
 
     private AccountReport createReport(Request_ReportShop_DTO reportDTO) {
@@ -100,7 +126,7 @@ public class Service_ShowInfoSeller {
         newReport.setShop(shop);
         newReport.setContent(reportDTO.getContent());
         newReport.setCreateAt(reportDTO.getCreateAt());
-        newReport.setStatus(reportDTO.isStatus());
+        newReport.setStatus(reportDTO.getStatus());
         newReport.setTitle(reportDTO.getTitle());
         reportRepository.save(newReport);
 
@@ -143,4 +169,54 @@ public class Service_ShowInfoSeller {
         return imagesAccountReport;
     }
 
+    private boolean isValidImageFormat(MultipartFile image) {
+        try (ImageInputStream iis = ImageIO.createImageInputStream(image.getInputStream())) {
+            Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
+            if (readers.hasNext()) {
+                ImageReader reader = readers.next();
+                String formatName = reader.getFormatName().toLowerCase();
+                return formatName.equals("jpg") || formatName.equals("jpeg") || formatName.equals("png");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private void checkImageAttributes(MultipartFile image) throws IOException {
+
+        BufferedImage bufferedImage = ImageIO.read(image.getInputStream());
+        if (bufferedImage == null) {
+            throw new AppException(ErrorCode.OBJECT_SETUP, "Không thể đọc ảnh: " + image.getOriginalFilename());
+        }
+
+        int width = bufferedImage.getWidth();
+        int height = bufferedImage.getHeight();
+        long size = image.getSize();
+
+        if (size > 5 * 1024 * 1024) {
+            throw new AppException(ErrorCode.OBJECT_SETUP, "Kích thước ảnh không vượt quá 5MB");
+        }
+
+    }
+
+    public Map<String, Object> selectTop3ProductHomeShop(List<FlashSaleDetail> flashSaleDetails, Integer id_Shop) {
+        // Pageable pageable = PageRequest.of(0, 3); // Chỉ lấy 3 sản phẩm đầu tiên
+        List<Product> pageProducts = productRepo.findTop3ProductsByShopId(id_Shop);
+        List<Response_Product> response_Products = new ArrayList<Response_Product>();
+        for (Product product : pageProducts) {
+            if (product.getAccount().getId() == id_Shop) {
+                response_Products.add(productMaper.productToResponse_Product(product));
+            }
+        }
+        Map<String, Object> response = new HashMap<String, Object>();
+        if (response_Products.size() > 0) {
+            response.put("datas", response_Products);
+            // response.put("totalPages", pageProducts.getTotalPages() *
+            // response_Products.size());
+        } else {
+            response.put("error", 1002);
+        }
+        return response;
+    }
 }

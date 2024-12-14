@@ -74,8 +74,8 @@ public class Service_SelectAllProductHome {
 
 		// List<Integer> idProducts = list.stream().map(p ->
 		// p.getProduct().getId()).collect(Collectors.toList());
-		Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
-		List<Product> pageProducts = productRepo.findAllIdIn(idShop);
+		Pageable pageable = PageRequest.of(0, size);
+		Page<Product> pageProducts = productRepo.findAllIdIn(idShop, pageable);
 		List<Response_Product> response_Products = new ArrayList<Response_Product>();
 		for (Product product : pageProducts) {
 			if (product.getAccount().getId() == idShop) {
@@ -177,24 +177,4 @@ public class Service_SelectAllProductHome {
 		}
 		return listResponse_Products;
 	}
-	// public Map<String, Object> selectTopProductHomeShop(List<FlashSaleDetail>
-	// flashSaleDetails, Integer id_Shop) {
-	// List<Product> pageProducts = productRepo.findTopProductShop(id_Shop);
-	// List<Response_Product> response_Products = new ArrayList<Response_Product>();
-	// for (Product product : pageProducts) {
-	// if (product.getAccount().getId() == id_Shop) {
-	// response_Products.add(productMaper.productToResponse_Product(product));
-	// }
-	// }
-	// Map<String, Object> response = new HashMap<String, Object>();
-	// if (response_Products.size() > 0) {
-	// response.put("datas", response_Products);
-	// // response.put("totalPages", pageProducts.getTotalPages() *
-	// // response_Products.size());
-	// } else {
-	// response.put("error", 1002);
-	// }
-	// return response;
-	// }
-
 }

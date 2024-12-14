@@ -1,5 +1,7 @@
 package com.toel.repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +32,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			+ "	 ORDER BY CASE WHEN :orderBy = 'create' THEN b.createAt "
 			+ "              WHEN :orderBy = 'update' THEN b.updateAt " + "              ELSE b.createAt END DESC")
 	List<Object[]> findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(@Param("userId") Integer userId,
-			@Param("orderStatus") Integer orderStatus, @Param("orderBy") String orderBy);
+			@Param("orderStatus") Integer orderStatus, @Param("orderBy") String orderBy, Pageable pageable);
 
 	@Query("SELECT \r\n" + //
 			"    b.id AS billId, \r\n" + //
@@ -45,7 +47,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			"JOIN  b.orderStatus os WHERE a.id = :userId \r\n" + //
 			"ORDER BY b.createAt DESC\r\n" + //
 			"")
-	List<Object[]> findBillsByUserId(@Param("userId") Integer userId);
+	List<Object[]> findBillsByUserId(@Param("userId") Integer userIdm, Pageable pageable);
 
 	// Seller (Update Shop)
 
@@ -244,5 +246,8 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	@Query("SELECT b FROM Bill b WHERE b.account.id = ?1 ORDER BY b.id DESC")
 	List<Bill> findByAccountId(Integer account_id);
+
+	@Query("SELECT b FROM Bill b WHERE b.orderStatus.id = 4 AND b.updateAt <= :sevenDaysAgo")
+	List<Bill> findBillsToAutoConfirm(@Param("sevenDaysAgo") LocalDateTime sevenDaysAgo);
 
 }

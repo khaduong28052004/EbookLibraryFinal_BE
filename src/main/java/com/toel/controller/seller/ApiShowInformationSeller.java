@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.seller.response.Response_InforSeller;
@@ -118,19 +119,17 @@ public class ApiShowInformationSeller {
         String sellerID = body.get("sellerID");
         String userID = body.get("userID");
         Integer defaultValue = 1;
-        if (sellerID.equals(userID)) {
-            return ApiResponse.<String>build()
-                    .code(400)
-                    .message("Invalid Seller ID: Not a number")
-                    .result(null);
-        }
+
+        // Kiểm tra nếu sellerID không phải là số
         if (!isNumeric(sellerID)) {
             return ApiResponse.<String>build()
                     .code(400)
                     .message("Invalid Seller ID: Not a number")
                     .result(null);
         }
+
         try {
+            System.out.println("sellerID: " + sellerID);
             Account account = accountRepository.findById(Integer.parseInt(sellerID))
                     .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
                             "ID:[" + sellerID + "] không tìm thấy người bán"));
@@ -138,20 +137,23 @@ public class ApiShowInformationSeller {
             Response_InforSeller inforSeller = new Response_InforSeller();
             inforSeller.setIdSeller(account.getId());
             inforSeller.setNumberOfProducts(account.getProducts().size());
-            inforSeller.setTrackingNumber(defaultValue); // nguoi ban da dax theo gioi casi gi
+            inforSeller.setTrackingNumber(defaultValue);
             inforSeller.setShopCancellationRate(defaultValue);
             inforSeller.setAvatar(account.getAvatar());
             inforSeller.setBackground(account.getBackground());
 
+            // Lấy số lượng follower
             Integer follower = followRepository.countFollowersByShopId(account.getId());
             inforSeller.setNumberOfFollowers(follower);
+
             // Kiểm tra userID và set trạng thái theo dõi
-            if (isNumeric(userID) || !sellerID.equals(userID)) {
+            if (userID != null && isNumeric(userID) && !sellerID.equals(userID)) {
                 inforSeller.setIsFollowed(
                         followerService.checkFollower(Integer.parseInt(userID), Integer.parseInt(sellerID)));
             } else {
                 inforSeller.setIsFollowed(null);
             }
+
             // Lấy địa chỉ mặc định
             String district = account.getAddresses().stream()
                     .filter(Address::isStatus)
@@ -159,9 +161,12 @@ public class ApiShowInformationSeller {
                     .findFirst()
                     .orElse("Chưa cập nhật!");
             inforSeller.setDistrict(district);
+
+            // Thông tin thêm
             inforSeller.setCreateAtSeller(account.getCreateAtSeller());
             inforSeller.setParticipationTime(inforSeller.calculateActiveDays());
             inforSeller.setShopName(account.getShopName());
+
             // Kết quả trả về
             Map<String, Object> map = new HashMap<>();
             map.put("shopDataEX", inforSeller);
@@ -470,7 +475,6 @@ public class ApiShowInformationSeller {
         LocalDateTime localDateTime = LocalDateTime.now();
         FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime);
         try {
-
             flashSaleDetails = flashSaleDetailRepo.findAllByFlashSale(flashSale);
         } catch (Exception e) {
         }
@@ -484,12 +488,41 @@ public class ApiShowInformationSeller {
         return ApiResponse.<Map<String, Object>>build().message("success").result(response);
     }
 
-    @PostMapping("api/v1/user/shop/createReport")
+    @PostMapping("api/v1/user/shop/createReport/saveImg")
     public ResponseEntity<Map<String, Object>> createReportShop(
             @Valid @ModelAttribute Request_ReportShop_DTO reportDTO,
             BindingResult bindingResult) {
+
+        System.out.println("accountId: " + reportDTO.getAccountId());
+        System.out.println("shopId: " + reportDTO.getShopId());
+        System.out.println("content: " + reportDTO.getContent());
+        System.out.println("createAt: " + reportDTO.getCreateAt());
+        System.out.println("title: " + reportDTO.getTitle());
+        System.out.println("images: " + Arrays.toString(reportDTO.getImages()));
+
         Map<String, Object> response = serviceShowInfoSeller.createReportShop(reportDTO);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/api/v1/user/shop/top3ProductShop")
+    public ApiResponse<?> top3ProductShop(
+            @RequestParam(name = "id_Shop", defaultValue = "0") Integer id_Shop) {
+
+        List<FlashSaleDetail> flashSaleDetails = new ArrayList<FlashSaleDetail>();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime);
+        try {
+            Boolean isaccount = accountRepository.existsById(id_Shop);
+            flashSaleDetails = flashSaleDetailRepo.findAllByFlashSale(flashSale);
+        } catch (Exception e) {
+        }
+
+        Map<String, Object> products = serviceShowInfoSeller.selectTop3ProductHomeShop(flashSaleDetails, id_Shop);
+        return ApiResponse.<Map<String, Object>>build()
+                .code(0)
+                .message("e.getMessage()")
+                .result(products);
+
     }
 
     // @PostMapping("/api/v1/user/send-otpe")
@@ -516,51 +549,6 @@ public class ApiShowInformationSeller {
     // } else {
     // return ApiResponse.build().message("OTP đã được gửi qua g.");
     // }
-    // }
-    // @GetMapping("/api/v1/user/topProducts")
-    // public ApiResponse<?> topProducts() {
-    // try {
-    // OrderStatus orderStatus = orderStatusRepository.findById(1).orElse(null);
-    // if (orderStatus == null) {
-    // return ApiResponse.<String>build().code(1).message("Đơn hoàn thành bằng
-    // 0").result(null);
-    // }
-    // List<Bill> listBill = billRepository.findByOrderStatus(orderStatus);
-    // if (listBill == null || listBill.isEmpty()) {
-    // // ne
-    // return ApiResponse.<String>build().code(1).message("không có hóa đơn
-    // nào!").result(null);
-    // }
-    // List<BillDetail> listBillDetails =
-    // billDetailRepository.findAllByBillIn(listBill);
-    // // Thống kê số lượng sản phẩm đã bán
-    // if (listBillDetails.isEmpty()) {
-    // return ApiResponse.<String>build().code(1).message("không có hóa đơn
-    // nào!").result(null);
-    // }
-    // Map<Product, Long> productCountMap = listBillDetails.stream()
-    // .collect(
-    // Collectors.groupingBy(BillDetail::getProduct,
-    // Collectors.summingLong(BillDetail::getQuantity)));
-
-    // // List<BillDetail> listBillDetails1 = billDetailRepository.
-
-    // // // hash.put("listProduct", listProductO);
-
-    // Map<String, Object> hash = new HashMap<>();
-    // hash.put("list", listBillDetails);
-
-    // return ApiResponse.<Map>build()
-    // .code(0)
-    // .message("Top sold products fetched successfully")
-    // .result(hash);
-    // } catch (Exception e) {
-    // return ApiResponse.<Map>build()
-    // .code(0)
-    // .message(e.getMessage())
-    // .result(null);
-    // }
-
     // }
 
     // public double averageStars(Account account) {
