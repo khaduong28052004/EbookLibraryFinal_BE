@@ -134,4 +134,31 @@ public class UserProductActionsController {
                 .result(pagedList);
     }
 
+    @GetMapping("/api/v1/user/actions_product_category1")
+    public ApiResponse<?> getAllProductAndCategory1(
+            @RequestParam(defaultValue = "0") int page, // Page number
+            @RequestParam(defaultValue = "4") int size, // Items per page
+            @RequestParam(defaultValue = "0") Integer account_id // Items per page
+    ) {
+        // Fetch all products from the service
+        List<Response_ProductInfo> allProducts = actionsService.recomendProductsAndCategory(account_id);
+
+        // Calculate pagination indices
+        int start = (int) Math.min((long) page * size, allProducts.size());
+        int end = (int) Math.min(start + size, allProducts.size());
+
+        // Extract the current page's content
+        List<Response_ProductInfo> pagedContent = allProducts.subList(start, end);
+
+        // Wrap the paginated content with PageImpl
+        Page<Response_ProductInfo> pagedList = new PageImpl<>(pagedContent, PageRequest.of(page, size),
+                allProducts.size());
+
+        // Return the response
+        return ApiResponse.<Page<Response_ProductInfo>>build()
+                .code(0)
+                .message("actions_product_category")
+                .result(pagedList);
+    }
+
 }

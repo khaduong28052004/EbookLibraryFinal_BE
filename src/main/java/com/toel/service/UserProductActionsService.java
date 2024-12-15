@@ -357,9 +357,11 @@ public class UserProductActionsService {
         List<Response_ProductInfo> list = recommendProducts(userId);
         List<com.toel.model.Category> listCategory = new ArrayList<>(); // danh mục in sản phẩm đề xuất
         for (Response_ProductInfo response_ProductInfo : list) {
-            List<com.toel.model.Category> categories = categoryRepository
-                    .findALlByIdAccount(response_ProductInfo.getAccount().getId());
-            listCategory.addAll(categories);
+            // List<com.toel.model.Category> categories = categoryRepository
+            //         .findALlByIdAccount(response_ProductInfo.getAccount().getId());
+            // listCategory.addAll(categories);
+            listCategory.add(response_ProductInfo.getCategory());
+
         }
         listCategory = listCategory.stream() // Loại bỏ trùng lặp danh mục
                 .distinct()
