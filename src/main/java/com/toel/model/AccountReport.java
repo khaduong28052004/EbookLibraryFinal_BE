@@ -25,7 +25,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "accountReports")
+@Table(name = "accountreports")
 public class AccountReport {
 
 	@Id
@@ -39,7 +39,7 @@ public class AccountReport {
 	@ManyToOne
 	@JoinColumn(name = "shop_id")
 	Account shop;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "account_id")
 	Account account;
