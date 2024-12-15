@@ -26,4 +26,5 @@ public class ImageAccountReport {
 	@ManyToOne
 	@JoinColumn(name = "accountReport_id")
 	AccountReport accountReport;
+    // hành đông cân nhắc tư tương cứng rắng không tiếp nhận ý kiến
 }
