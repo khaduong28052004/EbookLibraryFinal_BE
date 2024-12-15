@@ -22,7 +22,7 @@ import lombok.Setter;
 @NoArgsConstructor
 
 @Entity
-@Table(name = "Carts")
+@Table(name = "carts")
 public class Cart {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

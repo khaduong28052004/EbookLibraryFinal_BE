@@ -15,7 +15,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Tokens")
+@Table(name = "tokens")
 public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -18,7 +18,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Platforms")
+@Table(name = "platforms")
 public class Platform {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

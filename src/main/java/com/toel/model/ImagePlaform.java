@@ -15,7 +15,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "ImagePlaforms")
+@Table(name = "imageplaforms")
 public class ImagePlaform {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

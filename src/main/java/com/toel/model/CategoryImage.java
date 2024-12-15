@@ -20,7 +20,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "CategoryImages")
+@Table(name = "categoryimages")
 public class CategoryImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

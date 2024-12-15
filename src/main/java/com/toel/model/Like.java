@@ -23,7 +23,7 @@ import lombok.Setter;
 @NoArgsConstructor
 
 @Entity
-@Table(name = "Likes")
+@Table(name = "likes")
 public class Like {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -22,7 +22,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Permissions")
+@Table(name = "permissions")
 public class Permission {
 
 	@Id
@@ -36,6 +36,5 @@ public class Permission {
 
 	@OneToMany(mappedBy = "permission")
 	List<RolePermission> rolePermissions;
-	
 
 }

@@ -24,7 +24,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "FlashSaleDetails")
+@Table(name = "flashsaledetails")
 public class FlashSaleDetail {
 
 	@Id

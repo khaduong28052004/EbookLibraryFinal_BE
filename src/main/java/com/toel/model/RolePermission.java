@@ -19,7 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Role_Permissions")
+@Table(name = "rolepermissions")
 public class RolePermission {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
