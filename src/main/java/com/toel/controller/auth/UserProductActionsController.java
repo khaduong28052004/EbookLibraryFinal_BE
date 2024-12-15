@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.toel.dto.Api.ApiResponse;
+import com.toel.dto.seller.response.Response_Product;
 import com.toel.dto.seller.response.Response_ProductInfo;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
+import com.toel.mapper.ProductMapper;
+import com.toel.mapper.user.ProductMaperUser;
+import com.toel.model.BillDetail;
+import com.toel.model.FlashSaleDetail;
 import com.toel.model.Product;
 import com.toel.model.UserProductActions;
+import com.toel.repository.BillDetailRepository;
+import com.toel.repository.ProductRepository;
 import com.toel.service.UserProductActionsService;
 
 @CrossOrigin("*")
@@ -154,10 +162,8 @@ public class UserProductActionsController {
 
         int start = (int) Math.min((long) page * size, combinedProducts.size());
         int end = (int) Math.min(start + size, combinedProducts.size());
-
         // Extract the current page's content
         List<Response_ProductInfo> pagedContent = combinedProducts.subList(start, end);
-
         // Wrap the paginated content with PageImpl
         Page<Response_ProductInfo> pagedList = new PageImpl<>(pagedContent, PageRequest.of(page, size),
                 allProducts.size());
@@ -195,7 +201,7 @@ public class UserProductActionsController {
 
         // Wrap the paginated content with PageImpl
         Page<Response_ProductInfo> pagedList = new PageImpl<>(pagedContent, PageRequest.of(page, size),
-        combinedProducts.size());
+                combinedProducts.size());
 
         // Return the response
         return ApiResponse.<Page<Response_ProductInfo>>build()
@@ -203,6 +209,18 @@ public class UserProductActionsController {
                 .message("actions_product_category")
                 .result(pagedList);
     }
+
+    ProductRepository productRepo;
+
+    ProductMaperUser productMaper;
+
+    @Autowired
+    BillDetailRepository billDetailRepository;
+    @Autowired
+    ProductRepository productRepository;
+
+    @Autowired
+    ProductMapper productMapper;
 
     @GetMapping("/api/v1/user/actions_product_category1_Bestseller")
     public ApiResponse<?> getAllProductAndCategorydataBestseller(
@@ -210,66 +228,58 @@ public class UserProductActionsController {
             @RequestParam(defaultValue = "4") int size, // Items per page
             @RequestParam(defaultValue = "0") Integer account_id // Items per page
     ) {
-        // Fetch all products from the service
-        // List<Response_ProductInfo> allProducts =
-        // actionsService.recomendProductsAndCategory(account_id);
-        List<Response_ProductInfo> allProducts = actionsService.recommendProducts(account_id, LocalDateTime.now());
-        List<Response_ProductInfo> allProducts1 = actionsService.recommendProducts();
-        // Calculate pagination indices
-
-        // Combine the lists
-        List<Response_ProductInfo> combinedProducts = new ArrayList<>();
-        combinedProducts.addAll(allProducts);
-        combinedProducts.addAll(allProducts1);
-
-        int start = (int) Math.min((long) page * size, combinedProducts.size());
-        int end = (int) Math.min(start + size, combinedProducts.size());
-
-        // Extract the current page's content
-        List<Response_ProductInfo> pagedContent = combinedProducts.subList(start, end);
-
-        // Wrap the paginated content with PageImpl
+        List<BillDetail> listBD = billDetailRepository.findAll().stream()
+                .filter(m -> m.getBill().getOrderStatus().getId() == 5).collect(Collectors.toList());
+        List<Product> listP = listBD.stream().map(m -> m.getProduct()).collect(Collectors.toList());
+        
+        List<Response_ProductInfo> allProducts = productMapper.Response_ProductInfo(listP);
+        int start = (int) Math.min((long) page * size, allProducts.size());
+        int end = (int) Math.min(start + size, allProducts.size());
+        List<Response_ProductInfo> pagedContent = allProducts.subList(start, end);
         Page<Response_ProductInfo> pagedList = new PageImpl<>(pagedContent, PageRequest.of(page, size),
-        combinedProducts.size());
-
-        // Return the response
+                allProducts.size());   // Return the response
         return ApiResponse.<Page<Response_ProductInfo>>build()
                 .code(0)
                 .message("actions_product_category")
                 .result(pagedList);
     }
-//   @PostMapping("/api/v1/user/topLikeProducts") // đang dùng
-//     public ApiResponse<?> thichNhieu1(@RequestBody Map<String, String> body) {
-//           // Lấy danh sách sản phẩm theo lượt like
-//         List<Map<String, Object>> topLikedProducts = likeRepository.findTopLikedProducts();
-//         // Lấy danh sách id sản phẩm từ kết quả truy vấn
-//         List<Integer> productIds = topLikedProducts.stream()
-//                 .map(item -> (Integer) item.get("productId"))
-//                 .collect(Collectors.toList());
-//         // Lấy chi tiết sản phẩm từ danh sách id
-//         List<Product> products = productRepository.findAllById(productIds);
-//         List<Response_ProductInfo> listResponse_Products = productMapper.Response_ProductInfo(products);
-//         // Chuẩn bị dữ liệu phản hồi
-//         List<Map<String, Object>> responseList = topLikedProducts.stream()
-//                 .map(item -> {
-//                     Integer productId = (Integer) item.get("productId");
-//                     Long likeCount = (Long) item.get("likeCount");
-//                     // Tìm chi tiết sản phẩm tương ứng
-//                     Response_ProductInfo product = listResponse_Products.stream()
-//                             .filter(p -> p.getId().equals(productId))
-//                             .findFirst()
-//                             .orElse(null);
-//                     // Trả về dữ liệu sản phẩm với số lượt like
-//                     Map<String, Object> response = new HashMap<>();
-//                     response.put("product", product);
-//                     response.put("likeCount", likeCount);
-//                     return response;
-//                 })
-//                 .collect(Collectors.toList());
 
-//         // Đóng gói phản hồi API
-//         Map<String, Object> response = new HashMap<>();
-//         response.put("topLikedProducts", responseList);
-//         return ApiResponse.<Map>build().message("Top liked products retrieved successfully").result(response);
-//     }
+
+    // @PostMapping("/api/v1/user/topLikeProducts") // đang dùng
+    // public ApiResponse<?> thichNhieu1(@RequestBody Map<String, String> body) {
+    // // Lấy danh sách sản phẩm theo lượt like
+    // List<Map<String, Object>> topLikedProducts =
+    // likeRepository.findTopLikedProducts();
+    // // Lấy danh sách id sản phẩm từ kết quả truy vấn
+    // List<Integer> productIds = topLikedProducts.stream()
+    // .map(item -> (Integer) item.get("productId"))
+    // .collect(Collectors.toList());
+    // // Lấy chi tiết sản phẩm từ danh sách id
+    // List<Product> products = productRepository.findAllById(productIds);
+    // List<Response_ProductInfo> listResponse_Products =
+    // productMapper.Response_ProductInfo(products);
+    // // Chuẩn bị dữ liệu phản hồi
+    // List<Map<String, Object>> responseList = topLikedProducts.stream()
+    // .map(item -> {
+    // Integer productId = (Integer) item.get("productId");
+    // Long likeCount = (Long) item.get("likeCount");
+    // // Tìm chi tiết sản phẩm tương ứng
+    // Response_ProductInfo product = listResponse_Products.stream()
+    // .filter(p -> p.getId().equals(productId))
+    // .findFirst()
+    // .orElse(null);
+    // // Trả về dữ liệu sản phẩm với số lượt like
+    // Map<String, Object> response = new HashMap<>();
+    // response.put("product", product);
+    // response.put("likeCount", likeCount);
+    // return response;
+    // })
+    // .collect(Collectors.toList());
+
+    // // Đóng gói phản hồi API
+    // Map<String, Object> response = new HashMap<>();
+    // response.put("topLikedProducts", responseList);
+    // return ApiResponse.<Map>build().message("Top liked products retrieved
+    // successfully").result(response);
+    // }
 }
