@@ -2,6 +2,8 @@ package com.toel.service.user;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.user.response.Response_Bill_User;
@@ -86,6 +92,42 @@ public class Service_Bill_User {
 	@Autowired
 	VoucherRepository voucherRepository;
 
+	// public Map<String, Object> getBills(Request_Bill_User requestBillDTO) {
+	// Map<String, Object> response = new HashMap<>();
+	// try {
+	// List<Object[]> productsInBill = getBillsByOrderStatus(requestBillDTO);
+	// List<Response_Bill_User> listConver =
+	// convertToResponseBillUser(productsInBill);
+	// List<BillDTO> shopListInBill =
+	// createBillsWithProductsInBillDetail(listConver);
+
+	// int page = requestBillDTO.getPage();
+	// int size = requestBillDTO.getSize();
+	// int totalItems = shopListInBill.size();
+	// int totalPages = (int) Math.ceil((double) totalItems / size);
+
+	// // Lấy dữ liệu cho trang hiện tại
+	// int start = Math.min(page * size, totalItems);
+	// int end = Math.min(start + size, totalItems);
+	// List<BillDTO> paginatedList = shopListInBill.subList(start, end);
+
+	// response.put("data", paginatedList); // Dữ liệu cho trang hiện tại
+	// response.put("currentPage", page);
+	// response.put("totalItems", totalItems);
+	// response.put("totalPages", totalPages);
+	// response.put("pageSize", size);
+
+	// // response.put("data", shopListInBill);
+	// response.put("status", "successfully");
+	// response.put("message", "Retrieve data successfully");
+	// } catch (Exception e) {
+	// response.put("status", "error");
+	// response.put("message", "An error occurred while retrieving orders.");
+	// response.put("error", e.getMessage());
+	// }
+	// return response;
+	// }
+
 	public Map<String, Object> getBills(Request_Bill_User requestBillDTO) {
 		Map<String, Object> response = new HashMap<>();
 		try {
@@ -93,21 +135,13 @@ public class Service_Bill_User {
 			List<Response_Bill_User> listConver = convertToResponseBillUser(productsInBill);
 			List<BillDTO> shopListInBill = createBillsWithProductsInBillDetail(listConver);
 
-			int page = requestBillDTO.getPage();
-			int size = requestBillDTO.getSize();
-			int totalItems = shopListInBill.size();
-			int totalPages = (int) Math.ceil((double) totalItems / size);
-
 			// Lấy dữ liệu cho trang hiện tại
-			int start = Math.min(page * size, totalItems);
-			int end = Math.min(start + size, totalItems);
-			List<BillDTO> paginatedList = shopListInBill.subList(start, end);
 
-			response.put("data", paginatedList); // Dữ liệu cho trang hiện tại
-			response.put("currentPage", page);
-			response.put("totalItems", totalItems);
-			response.put("totalPages", totalPages);
-			response.put("pageSize", size);
+			response.put("data", shopListInBill); // Dữ liệu cho trang hiện tại
+			// response.put("currentPage", page);
+			// response.put("totalItems", totalItems);
+			// response.put("totalPages", totalPages);
+			// response.put("pageSize", size);
 
 			// response.put("data", shopListInBill);
 			response.put("status", "successfully");
@@ -124,22 +158,29 @@ public class Service_Bill_User {
 		Integer userId = BillShopRequestDTO.getUserID();
 		String orderStatus = BillShopRequestDTO.getOrderStatusFind() == null ? ""
 				: BillShopRequestDTO.getOrderStatusFind();
+		Pageable pageable = PageRequest.of(0, BillShopRequestDTO.getSize());
 
 		switch (orderStatus) {
 			case "CHODUYET":
-				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 1, "create"); // Status
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 1, "create",
+						pageable); // Status
 			case "DANGXULY":
-				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 2, "update"); // Status
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 2, "update",
+						pageable); // Status
 			case "DANGGIAO":
-				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 3, "update"); // Status
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 3, "update",
+						pageable); // Status
 			case "DAGIAO":
-				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 4, "update"); // Status
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 4, "update",
+						pageable); // Status
 			case "HOANTHANH":
-				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 5, "update"); // Status
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 5, "update",
+						pageable); // Status
 			case "DAHUY":
-				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 6, "update"); // Status
+				return billRepository.findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(userId, 6, "update",
+						pageable); // Status
 			default:
-				return billRepository.findBillsByUserId(userId); // Default: No filter on order status
+				return billRepository.findBillsByUserId(userId, pageable); // Default: No filter on order status
 		}
 	}
 
@@ -197,8 +238,9 @@ public class Service_Bill_User {
 		Account user = bill.getAccount();
 
 		// if (checkAndBlockUsers(user.getId()) > 2) {
-		// 	throw new AppException(ErrorCode.OBJECT_SETUP,
-		// 			"Tài khoản của bạn đã bị khóa, do đã hủy đơn quá nhiều lần trong ngày. Vui lòng liên hệ TOEL để mở khóa");
+		// throw new AppException(ErrorCode.OBJECT_SETUP,
+		// "Tài khoản của bạn đã bị khóa, do đã hủy đơn quá nhiều lần trong ngày. Vui
+		// lòng liên hệ TOEL để mở khóa");
 		// }
 
 		bill.setUpdateAt(new Date());
@@ -267,6 +309,25 @@ public class Service_Bill_User {
 		bill.setOrderStatus(orderStatusRepository.findById(5).get());
 		billRepository.saveAndFlush(bill);
 
+	}
+
+	// @Scheduled(fixedRate = 60000) // 60000ms = 1 phút
+	@Scheduled(cron = "0 0 0 * * ?") // Runs every day at midnight
+	public void autoConfirmOrders() {
+		System.out.println("Tự động xác nhận hóa đơn đang chạy lúc: " + LocalDateTime.now());
+		// Get the current date and the date 7 days ago
+		LocalDate currentDate = LocalDate.now();
+		LocalDate sevenDaysAgo = currentDate.minusDays(7);
+		LocalDateTime sevenDaysAgoDateTime = sevenDaysAgo.atStartOfDay();
+
+		// Get all orders where 'finishAt' is older than 7 days and not yet confirmed
+		// (orderStatus is not 'confirmed')
+		List<Bill> billsToConfirm = billRepository.findBillsToAutoConfirm(sevenDaysAgoDateTime);
+
+		// Loop through each bill and confirm it
+		for (Bill bill : billsToConfirm) {
+			confirmBill(bill.getId());
+		}
 	}
 
 	private void sendNotification(Bill bill) {
@@ -342,24 +403,4 @@ public class Service_Bill_User {
 			return null; // Hoặc xử lý lỗi theo cách khác
 		}
 	}
-
-	// public Integer checkAndBlockUsers(Integer userId) {
-	// 	Map<String, Object> response = new HashMap<>();
-	// 	Account user = accountRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-	// 	Integer cancelCounts = billRepository.findUserCancelCountsForDay(userId);
-
-	// 	// if (cancelCounts == 2) {
-	// 	// response.put("checkCancel",
-	// 	// "Bạn đã hủy đơn quá nhiều lần trong hôm nay. Nếu tiếp tục, tài khoản của bạn
-	// 	// có thế bị khóa");
-	// 	// }
-
-	// 	if (cancelCounts > 2) {
-	// 		user.setStatus(false);
-	// 		accountRepository.save(user);
-	// 	}
-
-	// 	return cancelCounts;
-
-	// }
 }

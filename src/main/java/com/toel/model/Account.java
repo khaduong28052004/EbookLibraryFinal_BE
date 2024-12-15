@@ -29,7 +29,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Accounts")
+@Table(name = "accounts")
 public class Account {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -147,9 +147,9 @@ public class Account {
 	@OneToMany(mappedBy = "account")
 	List<DeviceId> deviceIds;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "account")
-	List<Platform> platforms;
+	// @JsonIgnore
+	// @OneToMany(mappedBy = "account")
+	// List<Platform> platforms;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "account")
@@ -159,4 +159,7 @@ public class Account {
 	@OneToMany(mappedBy = "account")
 	List<Token> tokens;
 
+	@ManyToOne
+    @JoinColumn(name = "platform_id")
+	Platform platform;
 }

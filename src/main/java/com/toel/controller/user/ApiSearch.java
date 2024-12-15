@@ -43,6 +43,25 @@ public class ApiSearch {
 				.result(service_Search.filterProductByPrice(priceMin, priceMax, 1000000, "createAt"));
 	}
 
+	@GetMapping("filtercategory/audio")
+	public ApiResponse<PageImpl<Response_Product>> filtercategoryAudio(
+			@RequestParam("id_categories") List<Integer> id_categories,
+			@RequestParam(value = "page", defaultValue = "0") Integer page,
+			@RequestParam(value = "size", defaultValue = "9") Integer size) {
+		return ApiResponse.<PageImpl<Response_Product>>build().message("success")
+				.result(service_Search.filterProductByCategoryAudio(id_categories, page, size));
+	}
+
+	@GetMapping("filterprice/audio")
+	public ApiResponse<PageImpl<Response_Product>> filterPriceAudio(
+			@RequestParam("priceMin") double priceMin,
+			@RequestParam("priceMax") double priceMax,
+			@RequestParam(value = "page", defaultValue = "0") Integer page,
+			@RequestParam(value = "size", defaultValue = "3") Integer size) {
+		return ApiResponse.<PageImpl<Response_Product>>build().message("success")
+				.result(service_Search.filterProductByPriceAudio(priceMin, priceMax, page, 9));
+	}
+
 	@GetMapping("searchImage")
 	public ApiResponse<PageImpl<Response_Product>> searchImage(
 			@RequestParam(value = "idProducts") List<Integer> idProducts,

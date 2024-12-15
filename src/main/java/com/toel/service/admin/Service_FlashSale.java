@@ -12,7 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.request.FlashSale.Request_FlashSaleCreate;
@@ -74,17 +73,17 @@ public class Service_FlashSale {
         }
 
         public Response_FlashSale update(Request_FlashSaleUpdate flashSaleUpdate, Integer accountID) {
+                Response_FlashSale entityOld = flashSaleMapper.tResponse_FlashSale(flashSaleRepository
+                                .findById(flashSaleUpdate.getId())
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSale")));
                 FlashSale entity = flashSaleRepository.findById(flashSaleUpdate.getId())
                                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSale"));
-                FlashSale entityOld = flashSaleRepository.findById(flashSaleUpdate.getId())
-                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "FlashSale"));
-                Account account = accountRepository.findById(flashSaleUpdate.getAccount())
-                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
                 flashSaleMapper.toFlashSaleUpdate(entity, flashSaleUpdate);
-                entity.setAccount(account);
+                entity.setAccount(accountRepository.findById(flashSaleUpdate.getAccount())
+                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account")));
                 FlashSale flashSaleNew = flashSaleRepository.save(entity);
                 service_Log.setLog(getClass(), accountID, "INFO", "FlashSale",
-                                flashSaleMapper.tResponse_FlashSale(entityOld),
+                                entityOld,
                                 flashSaleMapper.tResponse_FlashSale(flashSaleNew),
                                 "Cập nhật Flash sale");
                 return flashSaleMapper.tResponse_FlashSale(flashSaleNew);
@@ -106,15 +105,4 @@ public class Service_FlashSale {
                                 "Xóa Flash sale");
         }
 
-        @Scheduled(fixedDelay = 60000)
-        public void run() {
-                if (flashSaleRepository.findByIsDelete(false).size() >= 1) {
-                        flashSaleRepository.findByIsDelete(false).forEach(flasesale -> {
-                                if (flasesale.getDateEnd().isBefore(LocalDateTime.now())) {
-                                        flasesale.setDelete(true);
-                                        flashSaleRepository.save(flasesale);
-                                }
-                        });
-                }
-        }
 }

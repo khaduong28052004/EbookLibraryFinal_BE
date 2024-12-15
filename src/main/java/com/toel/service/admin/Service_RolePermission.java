@@ -43,7 +43,7 @@ public class Service_RolePermission {
             rolePermission.setRole(role);
             RolePermission rolePermissionNew = rolePermissionRepository.save(rolePermission);
             service_Log.setLog(getClass(), accountID, "INFO", "RolePermission",
-                    rolePermissionMapper.toRolePermission(rolePermissionNew), null, "Thêm tiết quyền");
+                    rolePermissionMapper.toRolePermission(rolePermissionNew), null, "Thêm chi tiết quyền");
             list.add(rolePermissionMapper.toRolePermission(rolePermissionNew));
         });
 

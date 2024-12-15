@@ -15,7 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.request.DiscountRate.Request_DiscountRateCreate;
@@ -73,8 +72,9 @@ public class Service_DiscountRate {
     public Response_DiscountRate update(Request_DiscountRateUpdate discountRateUpdate, Integer accountID) {
         DiscountRate entity = discountRateRepository.findById(discountRateUpdate.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Chiết khấu"));
-        DiscountRate entityOld = discountRateRepository.findById(discountRateUpdate.getId())
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Chiết khấu"));
+        Response_DiscountRate entityOld = discountRateMapper
+                .tochChietKhauResponse(discountRateRepository.findById(discountRateUpdate.getId())
+                        .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Chiết khấu")));
         List<DiscountRate> discountRateNow = discountRateRepository.findAllBydateDeleteIsNull();
         for (DiscountRate discountRate2 : discountRateNow) {
             if (discountRate2.getDiscount() == discountRateUpdate.getDiscount()
@@ -82,9 +82,8 @@ public class Service_DiscountRate {
                 throw new AppException(ErrorCode.OBJECT_ACTIVE, "Mức chiết khấu");
             }
         }
-// <<<<<<< HEAD
-        entity.setDateStart(entity.getDateStart());
-        entity.setDiscount(entity.getDiscount());
+        entity.setDateStart(discountRateUpdate.getDateStart().atStartOfDay());
+        entity.setDiscount(discountRateUpdate.getDiscount());
         if (check(entity)) {
             Response_DiscountRate dResponse_DiscountRate = discountRateMapper
                     .tochChietKhauResponse(discountRateRepository.save(entity));
@@ -106,32 +105,18 @@ public class Service_DiscountRate {
                     emailToNameMap,
                     formattedDate,
                     entity.getDiscount().toString() + " %");
-            service_Log.setLog(getClass(), accountID, "INFO", "DiscountRate", discountRateMapper
-                    .tochChietKhauResponse(entityOld),
-                    dResponse_DiscountRate,
+            service_Log.setLog(getClass(), accountID, "INFO", "DiscountRate", entityOld, dResponse_DiscountRate,
                     "Cập nhật chiết khấu");
             return dResponse_DiscountRate;
         } else {
             throw new AppException(ErrorCode.OBJECT_SETUP, "Ngày áp dụng đã tồn tại");
         }
-// =======
-
-//         return Optional.of(discountRate)
-//                 .map(entity -> {
-//                     entity.setDateStart(discountRateUpdate.getDateStart());
-//                     entity.setDiscount(discountRateUpdate.getDiscount());
-//                     return entity;
-//                 })
-//                 .filter(this::check)
-//                 .map(discountRateRepository::saveAndFlush)
-//                 .map(discountRateMapper::tochChietKhauResponse)
-//                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_SETUP, "Ngày áp dụng đã tồn tại"));
-
-// >>>>>>> khadev28
     }
 
     public Response_DiscountRate create(Request_DiscountRateCreate discountRateCreate, Integer accountID) {
-        DiscountRate entity = discountRateMapper.toDiscountRateCreate(discountRateCreate);
+        DiscountRate entity = new DiscountRate();
+        entity.setDiscount(discountRateCreate.getDiscount());
+        entity.setDateStart(discountRateCreate.getDateStart().atStartOfDay());
         entity.setAccount(accountRepository.findById(1)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
                         "Account")));
@@ -184,19 +169,6 @@ public class Service_DiscountRate {
             // discountRateMapper.tochChietKhauResponse(discountRate),null,
             // "Xóa chiết khấu");
             throw new AppException(ErrorCode.OBJECT_ACTIVE, "Chiết khấu");
-        }
-    }
-
-    @Scheduled(fixedDelay = 60000)
-    // @Scheduled(fixedDelay = 100)
-    public void run() {
-        if (discountRateRepository.findAllBydateDeleteIsNull().size() >= 2) {
-            DiscountRate discountRate = discountRateRepository.findLatestDiscountRate().get(0);
-            discountRateRepository.findAllBydateDeleteIsNull().forEach(rate -> {
-                if (rate.getDateStart().isBefore(LocalDateTime.now()) && rate.getId() != discountRate.getId())
-                    rate.setDateDelete(LocalDateTime.now());
-                discountRateRepository.save(rate);
-            });
         }
     }
 

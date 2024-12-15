@@ -79,7 +79,7 @@ public class Service_AccountReport {
                 EmailTemplateType.PHANHOIREPORT, entity.getAccount().getFullname(), contents, formattedDate,
                 entity.getTitle(), entity.getContent());
         AccountReport accountReportNew = accountReportRepository.save(entity);
-        service_Log.setLog(getClass(), accountID, "INFO", "Account", accountReportNew,null,
+        service_Log.setLog(getClass(), accountID, "INFO", "AccountReport", accountReportNew,null,
                 "Xử lý tài khoản bị báo cáo");
         return accountReportMapper.toResponse_AccountReport(accountReportNew);
     }

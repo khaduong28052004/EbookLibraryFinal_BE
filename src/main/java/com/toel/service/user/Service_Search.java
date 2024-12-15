@@ -135,6 +135,43 @@ public class Service_Search {
 		return response;
 	}
 
+	public PageImpl<Response_Product> filterProductByCategoryAudio(List<Integer> id_categories, Integer page,
+			Integer size) {
+		System.out.println("=============================================" + listProducts.size());
+		Pageable pageable = PageRequest.of(page, size);
+		List<Category> listCategories = new ArrayList<Category>();
+		for (Integer id_catgory : id_categories) {
+			listCategories.add(categoryRepo.findById(id_catgory).get());
+		}
+		List<Integer> listIdProducts = listProducts.stream().map(product -> product.getId())
+				.collect(Collectors.toList());
+		Page<Product> pageProducts = productRepo.findByCategoryInAndIdIn(listCategories, listIdProducts, pageable);
+
+		List<Response_Product> listResponse_Products = new ArrayList<Response_Product>();
+		for (Product product : pageProducts) {
+			listResponse_Products.add(productMaperUser.productToResponse_Product(product));
+		}
+		return new PageImpl<>(listResponse_Products, pageable, pageProducts.getTotalElements());
+	}
+
+	public PageImpl<Response_Product> filterProductByPriceAudio(double priceMin, double priceMax, Integer page,
+			Integer size) {
+		Pageable pageable = PageRequest.of(page, size);
+
+		List<Integer> listIdProducts = listProducts.stream().map(product -> product.getId())
+				.collect(Collectors.toList());
+		Page<Product> pageProducts = productRepo.findByPriceBetweenAndIdIn(priceMin, priceMax, listIdProducts,
+				pageable);
+
+		listProductByCategory = pageProducts.getContent();
+
+		List<Response_Product> listResponse_Products = new ArrayList<Response_Product>();
+		for (Product product : pageProducts) {
+			listResponse_Products.add(productMaperUser.productToResponse_Product(product));
+		}
+		return new PageImpl<>(listResponse_Products, pageable, pageProducts.getTotalElements());
+	}
+
 	public Map<String, Object> filterProductByPrice(double priceMin, double priceMax, Integer size, String sort) {
 		Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, sort));
 
@@ -259,32 +296,48 @@ public class Service_Search {
 				listAudio = service_ThongKe_Product.get_Search_Product(
 						java.sql.Date.valueOf(startDate),
 						java.sql.Date.valueOf(endDate), option, null, page, size, true, sortKey);
+				listProducts = productMaperUser.toResponse_SearchAudio(service_ThongKe_Product.get_Search_Product(
+						java.sql.Date.valueOf(startDate),
+						java.sql.Date.valueOf(endDate), option, null, 0, (int) listAudio.getTotalElements(), true,
+						sortKey).getContent());
 			} else if (option != null) {
 				listAudio = service_ThongKe_Product.get_Search_Product(null,
 						null, option, null, page, size, true, sortKey);
+
+				listProducts = productMaperUser.toResponse_SearchAudio(service_ThongKe_Product.get_Search_Product(null,
+						null, option, null, 0, (int) listAudio.getTotalElements(), true, sortKey).getContent());
 			} else {
 				pageProduct = productRepository.selectAllMatchingKey(search, null,
 						pageable);
+
+				Pageable pageable2 = PageRequest.of(0, (int) pageProduct.getTotalElements());
+
+				listProducts = productRepository.selectAllMatchingKey(search, null,
+						pageable2).getContent();
 			}
 		} else {
 			listAudio = new PageImpl<>(new ArrayList<>()); // Khởi tạo một PageImpl rỗng nếu không có dữ liệu
 			pageProduct = productRepository.selectAllMatchingKey(search, null,
 					pageable);
+			Pageable pageable2 = PageRequest.of(0, (int) pageProduct.getTotalElements());
 
+			listProducts = productRepository.selectAllMatchingKey(search, null,
+					pageable2).getContent();
 		}
 
 		// Xử lý dữ liệu trả về
 		if (listAudio != null && !listAudio.getContent().isEmpty()) {
 			Response_Search<Response_SearchAudio> responseSearch = new Response_Search<>();
 
-			for (Response_SearchAudio audio : listAudio.getContent()) {
-				// if (audio.getCategory() != null && !listCategories.stream().anyMatch(c -> c.getId().equals(audio.getCategory().getId()))) {
-					if (audio.getCategory() != null && !listCategories.contains(audio.getCategory())) {	
-				listCategories.add(audio.getCategory());
+			for (Product audio : listProducts) {
+				if (audio.getCategory() != null && !listCategories.contains(audio.getCategory())) {
+					listCategories.add(audio.getCategory());
 				}
 			}
 			responseSearch.setProduct(listAudio);
 			responseSearch.setCategories(listCategories);
+			System.out.println("=============================================responseSearch" + listProducts.size());
+
 			return responseSearch;
 		} else if (pageProduct != null && !pageProduct.getContent().isEmpty()) {
 			Response_Search<Response_Product> responseSearch = new Response_Search<>();
@@ -292,15 +345,16 @@ public class Service_Search {
 					.map(product -> productMaperUser.productToResponse_Product(product))
 					.collect(Collectors.toList());
 			for (Product product : pageProduct.getContent()) {
-				// if (product.getCategory() != null && !listCategories.stream().anyMatch(c -> c.getId().equals(product.getCategory().getId()))) {
-				    if (product.getCategory() != null && !listCategories.contains(product.getCategory())) {
-	
-				listCategories.add(product.getCategory());
+				if (product.getCategory() != null && !listCategories.contains(product.getCategory())) {
+
+					listCategories.add(product.getCategory());
 				}
 			}
 			PageImpl<Response_Product> pageImpl = new PageImpl<>(list, pageable, pageProduct.getTotalElements());
 			responseSearch.setProduct(pageImpl);
 			responseSearch.setCategories(listCategories);
+			System.out.println("=============================================responseSearch" + listProducts.size());
+
 			return responseSearch;
 		} else {
 			return null;

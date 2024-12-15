@@ -1,5 +1,7 @@
 package com.toel.repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -8,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -30,7 +31,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			+ "	 ORDER BY CASE WHEN :orderBy = 'create' THEN b.createAt "
 			+ "              WHEN :orderBy = 'update' THEN b.updateAt " + "              ELSE b.createAt END DESC")
 	List<Object[]> findBillsByUserIdAndOrderStatusOrderedByCreateOrUpdate(@Param("userId") Integer userId,
-			@Param("orderStatus") Integer orderStatus, @Param("orderBy") String orderBy);
+			@Param("orderStatus") Integer orderStatus, @Param("orderBy") String orderBy, Pageable pageable);
 
 	@Query("SELECT \r\n" + //
 			"    b.id AS billId, \r\n" + //
@@ -45,7 +46,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			"JOIN  b.orderStatus os WHERE a.id = :userId \r\n" + //
 			"ORDER BY b.createAt DESC\r\n" + //
 			"")
-	List<Object[]> findBillsByUserId(@Param("userId") Integer userId);
+	List<Object[]> findBillsByUserId(@Param("userId") Integer userIdm, Pageable pageable);
 
 	// Seller (Update Shop)
 
@@ -249,5 +250,9 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			+ "AND DATE(bd.bill.createAt) BETWEEN COALESCE(:startDate, CURRENT_DATE) AND COALESCE(:endDate, CURRENT_DATE) GROUP BY b.id ORDER BY b.id DESC")
 	List<Bill> getBillChatBot(@Param("accountId") Integer accountId, @Param("startDate") Date dateStart,
 			@Param("endDate") Date dateEnd);
+
+	@Query("SELECT b FROM Bill b WHERE b.orderStatus.id = 4 AND b.updateAt <= :sevenDaysAgo")
+	List<Bill> findBillsToAutoConfirm(@Param("sevenDaysAgo") LocalDateTime sevenDaysAgo);
+
 
 }

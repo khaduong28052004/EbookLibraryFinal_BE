@@ -8,8 +8,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.*;
@@ -20,21 +18,21 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Platforms")
+@Table(name = "platforms")
 public class Platform {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
-    String token;
+    String name;
     String address;
     String phone;
     String email;
     String policies;
 
-    @ManyToOne
-    @JoinColumn(name = "account_id")
-    Account account;
+    @JsonIgnore
+	@OneToMany(mappedBy = "platform")
+    List<Account> accounts;
 
     @JsonIgnore
 	@OneToMany(mappedBy = "platform")

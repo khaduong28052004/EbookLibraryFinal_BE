@@ -34,6 +34,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	@Query("SELECT p FROM Product p WHERE p.isActive = false and p.isDelete=false "
 			+ "AND (:price IS NULL OR p.price = :price OR p.sale = :price )"
 			+ "AND (:key iS NULL OR p.name LIKE %:key%  "
+			+ "OR p.category.name LIKE %:key%  "
 			+ "OR p.writerName LIKE %:key% OR p.publishingCompany LIKE %:key%)")
 	Page<Product> selectAllByActiveAndDeleteAndMatchingAttributes(@Param("key") String key,
 			@Param("price") Double price, Pageable pageable);
@@ -41,6 +42,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	@Query("SELECT p FROM Product p WHERE p.isActive = true "
 			+ "AND (:price IS NULL OR p.price = :price OR p.sale = :price )"
 			+ "AND (:key iS NULL OR p.name LIKE %:key%  "
+			+ "OR p.category.name LIKE %:key%  "
 			+ "OR p.writerName LIKE %:key% OR p.publishingCompany LIKE %:key%)")
 	Page<Product> selectAllByActiveAndMatchingKey(@Param("key") String key, @Param("price") Double price,
 			Pageable pageable);
@@ -48,6 +50,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	@Query("SELECT p FROM Product p WHERE p.isActive != false And p.isDelete != true "
 			+ "AND (:price IS NULL OR p.price = :price OR p.sale = :price )"
 			+ "AND (:key iS NULL OR p.name LIKE %:key%  "
+			+ "OR p.category.name LIKE %:key%  "
 			+ "OR p.writerName LIKE %:key% OR p.publishingCompany LIKE %:key%)")
 	Page<Product> selectAllMatchingKey(@Param("key") String key, @Param("price") Double price, Pageable pageable);
 
@@ -105,7 +108,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			Pageable pageable);
 
 	@Query("SELECT p FROM Product p WHERE p.account.id = :idShop AND p.isActive = true AND p.isDelete=false AND p.account.status = true")
-	List<Product> findAllIdIn(@Param("idShop") Integer idShop);
+	Page<Product> findAllIdIn(@Param("idShop") Integer idShop, Pageable pageable);
 
 	@Query("SELECT p FROM Product p WHERE p.isActive = true AND p.isDelete = false AND p.account.status = true")
 	List<Product> findAllProduct(Sort sort);
@@ -133,17 +136,18 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			+ "GROUP BY bd.product.id")
 	List<Integer> selectIdBillDetailTopProduct(Pageable pageable);
 
+	@Query("SELECT bd.product.id " + "FROM BillDetail bd " + "WHERE bd.bill.orderStatus.id IN (4, 5) "
+			+ "AND bd.product.id NOT IN :excludedIds " + "GROUP BY bd.product.id")
+	List<Integer> selectIdBillDetailTopProductNotIds(@Param("excludedIds") List<Integer> excludedIds,
+			Pageable pageable);
+
 	@Query("SELECT p FROM Product p " + "WHERE p.isActive = true " + "AND p.isDelete = false " + "  AND p.quantity > 0"
 			+ "AND p.account.status = true " + "AND p.id IN ?1")
 	List<Product> selectProductInIdProduct(List<Integer> ids);
 
-	@Query("SELECT p " +
-			"FROM Product p " +
-			"JOIN BillDetail bd ON p.id = bd.product.id " +
-			"JOIN Bill b ON bd.bill.id = b.id " +
-			"WHERE b IN :bills " +
-			"GROUP BY p.id " +
-			"ORDER BY SUM(bd.quantity) DESC")
+	@Query("SELECT p " + "FROM Product p " + "JOIN BillDetail bd ON p.id = bd.product.id "
+			+ "JOIN Bill b ON bd.bill.id = b.id " + "WHERE b IN :bills " + "GROUP BY p.id "
+			+ "ORDER BY SUM(bd.quantity) DESC")
 	List<Product> findTop10ByBillDetails(@Param("bills") List<Bill> bills);
 
 	@Query("SELECT p FROM Product p " +
@@ -174,53 +178,34 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 			"         END DESC")
 	List<Product> findChatBotASC(@Param("keySearch") String keySearch);
 
-	@Query("SELECT p FROM Product p " +
-			"LEFT JOIN BillDetail bd ON p.id = bd.product.id " +
-			"LEFT JOIN Evalue e ON e.product.id = p.id " +
-			"LEFT JOIN Like l ON l.product.id = p.id " +
-			"WHERE p.isDelete = false AND p.isActive = true " +
-			"AND " +
-			"  CASE " +
-			"    WHEN :keySearch = 'moi' THEN p.createAt BETWEEN :dateStart AND :dateEnd " +
-			"    WHEN :keySearch = 'danh gia' THEN e.createAt BETWEEN :dateStart AND :dateEnd " +
-			"    WHEN :keySearch = 'luot ban' THEN bd.bill.createAt BETWEEN :dateStart AND :dateEnd" +
-			"    WHEN :keySearch = 'yeu thich' THEN l.createAt BETWEEN :dateStart AND :dateEnd" +
-			"  END " +
-			"GROUP BY p.id " +
-			"ORDER BY " +
-			"  CASE " +
-			"    WHEN :keySearch = 'moi' THEN p.id " +
-			"    WHEN :keySearch = 'danh gia' THEN COUNT(e.id) " +
-			"    WHEN :keySearch = 'luot ban' THEN SUM(bd.quantity) " +
-			"    WHEN :keySearch = 'yeu thich' THEN COUNT(l.id) " +
-			"  END DESC")
-	List<Product> findChatBotByDateDESC(@Param("keySearch") String keySearch,
-			@Param("dateStart") Date dateStart,
+	@Query("SELECT p FROM Product p " + "LEFT JOIN BillDetail bd ON p.id = bd.product.id "
+			+ "LEFT JOIN Evalue e ON e.product.id = p.id " + "LEFT JOIN Like l ON l.product.id = p.id "
+			+ "WHERE p.isDelete = false AND p.isActive = true " + "AND " + "  CASE "
+			+ "    WHEN :keySearch = 'moi' THEN p.createAt BETWEEN :dateStart AND :dateEnd "
+			+ "    WHEN :keySearch = 'danh gia' THEN e.createAt BETWEEN :dateStart AND :dateEnd "
+			+ "    WHEN :keySearch = 'luot ban' THEN bd.bill.createAt BETWEEN :dateStart AND :dateEnd"
+			+ "    WHEN :keySearch = 'yeu thich' THEN l.createAt BETWEEN :dateStart AND :dateEnd" + "  END "
+			+ "GROUP BY p.id " + "ORDER BY " + "  CASE " + "    WHEN :keySearch = 'moi' THEN p.id "
+			+ "    WHEN :keySearch = 'danh gia' THEN COUNT(e.id) "
+			+ "    WHEN :keySearch = 'luot ban' THEN SUM(bd.quantity) "
+			+ "    WHEN :keySearch = 'yeu thich' THEN COUNT(l.id) " + "  END DESC")
+	List<Product> findChatBotByDateDESC(@Param("keySearch") String keySearch, @Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd);
 
-	@Query("SELECT p FROM Product p " +
-			"LEFT JOIN BillDetail bd ON p.id = bd.product.id " +
-			"LEFT JOIN Evalue e ON e.product.id = p.id " +
-			"LEFT JOIN Like l ON l.product.id = p.id " +
-			"WHERE p.isDelete = false AND p.isActive = true " +
-			"AND " +
-			"  CASE " +
-			"    WHEN :keySearch = 'moi' THEN p.createAt BETWEEN :dateStart AND :dateEnd " +
-			"    WHEN :keySearch = 'danh gia' THEN e.createAt BETWEEN :dateStart AND :dateEnd " +
-			"    WHEN :keySearch = 'luot ban' THEN bd.bill.createAt BETWEEN :dateStart AND :dateEnd" +
-			"    WHEN :keySearch = 'yeu thich' THEN l.createAt BETWEEN :dateStart AND :dateEnd" +
-			"  END " +
-			"GROUP BY p.id " +
-			"ORDER BY " +
-			"  CASE " +
-			"    WHEN :keySearch = 'moi' THEN p.id " +
-			"    WHEN :keySearch = 'danh gia' THEN COUNT(e.id) " +
-			"    WHEN :keySearch = 'luot ban' THEN SUM(bd.quantity) " +
-			"    WHEN :keySearch = 'yeu thich' THEN COUNT(l.id) " +
-			"  END ASC")
-	List<Product> findChatBotByDateASC(@Param("keySearch") String keySearch,
-			@Param("dateStart") Date dateStart,
+	@Query("SELECT p FROM Product p " + "LEFT JOIN BillDetail bd ON p.id = bd.product.id "
+			+ "LEFT JOIN Evalue e ON e.product.id = p.id " + "LEFT JOIN Like l ON l.product.id = p.id "
+			+ "WHERE p.isDelete = false AND p.isActive = true " + "AND " + "  CASE "
+			+ "    WHEN :keySearch = 'moi' THEN p.createAt BETWEEN :dateStart AND :dateEnd "
+			+ "    WHEN :keySearch = 'danh gia' THEN e.createAt BETWEEN :dateStart AND :dateEnd "
+			+ "    WHEN :keySearch = 'luot ban' THEN bd.bill.createAt BETWEEN :dateStart AND :dateEnd"
+			+ "    WHEN :keySearch = 'yeu thich' THEN l.createAt BETWEEN :dateStart AND :dateEnd" + "  END "
+			+ "GROUP BY p.id " + "ORDER BY " + "  CASE " + "    WHEN :keySearch = 'moi' THEN p.id "
+			+ "    WHEN :keySearch = 'danh gia' THEN COUNT(e.id) "
+			+ "    WHEN :keySearch = 'luot ban' THEN SUM(bd.quantity) "
+			+ "    WHEN :keySearch = 'yeu thich' THEN COUNT(l.id) " + "  END ASC")
+	List<Product> findChatBotByDateASC(@Param("keySearch") String keySearch, @Param("dateStart") Date dateStart,
 			@Param("dateEnd") Date dateEnd);
+	
 	// @Query("SELECT p.id, p.name, sum(billdetails.quantity) as totalSell\r\n" + //
 	// "from BillDetail bd\r\n" + //
 	// "join Product p on bd.product.id = p.id \r\n" + //
@@ -229,5 +214,26 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 	// "and bills.createAt >= DATE_SUB(NOW())\r\n" + //
 	// "GROUP BY p.id, p.name\r\n")
 	// List<Product> findTopProductShop(Integer id_Shop);
+
+	List<Product> findByCategory(Category category);
+
+	@Query("SELECT p FROM Product p WHERE p.category IN :categories")
+	List<Product> findByCategoryIn(@Param("categories") List<Category> categories);
+	
+	
+
+	@Query(value = "SELECT p.* " +
+			"FROM billdetails bd " +
+			"JOIN products p ON bd.product_id = p.id " +
+			"JOIN bills b ON bd.bill_id = b.id " +
+			"WHERE p.isActive = 1 AND p.isDelete = 0 AND p.account_id = ?1  AND (b.orderstatus_id = 6 OR b.orderstatus_id = 5) "+
+			"GROUP BY p.id " +
+			"ORDER BY SUM(bd.quantity) DESC " +
+			"LIMIT 3", nativeQuery = true)
+	List<Product> findTop3ProductsByShopId(Integer idShop);
+
+
+
+	
 
 }

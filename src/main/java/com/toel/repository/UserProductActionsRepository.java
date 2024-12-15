@@ -1,16 +1,13 @@
 package com.toel.repository;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.toel.model.UserProductActions;
 import java.util.List;
+import java.time.LocalDateTime;
 
 @Repository
 public interface UserProductActionsRepository extends JpaRepository<UserProductActions, Long> {
@@ -19,6 +16,17 @@ public interface UserProductActionsRepository extends JpaRepository<UserProductA
     Optional<UserProductActions> findByUserIdAndProductId(Integer userId, Integer productId);
 
     List<UserProductActions> findByUserId(Integer userId);
+
+    List<UserProductActions> findByLastActionTime(LocalDateTime lastActionTime);
+
+    List<UserProductActions> findByLastActionTimeBetween(LocalDateTime start, LocalDateTime end);
+
+    List<UserProductActions> findByUserIdAndLastActionTime(Integer userId, LocalDateTime lastActionTime);
+
+    List<UserProductActions> findByUserIdAndLastActionTimeBetween(Integer userId, LocalDateTime start, LocalDateTime end);
+
+    
+    
     // Cập nhật số lượng cho hành động cụ thể
     // @Modifying
     // @Query("UPDATE UserProductActions u SET u.viewCount = u.viewCount + :count,

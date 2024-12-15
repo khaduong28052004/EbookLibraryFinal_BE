@@ -1,5 +1,6 @@
 package com.toel.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,7 +27,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "DiscountRates")
+@Table(name = "discountrates")
 public class DiscountRate {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
