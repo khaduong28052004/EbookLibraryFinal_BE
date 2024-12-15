@@ -386,11 +386,17 @@ public class UserProductActionsService {
         return productMapper.Response_ProductInfo(listhoatdong);
     }
 
-    public List<UserProductActions> UserProductActionsDate(List<UserProductActions> userProductActions,
+    public List<UserProductActions> UserProductActionsDate(
             LocalDateTime date) {
         List<UserProductActions> behaviors = actionsRepository.findByLastActionTime(date);// get all UserProductActions
-        return userProductActions;
+        return behaviors;
     }
+
+//     public List<UserProductActions> UserProductActionType(
+//         LocalDateTime date) {
+//     List<UserProductActions> behaviors = actionsRepository.findByA;// get all UserProductActions
+//     return behaviors;
+// }
 
 
 
