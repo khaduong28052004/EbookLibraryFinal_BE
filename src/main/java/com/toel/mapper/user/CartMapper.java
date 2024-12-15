@@ -5,7 +5,7 @@ import org.mapstruct.Mapper;
 import com.toel.dto.user.response.Response_Cart;
 import com.toel.model.Cart;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface CartMapper {
 	Response_Cart response_Cart_MapperTo_Cart(Cart cart);
 }

@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import org.springdoc.core.converters.models.Sort;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.toel.model.Product;
@@ -335,17 +336,17 @@ public class UserProductActionsService {
         listCategory = listCategory.stream() // Loại bỏ trùng lặp danh mục
                 .distinct()
                 .collect(Collectors.toList());
-        List<Product> products = productRepository.findByCategoryIn(listCategory).stream() // loc san pham //
-                                                                                           // product.isDelete() = //
-                                                                                           // false // nguoc lai
+        List<Product> products = productRepository.findByCategoryIn(listCategory).stream()
                 .filter(product -> product.isActive() && product.isDelete() == false && product.getAccount().isStatus())
                 .limit(size)
                 .collect(Collectors.toList());
         // pr inin danh mục trong
-        // List<Product> listhoatdong = products.stream() // loc san pham product.isDelete() == false // nguoc lai isStatus
-        //                                                // = true
-        //         .filter(product -> product.isActive() && product.isDelete() == false && product.getAccount().isStatus())
-        //         .collect(Collectors.toList());
+        // List<Product> listhoatdong = products.stream() // loc san pham
+        // product.isDelete() == false // nguoc lai isStatus
+        // // = true
+        // .filter(product -> product.isActive() && product.isDelete() == false &&
+        // product.getAccount().isStatus())
+        // .collect(Collectors.toList());
         return productMapper.Response_ProductInfo(products);
     }
 
@@ -354,9 +355,11 @@ public class UserProductActionsService {
         List<Response_ProductInfo> list = recommendProducts(userId);
         List<com.toel.model.Category> listCategory = new ArrayList<>(); // danh mục in sản phẩm đề xuất
         for (Response_ProductInfo response_ProductInfo : list) {
-            List<com.toel.model.Category> categories = categoryRepository
-                    .findALlByIdAccount(response_ProductInfo.getAccount().getId());
-            listCategory.addAll(categories);
+            // List<com.toel.model.Category> categories = categoryRepository
+            //         .findALlByIdAccount(response_ProductInfo.getAccount().getId());
+            // listCategory.addAll(categories);
+            listCategory.add(response_ProductInfo.getCategory());
+
         }
         listCategory = listCategory.stream() // Loại bỏ trùng lặp danh mục
                 .distinct()
@@ -388,6 +391,8 @@ public class UserProductActionsService {
         List<UserProductActions> behaviors = actionsRepository.findByLastActionTime(date);// get all UserProductActions
         return userProductActions;
     }
+
+
 
     // public List<Product> recommendProducts() {
     // List<UserProductActions> behaviors = actionsRepository.findAll();

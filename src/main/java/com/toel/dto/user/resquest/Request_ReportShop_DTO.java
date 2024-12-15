@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Mapper(componentModel = "spring")
+// @Mapper(componentModel = "spring")
 public class Request_ReportShop_DTO {
     @NotNull(message = "Vui lòng kiểm tra account id")
     private Integer accountId;

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.toel.model.Category;
+import com.toel.model.Product;
 
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
@@ -36,5 +37,8 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
                         "AND (?1 IS NULL OR c.name LIKE CONCAT('%', ?1, '%')) " +
                         "GROUP BY c.id, parent.name")
         Page<Object[]> findCategoriesWithParentName(String search, Integer accountId, Pageable pageable);
+
+        @Query("SELECT p FROM Product p JOIN p.evalues e WHERE p.isActive = true AND p.isDelete = false AND p.category.name LIKE CONCAT('%', ?1, '%') GROUP BY p.id ORDER BY AVG(e.star) DESC")
+        List<Product> findTop1ByCategoryName(String name);
 
 }
