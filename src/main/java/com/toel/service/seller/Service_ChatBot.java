@@ -22,6 +22,7 @@ import com.toel.dto.seller.response.Response_ChatBotCategory;
 import com.toel.dto.user.response.Response_Product;
 import com.toel.mapper.BillMapper;
 import com.toel.mapper.user.ProductMaperUser;
+import com.toel.model.Bill;
 import com.toel.model.Product;
 import com.toel.repository.BillRepository;
 import com.toel.repository.CategoryRepository;
