@@ -24,7 +24,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Roles")
+@Table(name = "roles")
 public class Role {
 
 	@Id

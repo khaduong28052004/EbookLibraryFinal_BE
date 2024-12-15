@@ -23,7 +23,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "ProductReports")
+@Table(name = "productreports")
 public class ProductReport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -15,7 +15,7 @@ import lombok.Setter;
 
 @Data
 @Entity
-@Table(name = "userProductActions")
+@Table(name = "userproductactions")
 @Setter
 @Getter
 @AllArgsConstructor
