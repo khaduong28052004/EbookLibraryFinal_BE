@@ -17,6 +17,7 @@ public interface UserProductActionsRepository extends JpaRepository<UserProductA
 
     List<UserProductActions> findByUserId(Integer userId);
 
+
     List<UserProductActions> findByLastActionTime(LocalDateTime lastActionTime);
 
     List<UserProductActions> findByLastActionTimeBetween(LocalDateTime start, LocalDateTime end);
