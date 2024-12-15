@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.toel.dto.admin.request.ImagePlaform.Request_ImagePlaformCreate;
 import com.toel.dto.admin.request.Platform.Request_PlatformUpdate;
 import com.toel.dto.admin.response.Response_ImagePlaform;
 import com.toel.dto.admin.response.Response_Platform;
@@ -18,11 +17,9 @@ import com.toel.mapper.ImagePlaformMapper;
 import com.toel.mapper.PlatformMapper;
 import com.toel.model.CategoryImage;
 import com.toel.model.ImagePlaform;
-import com.toel.model.ImageProduct;
 import com.toel.model.Platform;
-import com.toel.model.Product;
-import com.toel.repository.CategoryImageRepository;
-import com.toel.repository.ImagePlaformRepository;
+import com.toel.repository.CategoryImagesRepository;
+import com.toel.repository.ImagePlatformsRepository;
 import com.toel.repository.PlatformRepository;
 import com.toel.service.firebase.DeleteImage;
 import com.toel.service.firebase.UploadImage;
@@ -32,9 +29,9 @@ public class Service_ThongTinSan {
     @Autowired
     PlatformRepository platformRepository;
     @Autowired
-    CategoryImageRepository categoryImageRepository;
+    CategoryImagesRepository categoryImageRepository;
     @Autowired
-    ImagePlaformRepository imagePlaformRepository;
+    ImagePlatformsRepository imagePlaformRepository;
     @Autowired
     PlatformMapper platformMapper;
     @Autowired
@@ -51,7 +48,11 @@ public class Service_ThongTinSan {
     public Response_Platform update(Request_PlatformUpdate platformUpdate) {
         Platform platform = platformRepository.findById(platformUpdate.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Sàn"));
-        platformMapper.Request_PlatformUpdate(platform, platformUpdate);
+        if (platformUpdate.getPolicies() == null) {
+            platformMapper.Request_PlatformUpdateNotPolicies(platform, platformUpdate);
+        } else {
+            platform.setPolicies(platformUpdate.getPolicies());
+        }
         return platformMapper.tResponse_Platform(platformRepository.save(platform));
     }
 
@@ -69,37 +70,45 @@ public class Service_ThongTinSan {
                 .toList();
     }
 
-    // public Response_ImagePlaform createImagePlaform(Request_ImagePlaformCreate image) {
-    //     ImagePlaform entity = new ImagePlaform();
-    //     entity.setCategoryImage(categoryImageRepository.findById(image.getCategoryImage()).get());
-    //     entity.setUrl(image.getUrl());
-    //     return imagePlaformMapper.toImagePlaform(imagePlaformRepository.save(entity));
+    // public Response_ImagePlaform createImagePlaform(Request_ImagePlaformCreate
+    // image) {
+    // ImagePlaform entity = new ImagePlaform();
+    // entity.setCategoryImage(categoryImageRepository.findById(image.getCategoryImage()).get());
+    // entity.setUrl(image.getUrl());
+    // return
+    // imagePlaformMapper.toImagePlaform(imagePlaformRepository.save(entity));
     // }
 
-    public void delete(List<Integer> list) {
-        list.forEach(item -> {
-            ImagePlaform imagePlaform = imagePlaformRepository.findById(item)
-                    .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Ảnh"));
-            imagePlaformRepository.delete(imagePlaform);
-        });
-    }
+    // public void delete(List<Integer> list) {
+    // list.forEach(item -> {
+    // ImagePlaform imagePlaform = imagePlaformRepository.findById(item)
+    // .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Ảnh"));
+    // imagePlaformRepository.delete(imagePlaform);
+    // });
+    // }
 
-    public boolean saveImagePlaform(Integer categoryId, List<MultipartFile> images) {
-        return updateProductImages(categoryImageRepository.findById(categoryId)
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Loại Ảnh")), images);
-    }
+    // public boolean saveImagePlaform(Integer categoryId, List<MultipartFile>
+    // images) {
+    // return updateProductImages(categoryImageRepository.findById(categoryId)
+    // .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Loại Ảnh")),
+    // images);
+    // }
 
     public boolean updateProductImages(CategoryImage categoryImage, List<MultipartFile> images) {
         try {
-            for (ImagePlaform image : categoryImage.getImagePlaforms()) {
-                try {
-                    deleteImage.deleteFileByUrl(image.getUrl());
-                    imagePlaformRepository.delete(image);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return false;
-                }
-            }
+            System.out.println("===== categoryImage" + categoryImage.getName());
+
+            imagePlaformRepository.deleteAll(categoryImage.getImagePlaforms());
+            // for (ImagePlaform image : categoryImage.getImagePlaforms()) {
+            // try {
+            // System.out.println("===== categoryImageIMG" + image);
+            // // deleteImage.deleteFileByUrl(image.getUrl());
+            // imagePlaformRepository.delete(image);
+            // } catch (Exception e) {
+            // e.printStackTrace();
+            // return false;
+            // }
+            // }
 
             List<ImagePlaform> imagePlaforms = new ArrayList<>();
             for (MultipartFile requestImage : images) {

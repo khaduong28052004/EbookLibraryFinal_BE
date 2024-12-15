@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 import com.toel.dto.user.CategoryImageDTO;
 import com.toel.dto.user.ImagePlatformDTO;
 import com.toel.model.CategoryImage;
-import com.toel.model.ImagePlaform;
 import com.toel.repository.CategoryImagesRepository;
-import com.toel.repository.ImagePlatformsRepository;
 @Service
 public class Service_ImagePlatform_User {
    

@@ -30,7 +30,7 @@ public class Service_Home {
     public Integer getCountByRole(int roleId) {
         Role role = roleRepository.findById(roleId)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Role"));
-        Integer count = accountRepository.findAllByRole(role).size();
+        Integer count = accountRepository.findByRoleAndStatus(role, true).size();
         return count == null ? 0 : count;
     }
 
@@ -60,7 +60,7 @@ public class Service_Home {
 
     public List<Response_ChartAccount> getCharAccount() {
         List<Response_ChartAccount> list = new ArrayList<>();
-        list.add(createChartAccount("Nhân viên sàn", 2));
+        list.add(createChartNhanVien("Nhân viên sàn"));
         list.add(createChartAccount("Người bán", 3));
         list.add(createChartAccount("Khách hàng", 4));
         return list;
@@ -70,6 +70,15 @@ public class Service_Home {
         Response_ChartAccount chartAccount = new Response_ChartAccount();
         chartAccount.setLabels(key);
         chartAccount.setSeries(getCountByRole(roleId));
+        return chartAccount;
+    }
+
+    private Response_ChartAccount createChartNhanVien(String key) {
+        List<Role> listRole = roleRepository.selectRoleNhanVien();
+
+        Response_ChartAccount chartAccount = new Response_ChartAccount();
+        chartAccount.setLabels(key);
+        chartAccount.setSeries(accountRepository.selectAllByRolesIn(listRole, true).size());
         return chartAccount;
     }
 

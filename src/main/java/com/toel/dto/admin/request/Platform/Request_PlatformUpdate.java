@@ -13,13 +13,10 @@ public class Request_PlatformUpdate {
     @NotNull(message = "FIELD_REQUIRED")
     private Integer id;
     @NotBlank(message = "FIELD_REQUIRED")
-    private String name;
-    @NotBlank(message = "FIELD_REQUIRED")
     private String address;
     @NotBlank(message = "FIELD_REQUIRED")
     private String phone;
     @NotBlank(message = "FIELD_REQUIRED")
     private String email;
-    @NotBlank(message = "FIELD_REQUIRED")
     private String policies;
 }

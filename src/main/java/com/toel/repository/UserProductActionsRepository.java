@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.toel.model.UserProductActions;
 import java.util.List;
+import java.time.LocalDateTime;
 
 @Repository
 public interface UserProductActionsRepository extends JpaRepository<UserProductActions, Long> {
