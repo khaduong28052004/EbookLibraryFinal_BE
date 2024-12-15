@@ -230,20 +230,21 @@ public class UserProductActionsController {
     ) {
         List<BillDetail> listBD = billDetailRepository.findAll().stream()
                 .filter(m -> m.getBill().getOrderStatus().getId() == 5).collect(Collectors.toList());
-        List<Product> listP = listBD.stream().map(m -> m.getProduct()).collect(Collectors.toList());
-        
+        List<Product> listP = listBD.stream().map(m -> m.getProduct()).collect(Collectors.toSet()).stream()
+                .filter(product -> product.isActive() && product.isDelete() == false)
+                .collect(Collectors.toList()); // Convert it back to a list if needed;
+
         List<Response_ProductInfo> allProducts = productMapper.Response_ProductInfo(listP);
         int start = (int) Math.min((long) page * size, allProducts.size());
         int end = (int) Math.min(start + size, allProducts.size());
         List<Response_ProductInfo> pagedContent = allProducts.subList(start, end);
         Page<Response_ProductInfo> pagedList = new PageImpl<>(pagedContent, PageRequest.of(page, size),
-                allProducts.size());   // Return the response
+                allProducts.size()); // Return the response
         return ApiResponse.<Page<Response_ProductInfo>>build()
                 .code(0)
                 .message("actions_product_category")
                 .result(pagedList);
     }
-
 
     // @PostMapping("/api/v1/user/topLikeProducts") // đang dùng
     // public ApiResponse<?> thichNhieu1(@RequestBody Map<String, String> body) {
