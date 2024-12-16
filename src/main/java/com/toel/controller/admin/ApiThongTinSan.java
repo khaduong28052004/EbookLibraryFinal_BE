@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.toel.dto.Api.ApiResponse;
 import com.toel.dto.admin.request.Platform.Request_PlatformUpdate;
+import com.toel.dto.admin.request.Platform.Request_PlatformUpdatePolicies;
 import com.toel.dto.admin.response.Response_Platform;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
@@ -41,11 +42,17 @@ public class ApiThongTinSan {
                 .result(san.getIdPlatform(1));
     }
 
-    @PutMapping
+    @PutMapping("thongtinchung")
     public ApiResponse<Response_Platform> putThongTinSan(
             @Valid @RequestBody Request_PlatformUpdate request_PlatformUpdate) {
         return ApiResponse.<Response_Platform>build()
                 .result(san.update(request_PlatformUpdate));
+    }
+    @PutMapping("chinhsach")
+    public ApiResponse<Response_Platform> putChinhsach(
+            @Valid @RequestBody Request_PlatformUpdatePolicies request_PlatformUpdatePoliciese) {
+        return ApiResponse.<Response_Platform>build()
+                .result(san.updatePolicies(request_PlatformUpdatePoliciese));
     }
 
     @PostMapping("chude/saveImg")
