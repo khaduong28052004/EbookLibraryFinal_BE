@@ -20,13 +20,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Service
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
-
+// @RequiredArgsConstructor
+// @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Service_SelectFlashSale {
 
-	final FlashSaleDetailRepository flashSaleDetailRepo;
-	final FlashSaleDetailMapper flashSaleDetailMapper;
+	@Autowired
+	FlashSaleDetailRepository flashSaleDetailRepo;
+	@Autowired
+	FlashSaleDetailMapper flashSaleDetailMapper;
 	@Autowired
 	FlashSaleService flashSaleService;
 
