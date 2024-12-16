@@ -22,12 +22,14 @@ import com.toel.exception.ErrorCode;
 import com.toel.mapper.BillMapper;
 import com.toel.model.Account;
 import com.toel.model.Bill;
+import com.toel.model.BillDetail;
 import com.toel.model.FlashSaleDetail;
 import com.toel.model.OrderStatus;
 import com.toel.model.Product;
 import com.toel.model.Voucher;
 import com.toel.model.VoucherDetail;
 import com.toel.repository.AccountRepository;
+import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
 import com.toel.repository.FlashSaleDetailRepository;
 import com.toel.repository.OrderStatusRepository;
@@ -57,6 +59,8 @@ public class Service_BillSeller {
     VoucherRepository voucherRepository;
     @Autowired
     EmailService emailService;
+    @Autowired
+    BillDetailRepository billDetailRepository;
 
     public PageImpl<Response_Bill> getAll(
             Integer page, Integer size, boolean sortBy, String sortColumn,
@@ -73,10 +77,26 @@ public class Service_BillSeller {
             Request_Bill request_Bill) {
         Bill bill = billRepository.findById(request_Bill.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Bill"));
+        duyet(bill);
         bill.setOrderStatus(orderStatusRepository.findById(request_Bill.getOrderStatus() + 1)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "OrderStatus")));
         bill.setUpdateAt(new Date());
         return billMapper.response_Bill(billRepository.saveAndFlush(bill));
+    }
+
+    public void duyet(Bill bill) {
+        if (bill.getOrderStatus().getId() == 1) {
+            List<BillDetail> listBillDetails = billDetailRepository.findByBillId(bill.getId());
+            List<Product> listProducts = new ArrayList<>();
+            for (BillDetail billDetail : listBillDetails) {
+                if (billDetail.getFlashSaleDetail() == null) {
+                    Product product = productRepository.findById(billDetail.getProduct().getId()).get();
+                    product.setQuantity(product.getQuantity() - billDetail.getQuantity());
+                    listProducts.add(product);
+                }
+            }
+            productRepository.saveAll(listProducts);
+        }
     }
 
     public Response_Bill huy(
@@ -103,14 +123,15 @@ public class Service_BillSeller {
 
             if (bill.getBillDetails() != null & !bill.getBillDetails().isEmpty()) {
                 bill.getBillDetails().forEach(billDetail -> {
-                    Product product = billDetail.getProduct();
-                    product.setQuantity(product.getQuantity() + billDetail.getQuantity());
-                    updatedProducts.add(product);
 
                     if (billDetail.getFlashSaleDetail() != null) {
                         FlashSaleDetail flashSaleDetail = billDetail.getFlashSaleDetail();
                         flashSaleDetail.setQuantity(flashSaleDetail.getQuantity() + billDetail.getQuantity());
                         updatedFlashSaleDetails.add(flashSaleDetail);
+                    } else {
+                        Product product = billDetail.getProduct();
+                        product.setQuantity(product.getQuantity() + billDetail.getQuantity());
+                        updatedProducts.add(product);
                     }
                 });
             }
@@ -136,9 +157,7 @@ public class Service_BillSeller {
             if (!voucherDetailsToDelete.isEmpty()) {
                 voucherDetailRepository.deleteAll(voucherDetailsToDelete);
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
             throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION, "System");
         }
     }

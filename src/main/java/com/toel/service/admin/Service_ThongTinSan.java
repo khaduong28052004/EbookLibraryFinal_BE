@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.toel.dto.admin.request.Platform.Request_PlatformUpdate;
+import com.toel.dto.admin.request.Platform.Request_PlatformUpdatePolicies;
 import com.toel.dto.admin.response.Response_ImagePlaform;
 import com.toel.dto.admin.response.Response_Platform;
 import com.toel.exception.AppException;
@@ -48,11 +49,14 @@ public class Service_ThongTinSan {
     public Response_Platform update(Request_PlatformUpdate platformUpdate) {
         Platform platform = platformRepository.findById(platformUpdate.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Sàn"));
-        if (platformUpdate.getPolicies() == null) {
             platformMapper.Request_PlatformUpdateNotPolicies(platform, platformUpdate);
-        } else {
+        return platformMapper.tResponse_Platform(platformRepository.save(platform));
+    }
+
+    public Response_Platform updatePolicies(Request_PlatformUpdatePolicies platformUpdate) {
+        Platform platform = platformRepository.findById(platformUpdate.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Sàn"));
             platform.setPolicies(platformUpdate.getPolicies());
-        }
         return platformMapper.tResponse_Platform(platformRepository.save(platform));
     }
 
@@ -70,45 +74,11 @@ public class Service_ThongTinSan {
                 .toList();
     }
 
-    // public Response_ImagePlaform createImagePlaform(Request_ImagePlaformCreate
-    // image) {
-    // ImagePlaform entity = new ImagePlaform();
-    // entity.setCategoryImage(categoryImageRepository.findById(image.getCategoryImage()).get());
-    // entity.setUrl(image.getUrl());
-    // return
-    // imagePlaformMapper.toImagePlaform(imagePlaformRepository.save(entity));
-    // }
-
-    // public void delete(List<Integer> list) {
-    // list.forEach(item -> {
-    // ImagePlaform imagePlaform = imagePlaformRepository.findById(item)
-    // .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Ảnh"));
-    // imagePlaformRepository.delete(imagePlaform);
-    // });
-    // }
-
-    // public boolean saveImagePlaform(Integer categoryId, List<MultipartFile>
-    // images) {
-    // return updateProductImages(categoryImageRepository.findById(categoryId)
-    // .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Loại Ảnh")),
-    // images);
-    // }
-
     public boolean updateProductImages(CategoryImage categoryImage, List<MultipartFile> images) {
         try {
             System.out.println("===== categoryImage" + categoryImage.getName());
 
             imagePlaformRepository.deleteAll(categoryImage.getImagePlaforms());
-            // for (ImagePlaform image : categoryImage.getImagePlaforms()) {
-            // try {
-            // System.out.println("===== categoryImageIMG" + image);
-            // // deleteImage.deleteFileByUrl(image.getUrl());
-            // imagePlaformRepository.delete(image);
-            // } catch (Exception e) {
-            // e.printStackTrace();
-            // return false;
-            // }
-            // }
 
             List<ImagePlaform> imagePlaforms = new ArrayList<>();
             for (MultipartFile requestImage : images) {

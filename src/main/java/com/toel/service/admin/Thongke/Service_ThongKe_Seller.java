@@ -186,15 +186,15 @@ public class Service_ThongKe_Seller {
 
                 if (search == null || search.isBlank()) {
                         pageAccount = (gender == null)
-                                        ? accountRepository.findAllByCreateAtBetweenAndRole(finalDateStart,
+                                        ? accountRepository.findAllByCreateAtSellerBetweenAndRole(finalDateStart,
                                                         finalDateEnd, role)
-                                        : accountRepository.findAllByCreateAtBetweenAndRoleAndGender(
+                                        : accountRepository.findAllByCreateAtSellerBetweenAndRoleAndGender(
                                                         finalDateStart,
                                                         finalDateEnd, role,
                                                         gender);
                 } else {
                         pageAccount = accountRepository
-                                        .findAllByCreateAtBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+                                        .findAllByCreateAtSellerBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
                                                         gender, role, search, search, search, search, finalDateStart,
                                                         finalDateEnd);
                 }

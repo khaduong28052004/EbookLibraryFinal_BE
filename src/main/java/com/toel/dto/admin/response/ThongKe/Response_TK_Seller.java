@@ -1,10 +1,12 @@
 package com.toel.dto.admin.response.ThongKe;
 
 import java.util.Date;
+import java.util.List;
 
 import org.hibernate.internal.build.AllowPrintStacktrace;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.toel.dto.admin.response.Response_AccountReport;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,4 +30,5 @@ public class Response_TK_Seller {
     Integer sumReport;
     Double DoanhSo; // trừ chiết khấu
     Double DoanhThu; // không trừ chiết khấu
+    List<Response_AccountReport> accountReports;
 }
