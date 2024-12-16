@@ -27,7 +27,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "DiscountRates")
+@Table(name = "discountrates")
 public class DiscountRate {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
