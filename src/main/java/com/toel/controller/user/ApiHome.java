@@ -113,7 +113,7 @@ public class ApiHome {
 	public ApiResponse<Map<String, Object>> testGetLocal(
 			@RequestParam(name = "id_Shop", defaultValue = "0") Integer id_Shop) {
 		Map<String, Object> map = new HashMap<>();
-		LocalDateTime localDateTime = LocalDateTime.now();
+		LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
 		// Date localDateTime = new Date();
 		// SimpleDateFormat dp = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
 		// dp.format(localDateTime);
