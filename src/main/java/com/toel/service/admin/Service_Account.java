@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -176,7 +177,7 @@ public class Service_Account {
                 } else {
                         list = accountRepository
                                         .findAllByGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                                                        gender, role, search, search, search,search, search);
+                                                        gender, role, search, search, search, search, search);
                 }
                 Calendar calStart = Calendar.getInstance();
                 calStart.set(Calendar.DAY_OF_MONTH, 1);
@@ -355,8 +356,15 @@ public class Service_Account {
                 if (!isValidPhoneNumber(entity.getPhone())) {
                         throw new AppException(ErrorCode.OBJECT_SETUP, "Số điện thoại không hợp lệ");
                 }
-                account.setRole(roleRepository.findById(entity.getRole())
-                                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Quyền")));
+                if (entity.getRole() == null) {
+                        Role entityRole = roleRepository.findByNameIgnoreCase("adminv1");
+                        if (entityRole == null) {
+                                throw new IllegalStateException("Default role 'adminv1' not found in the database.");
+                        }
+                        account.setRole(entityRole);
+                } else {
+                        account.setRole(roleRepository.findById(entity.getRole()).get());
+                }
                 account.setAvatar(
                                 "https://firebasestorage.googleapis.com/v0/b/ebookstore-4fbb3.appspot.com/o/1_W35QUSvGpcLuxPo3SRTH4w.png?alt=media");
                 account.setStatus(true);
