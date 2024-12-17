@@ -60,6 +60,15 @@ public class Service_Autosave {
         if (flashSaleRepository.findByIsDelete(false).size() >= 1) {
             flashSaleRepository.findByIsDelete(false).forEach(flasesale -> {
                 if (flasesale.getDateEnd().isBefore(LocalDateTime.now())) {
+                    for (FlashSaleDetail flashSaleDetail : flasesale.getFlashSaleDetails()) {
+                        Product product = flashSaleDetail.getProduct();
+                        int availableQuantity = product.getQuantity();
+                        flashSaleDetail.setQuantity(0);
+                        flashSaleDetailRepository.save(flashSaleDetail);
+
+                        product.setQuantity(availableQuantity + flashSaleDetail.getQuantity());
+                        productRepository.save(product);
+                    }
                     flasesale.setDelete(true);
                     flashSaleRepository.save(flasesale);
                 }
