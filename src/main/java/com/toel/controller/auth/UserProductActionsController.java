@@ -165,7 +165,8 @@ public class UserProductActionsController {
                 combinedProducts1.addAll(allProducts);
                 // Gộp hai danh sách và loại bỏ trùng lặp
                 List<Response_ProductInfo> combinedProducts = combinedProducts1.stream().collect(Collectors.toSet())
-                                .stream().collect(Collectors.toList());//
+                                .stream().limit(40)
+                                .collect(Collectors.toList());//
 
                 int start = (int) Math.min((long) page * size, combinedProducts.size());
                 int end = (int) Math.min(start + size, combinedProducts.size());
@@ -204,7 +205,7 @@ public class UserProductActionsController {
                 combinedProducts1.addAll(allProducts1);
                 combinedProducts1.addAll(allProducts);
                 List<Response_ProductInfo> combinedProducts = combinedProducts1.stream().collect(Collectors.toSet())
-                .stream().collect(Collectors.toList());//
+                .stream().limit(40).collect(Collectors.toList());//
 
                 // List<Response_ProductInfo> list = combinedProducts.stream().f
                 int start = (int) Math.min((long) page * size, combinedProducts.size());
@@ -247,6 +248,7 @@ public class UserProductActionsController {
                 List<Product> listP = listBD.stream().map(m -> m.getProduct()).collect(Collectors.toSet()).stream()
                                 .filter(product -> product.isActive() && product.isDelete() == false
                                                 && product.getAccount().isStatus())
+                                                .limit(40)
                                 .collect(Collectors.toList()); // Convert it back to a list if needed;
 
                                 
