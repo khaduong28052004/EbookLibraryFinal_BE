@@ -129,7 +129,7 @@ public class Service_SelectAllProductHome {
 		List<Like> listLikes = new ArrayList<Like>();
 		List<Product> listProductByBills = new ArrayList<>();
 		if (id_user == 0) {
-			Pageable pageable = PageRequest.of(0, 5);
+			Pageable pageable = PageRequest.of(0, 8);
 			List<Integer> listIdTopLikes = likeRepository.selectIdLikeByTopProductLike(pageable);
 			listLikes = likeRepository.selectAllByListID(listIdTopLikes);
 
@@ -139,7 +139,6 @@ public class Service_SelectAllProductHome {
 			Account user = accountRepository.findById(id_user).get();
 			listFollowers = followerRepository.findAllByAccount(user);
 			listLikes = likeRepository.findAllByAccount(user);
-
 			if (listFollowers.size() + listLikes.size() < 8) {
 				List<Integer> ids = new ArrayList<Integer>();
 				ids.addAll(productRepo.findAllByBillOfUser(id_user).stream().map(product -> product.getId())

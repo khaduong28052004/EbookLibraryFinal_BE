@@ -119,8 +119,9 @@ public class Service_ThongKe_KhachHang {
                 Response_TK_Account response = accountMapper.tResponse_TK_Account(account);
                 int sumBill = billRepository.countByAccount(account) == null ? 0
                                 : billRepository.countByAccount(account);
+                double star = evalueRepository.calculateAverageStarByKhachHang(account);
                 response.setAvgdonhang(billRepository.calculateAGVTotalPriceByAccount(account));
-                response.setAvgStar(evalueRepository.calculateAverageStarByKhachHang(account));
+                response.setAvgStar(star == 0 ? 5 : star);
                 response.setSumDonHang(sumBill);
                 return response;
         }

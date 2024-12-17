@@ -3,6 +3,7 @@ package com.toel.dto.admin.response;
 import java.util.Date;
 import java.util.List;
 
+import com.toel.dto.seller.response.Response_ImageProduct;
 import com.toel.model.Category;
 import com.toel.model.ImageProduct;
 
@@ -27,6 +28,7 @@ public class Response_ProductListFlashSale {
     boolean isActive;
     Response_Account account;
     Category category;
-    List<ImageProduct> imageProducts;
-    List<Response_FlashSaleDetail> flashSaleDetails;
+    List<Response_ImageProduct> imageProducts;
+    // List<Response_FlashSaleDetail> flashSaleDetails;
+    Integer sumBaoCao;
 }

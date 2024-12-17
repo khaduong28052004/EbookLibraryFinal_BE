@@ -1,6 +1,7 @@
 package com.toel.service.admin;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import com.toel.dto.admin.request.Account.Request_AccountCreate;
 import com.toel.dto.admin.response.Response_Account;
+import com.toel.dto.admin.response.Response_ProductListFlashSale;
 import com.toel.dto.admin.response.ThongKe.Response_TK_Seller;
 import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
@@ -73,9 +75,57 @@ public class Service_Account {
 
         public PageImpl<Response_Account> getAll(String rolename,
                         String search, Boolean gender, Integer page, Integer size, Boolean sortBy, String sortColumn) {
-                Pageable pageable = PageRequest.of(page, size,
-                                Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
+                // Pageable pageable = PageRequest.of(page, size,
+                //                 Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
+                Pageable pageable;
+                Page<Account> pageAccount;
                 Role role = roleRepository.findByNameIgnoreCase(rolename);
+
+                // Calendar calStart = Calendar.getInstance();
+                // calStart.set(Calendar.DAY_OF_MONTH, 1);
+                // Calendar calEnd = Calendar.getInstance();
+                // calEnd.set(Calendar.DAY_OF_MONTH,
+                // calEnd.getActualMaximum(Calendar.DAY_OF_MONTH));
+
+                // Page<Account> pageAccount = pageAccount(search, gender, pageable, role);
+                if ("sumhuy".equalsIgnoreCase(sortColumn)) {
+                        pageable = PageRequest.of(0, 100000);
+                        pageAccount = pageAccount(search, gender, pageable, role);
+
+                } else {
+                        pageable = PageRequest.of(page, size,
+                                        Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
+                        pageAccount = pageAccount(search, gender, pageable, role);
+
+                }
+                List<Response_Account> list = pageAccount.stream()
+                                .map(account -> {
+                                        Response_Account aResponse_Account = accountMapper.toAccount(account);
+                                        aResponse_Account.setSumHuy(accountRepository.countBillHuy(account.getId()));
+                                        return aResponse_Account;
+                                })
+                                .collect(Collectors.toList());
+
+                if ("sumhuy".equalsIgnoreCase(sortColumn)) {
+                        list = list.stream()
+                                        .sorted(Comparator.comparing(Response_Account::getSumHuy,
+                                                        sortBy ? Comparator.reverseOrder() : Comparator.naturalOrder()))
+                                        .collect(Collectors.toList());
+                        pageable = PageRequest.of(page, size);
+                        int start = (int) pageable.getOffset();
+                        int end = Math.min((start + pageable.getPageSize()), list.size());
+                        if (start >= list.size()) {
+                                return new PageImpl<>(Collections.emptyList(), pageable, list.size());
+                        }
+                        List<Response_Account> paginatedList = list.subList(start, end);
+                        return new PageImpl<>(paginatedList, pageable, list.size());
+                } else {
+                        return new PageImpl<>(list, pageable, pageAccount.getTotalElements());
+                }
+        }
+
+        private Page<Account> pageAccount(String search, Boolean gender, Pageable pageable,
+                        Role role) {
                 Page<Account> pageAccount = null;
                 if (search == null || search.isBlank()) {
                         pageAccount = (gender == null)
@@ -88,15 +138,7 @@ public class Service_Account {
                                                         gender, role, search, search, search, search,
                                                         pageable);
                 }
-                Calendar calStart = Calendar.getInstance();
-                calStart.set(Calendar.DAY_OF_MONTH, 1);
-                Calendar calEnd = Calendar.getInstance();
-                calEnd.set(Calendar.DAY_OF_MONTH, calEnd.getActualMaximum(Calendar.DAY_OF_MONTH));
-
-                List<Response_Account> list = pageAccount.stream()
-                                .map(account -> accountMapper.toAccount(account))
-                                .collect(Collectors.toList());
-                return new PageImpl<>(list, pageable, pageAccount.getTotalElements());
+                return pageAccount;
         }
 
         public PageImpl<Response_Account> getAllNhanVien(
@@ -265,7 +307,7 @@ public class Service_Account {
                 // MDC.clear();
                 Account accountNew = accountRepository.saveAndFlush(entity);
                 service_Log.setLog(getClass(), accountID, "INFO", "Account",
-                                accountMapper.toAccount(accountNew),null, action_type);
+                                accountMapper.toAccount(accountNew), null, action_type);
                 return accountMapper.toAccount(accountNew);
         }
 
@@ -299,7 +341,7 @@ public class Service_Account {
                 Account accountnew = accountRepository.saveAndFlush(entity);
                 Response_Account aResponse_Account = accountMapper.toAccount(accountnew);
                 service_Log.setLog(getClass(), accountID, "INFO", "Account",
-                                aResponse_Account,null, action_type);
+                                aResponse_Account, null, action_type);
 
                 return accountMapper.toAccount(accountnew);
         }
@@ -320,7 +362,7 @@ public class Service_Account {
                 account.setPassword(hashPass);
                 Account accountnew = accountRepository.saveAndFlush(account);
                 service_Log.setLog(getClass(), accountID, "INFO", "Account",
-                                accountMapper.toAccount(accountnew),null, "Tạo tài khoản");
+                                accountMapper.toAccount(accountnew), null, "Tạo tài khoản");
                 return accountMapper.toAccount(accountnew);
         }
 

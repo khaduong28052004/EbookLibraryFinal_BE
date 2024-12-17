@@ -23,6 +23,7 @@ import com.toel.mapper.BillMapper;
 import com.toel.model.Account;
 import com.toel.model.Bill;
 import com.toel.model.BillDetail;
+import com.toel.model.FlashSale;
 import com.toel.model.FlashSaleDetail;
 import com.toel.model.OrderStatus;
 import com.toel.model.Product;
@@ -88,14 +89,24 @@ public class Service_BillSeller {
         if (bill.getOrderStatus().getId() == 1) {
             List<BillDetail> listBillDetails = billDetailRepository.findByBillId(bill.getId());
             List<Product> listProducts = new ArrayList<>();
+            List<FlashSaleDetail> listFlashSalesDetails = new ArrayList<>();
             for (BillDetail billDetail : listBillDetails) {
                 if (billDetail.getFlashSaleDetail() == null) {
                     Product product = productRepository.findById(billDetail.getProduct().getId()).get();
                     product.setQuantity(product.getQuantity() - billDetail.getQuantity());
                     listProducts.add(product);
+                } else {
+                    FlashSaleDetail flashSaleDetail = billDetail.getFlashSaleDetail();
+                    flashSaleDetail.setQuantity(flashSaleDetail.getQuantity() - billDetail.getQuantity());
+                    listFlashSalesDetails.add(flashSaleDetail);
                 }
             }
-            productRepository.saveAll(listProducts);
+            if (!listProducts.isEmpty()) {
+                productRepository.saveAll(listProducts);
+            }
+            if (!listFlashSalesDetails.isEmpty()) {
+                flashSaleDetailRepository.saveAll(listFlashSalesDetails);
+            }
         }
     }
 

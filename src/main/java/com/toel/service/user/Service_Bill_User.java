@@ -248,7 +248,6 @@ public class Service_Bill_User {
 		bill.setOrderStatus(orderStatusRepository.findById(6).get());
 		billRepository.saveAndFlush(bill);
 		returnStatus(bill);
-
 		sendNotification(bill);
 
 		return billRepository.saveAndFlush(bill);
