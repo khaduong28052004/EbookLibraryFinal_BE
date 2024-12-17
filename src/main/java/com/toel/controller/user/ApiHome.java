@@ -108,4 +108,50 @@ public class ApiHome {
 	// .result(id_user);
 	// }
 
+	@RequestMapping("testGetLocal")
+	public ApiResponse<Map<String, Object>> testGetLocal(
+			@RequestParam(name = "id_Shop", defaultValue = "0") Integer id_Shop) {
+		Map<String, Object> map = new HashMap<>();
+		LocalDateTime localDateTime = LocalDateTime.now();
+		// Date localDateTime = new Date();
+		// SimpleDateFormat dp = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+		// dp.format(localDateTime);
+
+		try {
+			// FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime);
+			// List<Response_FlashSaleDetail> response =
+			// service_SelectFlashSale.selectFlashSale(flashSale, id_Shop);
+			map.put("datas", localDateTime);
+			// map.put("lastDate", flashSale.getDateEnd());
+			return ApiResponse.<Map<String, Object>>build().message("data success").result(map);
+
+		} catch (Exception e) {
+			return ApiResponse.<Map<String, Object>>build().message("not fault").code(1002);
+		}
+
+	}
+
+	@RequestMapping("testGetLocalData")
+	public ApiResponse<Map<String, Object>> testGetLocalData(
+			@RequestParam(name = "id_Shop", defaultValue = "0") Integer id_Shop) {
+		Map<String, Object> map = new HashMap<>();
+		LocalDateTime localDateTime = LocalDateTime.now();
+		// Date localDateTime = new Date();
+		// SimpleDateFormat dp = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+		// dp.format(localDateTime);
+
+		try {
+			FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime);
+			// List<Response_FlashSaleDetail> response =
+			// service_SelectFlashSale.selectFlashSale(flashSale, id_Shop);
+			map.put("datas", flashSale);
+			// map.put("lastDate", flashSale.getDateEnd());
+			return ApiResponse.<Map<String, Object>>build().message("data success").result(map);
+
+		} catch (Exception e) {
+			return ApiResponse.<Map<String, Object>>build().message("not fault").code(1002);
+		}
+
+	}
+
 }
