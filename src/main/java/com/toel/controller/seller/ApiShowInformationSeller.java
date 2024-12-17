@@ -133,8 +133,17 @@ public class ApiShowInformationSeller {
             Account account = accountRepository.findById(Integer.parseInt(sellerID))
                     .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND,
                             "ID:[" + sellerID + "] không tìm thấy người bán"));
+            System.out.println("accountShop role " + account.getRole().getId());
 
             Response_InforSeller inforSeller = new Response_InforSeller();
+
+            if (account.getRole().getId() != 3) {
+                inforSeller = null;
+                account = null; 
+            } 
+            System.out.println("accountShop đssadfsdfrole " + account.getRole().getId());
+
+    
             inforSeller.setIdSeller(account.getId());
             inforSeller.setNumberOfProducts(account.getProducts().size());
             inforSeller.setTrackingNumber(defaultValue);

@@ -11,8 +11,12 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import org.checkerframework.checker.units.qual.h;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.toel.exception.ErrorCode;
+
+import com.toel.exception.AppException;
 import com.toel.mapper.user.ProductMaperUser;
 //import com.toel.exception.CustomException;
 import com.toel.model.Account;
@@ -20,16 +24,22 @@ import com.toel.model.Address;
 import com.toel.model.Bill;
 import com.toel.model.BillDetail;
 import com.toel.model.Cart;
+import com.toel.model.FlashSaleDetail;
 import com.toel.model.ImageProduct;
 import com.toel.model.Product;
+import com.toel.model.Voucher;
+import com.toel.model.VoucherDetail;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.AddressRepository;
 import com.toel.repository.BillDetailRepository;
 import com.toel.repository.BillRepository;
 import com.toel.repository.CartRepository;
 import com.toel.repository.EvalueRepository;
+import com.toel.repository.FlashSaleDetailRepository;
 import com.toel.repository.OrderStatusRepository;
 import com.toel.repository.ProductRepository;
+import com.toel.repository.VoucherDetailRepository;
+import com.toel.repository.VoucherRepository;
 
 @Service
 public class Service_BillDetail_User {
@@ -51,6 +61,13 @@ public class Service_BillDetail_User {
 	ProductMaperUser productMapperUser;
 	@Autowired
 	AccountRepository accountRepository;
+
+	@Autowired
+	FlashSaleDetailRepository flashSaleDetailRepository; 
+	@Autowired
+	VoucherDetailRepository voucherDetailRepository;
+	@Autowired
+	VoucherRepository voucherRepository;
 
 	public Map<String, Object> getBillDetail(Integer billId) {
 		return getInfoBill(billId);
@@ -305,13 +322,61 @@ public class Service_BillDetail_User {
 	// return productData;
 	// }
 
-	public void cancelBill(Integer billId) {
+public void cancelBill(Integer billId) {
 		checkBillDetailStatus(billId, 1);
 		Bill bill = billRepository.findById(billId).get();
 		bill.setUpdateAt(new Date());
 		bill.setFinishAt(new Date());
 		bill.setOrderStatus(orderStatusRepository.findById(6).get());
+		returnStatus(bill);
 		billRepository.saveAndFlush(bill);
+	}
+
+	public void returnStatus(Bill bill) {
+		try {
+			List<Product> updatedProducts = new ArrayList<>();
+			List<FlashSaleDetail> updatedFlashSaleDetails = new ArrayList<>();
+			List<VoucherDetail> voucherDetailsToDelete = new ArrayList<>();
+			List<Voucher> updatedVouchers = new ArrayList<>();
+
+			bill.getBillDetails().forEach(billDetail -> {
+				Product product = billDetail.getProduct();
+				product.setQuantity(product.getQuantity() + billDetail.getQuantity());
+				updatedProducts.add(product);
+
+				if (billDetail.getFlashSaleDetail() != null) {
+					FlashSaleDetail flashSaleDetail = billDetail.getFlashSaleDetail();
+					flashSaleDetail.setQuantity(flashSaleDetail.getQuantity() + billDetail.getQuantity());
+					updatedFlashSaleDetails.add(flashSaleDetail);
+				}
+			});
+
+			if (bill.getVoucherDetails() != null) {
+				bill.getVoucherDetails().forEach(voucherDetails -> {
+					Voucher voucher = voucherDetails.getVoucher();
+					voucher.setQuantity(voucher.getQuantity() + 1);
+					updatedVouchers.add(voucher);
+					voucherDetailsToDelete.add(voucherDetails);
+				});
+			}
+			if (!updatedProducts.isEmpty()) {
+				productRepository.saveAll(updatedProducts);
+			}
+			if (!updatedFlashSaleDetails.isEmpty()) {
+				flashSaleDetailRepository.saveAll(updatedFlashSaleDetails);
+			}
+			if (!updatedVouchers.isEmpty()) {
+				voucherRepository.saveAll(updatedVouchers);
+
+			}
+			if (!voucherDetailsToDelete.isEmpty()) {
+				voucherDetailRepository.deleteAll(voucherDetailsToDelete);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION, "System");
+		}
 	}
 
 	public void confirmBill(Integer billId) {
