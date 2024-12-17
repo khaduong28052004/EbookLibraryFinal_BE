@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.toel.dto.admin.response.Response_Account;
+import com.toel.dto.admin.response.Response_FlashSaleDetail;
+import com.toel.dto.seller.response.Response_Category;
 import com.toel.dto.seller.response.Response_CategorySeller;
 import com.toel.dto.seller.response.Response_ImageProduct;
 
@@ -29,7 +31,7 @@ public class Response_TK_Product {
     Integer quantity;
     boolean isActive;
     Response_Account account;
-    Response_CategorySeller category;
+    Response_Category category;
     Integer sumBill;
     Integer sumEvalue;
     Integer sumLike;
