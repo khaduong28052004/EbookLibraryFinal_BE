@@ -1,7 +1,12 @@
 package com.toel.controller.user;
 
+import java.text.DateFormat;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +48,10 @@ public class ApiHome {
 	public ApiResponse<Map<String, Object>> selectFlashSale(
 			@RequestParam(name = "id_Shop", defaultValue = "0") Integer id_Shop) {
 		Map<String, Object> map = new HashMap<>();
-		LocalDateTime localDateTime = LocalDateTime.now();
+		LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+		// Date localDateTime = new Date();
+		// SimpleDateFormat dp = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+		// dp.format(localDateTime);
 
 		try {
 			FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime);
@@ -74,7 +82,7 @@ public class ApiHome {
 		}
 
 		Map<String, Object> response = serviceSellectAll.selectAll(flashSaleDetails, id_Shop, page, size, sort);
-//		response.put("flashSalene", flashSale);
+		// response.put("flashSalene", flashSale);
 		if (response.get("error") != null) {
 			return ApiResponse.<Map<String, Object>>build().message("not fault").code(1002);
 		}
@@ -82,22 +90,69 @@ public class ApiHome {
 		return ApiResponse.<Map<String, Object>>build().message("success").result(response);
 	}
 
-//	suggest 
+	// suggest
 	@GetMapping("suggest")
 	public ApiResponse<List<Response_Product>> suggests(
 			@RequestParam(name = "id_user", defaultValue = "6") Integer id_user) {
 		return ApiResponse.<List<Response_Product>>build().message("fetch suggest success")
 				.result(serviceSellectAll.suggestProduct(id_user));
 	}
-	
-////	suggest 
-//	@GetMapping("suggest")
-//	public ApiResponse<Integer> suggests(
-//			@RequestParam(name = "id_user", defaultValue = "6") Integer id_user) {
-////		return ApiResponse.<List<Response_Product>>build().message("fetch suggest success")
-////				.result(serviceSellectAll.suggestProduct(id_user));
-//		return ApiResponse.<Integer>build().message("fetch suggest success")
-//				.result(id_user);
-//	}
+
+	//// suggest
+	// @GetMapping("suggest")
+	// public ApiResponse<Integer> suggests(
+	// @RequestParam(name = "id_user", defaultValue = "6") Integer id_user) {
+	//// return ApiResponse.<List<Response_Product>>build().message("fetch suggest
+	//// success")
+	//// .result(serviceSellectAll.suggestProduct(id_user));
+	// return ApiResponse.<Integer>build().message("fetch suggest success")
+	// .result(id_user);
+	// }
+
+	@RequestMapping("testGetLocal")
+	public ApiResponse<Map<String, Object>> testGetLocal(
+			@RequestParam(name = "id_Shop", defaultValue = "0") Integer id_Shop) {
+		Map<String, Object> map = new HashMap<>();
+		LocalDateTime localDateTime = LocalDateTime.now(ZoneId.of("Asia/Ho_Chi_Minh"));
+		// Date localDateTime = new Date();
+		// SimpleDateFormat dp = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+		// dp.format(localDateTime);
+
+		try {
+			// FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime);
+			// List<Response_FlashSaleDetail> response =
+			// service_SelectFlashSale.selectFlashSale(flashSale, id_Shop);
+			map.put("datas", localDateTime);
+			// map.put("lastDate", flashSale.getDateEnd());
+			return ApiResponse.<Map<String, Object>>build().message("data success").result(map);
+
+		} catch (Exception e) {
+			return ApiResponse.<Map<String, Object>>build().message("not fault").code(1002);
+		}
+
+	}
+
+	@RequestMapping("testGetLocalData")
+	public ApiResponse<Map<String, Object>> testGetLocalData(
+			@RequestParam(name = "id_Shop", defaultValue = "0") Integer id_Shop) {
+		Map<String, Object> map = new HashMap<>();
+		LocalDateTime localDateTime = LocalDateTime.now();
+		// Date localDateTime = new Date();
+		// SimpleDateFormat dp = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+		// dp.format(localDateTime);
+
+		try {
+			FlashSale flashSale = flashSaleRepo.findFlashSaleNow(localDateTime);
+			// List<Response_FlashSaleDetail> response =
+			// service_SelectFlashSale.selectFlashSale(flashSale, id_Shop);
+			map.put("datas", flashSale);
+			// map.put("lastDate", flashSale.getDateEnd());
+			return ApiResponse.<Map<String, Object>>build().message("data success").result(map);
+
+		} catch (Exception e) {
+			return ApiResponse.<Map<String, Object>>build().message("not fault").code(1002);
+		}
+
+	}
 
 }

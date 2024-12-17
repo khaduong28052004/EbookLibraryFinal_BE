@@ -12,12 +12,12 @@ public class DatabaseUtils {
 
     public static Connection getConnection() throws SQLException,
             ClassNotFoundException {
-        // String connectionUrl = "jdbc:mysql://103.72.98.197:3306/ebookLibrary";
-        // String USER = "khauser"; 
-        // String PASSWORD = "12345678";
-        String connectionUrl = "jdbc:mysql://localhost:3306/ebookLibrary";
+        String connectionUrl = "jdbc:mysql://103.72.99.71:3306/ebookLibrary";
         String USER = "root"; 
-        String PASSWORD = "system";
+        String PASSWORD = "12345678";
+        // String connectionUrl = "jdbc:mysql://localhost:3306/ebookLibrary";
+        // String USER = "root"; 
+        // String PASSWORD = "system";
         Class.forName("com.mysql.cj.jdbc.Driver");
         Connection conn = DriverManager.getConnection(connectionUrl, USER, PASSWORD);
         System.out.println("Connection thành công: "+ conn);
