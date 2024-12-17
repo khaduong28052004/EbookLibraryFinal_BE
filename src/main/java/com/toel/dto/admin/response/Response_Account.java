@@ -1,11 +1,9 @@
 package com.toel.dto.admin.response;
 
 import java.util.Date;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.toel.model.AccountReport;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,4 +35,5 @@ public class Response_Account {
     String afterIdImage;
     Response_Role_NotAccount role;
     // List<Response_AccountReport> shopReports;
+    Integer sumHuy;
 }

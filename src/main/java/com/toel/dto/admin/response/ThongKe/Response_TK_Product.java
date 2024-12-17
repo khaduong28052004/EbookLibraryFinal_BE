@@ -5,9 +5,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.toel.dto.admin.response.Response_Account;
-import com.toel.dto.admin.response.Response_FlashSaleDetail;
-import com.toel.model.Category;
-import com.toel.model.ImageProduct;
+import com.toel.dto.seller.response.Response_CategorySeller;
+import com.toel.dto.seller.response.Response_ImageProduct;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,11 +29,11 @@ public class Response_TK_Product {
     Integer quantity;
     boolean isActive;
     Response_Account account;
-    Category category;
+    Response_CategorySeller category;
     Integer sumBill;
     Integer sumEvalue;
     Integer sumLike;
     Double avgStar;
-    List<Response_FlashSaleDetail> flashSaleDetails;
-    List<ImageProduct> imageProducts;
+    // List<Response_FlashSaleDetail> flashSaleDetails;
+    List<Response_ImageProduct> imageProducts;
 }
