@@ -368,7 +368,7 @@ public class ApiShowInformationSeller {
                             .findFirst()
                             .orElse(null);
                     // Trả về dữ liệu sản phẩm với số lượt like
-                    Map<String, Object> response = new HashMap<>();
+                    Map<String, Object> response = new HashMap<>(); 
                     response.put("product", product);
                     response.put("likeCount", likeCount);
                     return response;

@@ -151,7 +151,7 @@ public class UserProductActionsController {
         @GetMapping("/api/v1/user/actions_product_category1")
         public ApiResponse<?> getAllProductAndCategory1(
                         @RequestParam(defaultValue = "0") int page, // Page number
-                        @RequestParam(defaultValue = "4") int size, // Items per page
+                        @RequestParam(defaultValue = "8") int size, // Items per page
                         @RequestParam(defaultValue = "0") Integer account_id // Items per page
         ) {
                 // Fetch all products from the service
@@ -159,10 +159,13 @@ public class UserProductActionsController {
                 List<Response_ProductInfo> allProducts1 = actionsService.recommendProducts(LocalDateTime.now());
                 // Calculate pagination indices
 
-                // Combine the lists
-                List<Response_ProductInfo> combinedProducts = new ArrayList<>();
-                combinedProducts.addAll(allProducts1);
-                combinedProducts.addAll(allProducts);
+                // // Combine the lists
+                List<Response_ProductInfo> combinedProducts1 = new ArrayList<>();
+                combinedProducts1.addAll(allProducts1);
+                combinedProducts1.addAll(allProducts);
+                // Gộp hai danh sách và loại bỏ trùng lặp
+                List<Response_ProductInfo> combinedProducts = combinedProducts1.stream().collect(Collectors.toSet())
+                                .stream().collect(Collectors.toList());//
 
                 int start = (int) Math.min((long) page * size, combinedProducts.size());
                 int end = (int) Math.min(start + size, combinedProducts.size());
@@ -182,7 +185,7 @@ public class UserProductActionsController {
         @GetMapping("/api/v1/user/actions_product_category1_data")
         public ApiResponse<?> getAllProductAndCategorydata(
                         @RequestParam(defaultValue = "0") int page, // Page number
-                        @RequestParam(defaultValue = "4") int size, // Items per page
+                        @RequestParam(defaultValue = "8") int size, // Items per page
                         @RequestParam(defaultValue = "0") Integer account_id // Items per page
         ) {
                 // Fetch all products from the service
@@ -194,10 +197,16 @@ public class UserProductActionsController {
                 // Calculate pagination indices
 
                 // Combine the lists
-                List<Response_ProductInfo> combinedProducts = new ArrayList<>();
-                combinedProducts.addAll(allProducts);
-                combinedProducts.addAll(allProducts1);
+                // List<Response_ProductInfo> combinedProducts = new ArrayList<>();
+                // combinedProducts.addAll(allProducts);
+                // combinedProducts.addAll(allProducts1);
+                List<Response_ProductInfo> combinedProducts1 = new ArrayList<>();
+                combinedProducts1.addAll(allProducts1);
+                combinedProducts1.addAll(allProducts);
+                List<Response_ProductInfo> combinedProducts = combinedProducts1.stream().collect(Collectors.toSet())
+                .stream().collect(Collectors.toList());//
 
+                // List<Response_ProductInfo> list = combinedProducts.stream().f
                 int start = (int) Math.min((long) page * size, combinedProducts.size());
                 int end = (int) Math.min(start + size, combinedProducts.size());
 
@@ -230,7 +239,7 @@ public class UserProductActionsController {
         @GetMapping("/api/v1/user/actions_product_category1_Bestseller")
         public ApiResponse<?> getAllProductAndCategorydataBestseller(
                         @RequestParam(defaultValue = "0") int page, // Page number
-                        @RequestParam(defaultValue = "4") int size, // Items per page
+                        @RequestParam(defaultValue = "8") int size, // Items per page
                         @RequestParam(defaultValue = "0") Integer account_id // Items per page
         ) {
                 List<BillDetail> listBD = billDetailRepository.findAll().stream()
@@ -239,6 +248,8 @@ public class UserProductActionsController {
                                 .filter(product -> product.isActive() && product.isDelete() == false
                                                 && product.getAccount().isStatus())
                                 .collect(Collectors.toList()); // Convert it back to a list if needed;
+
+                                
                 List<Response_ProductInfo> allProducts = productMapper.Response_ProductInfo(listP);
                 int start = (int) Math.min((long) page * size, allProducts.size());
                 int end = (int) Math.min(start + size, allProducts.size());
