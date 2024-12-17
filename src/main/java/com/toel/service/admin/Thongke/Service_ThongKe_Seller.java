@@ -156,7 +156,7 @@ public class Service_ThongKe_Seller {
                 entity.setSumFollower(sumFollower);
                 entity.setSumProduct(sumProduct);
                 entity.setSumReport(sumReport);
-                entity.setAvgStar(agvStar);
+                entity.setAvgStar(agvStar == 0 ? 5.0: agvStar);
                 entity.setDoanhSo(doanhSo == null ? 0 : doanhSo);
                 entity.setDoanhThu(doanhThu == null ? 0 : doanhThu);
                 return entity;
