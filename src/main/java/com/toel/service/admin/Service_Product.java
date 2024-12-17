@@ -1,5 +1,7 @@
 package com.toel.service.admin;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +30,7 @@ import com.toel.util.log.LogUtil;
 
 @Service
 public class Service_Product {
-      @Autowired
+    @Autowired
     ProductReportRepository productReportRepository;
     @Autowired
     ProductRepository productRepository;
@@ -41,9 +43,48 @@ public class Service_Product {
 
     public PageImpl<Response_ProductListFlashSale> getAll(int page, int size, Boolean sortBy, String column,
             String key, String option) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));
         Page<Product> pageProduct;
+        Pageable pageable;
         Double priceOrSale = parseStringToDouble(key);
+
+        if ("sumbaocao".equalsIgnoreCase(column)) {
+            pageable = PageRequest.of(0, 100000);
+            pageProduct = pageProduct(option, pageable, priceOrSale, key, column);
+
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy ? Direction.DESC : Direction.ASC, column));
+            pageProduct = pageProduct(option, pageable, priceOrSale, key, column);
+
+        }
+
+        List<Response_ProductListFlashSale> list = pageProduct.stream()
+                .map(product -> {
+                    Response_ProductListFlashSale response = productMapper.tProductListFlashSale(product);
+                    response.setSumBaoCao(product.getProductReports().size());
+                    return response;
+                })
+                .collect(Collectors.toList());
+
+        if ("sumbaocao".equalsIgnoreCase(column)) {
+            list = list.stream()
+                    .sorted(Comparator.comparing(Response_ProductListFlashSale::getSumBaoCao,
+                            sortBy ? Comparator.reverseOrder() : Comparator.naturalOrder()))
+                    .collect(Collectors.toList());
+            pageable = PageRequest.of(page, size);
+            int start = (int) pageable.getOffset();
+            int end = Math.min((start + pageable.getPageSize()), list.size());
+            if (start >= list.size()) {
+                return new PageImpl<>(Collections.emptyList(), pageable, list.size());
+            }
+            List<Response_ProductListFlashSale> paginatedList = list.subList(start, end);
+            return new PageImpl<>(paginatedList, pageable, list.size());
+        } else {
+            return new PageImpl<>(list, pageable, pageProduct.getTotalElements());
+        }
+    }
+
+    private Page<Product> pageProduct(String option, Pageable pageable, Double priceOrSale, String key, String column) {
+        Page<Product> pageProduct;
         if (option.equalsIgnoreCase("choduyet")) {
             if (key.isBlank()) {
                 pageProduct = productRepository.findAllByIsDeleteAndIsActive(false, false, pageable);
@@ -73,10 +114,7 @@ public class Service_Product {
                         pageable);
             }
         }
-        List<Response_ProductListFlashSale> list = pageProduct.stream()
-                .map(Product -> productMapper.tProductListFlashSale(Product))
-                .collect(Collectors.toList());
-        return new PageImpl<>(list, pageable, pageProduct.getTotalElements());
+        return pageProduct;
     }
 
     public PageImpl<Response_ProductListFlashSale> getAllBrowse(int page, int size, Boolean sortBy, String column,
@@ -165,7 +203,7 @@ public class Service_Product {
     public Integer getCountProductByAccountId(Integer accountId) {
         return productRepository.countProductByAccountId(accountId);
     }
-    
+
     // show Report sản phẩm
     public List<ProductReport> getReportsByAccountId(int accountId) {
         return productReportRepository.findByAccountId(accountId);

@@ -42,7 +42,7 @@ public class Service_Autosave {
     @Autowired
     FlashSaleDetailRepository flashSaleDetailRepository;
 
-    @Scheduled(fixedDelay = 86400)
+    @Scheduled(fixedDelay = 604800016) //1 tuần
     // @Scheduled(fixedDelay = 100)
     public void run() {
         productRepository.findAllCreatedBeforeSevenDays().forEach(product -> {
@@ -54,7 +54,7 @@ public class Service_Autosave {
         service_Log.deleteList(logRepository.selectAllCreatedBeforeSevenDays());
     }
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 60000) // 1 phút
     // @Scheduled(fixedDelay = 100)
     public void deleteFlashsale() {
         if (flashSaleRepository.findByIsDelete(false).size() >= 1) {
@@ -76,7 +76,7 @@ public class Service_Autosave {
         }
     }
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 60000) //1 phút
     // @Scheduled(fixedDelay = 100)
     public void ApdungFlashsale() {
         Optional<FlashSale> optionalFlashSale = flashSaleRepository.selectFlashSaleNow(LocalDateTime.now());
@@ -105,7 +105,7 @@ public class Service_Autosave {
         }
     }
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 172800000) //1 ngày
     // @Scheduled(fixedDelay = 100)
     public void deleteDiscountRate() {
         if (discountRateRepository.findAllBydateDeleteIsNull().size() >= 2) {

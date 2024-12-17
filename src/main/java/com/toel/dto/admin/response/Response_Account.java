@@ -36,5 +36,5 @@ public class Response_Account {
     String beforeIdImage;
     String afterIdImage;
     Response_Role_NotAccount role;
-    List<Response_AccountReport> shopReports;
+    // List<Response_AccountReport> shopReports;
 }
