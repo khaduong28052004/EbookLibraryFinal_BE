@@ -217,7 +217,7 @@ public class Service_ThongKe_Product {
                 Integer tongLike = likeRepository.countByProductAndCreateAt(product, startDate, endDate);
 
                 response.setSumBill(tongBill);
-                response.setAvgStar(avgStar);
+                response.setAvgStar(avgStar == 0 ? 5.0 : avgStar);
                 response.setSumEvalue(tongEvalue);
                 response.setSumLike(tongLike);
                 return response;
@@ -228,7 +228,8 @@ public class Service_ThongKe_Product {
                 Response_SearchAudio response = productMapper
                                 .toResponse_TK_ProductSearchAudio(product);
                 Integer tongBill = 0;
-                double avgStar = 0.0;
+                double avgStar = evalueRepository
+                                .calculateAverageStarByProduct(product.getId(), startDate, endDate);
                 Integer tongEvalue = 0;
                 Integer tongLike = 0;
 
@@ -239,8 +240,7 @@ public class Service_ThongKe_Product {
                         tongBill = billDetailRepository.findByProduct(product).size();
                 }
                 if (option.equalsIgnoreCase("danhgia")) {
-                        avgStar = evalueRepository
-                                        .calculateAverageStarByProduct(product.getId(), startDate, endDate);
+                        avgStar = avgStar == 0 ? 5.0 : 0;
                 } else {
                         avgStar = evalueRepository.calculateAverageStarByProduct(product.getId());
                 }

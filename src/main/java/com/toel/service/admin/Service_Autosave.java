@@ -1,19 +1,27 @@
 package com.toel.service.admin;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.toel.model.DiscountRate;
+import com.toel.model.FlashSale;
+import com.toel.model.FlashSaleDetail;
+import com.toel.model.Product;
 import com.toel.repository.AccountRepository;
 import com.toel.repository.DiscountRateRepository;
+import com.toel.repository.FlashSaleDetailRepository;
 import com.toel.repository.FlashSaleRepository;
 import com.toel.repository.LogRepository;
 import com.toel.repository.ProductRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
+@Transactional
 public class Service_Autosave {
     @Autowired
     Service_Product service_Product;
@@ -31,6 +39,8 @@ public class Service_Autosave {
     FlashSaleRepository flashSaleRepository;
     @Autowired
     DiscountRateRepository discountRateRepository;
+    @Autowired
+    FlashSaleDetailRepository flashSaleDetailRepository;
 
     @Scheduled(fixedDelay = 86400)
     // @Scheduled(fixedDelay = 100)
@@ -54,6 +64,35 @@ public class Service_Autosave {
                     flashSaleRepository.save(flasesale);
                 }
             });
+        }
+    }
+
+    @Scheduled(fixedDelay = 60000)
+    // @Scheduled(fixedDelay = 100)
+    public void ApdungFlashsale() {
+        Optional<FlashSale> optionalFlashSale = flashSaleRepository.selectFlashSaleNow(LocalDateTime.now());
+        if (optionalFlashSale.isPresent()) {
+            FlashSale flashSale = optionalFlashSale.get();
+            flashSale.getFlashSaleDetails().size();
+            for (FlashSaleDetail flashSaleDetail : flashSale.getFlashSaleDetails()) {
+                Product product = flashSaleDetail.getProduct();
+                int availableQuantity = product.getQuantity();
+
+                if (flashSaleDetail.getQuantity() > availableQuantity) {
+                    flashSaleDetail.setQuantity(availableQuantity);
+                    flashSaleDetailRepository.save(flashSaleDetail);
+
+                    product.setQuantity(0);
+                    productRepository.save(product);
+                } else {
+                    int remainingQuantity = availableQuantity - flashSaleDetail.getQuantity();
+                    product.setQuantity(remainingQuantity);
+                    productRepository.save(product);
+                }
+            }
+        } else {
+            // Log or handle the absence of an active FlashSale
+            System.out.println("No active Flash Sale found at " + LocalDateTime.now());
         }
     }
 

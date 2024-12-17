@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.toel.model.FlashSale;
 import java.util.List;
+import java.util.Optional;
 
 public interface FlashSaleRepository extends JpaRepository<FlashSale, Integer> {
 	@Query("SELECT f FROM FlashSale f WHERE (CAST(f.dateStart AS date) BETWEEN :dateStart AND :dateEnd OR CAST(f.dateEnd AS date) BETWEEN :dateStart AND :dateEnd)")
@@ -29,5 +30,8 @@ public interface FlashSaleRepository extends JpaRepository<FlashSale, Integer> {
 			+ "AND FUNCTION('DAY', f.dateStart) = FUNCTION('DAY', ?1) " + "AND ?1 <= f.dateEnd "
 			+ "AND f.isDelete = false")
 	Page<FlashSale> findAllByNow(LocalDateTime now, Pageable pageable);
+
+	@Query("SELECT f FROM FlashSale f WHERE f.dateStart <= :date AND :date <= f.dateEnd AND f.isDelete = false")
+	Optional<FlashSale> selectFlashSaleNow(@Param("date") LocalDateTime date);
 
 }
