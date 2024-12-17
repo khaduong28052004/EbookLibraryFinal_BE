@@ -76,7 +76,7 @@ public class Service_Account {
         public PageImpl<Response_Account> getAll(String rolename,
                         String search, Boolean gender, Integer page, Integer size, Boolean sortBy, String sortColumn) {
                 // Pageable pageable = PageRequest.of(page, size,
-                //                 Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
+                // Sort.by(sortBy ? Direction.DESC : Direction.ASC, sortColumn));
                 Pageable pageable;
                 Page<Account> pageAccount;
                 Role role = roleRepository.findByNameIgnoreCase(rolename);
@@ -176,7 +176,7 @@ public class Service_Account {
                 } else {
                         list = accountRepository
                                         .findAllByGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                                                        gender, role, search, search, search, search);
+                                                        gender, role, search, search, search,search, search);
                 }
                 Calendar calStart = Calendar.getInstance();
                 calStart.set(Calendar.DAY_OF_MONTH, 1);
@@ -208,7 +208,11 @@ public class Service_Account {
                                                                         calStart.getTime(), calEnd.getTime(),
                                                                         account));
                                         accountnew.setAvgStar(evalueRepository
-                                                        .calculateAverageStarByAccountId(account.getId()));
+                                                        .calculateAverageStarByAccountId(account.getId()) == 0
+                                                                        ? 5.0
+                                                                        : evalueRepository
+                                                                                        .calculateAverageStarByAccountId(
+                                                                                                        account.getId()));
                                         accountnew.setDoanhSo(doanhSo);
                                         accountnew.setDoanhThu(doanhThu);
                                         return accountnew;

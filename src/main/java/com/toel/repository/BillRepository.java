@@ -190,6 +190,7 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			+ "AND (:gender IS NULL OR a.gender = :gender) "
 			+ "AND (LOWER(a.username) LIKE LOWER(CONCAT('%', :search, '%')) "
 			+ "OR LOWER(a.fullname) LIKE LOWER(CONCAT('%', :search, '%')) "
+			+ "OR LOWER(a.shopName) LIKE LOWER(CONCAT('%', :search, '%')) "
 			+ "OR LOWER(a.email) LIKE LOWER(CONCAT('%', :search, '%')) "
 			+ "OR LOWER(a.phone) LIKE LOWER(CONCAT('%', :search, '%')))")
 	List<Account> findByFinishAtBetweenAndGenderAndSearch(@Param("dateStart") Date dateStart,
@@ -253,6 +254,5 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 
 	@Query("SELECT b FROM Bill b WHERE b.orderStatus.id = 4 AND b.updateAt <= :sevenDaysAgo")
 	List<Bill> findBillsToAutoConfirm(@Param("sevenDaysAgo") LocalDateTime sevenDaysAgo);
-
 
 }

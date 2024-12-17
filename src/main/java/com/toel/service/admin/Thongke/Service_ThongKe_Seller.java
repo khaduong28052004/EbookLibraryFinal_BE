@@ -172,7 +172,7 @@ public class Service_ThongKe_Seller {
                 } else {
                         listAccounts = accountRepository
                                         .findAllByGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                                                        gender, role, search, search, search, search);
+                                                        gender, role, search, search, search, search, search);
                 }
                 return listAccounts;
         }
@@ -195,7 +195,8 @@ public class Service_ThongKe_Seller {
                 } else {
                         pageAccount = accountRepository
                                         .findAllByCreateAtSellerBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                                                        gender, role, search, search, search, search, finalDateStart,
+                                                        gender, role, search, search, search, search, search,
+                                                        finalDateStart,
                                                         finalDateEnd);
                 }
                 return pageAccount;

@@ -133,7 +133,7 @@ public class Service_ThongKe_KhachHang {
                 } else {
                         return accountRepository
                                         .findAllByGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                                                        gender, role, search, search, search, search);
+                                                        gender, role, search, search, search, search, search);
                 }
         }
 
