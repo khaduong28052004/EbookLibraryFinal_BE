@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map; 
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -160,7 +160,7 @@ public class Service_SelectAllProductHome {
 
 				}
 				Pageable pageable = PageRequest.of(0, 8 - (listFollowers.size() + listLikes.size()));
-				List<Integer> listIdProductByBillDetails = productRepo.selectIdBillDetailTopProductNotIds(idProducts,
+				List<Integer> listIdProductByBillDetails = productRepo.selectIdBillDetailTopProductNotIds(ids,
 						pageable);
 				listProductByBills = productRepo.selectProductInIdProduct(listIdProductByBillDetails);
 			}

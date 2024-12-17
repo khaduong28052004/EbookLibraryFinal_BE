@@ -117,6 +117,9 @@ public class ApiController {
             if (!ACCOUNTIgnoreCase.isStatus()) {
                 return ApiResponse.<String>build().code(1001).message("Tài khoản đã bị khóa!").result(null);
             }
+            if(!authRequestDTO.getUsername().equals(ACCOUNTIgnoreCase.getUsername())){
+                return ApiResponse.<String>build().code(1001).message("Tài khoản không tồn tại !").result(null);
+            }
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(),
                             authRequestDTO.getPassword()));
