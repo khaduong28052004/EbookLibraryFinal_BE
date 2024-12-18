@@ -106,8 +106,8 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 	Page<Bill> getListThongKeBill(@Param("accountId") Integer accountId, @Param("startDate") Date dateStart,
 			@Param("endDate") Date dateEnd, Pageable pageable);
 
-	@Query("SELECT COUNT(b) FROM Bill b JOIN b.billDetails bd " + "WHERE bd.product.account.id = :accountId "
-			+ "AND b.finishAt IS NOT NULL "
+	@Query("SELECT COUNT(DISTINCT b) FROM Bill b JOIN b.billDetails bd " + "WHERE bd.product.account.id = :accountId "
+			+ "AND b.finishAt IS NOT NULL AND b.orderStatus.id = 5 "
 			+ "AND (:search IS NULL OR b.account.fullname LIKE CONCAT('%', :search, '%'))")
 	Integer tongSoLuotMua(@Param("accountId") Integer accountId, @Param("search") String search);
 

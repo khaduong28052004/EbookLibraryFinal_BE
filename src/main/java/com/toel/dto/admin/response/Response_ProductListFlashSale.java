@@ -31,4 +31,5 @@ public class Response_ProductListFlashSale {
     List<Response_ImageProduct> imageProducts;
     // List<Response_FlashSaleDetail> flashSaleDetails;
     Integer sumBaoCao;
+    double weight;
 }
