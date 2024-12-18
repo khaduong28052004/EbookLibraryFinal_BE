@@ -42,7 +42,7 @@ public class Service_Autosave {
     @Autowired
     FlashSaleDetailRepository flashSaleDetailRepository;
 
-    @Scheduled(fixedDelay = 604800016) //1 tuần
+    @Scheduled(fixedDelay = 604800016) // 1 tuần
     // @Scheduled(fixedDelay = 100)
     public void run() {
         productRepository.findAllCreatedBeforeSevenDays().forEach(product -> {
@@ -76,36 +76,37 @@ public class Service_Autosave {
         }
     }
 
-    @Scheduled(fixedDelay = 60000) //1 phút
-    // @Scheduled(fixedDelay = 100)
-    public void ApdungFlashsale() {
-        Optional<FlashSale> optionalFlashSale = flashSaleRepository.selectFlashSaleNow(LocalDateTime.now());
-        if (optionalFlashSale.isPresent()) {
-            FlashSale flashSale = optionalFlashSale.get();
-            flashSale.getFlashSaleDetails().size();
-            for (FlashSaleDetail flashSaleDetail : flashSale.getFlashSaleDetails()) {
-                Product product = flashSaleDetail.getProduct();
-                int availableQuantity = product.getQuantity();
+    // @Scheduled(fixedDelay = 60000) //1 phút
+    // // @Scheduled(fixedDelay = 100)
+    // public void ApdungFlashsale() {
+    // Optional<FlashSale> optionalFlashSale =
+    // flashSaleRepository.selectFlashSaleNow(LocalDateTime.now());
+    // if (optionalFlashSale.isPresent()) {
+    // FlashSale flashSale = optionalFlashSale.get();
+    // flashSale.getFlashSaleDetails().size();
+    // for (FlashSaleDetail flashSaleDetail : flashSale.getFlashSaleDetails()) {
+    // Product product = flashSaleDetail.getProduct();
+    // int availableQuantity = product.getQuantity();
 
-                if (flashSaleDetail.getQuantity() > availableQuantity) {
-                    flashSaleDetail.setQuantity(availableQuantity);
-                    flashSaleDetailRepository.save(flashSaleDetail);
+    // if (flashSaleDetail.getQuantity() > availableQuantity) {
+    // flashSaleDetail.setQuantity(availableQuantity);
+    // flashSaleDetailRepository.save(flashSaleDetail);
 
-                    product.setQuantity(0);
-                    productRepository.save(product);
-                } else {
-                    int remainingQuantity = availableQuantity - flashSaleDetail.getQuantity();
-                    product.setQuantity(remainingQuantity);
-                    productRepository.save(product);
-                }
-            }
-        } else {
-            // Log or handle the absence of an active FlashSale
-            System.out.println("No active Flash Sale found at " + LocalDateTime.now());
-        }
-    }
+    // product.setQuantity(0);
+    // productRepository.save(product);
+    // } else {
+    // int remainingQuantity = availableQuantity - flashSaleDetail.getQuantity();
+    // product.setQuantity(remainingQuantity);
+    // productRepository.save(product);
+    // }
+    // }
+    // } else {
+    // // Log or handle the absence of an active FlashSale
+    // System.out.println("No active Flash Sale found at " + LocalDateTime.now());
+    // }
+    // }
 
-    @Scheduled(fixedDelay = 172800000) //1 ngày
+    @Scheduled(fixedDelay = 172800000) // 1 ngày
     // @Scheduled(fixedDelay = 100)
     public void deleteDiscountRate() {
         if (discountRateRepository.findAllBydateDeleteIsNull().size() >= 2) {
