@@ -24,6 +24,8 @@ public class Response_TK_Seller {
     boolean status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", timezone = "UTC")
     Date createAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy", timezone = "UTC")
+    Date createAtSeller;
     Integer sumProduct;
     Integer sumFollower;
     Double avgStar;

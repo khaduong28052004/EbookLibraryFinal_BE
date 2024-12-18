@@ -26,8 +26,11 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
         Page<Account> findAllByRoleAndStatusAndGenderAndNumberIdIsNotNull(Role role, boolean status, boolean gender,
                         Pageable pageable);
 
-        Page<Account> findAllByUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContainingAndStatusAndRoleAndNumberIdIsNotNull(
-                        String username, String fullname, String email, String phone, boolean status, Role role,
+        @Query("SELECT a FROM Account a WHERE a.status = ?1 AND a.role = ?2 AND a.numberId IS NOT NULL "
+                        +
+                        "AND (a.username LIKE %?3% OR a.fullname LIKE %?4% OR a.email LIKE %?5% OR a.phone LIKE %?6%)")
+        Page<Account> findByStatusAndRoleAndNumberIdIsNotNullAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+                        boolean status, Role role, String username, String fullname, String email, String phone,
                         Pageable pageable);
 
         @Query("SELECT a FROM Account a WHERE a.gender = ?1 AND a.status = ?2 AND a.role = ?3 AND a.numberId IS NOT NULL "
@@ -72,13 +75,15 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
         // thống kê khách hàng
         @Query("SELECT a FROM Account a WHERE (:gender IS NULL OR a.gender = :gender) " +
                         "AND a.role = :role " +
-                        "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
+                        "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% OR a.shopName LIKE %:shopName% "
+                        +
                         "OR a.email LIKE %:email% OR a.phone LIKE %:phone%)")
         List<Account> findAllByGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
                         @Param("gender") Boolean gender,
                         @Param("role") Role role,
                         @Param("username") String username,
                         @Param("fullname") String fullname,
+                        @Param("shopName") String shopName,
                         @Param("email") String email,
                         @Param("phone") String phone);
 
@@ -159,7 +164,8 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
         @Query("SELECT a FROM Account a WHERE (:gender IS NULL OR a.gender = :gender) " +
                         "AND a.role = :role " +
-                        "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% " +
+                        "AND (a.username LIKE %:username% OR a.fullname LIKE %:fullname% OR a.shopName LIKE %:shopName% "
+                        +
                         "OR a.email LIKE %:email% OR a.phone LIKE %:phone%) " +
                         "AND a.createAtSeller BETWEEN :dateStart AND :dateEnd")
         List<Account> findAllByCreateAtSellerBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
@@ -168,10 +174,11 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
                         @Param("username") String username,
                         @Param("fullname") String fullname,
                         @Param("email") String email,
+                        @Param("shopName") String shopName,
                         @Param("phone") String phone,
                         @Param("dateStart") Date dateStart,
                         @Param("dateEnd") Date dateEnd);
 
         @Query("SELECT count(b) FROM Bill b WHERE b.orderStatus.id = 6 AND FUNCTION('DATE', b.updateAt) = CURRENT_DATE and b.account.id = :account")
-        Integer countBillHuy( @Param("account") Integer account);
+        Integer countBillHuy(@Param("account") Integer account);
 }

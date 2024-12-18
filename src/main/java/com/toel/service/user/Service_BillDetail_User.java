@@ -11,11 +11,13 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import org.checkerframework.checker.units.qual.h;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.toel.exception.AppException;
 import com.toel.exception.ErrorCode;
+
+import com.toel.exception.AppException;
 import com.toel.mapper.user.ProductMaperUser;
 //import com.toel.exception.CustomException;
 import com.toel.model.Account;
@@ -66,6 +68,13 @@ public class Service_BillDetail_User {
 	VoucherRepository voucherRepository;
 	@Autowired
 	FlashSaleDetailRepository flashSaleDetailRepository;
+
+	@Autowired
+	FlashSaleDetailRepository flashSaleDetailRepository;
+	@Autowired
+	VoucherDetailRepository voucherDetailRepository;
+	@Autowired
+	VoucherRepository voucherRepository;
 
 	public Map<String, Object> getBillDetail(Integer billId) {
 		return getInfoBill(billId);

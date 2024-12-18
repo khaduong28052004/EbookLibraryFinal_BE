@@ -1,6 +1,7 @@
 package com.toel.dto.admin.response;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.toel.dto.seller.response.Response_Product;
@@ -21,4 +22,5 @@ public class Response_ProductReport {
     String content;
     Response_Product product;
     Response_Account account;
+    List<Response_ImageProductReport> imageReportProducts;
 }

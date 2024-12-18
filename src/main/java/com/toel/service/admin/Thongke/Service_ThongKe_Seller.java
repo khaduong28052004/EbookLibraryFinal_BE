@@ -156,7 +156,7 @@ public class Service_ThongKe_Seller {
                 entity.setSumFollower(sumFollower);
                 entity.setSumProduct(sumProduct);
                 entity.setSumReport(sumReport);
-                entity.setAvgStar(agvStar);
+                entity.setAvgStar(agvStar == 0 ? 5.0: agvStar);
                 entity.setDoanhSo(doanhSo == null ? 0 : doanhSo);
                 entity.setDoanhThu(doanhThu == null ? 0 : doanhThu);
                 return entity;
@@ -172,7 +172,7 @@ public class Service_ThongKe_Seller {
                 } else {
                         listAccounts = accountRepository
                                         .findAllByGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                                                        gender, role, search, search, search, search);
+                                                        gender, role, search, search, search, search, search);
                 }
                 return listAccounts;
         }
@@ -195,7 +195,8 @@ public class Service_ThongKe_Seller {
                 } else {
                         pageAccount = accountRepository
                                         .findAllByCreateAtSellerBetweenAndGenderAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
-                                                        gender, role, search, search, search, search, finalDateStart,
+                                                        gender, role, search, search, search, search, search,
+                                                        finalDateStart,
                                                         finalDateEnd);
                 }
                 return pageAccount;

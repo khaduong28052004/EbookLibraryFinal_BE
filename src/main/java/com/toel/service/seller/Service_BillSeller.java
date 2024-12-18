@@ -90,6 +90,7 @@ public class Service_BillSeller {
             List<BillDetail> listBillDetails = billDetailRepository.findByBillId(bill.getId());
             List<Product> listProducts = new ArrayList<>();
             List<FlashSaleDetail> listFlashSalesDetails = new ArrayList<>();
+            List<Voucher> listVouchers = new ArrayList<>();
             for (BillDetail billDetail : listBillDetails) {
                 if (billDetail.getFlashSaleDetail() == null) {
                     Product product = productRepository.findById(billDetail.getProduct().getId()).get();
@@ -100,6 +101,14 @@ public class Service_BillSeller {
                     flashSaleDetail.setQuantity(flashSaleDetail.getQuantity() - billDetail.getQuantity());
                     listFlashSalesDetails.add(flashSaleDetail);
                 }
+            }
+            for (VoucherDetail voucherDetail : bill.getVoucherDetails()) {
+                Voucher voucher = voucherDetail.getVoucher();
+                voucher.setQuantity(voucher.getQuantity() - 1);
+                listVouchers.add(voucher);
+            }
+            if (!listVouchers.isEmpty()) {
+                voucherRepository.saveAll(listVouchers);
             }
             if (!listProducts.isEmpty()) {
                 productRepository.saveAll(listProducts);
@@ -115,10 +124,10 @@ public class Service_BillSeller {
             Request_Bill request_Bill) {
         Bill bill = billRepository.findById(request_Bill.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Bill"));
+        returnStatus(bill);
         bill.setOrderStatus(orderStatusRepository.findById(6)
                 .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "OrderStatus")));
         bill.setUpdateAt(new Date());
-        returnStatus(bill);
         emailService.push(bill.getAccount().getEmail(), "TOEL - Thông Báo Hủy Đơn Hàng", EmailTemplateType.HUYDON,
                 bill.getAccount().getFullname(),
                 String.valueOf(bill.getId()), content);
@@ -126,50 +135,52 @@ public class Service_BillSeller {
     }
 
     public void returnStatus(Bill bill) {
-        try {
-            List<Product> updatedProducts = new ArrayList<>();
-            List<FlashSaleDetail> updatedFlashSaleDetails = new ArrayList<>();
-            List<VoucherDetail> voucherDetailsToDelete = new ArrayList<>();
-            List<Voucher> updatedVouchers = new ArrayList<>();
+        if (bill.getOrderStatus().getId() != 1) {
+            try {
+                List<Product> updatedProducts = new ArrayList<>();
+                List<FlashSaleDetail> updatedFlashSaleDetails = new ArrayList<>();
+                List<VoucherDetail> voucherDetailsToDelete = new ArrayList<>();
+                List<Voucher> updatedVouchers = new ArrayList<>();
 
-            if (bill.getBillDetails() != null & !bill.getBillDetails().isEmpty()) {
-                bill.getBillDetails().forEach(billDetail -> {
+                if (bill.getBillDetails() != null & !bill.getBillDetails().isEmpty()) {
+                    bill.getBillDetails().forEach(billDetail -> {
 
-                    if (billDetail.getFlashSaleDetail() != null) {
-                        FlashSaleDetail flashSaleDetail = billDetail.getFlashSaleDetail();
-                        flashSaleDetail.setQuantity(flashSaleDetail.getQuantity() + billDetail.getQuantity());
-                        updatedFlashSaleDetails.add(flashSaleDetail);
-                    } else {
-                        Product product = billDetail.getProduct();
-                        product.setQuantity(product.getQuantity() + billDetail.getQuantity());
-                        updatedProducts.add(product);
-                    }
-                });
-            }
+                        if (billDetail.getFlashSaleDetail() != null) {
+                            FlashSaleDetail flashSaleDetail = billDetail.getFlashSaleDetail();
+                            flashSaleDetail.setQuantity(flashSaleDetail.getQuantity() + billDetail.getQuantity());
+                            updatedFlashSaleDetails.add(flashSaleDetail);
+                        } else {
+                            Product product = billDetail.getProduct();
+                            product.setQuantity(product.getQuantity() + billDetail.getQuantity());
+                            updatedProducts.add(product);
+                        }
+                    });
+                }
 
-            if (bill.getVoucherDetails() != null && !bill.getVoucherDetails().isEmpty()) {
-                bill.getVoucherDetails().forEach(voucherDetails -> {
-                    Voucher voucher = voucherDetails.getVoucher();
-                    voucher.setQuantity(voucher.getQuantity() + 1);
-                    updatedVouchers.add(voucher);
-                    voucherDetailsToDelete.add(voucherDetails);
-                });
-            }
-            if (!updatedProducts.isEmpty()) {
-                productRepository.saveAll(updatedProducts);
-            }
-            if (!updatedFlashSaleDetails.isEmpty()) {
-                flashSaleDetailRepository.saveAll(updatedFlashSaleDetails);
-            }
-            if (!updatedVouchers.isEmpty()) {
-                voucherRepository.saveAll(updatedVouchers);
+                if (bill.getVoucherDetails() != null && !bill.getVoucherDetails().isEmpty()) {
+                    bill.getVoucherDetails().forEach(voucherDetails -> {
+                        Voucher voucher = voucherDetails.getVoucher();
+                        voucher.setQuantity(voucher.getQuantity() + 1);
+                        updatedVouchers.add(voucher);
+                        voucherDetailsToDelete.add(voucherDetails);
+                    });
+                }
+                if (!updatedProducts.isEmpty()) {
+                    productRepository.saveAll(updatedProducts);
+                }
+                if (!updatedFlashSaleDetails.isEmpty()) {
+                    flashSaleDetailRepository.saveAll(updatedFlashSaleDetails);
+                }
+                if (!updatedVouchers.isEmpty()) {
+                    voucherRepository.saveAll(updatedVouchers);
 
+                }
+                if (!voucherDetailsToDelete.isEmpty()) {
+                    voucherDetailRepository.deleteAll(voucherDetailsToDelete);
+                }
+            } catch (Exception e) {
+                throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION, "System");
             }
-            if (!voucherDetailsToDelete.isEmpty()) {
-                voucherDetailRepository.deleteAll(voucherDetailsToDelete);
-            }
-        } catch (Exception e) {
-            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION, "System");
         }
     }
 

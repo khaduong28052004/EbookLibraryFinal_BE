@@ -158,7 +158,6 @@ public class UserProductActionsController {
                 List<Response_ProductInfo> allProducts = actionsService.recomendProductsAndCategory(account_id);
                 List<Response_ProductInfo> allProducts1 = actionsService.recommendProducts(LocalDateTime.now());
                 // Calculate pagination indices
-
                 // // Combine the lists
                 List<Response_ProductInfo> combinedProducts1 = new ArrayList<>();
                 combinedProducts1.addAll(allProducts1);
@@ -167,7 +166,6 @@ public class UserProductActionsController {
                 List<Response_ProductInfo> combinedProducts = combinedProducts1.stream().collect(Collectors.toSet())
                                 .stream().limit(40)
                                 .collect(Collectors.toList());//
-
                 int start = (int) Math.min((long) page * size, combinedProducts.size());
                 int end = (int) Math.min(start + size, combinedProducts.size());
                 // Extract the current page's content

@@ -65,7 +65,7 @@ public class JwtService {
 
 		return Jwts.builder().setClaims(claims).setClaims(map).setSubject(username)
 				.setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 5)) // 5 phút
+				.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10080)) // 5 phút
 				.signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
 	}
 

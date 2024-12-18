@@ -60,7 +60,8 @@ public class Service_Home {
 
     public List<Response_ChartAccount> getCharAccount() {
         List<Response_ChartAccount> list = new ArrayList<>();
-        list.add(createChartNhanVien("Nhân viên sàn"));
+        // list.add(createChartNhanVien("Nhân viên sàn"));
+        list.add(createChartAccount("Nhân viên sàn", 2));
         list.add(createChartAccount("Người bán", 3));
         list.add(createChartAccount("Khách hàng", 4));
         return list;
