@@ -272,9 +272,8 @@ public class Service_Account {
                 } else {
                         pageAccount = (gender == null)
                                         ? accountRepository
-                                                        .findAllByUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContainingAndStatusAndRoleAndNumberIdIsNotNull(
-                                                                        search, search, search, search, true,
-                                                                        role,
+                                                        .findByStatusAndRoleAndNumberIdIsNotNullAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContaining(
+                                                                        true, role, search, search, search, search,
                                                                         pageable)
                                         : accountRepository
                                                         .findAllByGenderAndStatusAndRoleAndUsernameContainingOrFullnameContainingOrEmailContainingOrPhoneContainingAndNumberIdIsNotNull(
