@@ -45,13 +45,19 @@ public class Service_Autosave {
     @Scheduled(fixedDelay = 604800016) // 1 tuần
     // @Scheduled(fixedDelay = 100)
     public void run() {
-        productRepository.findAllCreatedBeforeSevenDays().forEach(product -> {
-            service_Product.updateActive(product.getId(), true, null, null);
-        });
-        accountRepository.listAccountBeforeSevenDays().forEach(account -> {
-            service_Account.updateActive(account.getId(), true, null, null);
-        });
-        service_Log.deleteList(logRepository.selectAllCreatedBeforeSevenDays());
+        if (productRepository.findAllCreatedBeforeSevenDays().size() > 0) {
+            productRepository.findAllCreatedBeforeSevenDays().forEach(product -> {
+                service_Product.updateActive(product.getId(), true, null, null);
+            });
+        }
+        if (accountRepository.listAccountBeforeSevenDays().size() > 0) {
+            accountRepository.listAccountBeforeSevenDays().forEach(account -> {
+                service_Account.updateActive(account.getId(), true, null, null);
+            });
+        }
+        if (logRepository.selectAllCreatedBeforeSevenDays().size() > 0) {
+            service_Log.deleteList(logRepository.selectAllCreatedBeforeSevenDays());
+        }
     }
 
     // @Scheduled(fixedDelay = 60000) // 1 phút

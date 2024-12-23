@@ -24,21 +24,26 @@ public class LogUtil {
     @Autowired
     AccountRepository accountRepository;
 
-    public void setLog(Class<?> logClass, Integer accountID, String level, String tableName, Object dataOld,Object dataNew,
+    public void setLog(Class<?> logClass, Integer accountID, String level, String tableName, Object dataOld,
+            Object dataNew,
             String action_type) {
         // Logger logger = LogManager.getLogger(logClass);
-        Account account = accountRepository.findById(accountID)
-                .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
         Log log = new Log();
+        if (accountID != null) {
+            Account account = accountRepository.findById(accountID)
+                    .orElseThrow(() -> new AppException(ErrorCode.OBJECT_NOT_FOUND, "Account"));
+            log.setAccount(account);
+        } else {
+            log.setAccount(null);
+        }
         log.setLevel(level);
-        log.setAccount(account);
         log.setAction_type(action_type);
         log.setTableName(tableName);
         String jsonDataOld = convertToJson(dataOld);
 
         log.setDataOld(jsonDataOld);
-        
-        String jsonDataNew = convertToJson(dataNew); 
+
+        String jsonDataNew = convertToJson(dataNew);
 
         log.setDataNew(jsonDataNew);
         com.toel.util.log.LogManager logManager = new com.toel.util.log.LogManager();
