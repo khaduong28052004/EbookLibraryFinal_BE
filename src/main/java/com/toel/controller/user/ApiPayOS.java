@@ -20,7 +20,7 @@ import vn.payos.type.ItemData;
 import vn.payos.type.PaymentData;
 
 @RestController
-//@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+// @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequestMapping("api/v1/user")
 public class ApiPayOS {
 	private final PayOS payOS;
@@ -39,12 +39,12 @@ public class ApiPayOS {
 	@RequestMapping(value = "/success")
 	public void Success(HttpServletResponse response) throws IOException {
 		service_Pay.createOrder(requestPay, id_user, 3, id_address);
-		response.sendRedirect("http://localhost:5173/profile#order");
+		response.sendRedirect("https://toel.online/profile#order");
 	}
 
 	@RequestMapping(value = "/cancel")
 	public void Cancel(HttpServletResponse response) throws IOException {
-		response.sendRedirect("http://localhost:5173/cart");
+		response.sendRedirect("https://toel.online/cart");
 	}
 
 	@PostMapping("/create-payment-link")
@@ -58,8 +58,8 @@ public class ApiPayOS {
 			requestPay = pay;
 			final String productName = "THANH TOAN " + pay.getDatas().size() + " DON HANG TOEL";
 			final String description = "Thanh toán đơn hàng";
-			final String returnUrl = "http://localhost:8080/api/v1/user/success";
-			final String cancelUrl = "http://localhost:8080/api/v1/user/cancel";
+			final String returnUrl = "https://java.toel.online/api/v1/user/success";
+			final String cancelUrl = "https://java.toel.online/api/v1/user/cancel";
 			System.err.println("order =================================" + totalOrder);
 			Integer totalOrderNew = (int) totalOrder;
 			String total = String.valueOf(totalOrderNew).replace(".0", "");
